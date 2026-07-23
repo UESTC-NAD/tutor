@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>解三角形与平面向量 · 习题详解（11–19）</title>
+<style>
+  :root{
+    --ink:#20304d; --muted:#5c6b82; --line:#e3e7ee;
+    --navy:#23324c; --blue:#2f6fb0; --blue-soft:#eaf2fa;
+    --green:#2e7d46; --green-bg:#eaf6ee; --green-line:#bfe3ca;
+    --amber:#a15c00; --amber-bg:#fdf3e2;
+    --page:#f4f6f9; --card:#ffffff; --eq-bg:#f8fafc;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--page); color:var(--ink);
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",-apple-system,Segoe UI,Roboto,sans-serif;
+    line-height:1.85; font-size:16px;
+  }
+  .wrap{max-width:900px; margin:0 auto; padding:28px 20px 80px;}
+  header.top{
+    background:linear-gradient(135deg,#23324c,#33507a);
+    color:#fff; border-radius:16px; padding:26px 28px; margin-bottom:22px;
+    box-shadow:0 6px 22px rgba(35,50,76,.18);
+  }
+  header.top h1{margin:0 0 6px; font-size:24px; letter-spacing:.5px;}
+  header.top p{margin:2px 0; color:#d7e2f2; font-size:14px;}
+  h2.sec{
+    margin:34px 0 4px; font-size:20px; color:#fff;
+    background:var(--blue); padding:12px 18px; border-radius:12px 12px 0 0;
+    box-shadow:0 3px 10px rgba(47,111,176,.2);
+  }
+  h2.sec small{display:block; font-weight:400; font-size:13px; color:#e3eefa; margin-top:3px; line-height:1.6;}
+  .sec-body{padding-top:14px;}
+  .q{
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:18px 20px 16px; margin:0 0 16px;
+    box-shadow:0 1px 3px rgba(20,40,80,.05);
+  }
+  .q-head{display:flex; gap:12px; align-items:flex-start;}
+  .q-num{
+    flex:0 0 auto; width:30px; height:30px; border-radius:50%;
+    background:var(--navy); color:#fff; font-weight:700; font-size:15px;
+    display:flex; align-items:center; justify-content:center; margin-top:2px;
+  }
+  .q-body{flex:1;}
+  .tag{
+    display:inline-block; font-size:12px; padding:1px 8px; border-radius:20px;
+    background:var(--blue-soft); color:var(--blue); margin-left:6px; vertical-align:middle; white-space:nowrap;
+  }
+  .stem{margin:2px 0 2px;}
+  .sol{
+    margin:12px 0 0 42px; padding:14px 16px; background:var(--eq-bg);
+    border-left:4px solid var(--blue); border-radius:0 8px 8px 0;
+  }
+  .sol .lab{font-weight:700; color:var(--blue); font-size:14px; margin-bottom:4px; letter-spacing:.5px;}
+  .sol p{margin:7px 0;}
+  .sol ul,.sol ol{margin:6px 0; padding-left:20px;}
+  .sol li{margin:5px 0;}
+  .eq{
+    background:#eef3fb; border-radius:8px; padding:7px 12px; margin:8px 0; text-align:center;
+    overflow-x:auto;
+  }
+  .small{color:var(--muted); font-size:13.5px;}
+  .ans{
+    margin:12px 0 0 42px; padding:9px 16px; background:var(--green-bg);
+    border:1px solid var(--green-line); border-radius:8px;
+    color:var(--green); font-size:15px;
+  }
+  .ans b{color:#1b5e20;}
+  .kw{color:var(--blue); font-weight:600;}
+  .note{
+    background:var(--amber-bg); border:1px solid #f0d9ad; color:#7a4b06;
+    border-radius:12px; padding:14px 18px; margin:0 0 6px; font-size:14px;
+  }
+  .foot{text-align:center; color:var(--muted); font-size:13px; margin-top:40px;}
+  /* ---- 自绘数学记号（不依赖外部库/字体，离线可用） ---- */
+  .v{position:relative; display:inline-block; white-space:nowrap; padding-top:.2em; vertical-align:baseline;}
+  .v::before{content:"\2192"; position:absolute; top:-.34em; left:0; right:0; text-align:center; font-size:.72em; font-weight:400; line-height:1;}
+  .bv{font-weight:700; font-style:italic; font-family:"Times New Roman",serif;}
+  .m{font-style:italic; font-family:"Times New Roman",serif;}
+  .frac{display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; font-size:.82em; line-height:1.12; margin:0 .14em; position:relative; top:-0.06em;}
+  .frac>span{display:block; padding:0 .32em;}
+  .frac .n{border-bottom:1.3px solid currentColor;}
+  sup,sub{font-size:.72em;}
+  figure.fig{margin:12px 0 4px 42px; text-align:center;}
+  figure.fig svg{max-width:100%; height:auto; background:#fff; border:1px solid var(--line); border-radius:8px;}
+  figure.fig figcaption{font-size:12.5px; color:var(--muted); margin-top:5px;}
+  @media(max-width:560px){ figure.fig{margin-left:0;} }
+  @media print{
+    body{background:#fff;}
+    .q,.note,header.top{box-shadow:none;}
+    .q{break-inside:avoid;}
+    h2.sec{break-after:avoid;}
+  }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#c0392b"/></marker>
+  <marker id="ab" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2f6fb0"/></marker>
+  <marker id="ag" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#5c6b82"/></marker>
+  <marker id="agn" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2e7d46"/></marker>
+</defs></svg>
+<div class="wrap">
+<header class="top">
+  <h1>解三角形与平面向量 · 习题详解</h1>
+  <p>第 11–19 题 · 正弦/余弦定理 · 向量平行与垂直 · 方位角实际应用 · 中线与面积</p>
+  <p>公式全部用纯 CSS 记号绘制，离线、iPad 均可正常显示。</p>
+</header>
+
+<!-- ================= 选择 · 填空 ================= -->
+<h2 class="sec">一、选择与填空（11–14）<small>余弦定理 · 向量平行的坐标条件 · 锐角三角形取值范围</small></h2>
+<div class="sec-body">
+
+<!-- 11 -->
+<div class="q">
+  <div class="q-head"><div class="q-num">11</div><div class="q-body">
+    <div class="stem">货轮在 <span class="m">A</span> 处看灯塔 <span class="m">B</span> 在北偏东 75°、距离 12√6 n mile；看灯塔 <span class="m">C</span> 在北偏西 30°、距离 8√3 n mile。货轮由 <span class="m">A</span> 向正北航行到 <span class="m">D</span> 处时，看灯塔 <span class="m">B</span> 在南偏东 60° 方向。下列说法正确的是（　）<span class="tag">多选·方位角</span></div>
+    <div class="stem">A. <span class="m">A</span> 与 <span class="m">D</span> 间距离为 24 n mile　　B. 灯塔 <span class="m">C</span> 与 <span class="m">D</span> 间距离为 16 n mile<br>
+    C. 灯塔 <span class="m">C</span> 在 <span class="m">D</span> 的西偏南 60° 方向　　D. <span class="m">D</span> 在灯塔 <span class="m">B</span> 的北偏西 30° 方向</div>
+  </div></div>
+  <figure class="fig">
+    <svg viewBox="0 0 370 288" width="360">
+      <line x1="120" y1="250" x2="120" y2="82" stroke="#5c6b82" stroke-width="1.6" marker-end="url(#ag)"/>
+      <line x1="120" y1="250" x2="315" y2="198" stroke="#c0392b" stroke-width="1.8" marker-end="url(#ar)"/>
+      <line x1="120" y1="250" x2="74" y2="166" stroke="#2f6fb0" stroke-width="1.8" marker-end="url(#ab)"/>
+      <line x1="120" y1="82" x2="315" y2="198" stroke="#999" stroke-width="1.1" stroke-dasharray="4 3"/>
+      <circle cx="120" cy="250" r="3"/><circle cx="120" cy="82" r="3"/>
+      <circle cx="315" cy="198" r="3" fill="#c0392b"/><circle cx="74" cy="166" r="3" fill="#2f6fb0"/>
+      <text x="104" y="266" font-size="13">A</text>
+      <text x="321" y="202" font-size="13" fill="#c0392b">B</text>
+      <text x="60" y="164" font-size="13" fill="#2f6fb0">C</text>
+      <text x="126" y="94" font-size="13">D</text>
+      <text x="128" y="78" font-size="11" fill="#5c6b82">北</text>
+      <text x="230" y="216" font-size="11" fill="#c0392b">12√6</text>
+      <text x="66" y="212" font-size="11" fill="#2f6fb0">8√3</text>
+      <text x="126" y="172" font-size="11" fill="#5c6b82">AD=24</text>
+      <text x="129" y="236" font-size="10.5" fill="#c0392b">75°</text>
+      <text x="95" y="234" font-size="10.5" fill="#2f6fb0">30°</text>
+    </svg>
+    <figcaption>A 处正北航行至 D；红线视灯塔 B、蓝线视灯塔 C，虚线为 D 处对 B 的视线</figcaption>
+  </figure>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p><b>判断 A：</b>在 △<span class="m">ABD</span> 中，<span class="m">AD</span> 为正北。∠<span class="m">DAB</span>=75°（北与北偏东 75° 之夹角）；<span class="m">D</span> 处看 <span class="m">B</span> 为南偏东 60°，<span class="m">DA</span> 指向正南，故 ∠<span class="m">ADB</span>=60°；从而 ∠<span class="m">ABD</span>=180°−75°−60°=45°。</p>
+    <div class="eq"><span class="m">AD</span> = 12√6 · <span class="frac"><span class="n">sin45°</span><span class="d">sin60°</span></span> = 12√6 · <span class="frac"><span class="n">√2⁄2</span><span class="d">√3⁄2</span></span> = 12√6 · <span class="frac"><span class="n">√2</span><span class="d">√3</span></span> = 24　→ A 正确</div>
+    <p><b>判断 B、C：</b>在 △<span class="m">ACD</span> 中，<span class="m">AC</span>=8√3，<span class="m">AD</span>=24，∠<span class="m">CAD</span>=30°。</p>
+    <div class="eq"><span class="m">CD</span><sup>2</sup> = <span class="m">AC</span><sup>2</sup>+<span class="m">AD</span><sup>2</sup>−2·<span class="m">AC</span>·<span class="m">AD</span>·cos30° = 192+576−576 = 192</div>
+    <div class="eq"><span class="m">CD</span> = √192 = 8√3 ≈ 13.9 ≠ 16　→ B 错误</div>
+    <p>又 <span class="m">AC</span>=<span class="m">CD</span>=8√3，△<span class="m">ACD</span> 等腰，∠<span class="m">ADC</span>=∠<span class="m">CAD</span>=30°。<span class="m">DA</span> 指向正南、<span class="m">C</span> 在西侧，故 <span class="m">C</span> 在 <span class="m">D</span> 的南偏西 30°，即 <span class="kw">西偏南 60°</span> → C 正确。</p>
+    <p><b>判断 D：</b><span class="m">D</span> 处看 <span class="m">B</span> 为南偏东 60°，反向即 <span class="m">B</span> 处看 <span class="m">D</span> 为北偏西 60°（非 30°）→ D 错误。</p>
+  </div>
+  <div class="ans"><b>答案：A C</b></div>
+</div>
+
+<!-- 12 -->
+<div class="q">
+  <div class="q-head"><div class="q-num">12</div><div class="q-body">
+    <div class="stem">在 △<span class="m">ABC</span> 中，<span class="m">a</span>·sin<span class="m">A</span>+<span class="m">b</span>·sin<span class="m">B</span>=<span class="m">c</span>·sin<span class="m">C</span>−√3·<span class="m">b</span>·sin<span class="m">A</span>，则 <span class="m">C</span>= ____。<span class="tag">余弦定理</span></div>
+  </div></div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>由正弦定理（sin<span class="m">A</span> : sin<span class="m">B</span> : sin<span class="m">C</span> = <span class="m">a</span> : <span class="m">b</span> : <span class="m">c</span>），两边同乘 2<span class="m">R</span>：</p>
+    <div class="eq"><span class="m">a</span><sup>2</sup>+<span class="m">b</span><sup>2</sup>=<span class="m">c</span><sup>2</sup>−√3·<span class="m">ab</span>　⇒　<span class="m">a</span><sup>2</sup>+<span class="m">b</span><sup>2</sup>−<span class="m">c</span><sup>2</sup>=−√3·<span class="m">ab</span></div>
+    <div class="eq">cos<span class="m">C</span> = <span class="frac"><span class="n"><span class="m">a</span><sup>2</sup>+<span class="m">b</span><sup>2</sup>−<span class="m">c</span><sup>2</sup></span><span class="d">2<span class="m">ab</span></span></span> = <span class="frac"><span class="n">−√3·<span class="m">ab</span></span><span class="d">2<span class="m">ab</span></span></span> = −<span class="frac"><span class="n">√3</span><span class="d">2</span></span></div>
+  </div>
+  <div class="ans"><b>答案：<span class="m">C</span> = <span class="frac"><span class="n">5π</span><span class="d">6</span></span>（即 150°）</b></div>
+</div>
+
+<!-- 13 -->
+<div class="q">
+  <div class="q-head"><div class="q-num">13</div><div class="q-body">
+    <div class="stem">△<span class="m">ABC</span> 中，<b class="bv">m</b>=(<span class="m">a</span>+<span class="m">b</span>, sin<span class="m">C</span>)，<b class="bv">n</b>=(√3·<span class="m">a</span>+<span class="m">c</span>, sin<span class="m">B</span>−sin<span class="m">A</span>)，若 <b class="bv">m</b>∥<b class="bv">n</b>，求角 <span class="m">B</span>。<span class="tag">向量平行</span></div>
+  </div></div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>由 <b class="bv">m</b>∥<b class="bv">n</b> 得 (<span class="m">a</span>+<span class="m">b</span>)(sin<span class="m">B</span>−sin<span class="m">A</span>)−sin<span class="m">C</span>·(√3·<span class="m">a</span>+<span class="m">c</span>)=0，用正弦定理化边：</p>
+    <div class="eq">(<span class="m">a</span>+<span class="m">b</span>)(<span class="m">b</span>−<span class="m">a</span>)−<span class="m">c</span>(√3·<span class="m">a</span>+<span class="m">c</span>)=0　⇒　<span class="m">b</span><sup>2</sup>−<span class="m">a</span><sup>2</sup>=√3·<span class="m">ac</span>+<span class="m">c</span><sup>2</sup></div>
+    <div class="eq"><span class="m">a</span><sup>2</sup>+<span class="m">c</span><sup>2</sup>−<span class="m">b</span><sup>2</sup>=−√3·<span class="m">ac</span>　⇒　cos<span class="m">B</span> = <span class="frac"><span class="n"><span class="m">a</span><sup>2</sup>+<span class="m">c</span><sup>2</sup>−<span class="m">b</span><sup>2</sup></span><span class="d">2<span class="m">ac</span></span></span> = −<span class="frac"><span class="n">√3</span><span class="d">2</span></span></div>
+  </div>
+  <div class="ans"><b>答案：<span class="m">B</span> = <span class="frac"><span class="n">5π</span><span class="d">6</span></span>（即 150°）</b></div>
+</div>
+
+<!-- 14 -->
+<div class="q">
+  <div class="q-head"><div class="q-num">14</div><div class="q-body">
+    <div class="stem">锐角 △<span class="m">ABC</span> 中，<span class="m">a</span>=1，<span class="m">B</span>=2<span class="m">A</span>，求 <span class="m">b</span> 的取值范围。<span class="tag">取值范围</span></div>
+  </div></div>
+  <figure class="fig">
+    <svg viewBox="0 0 300 178" width="270">
+      <polygon points="150,40 60,150 250,150" fill="none" stroke="#333" stroke-width="1.5"/>
+      <circle cx="150" cy="40" r="2.6"/><circle cx="60" cy="150" r="2.6"/><circle cx="250" cy="150" r="2.6"/>
+      <text x="146" y="32" font-size="13">A</text>
+      <text x="46" y="163" font-size="13">B</text>
+      <text x="256" y="163" font-size="13">C</text>
+      <text x="150" y="167" font-size="11" fill="#5c6b82">a = 1（对 A）</text>
+      <text x="206" y="98" font-size="11" fill="#5c6b82">b（对 B）</text>
+      <text x="151" y="60" font-size="11" fill="#c0392b">A</text>
+      <text x="74" y="142" font-size="11" fill="#c0392b">2A</text>
+    </svg>
+    <figcaption>锐角三角形：∠B = 2∠A，∠C = π − 3A；a = 1 对 A，b = 2cosA</figcaption>
+  </figure>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>由正弦定理 <span class="m">b</span> = <span class="frac"><span class="n"><span class="m">a</span>·sin<span class="m">B</span></span><span class="d">sin<span class="m">A</span></span></span> = <span class="frac"><span class="n">sin2<span class="m">A</span></span><span class="d">sin<span class="m">A</span></span></span> = 2cos<span class="m">A</span>。三个内角 <span class="m">A</span>、2<span class="m">A</span>、π−3<span class="m">A</span> 均为锐角：</p>
+    <ul>
+      <li>2<span class="m">A</span> &lt; <span class="frac"><span class="n">π</span><span class="d">2</span></span>　⇒　<span class="m">A</span> &lt; <span class="frac"><span class="n">π</span><span class="d">4</span></span>；</li>
+      <li>π−3<span class="m">A</span> &lt; <span class="frac"><span class="n">π</span><span class="d">2</span></span>　⇒　<span class="m">A</span> &gt; <span class="frac"><span class="n">π</span><span class="d">6</span></span>。</li>
+    </ul>
+    <p>故 <span class="m">A</span> ∈ (<span class="frac"><span class="n">π</span><span class="d">6</span></span>, <span class="frac"><span class="n">π</span><span class="d">4</span></span>)，cos<span class="m">A</span> ∈ (<span class="frac"><span class="n">√2</span><span class="d">2</span></span>, <span class="frac"><span class="n">√3</span><span class="d">2</span></span>)，<span class="m">b</span>=2cos<span class="m">A</span> ∈ (√2, √3)。</p>
+  </div>
+  <div class="ans"><b>答案：<span class="m">b</span> ∈ ( √2 , √3 )</b></div>
+</div>
+
+</div><!-- /sec1 -->
+
+<!-- ================= 解答题 ================= -->
+<h2 class="sec">二、解答题（15–19）<small>向量运算 · 解三角形综合 · 方位角实际应用 · 中线与面积</small></h2>
+<div class="sec-body">
+
+<!-- 15 -->
+<div class="q">
+  <div class="q-head"><div class="q-num">15</div><div class="q-body">
+    <div class="stem">（13 分）已知平面向量 <b class="bv">a</b>=(1, <span class="m">x</span>)，<b class="bv">b</b>=(2<span class="m">x</span>+3, −<span class="m">x</span>)，<span class="m">x</span>∈<b>R</b>。（1）若 <b class="bv">a</b>⊥<b class="bv">b</b>，求 <span class="m">x</span>；（2）若 <b class="bv">a</b>∥<b class="bv">b</b>，求 |<b class="bv">a</b>−<b class="bv">b</b>|。<span class="tag">平面向量</span></div>
+  </div></div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p><b>（1）垂直：</b><b class="bv">a</b>·<b class="bv">b</b>=0。</p>
+    <div class="eq">1·(2<span class="m">x</span>+3)+<span class="m">x</span>·(−<span class="m">x</span>)=0 ⇒ <span class="m">x</span><sup>2</sup>−2<span class="m">x</span>−3=0 ⇒ (<span class="m">x</span>−3)(<span class="m">x</span>+1)=0</div>
+    <p>⇒ <span class="m">x</span>=3 或 <span class="m">x</span>=−1。</p>
+    <p><b>（2）平行：</b>1·(−<span class="m">x</span>)−<span class="m">x</span>·(2<span class="m">x</span>+3)=0 ⇒ −2<span class="m">x</span><sup>2</sup>−4<span class="m">x</span>=0 ⇒ <span class="m">x</span>=0 或 <span class="m">x</span>=−2。</p>
+    <ul>
+      <li><span class="m">x</span>=0：<b class="bv">a</b>=(1, 0)，<b class="bv">b</b>=(3, 0)，<b class="bv">a</b>−<b class="bv">b</b>=(−2, 0)，|<b class="bv">a</b>−<b class="bv">b</b>|=2；</li>
+      <li><span class="m">x</span>=−2：<b class="bv">a</b>=(1, −2)，<b class="bv">b</b>=(−1, 2)，<b class="bv">a</b>−<b class="bv">b</b>=(2, −4)，|<b class="bv">a</b>−<b class="bv">b</b>|=√(4+16)=2√5。</li>
+    </ul>
+  </div>
+  <div class="ans"><b>答案：（1）<span class="m">x</span>=3 或 −1；（2）|<b class="bv">a</b>−<b class="bv">b</b>|=2 或 2√5</b></div>
+</div>
+
+<!-- 16 -->
+<div class="q">
+  <div class="q-head"><div class="q-num">16</div><div class="q-body">
+    <div class="stem">（15 分）四边形 <span class="m">ABCD</span> 中，<span class="m">AD</span>∥<span class="m">BC</span>，<span class="m">AD</span>=6，<span class="m">BC</span>=4，<span class="m">CD</span>=2，∠<span class="m">CBD</span>=30°。（1）求 <span class="m">BD</span>；（2）求 <span class="m">A</span>。<span class="tag">解三角形</span></div>
+  </div></div>
+  <figure class="fig">
+    <svg viewBox="0 0 315 180" width="300">
+      <polygon points="40,150 142,91 278,91 244,150" fill="none" stroke="#333" stroke-width="1.5"/>
+      <line x1="142" y1="91" x2="244" y2="150" stroke="#2f6fb0" stroke-width="1.6"/>
+      <polyline points="249,141 240,136 235,145" fill="none" stroke="#2f6fb0" stroke-width="1.1"/>
+      <circle cx="40" cy="150" r="2.6"/><circle cx="142" cy="91" r="2.6"/><circle cx="278" cy="91" r="2.6"/><circle cx="244" cy="150" r="2.6"/>
+      <text x="30" y="163" font-size="13">A</text>
+      <text x="134" y="85" font-size="13">B</text>
+      <text x="282" y="88" font-size="13">C</text>
+      <text x="248" y="165" font-size="13">D</text>
+      <text x="130" y="164" font-size="11" fill="#5c6b82">AD = 6</text>
+      <text x="196" y="84" font-size="11" fill="#5c6b82">BC = 4</text>
+      <text x="256" y="123" font-size="11" fill="#5c6b82">CD = 2</text>
+      <text x="172" y="132" font-size="11" fill="#2f6fb0">BD = 2√3</text>
+      <text x="158" y="107" font-size="10.5" fill="#c0392b">30°</text>
+    </svg>
+    <figcaption>梯形 ABCD（AD∥BC）；对角线 BD 使 ∠BDC = 90°、∠CBD = 30°</figcaption>
+  </figure>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p><b>（1）求 <span class="m">BD</span>：</b>在 △<span class="m">BCD</span> 中，<span class="m">BC</span>=4，<span class="m">CD</span>=2，∠<span class="m">CBD</span>=30°，由正弦定理：</p>
+    <div class="eq">sin∠<span class="m">BDC</span> = <span class="frac"><span class="n"><span class="m">BC</span>·sin30°</span><span class="d"><span class="m">CD</span></span></span> = <span class="frac"><span class="n">4×½</span><span class="d">2</span></span> = 1　⇒　∠<span class="m">BDC</span>=90°</div>
+    <div class="eq"><span class="m">BD</span> = √(<span class="m">BC</span><sup>2</sup>−<span class="m">CD</span><sup>2</sup>) = √(16−4) = 2√3</div>
+    <p><b>（2）求 <span class="m">A</span>：</b>因 <span class="m">AD</span>∥<span class="m">BC</span>、<span class="m">BD</span> 为截线，故 ∠<span class="m">ADB</span>=∠<span class="m">DBC</span>=30°。在 △<span class="m">ABD</span> 中，<span class="m">AD</span>=6，<span class="m">BD</span>=2√3，∠<span class="m">ADB</span>=30°：</p>
+    <div class="eq"><span class="m">AB</span><sup>2</sup> = 36+12−2·6·2√3·<span class="frac"><span class="n">√3</span><span class="d">2</span></span> = 48−36 = 12</div>
+    <p>即 <span class="m">AB</span>=2√3=<span class="m">BD</span>，△<span class="m">ABD</span> 等腰，∠<span class="m">A</span>=∠<span class="m">ADB</span>=30°。</p>
+  </div>
+  <div class="ans"><b>答案：（1）<span class="m">BD</span>=2√3；（2）<span class="m">A</span>=<span class="frac"><span class="n">π</span><span class="d">6</span></span>（30°）</b></div>
+</div>
+
+<!-- 17 -->
+<div class="q">
+  <div class="q-head"><div class="q-num">17</div><div class="q-body">
+    <div class="stem">（15 分）锐角 △<span class="m">ABC</span> 中，<span class="m">a</span>、<span class="m">b</span>、<span class="m">c</span> 为角 <span class="m">A</span>、<span class="m">B</span>、<span class="m">C</span> 的对边，<b class="bv">m</b>=(2<span class="m">b</span>−<span class="m">c</span>, cos<span class="m">C</span>)，<b class="bv">n</b>=(<span class="m">a</span>, cos<span class="m">A</span>)，且 <b class="bv">m</b>∥<b class="bv">n</b>。（1）求角 <span class="m">A</span>；（2）求 <span class="m">y</span>=2sin<sup>2</sup><span class="m">B</span>+cos(<span class="frac"><span class="n">π</span><span class="d">3</span></span>−2<span class="m">B</span>) 的值域。<span class="tag">向量+三角</span></div>
+  </div></div>
+  <figure class="fig">
+    <svg viewBox="0 0 300 178" width="270">
+      <polygon points="150,42 62,150 248,150" fill="none" stroke="#333" stroke-width="1.5"/>
+      <circle cx="150" cy="42" r="2.6"/><circle cx="62" cy="150" r="2.6"/><circle cx="248" cy="150" r="2.6"/>
+      <text x="146" y="34" font-size="13">A</text>
+      <text x="50" y="163" font-size="13">B</text>
+      <text x="252" y="163" font-size="13">C</text>
+      <text x="151" y="166" font-size="11" fill="#5c6b82">a</text>
+      <text x="205" y="98" font-size="11" fill="#5c6b82">b</text>
+      <text x="98" y="98" font-size="11" fill="#5c6b82">c</text>
+      <text x="149" y="66" font-size="11" fill="#c0392b">A = 60°</text>
+    </svg>
+    <figcaption>锐角三角形，由 m∥n 得 A = π/3；B∈(π/6, π/2)，据此求 y 的值域</figcaption>
+  </figure>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p><b>（1）求 <span class="m">A</span>：</b>由 <b class="bv">m</b>∥<b class="bv">n</b>：(2<span class="m">b</span>−<span class="m">c</span>)cos<span class="m">A</span>−<span class="m">a</span>·cos<span class="m">C</span>=0，正弦定理化角：</p>
+    <div class="eq">2sin<span class="m">B</span>·cos<span class="m">A</span> = sin<span class="m">A</span>·cos<span class="m">C</span>+cos<span class="m">A</span>·sin<span class="m">C</span> = sin(<span class="m">A</span>+<span class="m">C</span>) = sin<span class="m">B</span></div>
+    <p>因 sin<span class="m">B</span>≠0，得 cos<span class="m">A</span>=½，<span class="m">A</span>=<span class="frac"><span class="n">π</span><span class="d">3</span></span>。</p>
+    <p><b>（2）求值域：</b>用 2sin<sup>2</sup><span class="m">B</span>=1−cos2<span class="m">B</span>，展开 cos(<span class="frac"><span class="n">π</span><span class="d">3</span></span>−2<span class="m">B</span>)=½cos2<span class="m">B</span>+<span class="frac"><span class="n">√3</span><span class="d">2</span></span>sin2<span class="m">B</span>：</p>
+    <div class="eq"><span class="m">y</span> = 1−cos2<span class="m">B</span>+½cos2<span class="m">B</span>+<span class="frac"><span class="n">√3</span><span class="d">2</span></span>sin2<span class="m">B</span> = 1+<span class="frac"><span class="n">√3</span><span class="d">2</span></span>sin2<span class="m">B</span>−½cos2<span class="m">B</span> = 1+sin(2<span class="m">B</span>−<span class="frac"><span class="n">π</span><span class="d">6</span></span>)</div>
+    <p>锐角三角形且 <span class="m">A</span>=<span class="frac"><span class="n">π</span><span class="d">3</span></span>：<span class="m">B</span>&lt;<span class="frac"><span class="n">π</span><span class="d">2</span></span> 且 <span class="m">C</span>=<span class="frac"><span class="n">2π</span><span class="d">3</span></span>−<span class="m">B</span>&lt;<span class="frac"><span class="n">π</span><span class="d">2</span></span> ⇒ <span class="m">B</span>&gt;<span class="frac"><span class="n">π</span><span class="d">6</span></span>，即 <span class="m">B</span>∈(<span class="frac"><span class="n">π</span><span class="d">6</span></span>, <span class="frac"><span class="n">π</span><span class="d">2</span></span>)。</p>
+    <div class="eq">2<span class="m">B</span>−<span class="frac"><span class="n">π</span><span class="d">6</span></span> ∈ (<span class="frac"><span class="n">π</span><span class="d">6</span></span>, <span class="frac"><span class="n">5π</span><span class="d">6</span></span>)　⇒　sin(2<span class="m">B</span>−<span class="frac"><span class="n">π</span><span class="d">6</span></span>) ∈ ( ½ , 1 ]</div>
+  </div>
+  <div class="ans"><b>答案：（1）<span class="m">A</span>=<span class="frac"><span class="n">π</span><span class="d">3</span></span>；（2）<span class="m">y</span>∈( <span class="frac"><span class="n">3</span><span class="d">2</span></span> , 2 ]</b></div>
+</div>
+
+<!-- 18 -->
+<div class="q">
+  <div class="q-head"><div class="q-num">18</div><div class="q-body">
+    <div class="stem">（17 分）<span class="m">A</span>、<span class="m">B</span> 为东西方向相距 (3+√3) n mile 的两观测点。渔船 <span class="m">D</span> 位于 <span class="m">A</span> 的北偏东 60°、<span class="m">B</span> 的西北（北偏西 45°）方向。救援船 <span class="m">C</span> 位于 <span class="m">B</span> 的南偏西 75°、距 <span class="m">B</span> 为 3√6 n mile 处，速度 30 n mile/h。（1）求 <span class="m">B</span> 到渔船 <span class="m">D</span> 的距离；（2）<span class="m">C</span> 处救援船到达 <span class="m">D</span> 需多长时间？<span class="tag">方位角应用</span></div>
+  </div></div>
+  <figure class="fig">
+    <svg viewBox="0 0 300 224" width="300">
+      <line x1="100" y1="130" x2="261" y2="130" stroke="#333" stroke-width="1.4"/>
+      <line x1="100" y1="130" x2="100" y2="103" stroke="#2f6fb0" stroke-width="1.2" marker-end="url(#ab)"/>
+      <line x1="261" y1="130" x2="261" y2="103" stroke="#2f6fb0" stroke-width="1.2" marker-end="url(#ab)"/>
+      <line x1="100" y1="130" x2="202" y2="71" stroke="#c0392b" stroke-width="1.7" marker-end="url(#ar)"/>
+      <line x1="261" y1="130" x2="202" y2="71" stroke="#c0392b" stroke-width="1.7" marker-end="url(#ar)"/>
+      <line x1="261" y1="130" x2="20" y2="195" stroke="#5c6b82" stroke-width="1.4"/>
+      <line x1="20" y1="195" x2="202" y2="71" stroke="#2e7d46" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#agn)"/>
+      <circle cx="100" cy="130" r="3"/><circle cx="261" cy="130" r="3"/>
+      <circle cx="202" cy="71" r="3" fill="#c0392b"/><circle cx="20" cy="195" r="3" fill="#2e7d46"/>
+      <text x="88" y="144" font-size="13">A</text>
+      <text x="264" y="144" font-size="13">B</text>
+      <text x="206" y="68" font-size="13" fill="#c0392b">D</text>
+      <text x="6" y="207" font-size="13" fill="#2e7d46">C</text>
+      <text x="92" y="99" font-size="10" fill="#2f6fb0">北</text>
+      <text x="253" y="99" font-size="10" fill="#2f6fb0">北</text>
+      <text x="168" y="145" font-size="11" fill="#5c6b82">3+√3</text>
+      <text x="233" y="98" font-size="11" fill="#c0392b">√6</text>
+      <text x="128" y="180" font-size="11" fill="#5c6b82">3√6</text>
+      <text x="52" y="188" font-size="11" fill="#2e7d46">√42</text>
+      <text x="106" y="119" font-size="10.5" fill="#c0392b">60°</text>
+    </svg>
+    <figcaption>A、B 东西相望；D 为渔船（红），C 为救援船，绿虚线为 C→D 营救航线</figcaption>
+  </figure>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p><b>（1）求 <span class="m">BD</span>：</b>在 △<span class="m">ABD</span> 中，<span class="m">AB</span> 沿正东：∠<span class="m">DAB</span>=90°−60°=30°，∠<span class="m">DBA</span>=90°−45°=45°，故 ∠<span class="m">ADB</span>=105°。由正弦定理（sin105°=<span class="frac"><span class="n">√6+√2</span><span class="d">4</span></span>）：</p>
+    <div class="eq"><span class="m">BD</span> = <span class="frac"><span class="n"><span class="m">AB</span>·sin30°</span><span class="d">sin105°</span></span> = <span class="frac"><span class="n">2(3+√3)</span><span class="d">√6+√2</span></span> = √6</div>
+    <p><b>（2）求 <span class="m">CD</span> 及时间：</b><span class="m">BD</span> 在北偏西 45°，<span class="m">BC</span> 在南偏西 75°，夹角 ∠<span class="m">DBC</span>=45°+15°=60°。在 △<span class="m">BCD</span> 中，<span class="m">BD</span>=√6，<span class="m">BC</span>=3√6：</p>
+    <div class="eq"><span class="m">CD</span><sup>2</sup> = <span class="m">BD</span><sup>2</sup>+<span class="m">BC</span><sup>2</sup>−2·<span class="m">BD</span>·<span class="m">BC</span>·cos60° = 6+54−18 = 42</div>
+    <div class="eq"><span class="m">CD</span> = √42，　<span class="m">t</span> = <span class="frac"><span class="n"><span class="m">CD</span></span><span class="d">30</span></span> = <span class="frac"><span class="n">√42</span><span class="d">30</span></span> h ≈ 0.22 h ≈ 13 min</div>
+  </div>
+  <div class="ans"><b>答案：（1）<span class="m">BD</span>=√6 n mile；（2）<span class="m">CD</span>=√42 n mile，用时 <span class="frac"><span class="n">√42</span><span class="d">30</span></span> 小时（约 13 分钟）</b></div>
+</div>
+
+<!-- 19 -->
+<div class="q">
+  <div class="q-head"><div class="q-num">19</div><div class="q-body">
+    <div class="stem">（17 分·2023 新课标Ⅱ卷）△<span class="m">ABC</span> 内角 <span class="m">A</span>、<span class="m">B</span>、<span class="m">C</span> 的对边为 <span class="m">a</span>、<span class="m">b</span>、<span class="m">c</span>，面积为 √3，<span class="m">D</span> 为 <span class="m">BC</span> 中点，<span class="m">AD</span>=1。（1）若 ∠<span class="m">ADC</span>=<span class="frac"><span class="n">π</span><span class="d">3</span></span>，求 tan<span class="m">B</span>；（2）若 <span class="m">b</span><sup>2</sup>+<span class="m">c</span><sup>2</sup>=8，求 <span class="m">b</span>、<span class="m">c</span>。<span class="tag">中线与面积</span></div>
+  </div></div>
+  <figure class="fig">
+    <svg viewBox="0 0 300 176" width="285">
+      <polygon points="177,102 40,150 260,150" fill="none" stroke="#333" stroke-width="1.5"/>
+      <line x1="177" y1="102" x2="150" y2="150" stroke="#c0392b" stroke-width="1.7"/>
+      <line x1="95" y1="145" x2="95" y2="155" stroke="#2f6fb0" stroke-width="1.3"/>
+      <line x1="205" y1="145" x2="205" y2="155" stroke="#2f6fb0" stroke-width="1.3"/>
+      <circle cx="177" cy="102" r="2.6"/><circle cx="40" cy="150" r="2.6"/><circle cx="260" cy="150" r="2.6"/><circle cx="150" cy="150" r="3" fill="#2f6fb0"/>
+      <text x="180" y="98" font-size="13">A</text>
+      <text x="28" y="156" font-size="13">B</text>
+      <text x="263" y="156" font-size="13">C</text>
+      <text x="143" y="167" font-size="13" fill="#2f6fb0">D</text>
+      <text x="154" y="128" font-size="11" fill="#c0392b">AD = 1</text>
+      <text x="160" y="145" font-size="10.5" fill="#5c6b82">60°</text>
+    </svg>
+    <figcaption>D 为 BC 中点（两侧等分），AD = 1 为中线，S<sub>△ABC</sub> = √3</figcaption>
+  </figure>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p><b>（1）求 tan<span class="m">B</span>：</b><span class="m">D</span> 为中点，<span class="m">S</span><sub>△ABD</sub>=½<span class="m">S</span><sub>△ABC</sub>=<span class="frac"><span class="n">√3</span><span class="d">2</span></span>；∠<span class="m">ADB</span>=π−<span class="frac"><span class="n">π</span><span class="d">3</span></span>=<span class="frac"><span class="n">2π</span><span class="d">3</span></span>。</p>
+    <div class="eq">½·<span class="m">AD</span>·<span class="m">BD</span>·sin<span class="frac"><span class="n">2π</span><span class="d">3</span></span> = <span class="frac"><span class="n">√3</span><span class="d">2</span></span> ⇒ ½·1·<span class="m">BD</span>·<span class="frac"><span class="n">√3</span><span class="d">2</span></span> = <span class="frac"><span class="n">√3</span><span class="d">2</span></span> ⇒ <span class="m">BD</span>=2</div>
+    <p>在 △<span class="m">ABD</span> 中，<span class="m">AD</span>=1，<span class="m">BD</span>=2，∠<span class="m">ADB</span>=<span class="frac"><span class="n">2π</span><span class="d">3</span></span>：</p>
+    <div class="eq"><span class="m">AB</span><sup>2</sup> = 1+4−2·1·2·cos<span class="frac"><span class="n">2π</span><span class="d">3</span></span> = 5+2 = 7 ⇒ <span class="m">AB</span>=√7</div>
+    <div class="eq">sin<span class="m">B</span> = <span class="frac"><span class="n"><span class="m">AD</span>·sin∠<span class="m">ADB</span></span><span class="d"><span class="m">AB</span></span></span> = <span class="frac"><span class="n">√3⁄2</span><span class="d">√7</span></span> = <span class="frac"><span class="n">√21</span><span class="d">14</span></span>，　cos<span class="m">B</span> = <span class="frac"><span class="n">7+4−1</span><span class="d">4√7</span></span> = <span class="frac"><span class="n">5√7</span><span class="d">14</span></span></div>
+    <p>⇒ tan<span class="m">B</span> = sin<span class="m">B</span> / cos<span class="m">B</span> = <span class="frac"><span class="n">√3</span><span class="d">5</span></span>。</p>
+    <p><b>（2）求 <span class="m">b</span>、<span class="m">c</span>：</b>中线长公式 <span class="m">AD</span><sup>2</sup>=<span class="frac"><span class="n">2<span class="m">b</span><sup>2</sup>+2<span class="m">c</span><sup>2</sup>−<span class="m">a</span><sup>2</sup></span><span class="d">4</span></span>，代入 <span class="m">AD</span>=1、<span class="m">b</span><sup>2</sup>+<span class="m">c</span><sup>2</sup>=8：</p>
+    <div class="eq">4 = 2·8−<span class="m">a</span><sup>2</sup> ⇒ <span class="m">a</span><sup>2</sup>=12</div>
+    <p>由面积与余弦定理：cos<span class="m">A</span>=<span class="frac"><span class="n"><span class="m">b</span><sup>2</sup>+<span class="m">c</span><sup>2</sup>−<span class="m">a</span><sup>2</sup></span><span class="d">2<span class="m">bc</span></span></span>=<span class="frac"><span class="n">−2</span><span class="d"><span class="m">bc</span></span></span>，sin<span class="m">A</span>=<span class="frac"><span class="n">2<span class="m">S</span></span><span class="d"><span class="m">bc</span></span></span>=<span class="frac"><span class="n">2√3</span><span class="d"><span class="m">bc</span></span></span>。代入 sin<sup>2</sup><span class="m">A</span>+cos<sup>2</sup><span class="m">A</span>=1：</p>
+    <div class="eq"><span class="frac"><span class="n">12+4</span><span class="d">(<span class="m">bc</span>)<sup>2</sup></span></span> = 1 ⇒ <span class="m">bc</span>=4</div>
+    <p>结合 <span class="m">b</span><sup>2</sup>+<span class="m">c</span><sup>2</sup>=8=2<span class="m">bc</span>，得 (<span class="m">b</span>−<span class="m">c</span>)<sup>2</sup>=0，<span class="m">b</span>=<span class="m">c</span>=2。</p>
+  </div>
+  <div class="ans"><b>答案：（1）tan<span class="m">B</span>=<span class="frac"><span class="n">√3</span><span class="d">5</span></span>；（2）<span class="m">b</span>=<span class="m">c</span>=2</b></div>
+</div>
+
+</div><!-- /sec2 -->
+
+<div class="foot">第 11–19 题 · 解三角形与平面向量专题 · 全部公式纯 CSS 绘制，离线可用</div>
+
+</div>
+</body>
+</html>

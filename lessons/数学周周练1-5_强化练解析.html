@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数学·必修第二册 平面向量 每周强化练 详细解析</title>
+<style>
+  :root{
+    --ink:#20304d; --muted:#5c6b82; --line:#e3e7ee;
+    --navy:#23324c; --blue:#2f6fb0; --blue-soft:#eaf2fa;
+    --green:#2e7d46; --green-bg:#eaf6ee; --green-line:#bfe3ca;
+    --amber:#a15c00; --amber-bg:#fdf3e2;
+    --page:#f4f6f9; --card:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--page); color:var(--ink);
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",-apple-system,Segoe UI,Roboto,sans-serif;
+    line-height:1.85; font-size:16px;
+  }
+  .wrap{max-width:900px; margin:0 auto; padding:28px 20px 80px;}
+  header.top{
+    background:linear-gradient(135deg,#23324c,#33507a);
+    color:#fff; border-radius:16px; padding:26px 28px; margin-bottom:22px;
+    box-shadow:0 6px 22px rgba(35,50,76,.18);
+  }
+  header.top h1{margin:0 0 6px; font-size:24px; letter-spacing:.5px;}
+  header.top p{margin:2px 0; color:#d7e2f2; font-size:14px;}
+  .note{
+    background:var(--amber-bg); border:1px solid #f0d9ad; color:#7a4b06;
+    border-radius:12px; padding:14px 18px; margin-bottom:26px; font-size:14.5px;
+  }
+  .note b{color:#8a3b00;}
+  .note code{background:#f6e6c8; padding:1px 5px; border-radius:4px;}
+  h2.sec{
+    margin:34px 0 4px; font-size:20px; color:#fff;
+    background:var(--blue); padding:12px 18px; border-radius:12px 12px 0 0;
+    box-shadow:0 3px 10px rgba(47,111,176,.2);
+  }
+  h2.sec small{display:block; font-weight:400; font-size:13px; color:#e3eefa; margin-top:3px; line-height:1.6;}
+  .sec-body{padding-top:14px;}
+  .q{
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:18px 20px 16px; margin:0 0 16px;
+    box-shadow:0 1px 3px rgba(20,40,80,.05);
+  }
+  .q-head{display:flex; gap:12px; align-items:flex-start;}
+  .q-num{
+    flex:0 0 auto; width:30px; height:30px; border-radius:50%;
+    background:var(--navy); color:#fff; font-weight:700; font-size:15px;
+    display:flex; align-items:center; justify-content:center; margin-top:2px;
+  }
+  .q-body{flex:1;}
+  .tag{
+    display:inline-block; font-size:12px; padding:1px 8px; border-radius:20px;
+    background:var(--blue-soft); color:var(--blue); margin-left:6px; vertical-align:middle; white-space:nowrap;
+  }
+  .opts{margin:8px 0 4px; padding-left:42px; columns:2; column-gap:24px;}
+  .opts div{break-inside:avoid; margin:3px 0;}
+  @media(max-width:560px){ .opts{columns:1;} }
+  figure.fig{margin:12px 0 6px 42px; text-align:center;}
+  figure.fig svg{max-width:100%; height:auto; background:#fff; border-radius:8px;}
+  figure.fig figcaption{font-size:12.5px; color:var(--muted); margin-top:4px;}
+  .sol{
+    margin:12px 0 0 42px; padding:14px 16px; background:#f8fafc;
+    border-left:4px solid var(--blue); border-radius:0 8px 8px 0;
+  }
+  .sol .lab{font-weight:700; color:var(--blue); font-size:14px; margin-bottom:4px; letter-spacing:.5px;}
+  .sol p{margin:7px 0;}
+  .sol ul{margin:6px 0; padding-left:20px;}
+  .sol li{margin:5px 0;}
+  .small{color:var(--muted); font-size:13.5px;}
+  .ans{
+    margin:12px 0 0 42px; padding:9px 16px; background:var(--green-bg);
+    border:1px solid var(--green-line); border-radius:8px;
+    color:var(--green); font-size:15px;
+  }
+  .ans b{color:#1b5e20;}
+  .kw{color:var(--blue); font-weight:600;}
+  .foot{text-align:center; color:var(--muted); font-size:13px; margin-top:40px;}
+  /* ---- 自绘数学记号（不依赖外部库/字体，离线可用） ---- */
+  .v{position:relative; display:inline-block; white-space:nowrap; padding-top:.2em; vertical-align:baseline;}
+  .v::before{content:"\2192"; position:absolute; top:-.34em; left:0; right:0; text-align:center; font-size:.72em; font-weight:400; line-height:1;}
+  .bv{font-weight:700; font-style:italic; font-family:"Times New Roman",serif;}
+  .frac{display:inline-flex; flex-direction:column; vertical-align:-0.42em; text-align:center; font-size:.82em; line-height:1.08; margin:0 .12em;}
+  .frac>span{display:block; padding:0 .32em;}
+  .frac .n{border-bottom:1.3px solid currentColor;}
+  sup,sub{font-size:.72em;}
+  @media print{
+    body{background:#fff;}
+    .q,.note,header.top{box-shadow:none;}
+    .q{break-inside:avoid;}
+    h2.sec{break-after:avoid;}
+  }
+  /* ---- 快速跳转 / 回到顶部 ---- */
+  html{scroll-behavior:smooth;}
+  .q, h2.sec{scroll-margin-top:14px;}
+  #navBtns{position:fixed; right:18px; bottom:20px; display:flex; flex-direction:column; gap:10px; z-index:50;}
+  #navBtns button{
+    border:none; cursor:pointer; font-family:inherit; font-size:13px; font-weight:600; color:#fff;
+    border-radius:24px; padding:10px 15px; box-shadow:0 4px 12px rgba(35,50,76,.28);
+  }
+  #btnMenu{background:var(--blue);}
+  #btnTop{background:var(--navy); opacity:0; pointer-events:none; transform:translateY(6px); transition:opacity .25s, transform .25s;}
+  #btnTop.show{opacity:1; pointer-events:auto; transform:translateY(0);}
+  #jumpPanel{
+    position:fixed; right:18px; bottom:80px; width:min(330px,86vw); max-height:64vh; overflow:auto;
+    background:#fff; border:1px solid var(--line); border-radius:14px;
+    box-shadow:0 12px 34px rgba(20,40,80,.24); z-index:60; display:none;
+  }
+  #jumpPanel.open{display:block;}
+  .jp-head{position:sticky; top:0; background:var(--navy); color:#fff; padding:11px 16px; font-weight:700;
+    font-size:14px; display:flex; justify-content:space-between; align-items:center; border-radius:14px 14px 0 0;}
+  .jp-close{cursor:pointer; font-size:20px; line-height:1;}
+  .jp-body{padding:4px 14px 12px;}
+  .jp-sec{padding:10px 0 4px; border-bottom:1px solid var(--line);}
+  .jp-sec:last-child{border-bottom:none;}
+  .jp-title{display:block; font-weight:600; font-size:13.5px; color:var(--ink); text-decoration:none; margin-bottom:7px;}
+  .jp-title:hover{color:var(--blue);}
+  .jp-chips{display:flex; flex-wrap:wrap; gap:6px;}
+  .jp-chips a{
+    display:flex; align-items:center; justify-content:center; min-width:28px; height:28px; padding:0 6px;
+    background:var(--blue-soft); color:var(--blue); border-radius:7px; text-decoration:none; font-size:13px; font-weight:600;
+  }
+  .jp-chips a:hover{background:var(--blue); color:#fff;}
+  @media print{ #navBtns,#jumpPanel{display:none !important;} }
+</style>
+</head>
+<body>
+<!-- 全局 SVG 箭头标记 -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#c0392b"/></marker>
+    <marker id="ab" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2f6fb0"/></marker>
+    <marker id="ag" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#333"/></marker>
+  </defs>
+</svg>
+
+<div class="wrap">
+<header class="top">
+  <h1>平面向量 · 每周强化练 详细解析</h1>
+  <p>数学 必修 第二册（配人教版 A）</p>
+  <p>本文档含：强化练 1（平面向量的概念）· 2（向量的加法运算）· 3（向量的减法运算）· 4（向量的数乘运算）· 6（向量数量积的运算律）</p>
+</header>
+
+<div class="note">
+  <b>说明：</b>本文档含 <b>强化练 1、2、3、4、6</b> 的全部解析。仅剩 <b>强化练 5（向量的数量积，005.png）</b> 尚未收到——注意它与已完成的 <b>强化练 6（向量数量积的运算律）</b> 不是同一份。把强化练 5 的图片贴进聊天，我即可补全为连续的 1～6。
+</div>
+
+<!-- ===================== 强化练 1 ===================== -->
+<h2 class="sec">每周强化练 1　平面向量的概念<small>核心：向量 / 零向量 / 单位向量 / 相等向量 / 共线（平行）向量 的概念辨析</small></h2>
+<div class="sec-body">
+
+<div class="q">
+  <div class="q-head"><div class="q-num">1</div><div class="q-body">下列说法正确的是<span class="tag">概念辨析</span></div></div>
+  <div class="opts">
+    <div>A. 两个有共同起点，且长度相等的向量，它们的终点相同</div>
+    <div>B. 零向量是最小的向量</div>
+    <div>C. 若向量 <b class="bv">a</b> 与 <b class="bv">b</b> 平行，<b class="bv">b</b> 与 <b class="bv">c</b> 平行，则 <b class="bv">a</b> 与 <b class="bv">c</b> 一定平行</div>
+    <div>D. 单位向量的长度为 1</div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <ul>
+      <li>A 错：起点相同、长度相等，但<span class="kw">方向可以不同</span>，终点在以公共起点为圆心的圆上，不一定重合。</li>
+      <li>B 错：向量是既有大小又有方向的量，<span class="kw">不能比较大小</span>，"最小的向量"说法本身不成立。</li>
+      <li>C 错：平行的传递性有一个例外——<span class="kw">规定零向量与任意向量平行</span>。若 <b class="bv">b</b>=<b class="bv">0</b>，则 <b class="bv">a</b>∥<b class="bv">b</b>、<b class="bv">b</b>∥<b class="bv">c</b> 恒成立，但 <b class="bv">a</b> 与 <b class="bv">c</b> 未必平行。</li>
+      <li>D 对：单位向量就是长度（模）等于 1 个单位长度的向量。</li>
+    </ul>
+  </div>
+  <div class="ans"><b>答案：D</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">2</div><div class="q-body">下列说法正确的是<span class="tag">概念辨析</span></div></div>
+  <div class="opts">
+    <div>A. 向量的模是一个正实数</div>
+    <div>B. 零向量没有方向</div>
+    <div>C. 单位向量的模等于 1 个单位长度</div>
+    <div>D. 零向量就是实数 0</div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <ul>
+      <li>A 错：向量的模是<span class="kw">非负实数</span>，零向量的模为 0，不是正实数。</li>
+      <li>B 错：零向量<span class="kw">有方向，只是方向任意（不确定）</span>，并非没有方向。</li>
+      <li>C 对：单位向量 |<b class="bv">a</b>|=1，即模等于 1 个单位长度。</li>
+      <li>D 错：零向量是<span class="kw">向量</span>（记作 <b class="bv">0</b>），实数 0 是<span class="kw">数量</span>，二者不能混为一谈。</li>
+    </ul>
+  </div>
+  <div class="ans"><b>答案：C</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">3</div><div class="q-body">下列说法正确的是<span class="tag">概念辨析</span></div></div>
+  <div class="opts">
+    <div>A. 单位向量都相等</div>
+    <div>B. 若 |<b class="bv">a</b>|=|<b class="bv">b</b>|，则 <b class="bv">a</b>∥<b class="bv">b</b></div>
+    <div>C. 若 |<b class="bv">a</b>|≠|<b class="bv">b</b>|，则 <b class="bv">a</b>≠<b class="bv">b</b></div>
+    <div>D. 若 <b class="bv">a</b>≠<b class="bv">b</b>，则 |<b class="bv">a</b>|≠|<b class="bv">b</b>|</div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>相等向量要求<span class="kw">模相等且方向相同</span>，二者缺一不可。</p>
+    <ul>
+      <li>A 错：单位向量模都为 1，但方向可不同，不一定相等。</li>
+      <li>B 错：模相等推不出方向平行。</li>
+      <li>C 对：模都不相等，则两向量必不是同一向量，故 <b class="bv">a</b>≠<b class="bv">b</b>。这是"相等 ⟹ 模相等"的<span class="kw">逆否命题</span>。</li>
+      <li>D 错：<b class="bv">a</b>≠<b class="bv">b</b> 可能只是方向不同，模仍可相等。</li>
+    </ul>
+  </div>
+  <div class="ans"><b>答案：C</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">4</div><div class="q-body">如图，梯形 <i>ABCD</i> 为等腰梯形，则两腰上的向量 <span class="v">AB</span> 与 <span class="v">DC</span> 的关系是<span class="tag">相等向量</span></div></div>
+  <figure class="fig">
+    <svg viewBox="0 0 240 150" width="240">
+      <polygon points="35,120 80,35 165,35 210,120" fill="none" stroke="#333" stroke-width="1.5"/>
+      <line x1="35" y1="120" x2="80" y2="35" stroke="#c0392b" stroke-width="2.4" marker-end="url(#ar)"/>
+      <line x1="210" y1="120" x2="165" y2="35" stroke="#2f6fb0" stroke-width="2.4" marker-end="url(#ab)"/>
+      <text x="26" y="130" font-size="13">A</text>
+      <text x="70" y="30" font-size="13">B</text>
+      <text x="167" y="30" font-size="13">C</text>
+      <text x="213" y="130" font-size="13">D</text>
+    </svg>
+    <figcaption>等腰梯形，上底 <i>BC</i>、下底 <i>AD</i>，两腰 <i>AB</i>、<i>DC</i></figcaption>
+  </figure>
+  <div class="opts">
+    <div>A. <span class="v">AB</span>=<span class="v">DC</span></div>
+    <div>B. |<span class="v">AB</span>|=|<span class="v">DC</span>|</div>
+    <div>C. <span class="v">AB</span>&gt;<span class="v">DC</span></div>
+    <div>D. <span class="v">AB</span>&lt;<span class="v">DC</span></div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>等腰梯形两腰<span class="kw">长度相等</span>，故 |<span class="v">AB</span>|=|<span class="v">DC</span>|。但 <span class="v">AB</span> 指向右上、<span class="v">DC</span> 指向左上，<span class="kw">方向不同</span>，所以 A 错；向量不能比较大小，C、D 错。</p>
+  </div>
+  <div class="ans"><b>答案：B</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">5</div><div class="q-body">在 △<i>ABC</i> 中，<i>AB</i>=<i>AC</i>，<i>D</i>、<i>E</i> 分别是 <i>AB</i>、<i>AC</i> 的中点，则<span class="tag">共线向量</span></div></div>
+  <figure class="fig">
+    <svg viewBox="0 0 240 180" width="230">
+      <polygon points="120,20 40,155 200,155" fill="none" stroke="#333" stroke-width="1.5"/>
+      <line x1="80" y1="87" x2="160" y2="87" stroke="#c0392b" stroke-width="2" marker-end="url(#ar)"/>
+      <line x1="200" y1="155" x2="40" y2="155" stroke="#2f6fb0" stroke-width="2" marker-end="url(#ab)"/>
+      <circle cx="80" cy="87" r="2.5"/><circle cx="160" cy="87" r="2.5"/>
+      <text x="116" y="15" font-size="13">A</text>
+      <text x="30" y="168" font-size="13">B</text>
+      <text x="203" y="168" font-size="13">C</text>
+      <text x="66" y="90" font-size="13">D</text>
+      <text x="166" y="90" font-size="13">E</text>
+      <text x="112" y="82" font-size="11" fill="#c0392b">DE</text>
+      <text x="112" y="150" font-size="11" fill="#2f6fb0">CB</text>
+    </svg>
+    <figcaption><i>D</i>、<i>E</i> 为中点，<i>DE</i> 是中位线，<i>DE</i>∥<i>BC</i></figcaption>
+  </figure>
+  <div class="opts">
+    <div>A. <span class="v">AB</span> 与 <span class="v">AC</span> 共线</div>
+    <div>B. <span class="v">DE</span> 与 <span class="v">CB</span> 共线</div>
+    <div>C. <span class="v">CD</span> 与 <span class="v">AE</span> 相等</div>
+    <div>D. <span class="v">AD</span> 与 <span class="v">BD</span> 相等</div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>共线向量即<span class="kw">平行向量</span>（方向相同或相反）。</p>
+    <ul>
+      <li>A 错：<span class="v">AB</span>、<span class="v">AC</span> 是三角形两条不重合的边，不平行。</li>
+      <li>B 对：<i>D</i>、<i>E</i> 是中点，<i>DE</i> 为中位线，<i>DE</i>∥<i>BC</i>，故 <span class="v">DE</span> 与 <span class="v">CB</span> 共线。</li>
+      <li>C 错：<span class="v">AE</span>=<span class="frac"><span class="n">1</span><span class="d">2</span></span><span class="v">AC</span>，而 <span class="v">CD</span> 是从 <i>C</i> 到 <i>AB</i> 中点的向量，方向、大小均不同。</li>
+      <li>D 错：<i>D</i> 是 <i>AB</i> 中点，<span class="v">AD</span> 与 <span class="v">BD</span> 模相等但<span class="kw">方向相反</span>（<span class="v">AD</span>=<span class="v">DB</span>=−<span class="v">BD</span>），不相等。</li>
+    </ul>
+  </div>
+  <div class="ans"><b>答案：B</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">6</div><div class="q-body">如图，已知 <i>AD</i>=3，<i>B</i>、<i>C</i> 是线段 <i>AD</i> 的三等分点，分别以图中各点为起点和终点，模长大于 1 的向量有 ______ 个。<span class="tag">计数</span></div></div>
+  <figure class="fig">
+    <svg viewBox="0 0 260 60" width="260">
+      <line x1="25" y1="35" x2="235" y2="35" stroke="#333" stroke-width="1.5"/>
+      <circle cx="25" cy="35" r="3"/><circle cx="95" cy="35" r="3"/><circle cx="165" cy="35" r="3"/><circle cx="235" cy="35" r="3"/>
+      <text x="21" y="24" font-size="13">A</text>
+      <text x="91" y="24" font-size="13">B</text>
+      <text x="161" y="24" font-size="13">C</text>
+      <text x="231" y="24" font-size="13">D</text>
+      <text x="52" y="52" font-size="11" fill="#5c6b82">1</text>
+      <text x="122" y="52" font-size="11" fill="#5c6b82">1</text>
+      <text x="192" y="52" font-size="11" fill="#5c6b82">1</text>
+    </svg>
+    <figcaption><i>AB</i>=<i>BC</i>=<i>CD</i>=1</figcaption>
+  </figure>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>由三等分知 <i>AB</i>=<i>BC</i>=<i>CD</i>=1。向量的模等于两端点间的距离，按距离分类：</p>
+    <ul>
+      <li>距离 =1（相邻点）：模等于 1，<span class="kw">不满足</span>"大于 1"，舍去。</li>
+      <li>距离 =2：点对 <i>A</i>-<i>C</i>、<i>B</i>-<i>D</i>，正反方向共 4 个：<span class="v">AC</span>、<span class="v">CA</span>、<span class="v">BD</span>、<span class="v">DB</span>。</li>
+      <li>距离 =3：点对 <i>A</i>-<i>D</i>，正反方向共 2 个：<span class="v">AD</span>、<span class="v">DA</span>。</li>
+    </ul>
+    <p>合计 4+2=6 个。</p>
+  </div>
+  <div class="ans"><b>答案：6 个</b>（<span class="v">AC</span>、<span class="v">CA</span>、<span class="v">BD</span>、<span class="v">DB</span>、<span class="v">AD</span>、<span class="v">DA</span>）</div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">7</div><div class="q-body">如图，<i>O</i> 是正三角形 <i>ABC</i> 的中心，四边形 <i>AOCD</i> 和 <i>AOBE</i> 均为平行四边形，则与 <span class="v">DA</span> 相等的向量为 ______，与 <span class="v">OA</span> 共线的向量为 ______，与 <span class="v">OA</span> 的模相等的向量为 ______（均填图中所画出的向量）。<span class="tag">相等/共线/模</span></div></div>
+  <figure class="fig">
+    <svg viewBox="0 0 250 160" width="250">
+      <polygon points="120,20 59,125 181,125" fill="none" stroke="#333" stroke-width="1.3"/>
+      <line x1="120" y1="90" x2="120" y2="20" stroke="#888" stroke-width="1.1"/>
+      <line x1="120" y1="90" x2="59" y2="125" stroke="#888" stroke-width="1.1"/>
+      <line x1="120" y1="90" x2="181" y2="125" stroke="#888" stroke-width="1.1"/>
+      <line x1="181" y1="125" x2="181" y2="55" stroke="#333" stroke-width="1.3"/>
+      <line x1="181" y1="55" x2="120" y2="20" stroke="#333" stroke-width="1.3"/>
+      <line x1="59" y1="125" x2="59" y2="55" stroke="#333" stroke-width="1.3"/>
+      <line x1="59" y1="55" x2="120" y2="20" stroke="#333" stroke-width="1.3"/>
+      <line x1="120" y1="90" x2="120" y2="23" stroke="#c0392b" stroke-width="2.2" marker-end="url(#ar)"/>
+      <circle cx="120" cy="90" r="2.5" fill="#000"/>
+      <text x="116" y="16" font-size="13">A</text>
+      <text x="48" y="130" font-size="13">B</text>
+      <text x="185" y="130" font-size="13">C</text>
+      <text x="185" y="52" font-size="13">D</text>
+      <text x="46" y="52" font-size="13">E</text>
+      <text x="126" y="62" font-size="11" fill="#c0392b">OA</text>
+      <text x="108" y="103" font-size="12">O</text>
+    </svg>
+    <figcaption>正三角形中心 <i>O</i>，|<span class="v">OA</span>|=|<span class="v">OB</span>|=|<span class="v">OC</span>|=<i>R</i>（外接圆半径）</figcaption>
+  </figure>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>设外接圆半径 <i>R</i>，则 |<span class="v">OA</span>|=|<span class="v">OB</span>|=|<span class="v">OC</span>|=<i>R</i>。为严谨，取坐标（<i>R</i>=1）：<i>O</i>(0, 0)，<i>A</i>(0, 1)，<i>B</i>(−√3/2, −1/2)，<i>C</i>(√3/2, −1/2)。由平行四边形 <i>AOCD</i> 得 <i>D</i>=<i>A</i>+<i>C</i>−<i>O</i>=(√3/2, 1/2)；由 <i>AOBE</i> 得 <i>E</i>=<i>A</i>+<i>B</i>−<i>O</i>=(−√3/2, 1/2)。</p>
+    <p><b>① 与 <span class="v">DA</span> 相等：</b><span class="v">DA</span>=<i>A</i>−<i>D</i>=(−√3/2, 1/2)。而 <span class="v">CO</span>=<i>O</i>−<i>C</i>=(−√3/2, 1/2)，两者相等 ⟹ <span class="v">DA</span>=<span class="v">CO</span>。</p>
+    <p><b>② 与 <span class="v">OA</span> 共线：</b><span class="v">OA</span>=(0, 1) 为竖直方向。图中竖直的边有 <span class="v">AO</span>、<span class="v">CD</span>、<span class="v">DC</span>、<span class="v">BE</span>、<span class="v">EB</span>（与 <span class="v">OA</span> 方向相同或相反）。</p>
+    <p><b>③ 与 <span class="v">OA</span> 模相等：</b>凡长度等于半径 <i>R</i> 的都算，即 <span class="v">OB</span>、<span class="v">OC</span>、<span class="v">AO</span>、<span class="v">BO</span>、<span class="v">CO</span>，以及各平行四边形的边 <span class="v">AD</span>、<span class="v">DA</span>、<span class="v">AE</span>、<span class="v">EA</span>、<span class="v">CD</span>、<span class="v">DC</span>、<span class="v">BE</span>、<span class="v">EB</span>（它们的模均为 <i>R</i>）。</p>
+  </div>
+  <div class="ans"><b>答案：</b>与 <span class="v">DA</span> 相等：<span class="v">CO</span>；　与 <span class="v">OA</span> 共线：<span class="v">AO</span>、<span class="v">CD</span>、<span class="v">DC</span>、<span class="v">BE</span>、<span class="v">EB</span>；　与 <span class="v">OA</span> 模相等：<span class="v">OB</span>、<span class="v">OC</span>、<span class="v">AO</span>、<span class="v">BO</span>、<span class="v">CO</span>、<span class="v">AD</span>、<span class="v">DA</span>、<span class="v">AE</span>、<span class="v">EA</span>、<span class="v">CD</span>、<span class="v">DC</span>、<span class="v">BE</span>、<span class="v">EB</span>。</div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">8</div><div class="q-body">在蔚蓝的大海上，一艘巡逻艇从 <i>A</i> 点出发向西航行 200 km 到 <i>B</i>，再向北偏西 40° 航行 400 km 到 <i>C</i>，最后向东航行 200 km 到 <i>D</i>。（1）作出向量 <span class="v">AB</span>、<span class="v">BC</span>、<span class="v">CD</span>；（2）求 |<span class="v">AD</span>|。<span class="tag">向量加法·实际</span></div></div>
+  <figure class="fig">
+    <svg viewBox="0 0 260 210" width="260">
+      <line x1="30" y1="45" x2="30" y2="18" stroke="#2f6fb0" stroke-width="1.4" marker-end="url(#ab)"/>
+      <text x="25" y="14" font-size="11" fill="#2f6fb0">北</text>
+      <line x1="228" y1="185" x2="160" y2="185" stroke="#c0392b" stroke-width="2.2" marker-end="url(#ar)"/>
+      <line x1="160" y1="185" x2="72" y2="82" stroke="#c0392b" stroke-width="2.2" marker-end="url(#ar)"/>
+      <line x1="72" y1="82" x2="140" y2="82" stroke="#c0392b" stroke-width="2.2" marker-end="url(#ar)"/>
+      <line x1="228" y1="185" x2="140" y2="82" stroke="#2f6fb0" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#ab)"/>
+      <circle cx="228" cy="185" r="2.6"/><circle cx="160" cy="185" r="2.6"/><circle cx="72" cy="82" r="2.6"/><circle cx="140" cy="82" r="2.6"/>
+      <text x="231" y="197" font-size="13">A</text>
+      <text x="150" y="197" font-size="13">B</text>
+      <text x="58" y="80" font-size="13">C</text>
+      <text x="143" y="79" font-size="13">D</text>
+      <text x="186" y="199" font-size="11" fill="#c0392b">200</text>
+      <text x="100" y="140" font-size="11" fill="#c0392b">400</text>
+      <text x="98" y="76" font-size="11" fill="#c0392b">200</text>
+      <text x="180" y="130" font-size="11" fill="#2f6fb0">AD</text>
+    </svg>
+    <figcaption>红色为航行路径 <i>A</i>→<i>B</i>→<i>C</i>→<i>D</i>，蓝色虚线为 <span class="v">AD</span></figcaption>
+  </figure>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>（1）见上图：<span class="v">AB</span> 向西、<span class="v">BC</span> 北偏西 40°、<span class="v">CD</span> 向东，首尾相接。</p>
+    <p>（2）由向量加法 <span class="v">AD</span>=<span class="v">AB</span>+<span class="v">BC</span>+<span class="v">CD</span>。注意 <span class="v">AB</span> 是"向西 200"、<span class="v">CD</span> 是"向东 200"，二者<span class="kw">大小相等、方向相反</span>，故 <span class="v">AB</span>+<span class="v">CD</span>=<b class="bv">0</b>。</p>
+    <p>于是 <span class="v">AD</span>=<span class="v">BC</span>，所以 |<span class="v">AD</span>|=|<span class="v">BC</span>|=400 km。</p>
+    <p class="small">（坐标验证：取东为 <i>x</i>、北为 <i>y</i>，<i>A</i>(0, 0)，<i>D</i>=(−400sin40°, 400cos40°)，|<span class="v">AD</span>|=400·√(sin<sup>2</sup>40°+cos<sup>2</sup>40°)=400。）</p>
+  </div>
+  <div class="ans"><b>答案：|<span class="v">AD</span>|=400 km</b></div>
+</div>
+
+</div><!-- /sec1 -->
+
+<!-- ===================== 强化练 2 ===================== -->
+<h2 class="sec">每周强化练 2　向量的加法运算<small>核心：三角形法则 / 平行四边形法则 / 加法运算律 / 三角不等式 |<b class="bv">a</b>+<b class="bv">b</b>| ≤ |<b class="bv">a</b>|+|<b class="bv">b</b>|</small></h2>
+<div class="sec-body">
+
+<div class="q">
+  <div class="q-head"><div class="q-num">1</div><div class="q-body">化简 <span class="v">MN</span>+<span class="v">NP</span>+<span class="v">PQ</span>=（　）<span class="tag">首尾相连</span></div></div>
+  <div class="opts">
+    <div>A. <span class="v">MP</span></div><div>B. <span class="v">MQ</span></div>
+    <div>C. <span class="v">NQ</span></div><div>D. <span class="v">PM</span></div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>三角形法则"首尾相接、首指向尾"：<span class="v">MN</span>+<span class="v">NP</span>+<span class="v">PQ</span>=<span class="v">MQ</span>。</p>
+  </div>
+  <div class="ans"><b>答案：B</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">2</div><div class="q-body">在四边形 <i>ABCD</i> 中，若 <span class="v">AC</span>=<span class="v">AB</span>+<span class="v">AD</span>，则四边形 <i>ABCD</i> 是（　）<span class="tag">平行四边形法则</span></div></div>
+  <div class="opts">
+    <div>A. 平行四边形</div><div>B. 菱形</div>
+    <div>C. 矩形</div><div>D. 正方形</div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p><span class="v">AB</span>、<span class="v">AD</span> 是以 <i>A</i> 为公共起点的两条邻边，由平行四边形法则，它们的和恰是<span class="kw">对角线</span> <span class="v">AC</span>。<span class="v">AC</span>=<span class="v">AB</span>+<span class="v">AD</span> 说明 <i>ABCD</i> 是平行四边形，但不能推出边相等或有直角，故不能确定为菱形、矩形、正方形。</p>
+  </div>
+  <div class="ans"><b>答案：A</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">3</div><div class="q-body">（多选）在平行四边形 <i>ABCD</i> 中，下列结论正确的是（　）<span class="tag">多选</span></div></div>
+  <figure class="fig">
+    <svg viewBox="0 0 240 130" width="230">
+      <polygon points="50,105 175,105 210,30 85,30" fill="none" stroke="#333" stroke-width="1.5"/>
+      <line x1="50" y1="105" x2="210" y2="30" stroke="#2f6fb0" stroke-width="1" stroke-dasharray="4 3"/>
+      <text x="41" y="118" font-size="13">A</text>
+      <text x="176" y="118" font-size="13">B</text>
+      <text x="213" y="27" font-size="13">C</text>
+      <text x="74" y="27" font-size="13">D</text>
+    </svg>
+    <figcaption>平行四边形 <i>ABCD</i>（<i>A</i>、<i>B</i> 在下，<i>D</i>、<i>C</i> 在上）</figcaption>
+  </figure>
+  <div class="opts">
+    <div>A. <span class="v">AB</span>=<span class="v">DC</span></div>
+    <div>B. <span class="v">AD</span>+<span class="v">AB</span>=<span class="v">AC</span></div>
+    <div>C. <span class="v">AB</span>=<span class="v">BD</span>+<span class="v">AD</span></div>
+    <div>D. <span class="v">BC</span>+<span class="v">CD</span>=<span class="v">DB</span></div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <ul>
+      <li>A 对：平行四边形对边平行、相等且同向，<span class="v">AB</span>=<span class="v">DC</span>。</li>
+      <li>B 对：平行四边形法则，邻边之和为对角线 <span class="v">AC</span>。</li>
+      <li>C 错：<span class="v">AB</span>=<span class="v">AD</span>+<span class="v">DB</span>=<span class="v">AD</span>−<span class="v">BD</span>，而选项写成 <span class="v">AD</span>+<span class="v">BD</span>，符号相反。</li>
+      <li>D 错：<span class="v">BC</span>+<span class="v">CD</span>=<span class="v">BD</span>，不是 <span class="v">DB</span>（二者反向）。</li>
+    </ul>
+  </div>
+  <div class="ans"><b>答案：AB</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">4</div><div class="q-body">（多选）下列等式<u>不正确</u>的是（　）<span class="tag">多选·找错</span></div></div>
+  <div class="opts">
+    <div>A. <b class="bv">a</b>+(<b class="bv">b</b>+<b class="bv">c</b>)=(<b class="bv">a</b>+<b class="bv">c</b>)+<b class="bv">b</b></div>
+    <div>B. <span class="v">AB</span>+<span class="v">BA</span>=<b class="bv">0</b></div>
+    <div>C. <span class="v">AC</span>=<span class="v">DC</span>+<span class="v">AB</span>+<span class="v">BD</span></div>
+    <div>D. |<b class="bv">a</b>+<b class="bv">b</b>|=|<b class="bv">a</b>|+|<b class="bv">b</b>|</div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <ul>
+      <li>A 正确：加法满足交换律、结合律，两边都等于 <b class="bv">a</b>+<b class="bv">b</b>+<b class="bv">c</b>。</li>
+      <li>B 正确：<span class="v">AB</span>+<span class="v">BA</span>=<span class="v">AA</span>=<b class="bv">0</b>（结果是零向量，右边应写 <b class="bv">0</b>）。</li>
+      <li>C 正确：调整顺序 <span class="v">AB</span>+<span class="v">BD</span>+<span class="v">DC</span>=<span class="v">AD</span>+<span class="v">DC</span>=<span class="v">AC</span>。</li>
+      <li>D <span class="kw">不正确</span>：一般只有 |<b class="bv">a</b>+<b class="bv">b</b>| ≤ |<b class="bv">a</b>|+|<b class="bv">b</b>|，等号仅当 <b class="bv">a</b>、<b class="bv">b</b> 同向（或至少一个为零向量）时成立，并非恒等。</li>
+    </ul>
+    <p>题目问"不正确的"，故选 D。</p>
+  </div>
+  <div class="ans"><b>答案：D</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">5</div><div class="q-body">若 <b class="bv">a</b> 表示"向东航行 1 km"，<b class="bv">b</b> 表示"向北航行 √3 km"，则 <b class="bv">a</b>+<b class="bv">b</b> 表示（　）<span class="tag">合成</span></div></div>
+  <div class="opts">
+    <div>A. 向东北方向航行 2 km</div>
+    <div>B. 向北偏东 30° 方向航行 2 km</div>
+    <div>C. 向正北方向航行 (1+√3) km</div>
+    <div>D. 向正东方向航行 (1+√3) km</div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>东、北方向垂直。合向量的模 |<b class="bv">a</b>+<b class="bv">b</b>|=√(1<sup>2</sup>+(√3)<sup>2</sup>)=√4=2。</p>
+    <p>设合向量与正北方向夹角 <i>θ</i>，则 tan<i>θ</i>=<span class="frac"><span class="n">东分量</span><span class="d">北分量</span></span>=<span class="frac"><span class="n">1</span><span class="d">√3</span></span>，<i>θ</i>=30°，即<span class="kw">北偏东 30°</span>。</p>
+  </div>
+  <div class="ans"><b>答案：B</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">6</div><div class="q-body">在 ▱<i>ABCD</i> 中，<span class="v">DC</span>+<span class="v">BC</span>+<span class="v">CA</span>= ______。<span class="tag">化简</span></div></div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p><span class="v">DC</span>+<span class="v">CA</span>=<span class="v">DA</span>，故原式 =<span class="v">DA</span>+<span class="v">BC</span>。在平行四边形 <i>ABCD</i> 中 <span class="v">BC</span>=<span class="v">AD</span>=−<span class="v">DA</span>，所以 <span class="v">DA</span>+<span class="v">BC</span>=<span class="v">DA</span>−<span class="v">DA</span>=<b class="bv">0</b>。</p>
+    <p class="small">（验证：取 <i>A</i>(0,0)、<i>B</i>(1,0)、<i>C</i>(1,1)、<i>D</i>(0,1)，<span class="v">DC</span>+<span class="v">BC</span>+<span class="v">CA</span>=(1,0)+(0,1)+(−1,−1)=(0,0)。）</p>
+  </div>
+  <div class="ans"><b>答案：<b class="bv">0</b>（零向量）</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">7</div><div class="q-body">如图，四边形 <i>ABCD</i> 中，|<span class="v">DA</span>|=|<span class="v">DB</span>|=|<span class="v">DC</span>|，且 <span class="v">DA</span>+<span class="v">DC</span>=<span class="v">DB</span>，那么 ∠<i>ABC</i>= ______。<span class="tag">综合</span></div></div>
+  <figure class="fig">
+    <svg viewBox="0 0 240 170" width="230">
+      <polygon points="60,95 120,55 180,95 120,140" fill="none" stroke="#333" stroke-width="1.4"/>
+      <line x1="120" y1="140" x2="60" y2="95" stroke="#888" stroke-width="1.1"/>
+      <line x1="120" y1="140" x2="120" y2="55" stroke="#c0392b" stroke-width="1.6" marker-end="url(#ar)"/>
+      <line x1="120" y1="140" x2="180" y2="95" stroke="#888" stroke-width="1.1"/>
+      <circle cx="120" cy="140" r="2.6"/>
+      <text x="49" y="99" font-size="13">A</text>
+      <text x="116" y="50" font-size="13">B</text>
+      <text x="184" y="99" font-size="13">C</text>
+      <text x="116" y="155" font-size="13">D</text>
+    </svg>
+    <figcaption><i>D</i> 到 <i>A</i>、<i>B</i>、<i>C</i> 等距，<span class="v">DB</span> 为 <span class="v">DA</span>、<span class="v">DC</span> 之和</figcaption>
+  </figure>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>设 |<span class="v">DA</span>|=|<span class="v">DB</span>|=|<span class="v">DC</span>|=<i>r</i>。由 <span class="v">DB</span>=<span class="v">DA</span>+<span class="v">DC</span> 两边取模平方：</p>
+    <p><i>r</i><sup>2</sup>=|<span class="v">DA</span>+<span class="v">DC</span>|<sup>2</sup>=<i>r</i><sup>2</sup>+<i>r</i><sup>2</sup>+2<i>r</i><sup>2</sup>cos∠<i>ADC</i>，得 cos∠<i>ADC</i>=−<span class="frac"><span class="n">1</span><span class="d">2</span></span>，∠<i>ADC</i>=120°。</p>
+    <p>又 |<span class="v">DA</span>|=|<span class="v">DC</span>|，故其和向量 <span class="v">DB</span> 平分 ∠<i>ADC</i>，∠<i>ADB</i>=∠<i>BDC</i>=60°。</p>
+    <p>在 △<i>ABD</i> 中 <i>DA</i>=<i>DB</i>=<i>r</i> 且顶角 60° ⟹ 等边三角形，∠<i>ABD</i>=60°；同理 ∠<i>DBC</i>=60°。所以 ∠<i>ABC</i>=∠<i>ABD</i>+∠<i>DBC</i>=120°。</p>
+  </div>
+  <div class="ans"><b>答案：∠<i>ABC</i>=120°</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">8</div><div class="q-body">已知菱形 <i>ABCD</i> 的边长为 2。（1）化简 <span class="v">AD</span>+<span class="v">DC</span>+<span class="v">CB</span>；（2）求 |<span class="v">AB</span>+<span class="v">AD</span>+<span class="v">CD</span>|。<span class="tag">化简+求模</span></div></div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>（1）首尾相接：<span class="v">AD</span>+<span class="v">DC</span>+<span class="v">CB</span>=<span class="v">AC</span>+<span class="v">CB</span>=<span class="v">AB</span>。</p>
+    <p>（2）菱形中 <span class="v">DC</span>=<span class="v">AB</span>，故 <span class="v">CD</span>=−<span class="v">AB</span>。于是 <span class="v">AB</span>+<span class="v">AD</span>+<span class="v">CD</span>=<span class="v">AB</span>+<span class="v">AD</span>−<span class="v">AB</span>=<span class="v">AD</span>，所以 |<span class="v">AB</span>+<span class="v">AD</span>+<span class="v">CD</span>|=|<span class="v">AD</span>|=2。</p>
+  </div>
+  <div class="ans"><b>答案：（1）<span class="v">AB</span>；（2）2</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">9</div><div class="q-body">四边形 <i>ABCD</i> 是平行四边形，<i>O</i> 是两条对角线的交点，<i>E</i> 是 <i>CD</i> 的一个三等分点（靠近点 <i>D</i>）。（1）求 <span class="v">AO</span>+<span class="v">AC</span>；（2）求 <span class="v">DE</span>+<span class="v">BA</span>。<span class="tag">线性表示</span></div></div>
+  <figure class="fig">
+    <svg viewBox="0 0 250 140" width="240">
+      <polygon points="40,120 180,120 220,35 80,35" fill="none" stroke="#333" stroke-width="1.5"/>
+      <line x1="40" y1="120" x2="220" y2="35" stroke="#888" stroke-width="1"/>
+      <line x1="180" y1="120" x2="80" y2="35" stroke="#888" stroke-width="1"/>
+      <circle cx="130" cy="77.5" r="2.6"/>
+      <circle cx="127" cy="35" r="2.8" fill="#c0392b"/>
+      <text x="31" y="133" font-size="13">A</text>
+      <text x="181" y="133" font-size="13">B</text>
+      <text x="223" y="32" font-size="13">C</text>
+      <text x="70" y="32" font-size="13">D</text>
+      <text x="122" y="30" font-size="11" fill="#c0392b">E</text>
+      <text x="135" y="76" font-size="12">O</text>
+    </svg>
+    <figcaption><i>O</i> 为对角线交点（各自中点），<i>E</i> 靠近 <i>D</i>，<span class="v">DE</span>=<span class="frac"><span class="n">1</span><span class="d">3</span></span><span class="v">DC</span></figcaption>
+  </figure>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>（1）<i>O</i> 是对角线交点，即 <i>AC</i> 中点，<span class="v">AO</span>=<span class="frac"><span class="n">1</span><span class="d">2</span></span><span class="v">AC</span>。所以 <span class="v">AO</span>+<span class="v">AC</span>=<span class="frac"><span class="n">1</span><span class="d">2</span></span><span class="v">AC</span>+<span class="v">AC</span>=<span class="frac"><span class="n">3</span><span class="d">2</span></span><span class="v">AC</span>。</p>
+    <p>（2）<i>E</i> 是 <i>CD</i> 靠近 <i>D</i> 的三等分点，故 <span class="v">DE</span>=<span class="frac"><span class="n">1</span><span class="d">3</span></span><span class="v">DC</span>。又平行四边形中 <span class="v">DC</span>=<span class="v">AB</span>，则 <span class="v">DE</span>=<span class="frac"><span class="n">1</span><span class="d">3</span></span><span class="v">AB</span>，而 <span class="v">BA</span>=−<span class="v">AB</span>，所以 <span class="v">DE</span>+<span class="v">BA</span>=<span class="frac"><span class="n">1</span><span class="d">3</span></span><span class="v">AB</span>−<span class="v">AB</span>=−<span class="frac"><span class="n">2</span><span class="d">3</span></span><span class="v">AB</span>=<span class="frac"><span class="n">2</span><span class="d">3</span></span><span class="v">BA</span>。</p>
+    <p class="small">（坐标验证：<i>A</i>(0,0)、<i>B</i>(2,0)、<i>C</i>(3,1)、<i>D</i>(1,1)。<span class="v">AO</span>+<span class="v">AC</span>=(1.5,0.5)+(3,1)=(4.5,1.5)=<span class="frac"><span class="n">3</span><span class="d">2</span></span><span class="v">AC</span>；<span class="v">DE</span>+<span class="v">BA</span>=(2/3,0)+(−2,0)=(−4/3,0)=<span class="frac"><span class="n">2</span><span class="d">3</span></span><span class="v">BA</span>。）</p>
+  </div>
+  <div class="ans"><b>答案：（1）<span class="frac"><span class="n">3</span><span class="d">2</span></span><span class="v">AC</span>；（2）<span class="frac"><span class="n">2</span><span class="d">3</span></span><span class="v">BA</span>（即 −<span class="frac"><span class="n">2</span><span class="d">3</span></span><span class="v">AB</span>）</b></div>
+</div>
+
+</div><!-- /sec2 -->
+
+<!-- ===================== 强化练 3 ===================== -->
+<h2 class="sec">每周强化练 3　向量的减法运算<small>核心：<span class="v">OA</span>−<span class="v">OB</span>=<span class="v">BA</span>（"共起点，箭头指向被减向量的终点"）</small></h2>
+<div class="sec-body">
+
+<div class="q">
+  <div class="q-head"><div class="q-num">1</div><div class="q-body">化简 <span class="v">OM</span>+<span class="v">MA</span>−<span class="v">OB</span> 的结果是（　）<span class="tag">化简</span></div></div>
+  <div class="opts">
+    <div>A. <span class="v">BA</span></div><div>B. <span class="v">AB</span></div>
+    <div>C. <span class="v">BM</span></div><div>D. <span class="v">MB</span></div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p><span class="v">OM</span>+<span class="v">MA</span>=<span class="v">OA</span>，故原式 =<span class="v">OA</span>−<span class="v">OB</span>=<span class="v">BA</span>（同起点 <i>O</i> 相减，指向被减向量的终点 <i>A</i>）。</p>
+  </div>
+  <div class="ans"><b>答案：A</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">2</div><div class="q-body">平行四边形 <i>ABCD</i> 中，<span class="v">AB</span>=<b class="bv">a</b>，<span class="v">AD</span>=<b class="bv">b</b>，<span class="v">AC</span>=<b class="bv">c</b>，<span class="v">BD</span>=<b class="bv">d</b>，下列式子<u>不正确</u>的是（　）<span class="tag">找错</span></div></div>
+  <div class="opts">
+    <div>A. <b class="bv">a</b>+<b class="bv">b</b>=<b class="bv">c</b></div>
+    <div>B. <b class="bv">a</b>−<b class="bv">b</b>=<b class="bv">d</b></div>
+    <div>C. <b class="bv">b</b>−<b class="bv">a</b>=<b class="bv">d</b></div>
+    <div>D. <b class="bv">c</b>−<b class="bv">a</b>=<b class="bv">b</b></div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <ul>
+      <li>A 对：<span class="v">AB</span>+<span class="v">AD</span>=<span class="v">AC</span>，即 <b class="bv">a</b>+<b class="bv">b</b>=<b class="bv">c</b>。</li>
+      <li>B <span class="kw">错</span>：<b class="bv">a</b>−<b class="bv">b</b>=<span class="v">AB</span>−<span class="v">AD</span>=<span class="v">DB</span>=−<span class="v">BD</span>=−<b class="bv">d</b>≠<b class="bv">d</b>。</li>
+      <li>C 对：<b class="bv">b</b>−<b class="bv">a</b>=<span class="v">AD</span>−<span class="v">AB</span>=<span class="v">BD</span>=<b class="bv">d</b>。</li>
+      <li>D 对：<b class="bv">c</b>−<b class="bv">a</b>=<span class="v">AC</span>−<span class="v">AB</span>=<span class="v">BC</span>=<span class="v">AD</span>=<b class="bv">b</b>。</li>
+    </ul>
+  </div>
+  <div class="ans"><b>答案：B</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">3</div><div class="q-body">如图，<span class="v">AB</span>=<b class="bv">a</b>，<span class="v">AC</span>=<b class="bv">b</b>，<span class="v">CD</span>=<b class="bv">c</b>，则 <span class="v">BD</span>=（　）<span class="tag">线性表示</span></div></div>
+  <figure class="fig">
+    <svg viewBox="0 0 220 180" width="215">
+      <line x1="35" y1="150" x2="165" y2="150" stroke="#c0392b" stroke-width="2" marker-end="url(#ar)"/>
+      <line x1="35" y1="150" x2="150" y2="70" stroke="#2f6fb0" stroke-width="2" marker-end="url(#ab)"/>
+      <line x1="150" y1="70" x2="80" y2="25" stroke="#2e7d46" stroke-width="2" marker-end="url(#ag)"/>
+      <line x1="165" y1="150" x2="80" y2="25" stroke="#888" stroke-width="1.4" stroke-dasharray="5 4"/>
+      <text x="26" y="163" font-size="13">A</text>
+      <text x="166" y="163" font-size="13">B</text>
+      <text x="153" y="68" font-size="13">C</text>
+      <text x="70" y="22" font-size="13">D</text>
+      <text x="95" y="167" font-size="12" fill="#c0392b">a</text>
+      <text x="86" y="108" font-size="12" fill="#2f6fb0">b</text>
+      <text x="112" y="42" font-size="12" fill="#2e7d46">c</text>
+    </svg>
+    <figcaption>虚线为待求的 <span class="v">BD</span></figcaption>
+  </figure>
+  <div class="opts">
+    <div>A. <b class="bv">a</b>+<b class="bv">b</b>−<b class="bv">c</b></div>
+    <div>B. <b class="bv">a</b>−<b class="bv">b</b>+<b class="bv">c</b></div>
+    <div>C. <b class="bv">b</b>−<b class="bv">a</b>+<b class="bv">c</b></div>
+    <div>D. <b class="bv">b</b>−<b class="bv">a</b>−<b class="bv">c</b></div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>沿 <i>B</i>→<i>A</i>→<i>C</i>→<i>D</i> 走：<span class="v">BD</span>=<span class="v">BA</span>+<span class="v">AC</span>+<span class="v">CD</span>=−<span class="v">AB</span>+<span class="v">AC</span>+<span class="v">CD</span>=−<b class="bv">a</b>+<b class="bv">b</b>+<b class="bv">c</b>=<b class="bv">b</b>−<b class="bv">a</b>+<b class="bv">c</b>。</p>
+  </div>
+  <div class="ans"><b>答案：C</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">4</div><div class="q-body">在四边形 <i>ABCD</i> 中，已知 <span class="v">OA</span>+<span class="v">OC</span>=<span class="v">OB</span>+<span class="v">OD</span>，则四边形 <i>ABCD</i> 为（　）<span class="tag">判定</span></div></div>
+  <div class="opts">
+    <div>A. 矩形</div><div>B. 菱形</div>
+    <div>C. 正方形</div><div>D. 平行四边形</div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>移项：<span class="v">OA</span>−<span class="v">OB</span>=<span class="v">OD</span>−<span class="v">OC</span>，即 <span class="v">BA</span>=<span class="v">CD</span>。</p>
+    <p><span class="v">BA</span>=<span class="v">CD</span> 表示 <i>BA</i> 与 <i>CD</i> 平行且相等，等价于 <i>A</i>+<i>C</i>=<i>B</i>+<i>D</i>，即<span class="kw">对角线 <i>AC</i> 与 <i>BD</i> 互相平分</span>，故 <i>ABCD</i> 是平行四边形。仅此条件无法判定为矩形/菱形/正方形。</p>
+  </div>
+  <div class="ans"><b>答案：D</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">5</div><div class="q-body">如图，平行四边形 <i>ABCD</i> 中，下列计算结果<u>错误</u>的是（　）<span class="tag">找错</span></div></div>
+  <figure class="fig">
+    <svg viewBox="0 0 240 130" width="230">
+      <polygon points="35,105 175,105 210,30 70,30" fill="none" stroke="#333" stroke-width="1.5"/>
+      <line x1="35" y1="105" x2="210" y2="30" stroke="#888" stroke-width="1"/>
+      <line x1="175" y1="105" x2="70" y2="30" stroke="#888" stroke-width="1"/>
+      <circle cx="122" cy="67.5" r="2.6"/>
+      <text x="26" y="118" font-size="13">A</text>
+      <text x="176" y="118" font-size="13">B</text>
+      <text x="213" y="27" font-size="13">C</text>
+      <text x="60" y="27" font-size="13">D</text>
+      <text x="127" y="66" font-size="12">O</text>
+    </svg>
+    <figcaption><i>O</i> 为对角线交点</figcaption>
+  </figure>
+  <div class="opts">
+    <div>A. <span class="v">AB</span>+<span class="v">AD</span>=<span class="v">AC</span></div>
+    <div>B. <span class="v">AC</span>+<span class="v">CD</span>+<span class="v">DO</span>=<span class="v">OA</span></div>
+    <div>C. <span class="v">AB</span>−<span class="v">AD</span>=<span class="v">DB</span></div>
+    <div>D. <span class="v">AC</span>+<span class="v">BA</span>+<span class="v">DA</span>=<b class="bv">0</b></div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <ul>
+      <li>A 对：平行四边形法则。</li>
+      <li>B <span class="kw">错</span>：<span class="v">AC</span>+<span class="v">CD</span>+<span class="v">DO</span>=<span class="v">AD</span>+<span class="v">DO</span>=<span class="v">AO</span>，结果是 <span class="v">AO</span> 而非 <span class="v">OA</span>（二者反向）。</li>
+      <li>C 对：<span class="v">AB</span>−<span class="v">AD</span>=<span class="v">DB</span>（同起点相减）。</li>
+      <li>D 对：<span class="v">AC</span>+<span class="v">BA</span>=<span class="v">BC</span>，而 <span class="v">BC</span>=<span class="v">AD</span>=−<span class="v">DA</span>，故 <span class="v">BC</span>+<span class="v">DA</span>=<b class="bv">0</b>。</li>
+    </ul>
+    <p>题目问"错误的"，故选 B。</p>
+  </div>
+  <div class="ans"><b>答案：B</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">6</div><div class="q-body">在 △<i>ABC</i> 中，若 |<span class="v">AB</span>|=|<span class="v">AC</span>|=|<span class="v">AB</span>−<span class="v">AC</span>|，则 ∠<i>BAC</i>= ______。<span class="tag">求角</span></div></div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p><span class="v">AB</span>−<span class="v">AC</span>=<span class="v">CB</span>，故 |<span class="v">AB</span>−<span class="v">AC</span>|=|<span class="v">CB</span>|=|<i>BC</i>|。</p>
+    <p>于是 |<i>AB</i>|=|<i>AC</i>|=|<i>BC</i>|，三边相等 ⟹ △<i>ABC</i> 为等边三角形，∠<i>BAC</i>=60°。</p>
+  </div>
+  <div class="ans"><b>答案：60°</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">7</div><div class="q-body">在正六边形 <i>ABCDEF</i> 中，<span class="v">AE</span>=<b class="bv">m</b>，<span class="v">AD</span>=<b class="bv">n</b>，则 <span class="v">BA</span>= ______（用 <b class="bv">m</b>、<b class="bv">n</b> 表示）。<span class="tag">基底表示</span></div></div>
+  <figure class="fig">
+    <svg viewBox="0 0 240 170" width="230">
+      <polygon points="180,90 150,38 90,38 60,90 90,142 150,142" fill="none" stroke="#333" stroke-width="1.4"/>
+      <line x1="180" y1="90" x2="90" y2="142" stroke="#c0392b" stroke-width="1.8" marker-end="url(#ar)"/>
+      <line x1="180" y1="90" x2="60" y2="90" stroke="#2f6fb0" stroke-width="1.8" marker-end="url(#ab)"/>
+      <line x1="150" y1="38" x2="180" y2="90" stroke="#2e7d46" stroke-width="1.8" marker-end="url(#ag)"/>
+      <text x="184" y="93" font-size="13">A</text>
+      <text x="153" y="34" font-size="13">B</text>
+      <text x="80" y="34" font-size="13">C</text>
+      <text x="46" y="93" font-size="13">D</text>
+      <text x="80" y="156" font-size="13">E</text>
+      <text x="150" y="156" font-size="13">F</text>
+      <text x="128" y="122" font-size="11" fill="#c0392b">m</text>
+      <text x="115" y="85" font-size="11" fill="#2f6fb0">n</text>
+      <text x="167" y="62" font-size="11" fill="#2e7d46">BA</text>
+    </svg>
+    <figcaption>正六边形 <i>ABCDEF</i>，<span class="v">AE</span>=<b class="bv">m</b>（红），<span class="v">AD</span>=<b class="bv">n</b>（蓝）</figcaption>
+  </figure>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>取坐标（外接圆半径 1）：<i>A</i>(1, 0)，<i>B</i>(1/2, √3/2)，<i>C</i>(−1/2, √3/2)，<i>D</i>(−1, 0)，<i>E</i>(−1/2, −√3/2)，<i>F</i>(1/2, −√3/2)。</p>
+    <p>则 <b class="bv">m</b>=<span class="v">AE</span>=(−3/2, −√3/2)，<b class="bv">n</b>=<span class="v">AD</span>=(−2, 0)，<span class="v">BA</span>=<i>A</i>−<i>B</i>=(1/2, −√3/2)。</p>
+    <p>设 <span class="v">BA</span>=<i>λ</i><b class="bv">m</b>+<i>μ</i><b class="bv">n</b>。比较 <i>y</i> 分量：−√3/2=−√3/2·<i>λ</i> ⟹ <i>λ</i>=1；再比较 <i>x</i>：1/2=−3/2−2<i>μ</i> ⟹ <i>μ</i>=−1。</p>
+    <p>所以 <span class="v">BA</span>=<b class="bv">m</b>−<b class="bv">n</b>。</p>
+  </div>
+  <div class="ans"><b>答案：<span class="v">BA</span>=<b class="bv">m</b>−<b class="bv">n</b></b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">8</div><div class="q-body">如图，梯形 <i>ABCD</i> 中，<i>AD</i>∥<i>BC</i>，<i>AC</i> 与 <i>BD</i> 交于点 <i>O</i>，化简 <span class="v">BA</span>−<span class="v">BC</span>−<span class="v">OA</span>+<span class="v">OD</span>+<span class="v">DA</span>。<span class="tag">化简</span></div></div>
+  <figure class="fig">
+    <svg viewBox="0 0 250 160" width="240">
+      <polygon points="70,35 160,35 220,130 20,130" fill="none" stroke="#333" stroke-width="1.5"/>
+      <line x1="70" y1="35" x2="220" y2="130" stroke="#888" stroke-width="1"/>
+      <line x1="160" y1="35" x2="20" y2="130" stroke="#888" stroke-width="1"/>
+      <circle cx="112" cy="82" r="2.6"/>
+      <text x="62" y="31" font-size="13">A</text>
+      <text x="160" y="31" font-size="13">D</text>
+      <text x="9" y="142" font-size="13">B</text>
+      <text x="223" y="142" font-size="13">C</text>
+      <text x="118" y="80" font-size="12">O</text>
+    </svg>
+    <figcaption>梯形 <i>ABCD</i>，<i>AD</i>∥<i>BC</i>，对角线交于 <i>O</i></figcaption>
+  </figure>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>逐段合并：</p>
+    <ul>
+      <li><span class="v">BA</span>−<span class="v">BC</span>=<span class="v">CA</span>（同起点 <i>B</i> 相减）。</li>
+      <li>−<span class="v">OA</span>+<span class="v">OD</span>=<span class="v">OD</span>−<span class="v">OA</span>=<span class="v">AD</span>。</li>
+    </ul>
+    <p>于是原式 =<span class="v">CA</span>+<span class="v">AD</span>+<span class="v">DA</span>。注意 <span class="v">AD</span>+<span class="v">DA</span>=<b class="bv">0</b>，所以原式 =<span class="v">CA</span>。</p>
+    <p class="small">（坐标验证：<i>A</i>(0,1)、<i>D</i>(2,1)、<i>B</i>(−1,0)、<i>C</i>(3,0)，原式 =(−3,1)=<span class="v">CA</span>。）</p>
+  </div>
+  <div class="ans"><b>答案：<span class="v">CA</span></b></div>
+</div>
+
+</div><!-- /sec3 -->
+
+<!-- ===================== 强化练 4 ===================== -->
+<h2 class="sec">每周强化练 4　向量的数乘运算<small>核心：数乘 <i>λ</i><b class="bv">a</b> 的方向与模；共线定理 <b class="bv">b</b>=<i>λ</i><b class="bv">a</b>（<b class="bv">a</b>≠<b class="bv">0</b>）；三点共线的向量判定</small></h2>
+<div class="sec-body">
+
+<div class="q">
+  <div class="q-head"><div class="q-num">1</div><div class="q-body">若平面四边形 <i>ABCD</i> 满足 <span class="v">AB</span>=2<span class="v">DC</span>，则该四边形一定是（　）<span class="tag">共线·判定</span></div></div>
+  <div class="opts">
+    <div>A. 平行四边形</div><div>B. 矩形</div>
+    <div>C. 菱形</div><div>D. 梯形</div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p><span class="v">AB</span>=2<span class="v">DC</span> 表明 <span class="v">AB</span> 与 <span class="v">DC</span> <span class="kw">方向相同且 |<span class="v">AB</span>|=2|<span class="v">DC</span>|</span>。即四边形一组对边 <i>AB</i>∥<i>DC</i> 但长度不等（2∶1），另一组对边不受约束，所以它是<span class="kw">一组对边平行且不相等</span>的梯形。若为平行四边形需 <span class="v">AB</span>=<span class="v">DC</span>（相等），此处不满足。</p>
+  </div>
+  <div class="ans"><b>答案：D</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">2</div><div class="q-body">化简 3(<b class="bv">a</b>+<b class="bv">b</b>)+<b class="bv">b</b>−4(<b class="bv">a</b>−<b class="bv">b</b>) 的结果是（　）<span class="tag">数乘化简</span></div></div>
+  <div class="opts">
+    <div>A. 2<b class="bv">b</b>−<b class="bv">a</b></div><div>B. −<b class="bv">a</b></div>
+    <div>C. 6<b class="bv">a</b>−<b class="bv">b</b></div><div>D. 8<b class="bv">b</b>−<b class="bv">a</b></div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>去括号合并同类项：3(<b class="bv">a</b>+<b class="bv">b</b>)+<b class="bv">b</b>−4(<b class="bv">a</b>−<b class="bv">b</b>)=3<b class="bv">a</b>+3<b class="bv">b</b>+<b class="bv">b</b>−4<b class="bv">a</b>+4<b class="bv">b</b>=(3−4)<b class="bv">a</b>+(3+1+4)<b class="bv">b</b>=−<b class="bv">a</b>+8<b class="bv">b</b>=8<b class="bv">b</b>−<b class="bv">a</b>。</p>
+  </div>
+  <div class="ans"><b>答案：D</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">3</div><div class="q-body">已知向量 <b class="bv">e</b><sub>1</sub>、<b class="bv">e</b><sub>2</sub> 是两个不共线的向量，<b class="bv">a</b>=2<b class="bv">e</b><sub>1</sub>−<b class="bv">e</b><sub>2</sub> 与 <b class="bv">b</b>=<b class="bv">e</b><sub>1</sub>+<i>λ</i><b class="bv">e</b><sub>2</sub> 共线，则 <i>λ</i>=（　）<span class="tag">共线定理</span></div></div>
+  <div class="opts">
+    <div>A. 2</div><div>B. −2</div>
+    <div>C. −<span class="frac"><span class="n">1</span><span class="d">2</span></span></div><div>D. <span class="frac"><span class="n">1</span><span class="d">2</span></span></div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p><b class="bv">a</b> 与 <b class="bv">b</b> 共线，则存在实数 <i>k</i> 使 <b class="bv">a</b>=<i>k</i><b class="bv">b</b>，即 2<b class="bv">e</b><sub>1</sub>−<b class="bv">e</b><sub>2</sub>=<i>k</i><b class="bv">e</b><sub>1</sub>+<i>kλ</i><b class="bv">e</b><sub>2</sub>。</p>
+    <p><b class="bv">e</b><sub>1</sub>、<b class="bv">e</b><sub>2</sub> 不共线可作基底，对应系数相等：<i>k</i>=2，<i>kλ</i>=−1，故 <i>λ</i>=−<span class="frac"><span class="n">1</span><span class="d"><i>k</i></span></span>=−<span class="frac"><span class="n">1</span><span class="d">2</span></span>。</p>
+  </div>
+  <div class="ans"><b>答案：C</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">4</div><div class="q-body">已知 <b class="bv">a</b>、<b class="bv">b</b> 为不共线向量，<span class="v">AB</span>=<b class="bv">a</b>+5<b class="bv">b</b>，<span class="v">BC</span>=−2<b class="bv">a</b>+8<b class="bv">b</b>，<span class="v">CD</span>=3(<b class="bv">a</b>−<b class="bv">b</b>)，则（　）<span class="tag">三点共线</span></div></div>
+  <div class="opts">
+    <div>A. <i>A</i>、<i>B</i>、<i>D</i> 三点共线</div>
+    <div>B. <i>A</i>、<i>B</i>、<i>C</i> 三点共线</div>
+    <div>C. <i>A</i>、<i>C</i>、<i>D</i> 三点共线</div>
+    <div>D. <i>B</i>、<i>C</i>、<i>D</i> 三点共线</div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>先求 <span class="v">BD</span>=<span class="v">BC</span>+<span class="v">CD</span>=(−2<b class="bv">a</b>+8<b class="bv">b</b>)+(3<b class="bv">a</b>−3<b class="bv">b</b>)=<b class="bv">a</b>+5<b class="bv">b</b>。</p>
+    <p>而 <span class="v">AB</span>=<b class="bv">a</b>+5<b class="bv">b</b>，所以 <span class="v">AB</span>=<span class="v">BD</span>。二者有公共点 <i>B</i> 且方向相同，故 <i>A</i>、<i>B</i>、<i>D</i> 三点共线（<i>B</i> 为 <i>AD</i> 的中点）。</p>
+  </div>
+  <div class="ans"><b>答案：A</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">5</div><div class="q-body">在平行四边形 <i>ABCD</i> 中，<span class="v">DE</span>=2<span class="v">EC</span>，则 <span class="v">BE</span>=（　）<span class="tag">线性表示</span></div></div>
+  <figure class="fig">
+    <svg viewBox="0 0 250 140" width="240">
+      <polygon points="35,120 175,120 215,35 75,35" fill="none" stroke="#333" stroke-width="1.5"/>
+      <line x1="175" y1="120" x2="168" y2="35" stroke="#c0392b" stroke-width="1.6" stroke-dasharray="0" opacity="0"/>
+      <line x1="175" y1="120" x2="168" y2="35" stroke="#c0392b" stroke-width="1.8" marker-end="url(#ar)"/>
+      <circle cx="168" cy="35" r="2.8" fill="#c0392b"/>
+      <text x="26" y="132" font-size="13">A</text>
+      <text x="176" y="132" font-size="13">B</text>
+      <text x="218" y="32" font-size="13">C</text>
+      <text x="65" y="32" font-size="13">D</text>
+      <text x="164" y="30" font-size="11" fill="#c0392b">E</text>
+    </svg>
+    <figcaption><i>E</i> 在 <i>DC</i> 上且 <span class="v">DE</span>=2<span class="v">EC</span>（<i>E</i> 靠近 <i>C</i>），红色为 <span class="v">BE</span></figcaption>
+  </figure>
+  <div class="opts">
+    <div>A. <span class="v">BC</span>+<span class="frac"><span class="n">1</span><span class="d">3</span></span><span class="v">CD</span></div>
+    <div>B. <span class="v">BC</span>+<span class="frac"><span class="n">2</span><span class="d">3</span></span><span class="v">CD</span></div>
+    <div>C. <span class="v">BC</span>−<span class="frac"><span class="n">1</span><span class="d">3</span></span><span class="v">CD</span></div>
+    <div>D. <span class="v">BC</span>−<span class="frac"><span class="n">2</span><span class="d">3</span></span><span class="v">CD</span></div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p><span class="v">BE</span>=<span class="v">BC</span>+<span class="v">CE</span>。由 <span class="v">DE</span>=2<span class="v">EC</span> 知 <i>E</i> 分 <i>DC</i> 为 <i>DE</i>∶<i>EC</i>=2∶1，故 <span class="v">EC</span>=<span class="frac"><span class="n">1</span><span class="d">3</span></span><span class="v">DC</span>，于是 <span class="v">CE</span>=−<span class="frac"><span class="n">1</span><span class="d">3</span></span><span class="v">DC</span>=<span class="frac"><span class="n">1</span><span class="d">3</span></span><span class="v">CD</span>。</p>
+    <p>所以 <span class="v">BE</span>=<span class="v">BC</span>+<span class="frac"><span class="n">1</span><span class="d">3</span></span><span class="v">CD</span>。</p>
+    <p class="small">（坐标验证：<i>A</i>(0,0)、<i>B</i>(2,0)、<i>C</i>(3,1)、<i>D</i>(1,1)，<i>E</i>=<i>D</i>+<span class="frac"><span class="n">2</span><span class="d">3</span></span><span class="v">DC</span>=(7/3,1)，<span class="v">BE</span>=(1/3,1)=<span class="v">BC</span>+<span class="frac"><span class="n">1</span><span class="d">3</span></span><span class="v">CD</span>。）</p>
+  </div>
+  <div class="ans"><b>答案：A</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">6</div><div class="q-body">在 △<i>ABC</i> 中，<span class="v">DC</span>=2<span class="v">BD</span>，若 <span class="v">BC</span>=<i>λ</i><span class="v">DC</span>，则 <i>λ</i>= ______。<span class="tag">共线系数</span></div></div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p><i>D</i> 在 <i>BC</i> 上，<span class="v">BD</span>+<span class="v">DC</span>=<span class="v">BC</span>。由 <span class="v">DC</span>=2<span class="v">BD</span> 得 <span class="v">BD</span>=<span class="frac"><span class="n">1</span><span class="d">2</span></span><span class="v">DC</span>。</p>
+    <p>所以 <span class="v">BC</span>=<span class="frac"><span class="n">1</span><span class="d">2</span></span><span class="v">DC</span>+<span class="v">DC</span>=<span class="frac"><span class="n">3</span><span class="d">2</span></span><span class="v">DC</span>，即 <i>λ</i>=<span class="frac"><span class="n">3</span><span class="d">2</span></span>。</p>
+  </div>
+  <div class="ans"><b>答案：<i>λ</i>=<span class="frac"><span class="n">3</span><span class="d">2</span></span></b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">7</div><div class="q-body">已知 <i>D</i> 是 △<i>ABC</i> 中 <i>BC</i> 边的中点，用 <span class="v">AB</span> 与 <span class="v">AC</span> 表示向量 <span class="v">AD</span>，则 <span class="v">AD</span>= ______。<span class="tag">中点·中线</span></div></div>
+  <figure class="fig">
+    <svg viewBox="0 0 240 175" width="220">
+      <polygon points="120,20 45,150 195,150" fill="none" stroke="#333" stroke-width="1.5"/>
+      <line x1="120" y1="20" x2="120" y2="150" stroke="#c0392b" stroke-width="1.8" marker-end="url(#ar)"/>
+      <circle cx="120" cy="150" r="2.6"/>
+      <text x="116" y="15" font-size="13">A</text>
+      <text x="35" y="163" font-size="13">B</text>
+      <text x="198" y="163" font-size="13">C</text>
+      <text x="124" y="165" font-size="13">D</text>
+    </svg>
+    <figcaption><i>D</i> 为 <i>BC</i> 中点，<span class="v">AD</span> 是中线</figcaption>
+  </figure>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p><span class="v">AD</span>=<span class="v">AB</span>+<span class="v">BD</span>=<span class="v">AB</span>+<span class="frac"><span class="n">1</span><span class="d">2</span></span><span class="v">BC</span>=<span class="v">AB</span>+<span class="frac"><span class="n">1</span><span class="d">2</span></span>(<span class="v">AC</span>−<span class="v">AB</span>)=<span class="frac"><span class="n">1</span><span class="d">2</span></span><span class="v">AB</span>+<span class="frac"><span class="n">1</span><span class="d">2</span></span><span class="v">AC</span>。</p>
+    <p>即中线向量等于两邻边向量和的一半。</p>
+  </div>
+  <div class="ans"><b>答案：<span class="v">AD</span>=<span class="frac"><span class="n">1</span><span class="d">2</span></span>(<span class="v">AB</span>+<span class="v">AC</span>)</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">8</div><div class="q-body">在平行四边形 <i>ABCD</i> 中，<span class="v">BE</span>=<span class="v">EC</span>，<span class="v">BF</span>=<span class="frac"><span class="n">1</span><span class="d">3</span></span><span class="v">BD</span>，设 <span class="v">AB</span>=<b class="bv">a</b>，<span class="v">AD</span>=<b class="bv">b</b>。（1）用 <b class="bv">a</b>、<b class="bv">b</b> 表示 <span class="v">AE</span>；（2）用 <b class="bv">a</b>、<b class="bv">b</b> 表示 <span class="v">EF</span>。<span class="tag">基底表示</span></div></div>
+  <figure class="fig">
+    <svg viewBox="0 0 250 145" width="240">
+      <polygon points="35,120 175,120 215,35 75,35" fill="none" stroke="#333" stroke-width="1.5"/>
+      <line x1="175" y1="120" x2="75" y2="35" stroke="#888" stroke-width="1"/>
+      <circle cx="195" cy="77.5" r="2.8" fill="#2f6fb0"/>
+      <circle cx="142" cy="92" r="2.8" fill="#c0392b"/>
+      <text x="26" y="132" font-size="13">A</text>
+      <text x="176" y="132" font-size="13">B</text>
+      <text x="218" y="32" font-size="13">C</text>
+      <text x="65" y="32" font-size="13">D</text>
+      <text x="200" y="80" font-size="11" fill="#2f6fb0">E</text>
+      <text x="130" y="94" font-size="11" fill="#c0392b">F</text>
+    </svg>
+    <figcaption><i>E</i> 为 <i>BC</i> 中点；<i>F</i> 在对角线 <i>BD</i> 上，<span class="v">BF</span>=<span class="frac"><span class="n">1</span><span class="d">3</span></span><span class="v">BD</span></figcaption>
+  </figure>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>以 <i>A</i> 为起点，<span class="v">AB</span>=<b class="bv">a</b>，<span class="v">AD</span>=<b class="bv">b</b>，则 <span class="v">BC</span>=<span class="v">AD</span>=<b class="bv">b</b>，<span class="v">BD</span>=<span class="v">AD</span>−<span class="v">AB</span>=<b class="bv">b</b>−<b class="bv">a</b>。</p>
+    <p>（1）<span class="v">BE</span>=<span class="v">EC</span> 说明 <i>E</i> 是 <i>BC</i> 的中点，<span class="v">BE</span>=<span class="frac"><span class="n">1</span><span class="d">2</span></span><span class="v">BC</span>=<span class="frac"><span class="n">1</span><span class="d">2</span></span><b class="bv">b</b>。故 <span class="v">AE</span>=<span class="v">AB</span>+<span class="v">BE</span>=<b class="bv">a</b>+<span class="frac"><span class="n">1</span><span class="d">2</span></span><b class="bv">b</b>。</p>
+    <p>（2）<span class="v">AF</span>=<span class="v">AB</span>+<span class="v">BF</span>=<b class="bv">a</b>+<span class="frac"><span class="n">1</span><span class="d">3</span></span>(<b class="bv">b</b>−<b class="bv">a</b>)=<span class="frac"><span class="n">2</span><span class="d">3</span></span><b class="bv">a</b>+<span class="frac"><span class="n">1</span><span class="d">3</span></span><b class="bv">b</b>。</p>
+    <p>于是 <span class="v">EF</span>=<span class="v">AF</span>−<span class="v">AE</span>=(<span class="frac"><span class="n">2</span><span class="d">3</span></span><b class="bv">a</b>+<span class="frac"><span class="n">1</span><span class="d">3</span></span><b class="bv">b</b>)−(<b class="bv">a</b>+<span class="frac"><span class="n">1</span><span class="d">2</span></span><b class="bv">b</b>)=−<span class="frac"><span class="n">1</span><span class="d">3</span></span><b class="bv">a</b>−<span class="frac"><span class="n">1</span><span class="d">6</span></span><b class="bv">b</b>。</p>
+    <p class="small">（坐标验证：<b class="bv">a</b>=(1,0)、<b class="bv">b</b>=(0,1)，<i>E</i>=(1,½)、<i>F</i>=(⅔,⅓)，<span class="v">EF</span>=(−⅓,−⅙)。）</p>
+  </div>
+  <div class="ans"><b>答案：（1）<span class="v">AE</span>=<b class="bv">a</b>+<span class="frac"><span class="n">1</span><span class="d">2</span></span><b class="bv">b</b>；（2）<span class="v">EF</span>=−<span class="frac"><span class="n">1</span><span class="d">3</span></span><b class="bv">a</b>−<span class="frac"><span class="n">1</span><span class="d">6</span></span><b class="bv">b</b></b></div>
+</div>
+
+</div><!-- /sec4 -->
+
+<!-- ===================== 强化练 6 ===================== -->
+<h2 class="sec">每周强化练 6　向量数量积的运算律<small>核心：<b class="bv">a</b>·<b class="bv">b</b>=|<b class="bv">a</b>||<b class="bv">b</b>|cos<i>θ</i>；|<b class="bv">v</b>|<sup>2</sup>=<b class="bv">v</b>·<b class="bv">v</b>；<b class="bv">a</b>⊥<b class="bv">b</b> ⟺ <b class="bv">a</b>·<b class="bv">b</b>=0</small></h2>
+<div class="sec-body">
+
+<div class="q">
+  <div class="q-head"><div class="q-num">1</div><div class="q-body">已知 |<b class="bv">a</b>|=2，|<b class="bv">b</b>|=√3，<b class="bv">a</b> 与 <b class="bv">b</b> 的夹角为 <span class="frac"><span class="n">π</span><span class="d">6</span></span>，则 (<b class="bv">a</b>+<b class="bv">b</b>)·(2<b class="bv">a</b>−<b class="bv">b</b>)=（　）<span class="tag">展开</span></div></div>
+  <div class="opts">
+    <div>A. 6</div><div>B. 8</div>
+    <div>C. 10</div><div>D. 14</div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>先求 <b class="bv">a</b>·<b class="bv">b</b>=|<b class="bv">a</b>||<b class="bv">b</b>|cos<span class="frac"><span class="n">π</span><span class="d">6</span></span>=2×√3×<span class="frac"><span class="n">√3</span><span class="d">2</span></span>=3。</p>
+    <p>用分配律展开：(<b class="bv">a</b>+<b class="bv">b</b>)·(2<b class="bv">a</b>−<b class="bv">b</b>)=2|<b class="bv">a</b>|<sup>2</sup>+<b class="bv">a</b>·<b class="bv">b</b>−|<b class="bv">b</b>|<sup>2</sup>=2×4+3−3=8。</p>
+  </div>
+  <div class="ans"><b>答案：B</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">2</div><div class="q-body">已知 <b class="bv">a</b>、<b class="bv">b</b> 是夹角为 <span class="frac"><span class="n">π</span><span class="d">3</span></span> 的单位向量，那么 |<b class="bv">a</b>+<b class="bv">b</b>|=（　）<span class="tag">求模</span></div></div>
+  <div class="opts">
+    <div>A. 1</div><div>B. <span class="frac"><span class="n">√3</span><span class="d">2</span></span></div>
+    <div>C. √3</div><div>D. 2√3</div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>|<b class="bv">a</b>|=|<b class="bv">b</b>|=1，<b class="bv">a</b>·<b class="bv">b</b>=cos<span class="frac"><span class="n">π</span><span class="d">3</span></span>=<span class="frac"><span class="n">1</span><span class="d">2</span></span>。</p>
+    <p>|<b class="bv">a</b>+<b class="bv">b</b>|<sup>2</sup>=|<b class="bv">a</b>|<sup>2</sup>+2<b class="bv">a</b>·<b class="bv">b</b>+|<b class="bv">b</b>|<sup>2</sup>=1+2×<span class="frac"><span class="n">1</span><span class="d">2</span></span>+1=3，故 |<b class="bv">a</b>+<b class="bv">b</b>|=√3。</p>
+  </div>
+  <div class="ans"><b>答案：C</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">3</div><div class="q-body">已知非零向量 <b class="bv">a</b>、<b class="bv">b</b> 满足 |<b class="bv">b</b>|=4|<b class="bv">a</b>|，且 <b class="bv">a</b>⊥(2<b class="bv">a</b>+<b class="bv">b</b>)，则 <b class="bv">a</b> 与 <b class="bv">b</b> 的夹角为（　）<span class="tag">求夹角</span></div></div>
+  <div class="opts">
+    <div>A. <span class="frac"><span class="n">π</span><span class="d">3</span></span></div><div>B. <span class="frac"><span class="n">π</span><span class="d">2</span></span></div>
+    <div>C. <span class="frac"><span class="n">2π</span><span class="d">3</span></span></div><div>D. <span class="frac"><span class="n">5π</span><span class="d">6</span></span></div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p><b class="bv">a</b>⊥(2<b class="bv">a</b>+<b class="bv">b</b>) ⟹ <b class="bv">a</b>·(2<b class="bv">a</b>+<b class="bv">b</b>)=0 ⟹ 2|<b class="bv">a</b>|<sup>2</sup>+<b class="bv">a</b>·<b class="bv">b</b>=0，即 <b class="bv">a</b>·<b class="bv">b</b>=−2|<b class="bv">a</b>|<sup>2</sup>。</p>
+    <p>cos<i>θ</i>=<span class="frac"><span class="n"><b class="bv">a</b>·<b class="bv">b</b></span><span class="d">|<b class="bv">a</b>||<b class="bv">b</b>|</span></span>=<span class="frac"><span class="n">−2|<b class="bv">a</b>|<sup>2</sup></span><span class="d">|<b class="bv">a</b>|·4|<b class="bv">a</b>|</span></span>=−<span class="frac"><span class="n">1</span><span class="d">2</span></span>，故 <i>θ</i>=<span class="frac"><span class="n">2π</span><span class="d">3</span></span>。</p>
+  </div>
+  <div class="ans"><b>答案：C</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">4</div><div class="q-body">已知非零向量 <b class="bv">a</b>、<b class="bv">b</b> 满足 |<b class="bv">a</b>|=3|<b class="bv">b</b>|，cos⟨<b class="bv">a</b>,<b class="bv">b</b>⟩=<span class="frac"><span class="n">1</span><span class="d">4</span></span>，若 <b class="bv">b</b>⊥(<i>t</i><b class="bv">a</b>+<b class="bv">b</b>)，则实数 <i>t</i>=（　）<span class="tag">求参数</span></div></div>
+  <div class="opts">
+    <div>A. 4</div><div>B. −4</div>
+    <div>C. <span class="frac"><span class="n">9</span><span class="d">4</span></span></div><div>D. −<span class="frac"><span class="n">4</span><span class="d">3</span></span></div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p><b class="bv">a</b>·<b class="bv">b</b>=|<b class="bv">a</b>||<b class="bv">b</b>|cos⟨<b class="bv">a</b>,<b class="bv">b</b>⟩=3|<b class="bv">b</b>|·|<b class="bv">b</b>|·<span class="frac"><span class="n">1</span><span class="d">4</span></span>=<span class="frac"><span class="n">3</span><span class="d">4</span></span>|<b class="bv">b</b>|<sup>2</sup>。</p>
+    <p><b class="bv">b</b>⊥(<i>t</i><b class="bv">a</b>+<b class="bv">b</b>) ⟹ <b class="bv">b</b>·(<i>t</i><b class="bv">a</b>+<b class="bv">b</b>)=0 ⟹ <i>t</i>(<b class="bv">a</b>·<b class="bv">b</b>)+|<b class="bv">b</b>|<sup>2</sup>=0。</p>
+    <p>代入：<i>t</i>·<span class="frac"><span class="n">3</span><span class="d">4</span></span>|<b class="bv">b</b>|<sup>2</sup>+|<b class="bv">b</b>|<sup>2</sup>=0 ⟹ <span class="frac"><span class="n">3</span><span class="d">4</span></span><i>t</i>+1=0 ⟹ <i>t</i>=−<span class="frac"><span class="n">4</span><span class="d">3</span></span>。</p>
+  </div>
+  <div class="ans"><b>答案：D</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">5</div><div class="q-body">已知向量 <b class="bv">a</b>、<b class="bv">b</b> 满足 |<b class="bv">a</b>|=1，|<b class="bv">b</b>|=2，且 |<b class="bv">a</b>−3<b class="bv">b</b>|=5，则 <b class="bv">a</b>·<b class="bv">b</b>=（　）<span class="tag">求数量积</span></div></div>
+  <div class="opts">
+    <div>A. 2</div><div>B. −2</div>
+    <div>C. 1</div><div>D. −1</div>
+  </div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>两边平方：|<b class="bv">a</b>−3<b class="bv">b</b>|<sup>2</sup>=|<b class="bv">a</b>|<sup>2</sup>−6<b class="bv">a</b>·<b class="bv">b</b>+9|<b class="bv">b</b>|<sup>2</sup>=1−6<b class="bv">a</b>·<b class="bv">b</b>+36=37−6<b class="bv">a</b>·<b class="bv">b</b>。</p>
+    <p>由 |<b class="bv">a</b>−3<b class="bv">b</b>|=5 得 25=37−6<b class="bv">a</b>·<b class="bv">b</b> ⟹ <b class="bv">a</b>·<b class="bv">b</b>=2。</p>
+  </div>
+  <div class="ans"><b>答案：A</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">6</div><div class="q-body">已知单位向量 <b class="bv">a</b>、<b class="bv">b</b> 的夹角为 <span class="frac"><span class="n">π</span><span class="d">3</span></span>，<b class="bv">a</b>−<i>k</i><b class="bv">b</b> 与 <b class="bv">b</b> 垂直，则实数 <i>k</i>= ______。<span class="tag">求参数</span></div></div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p><b class="bv">a</b>·<b class="bv">b</b>=cos<span class="frac"><span class="n">π</span><span class="d">3</span></span>=<span class="frac"><span class="n">1</span><span class="d">2</span></span>，|<b class="bv">b</b>|<sup>2</sup>=1。</p>
+    <p>(<b class="bv">a</b>−<i>k</i><b class="bv">b</b>)⊥<b class="bv">b</b> ⟹ (<b class="bv">a</b>−<i>k</i><b class="bv">b</b>)·<b class="bv">b</b>=0 ⟹ <b class="bv">a</b>·<b class="bv">b</b>−<i>k</i>|<b class="bv">b</b>|<sup>2</sup>=0 ⟹ <span class="frac"><span class="n">1</span><span class="d">2</span></span>−<i>k</i>=0，故 <i>k</i>=<span class="frac"><span class="n">1</span><span class="d">2</span></span>。</p>
+  </div>
+  <div class="ans"><b>答案：<i>k</i>=<span class="frac"><span class="n">1</span><span class="d">2</span></span></b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">7</div><div class="q-body">若 <b class="bv">e</b><sub>1</sub>、<b class="bv">e</b><sub>2</sub> 是单位向量，且 <b class="bv">e</b><sub>1</sub>·<b class="bv">e</b><sub>2</sub>=−<span class="frac"><span class="n">√2</span><span class="d">2</span></span>，则 <b class="bv">e</b><sub>1</sub> 与 <b class="bv">e</b><sub>2</sub> 的夹角是 ______。<span class="tag">求夹角</span></div></div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>cos<i>θ</i>=<span class="frac"><span class="n"><b class="bv">e</b><sub>1</sub>·<b class="bv">e</b><sub>2</sub></span><span class="d">|<b class="bv">e</b><sub>1</sub>||<b class="bv">e</b><sub>2</sub>|</span></span>=−<span class="frac"><span class="n">√2</span><span class="d">2</span></span>，且 <i>θ</i>∈[0, π]，故 <i>θ</i>=<span class="frac"><span class="n">3π</span><span class="d">4</span></span>。</p>
+  </div>
+  <div class="ans"><b>答案：<span class="frac"><span class="n">3π</span><span class="d">4</span></span>（即 135°）</b></div>
+</div>
+
+<div class="q">
+  <div class="q-head"><div class="q-num">8</div><div class="q-body">已知 |<b class="bv">a</b>|=2，|<b class="bv">b</b>|=3，<b class="bv">a</b>、<b class="bv">b</b> 的夹角为 <span class="frac"><span class="n">π</span><span class="d">3</span></span>。（1）求 (<b class="bv">a</b>+<b class="bv">b</b>)·(2<b class="bv">a</b>−<b class="bv">b</b>)；（2）求 |3<b class="bv">a</b>−2<b class="bv">b</b>|。<span class="tag">综合</span></div></div>
+  <div class="sol">
+    <div class="lab">解析</div>
+    <p>先求 <b class="bv">a</b>·<b class="bv">b</b>=|<b class="bv">a</b>||<b class="bv">b</b>|cos<span class="frac"><span class="n">π</span><span class="d">3</span></span>=2×3×<span class="frac"><span class="n">1</span><span class="d">2</span></span>=3。</p>
+    <p>（1）(<b class="bv">a</b>+<b class="bv">b</b>)·(2<b class="bv">a</b>−<b class="bv">b</b>)=2|<b class="bv">a</b>|<sup>2</sup>+<b class="bv">a</b>·<b class="bv">b</b>−|<b class="bv">b</b>|<sup>2</sup>=2×4+3−9=2。</p>
+    <p>（2）|3<b class="bv">a</b>−2<b class="bv">b</b>|<sup>2</sup>=9|<b class="bv">a</b>|<sup>2</sup>−12<b class="bv">a</b>·<b class="bv">b</b>+4|<b class="bv">b</b>|<sup>2</sup>=9×4−12×3+4×9=36−36+36=36，故 |3<b class="bv">a</b>−2<b class="bv">b</b>|=6。</p>
+  </div>
+  <div class="ans"><b>答案：（1）2；（2）6</b></div>
+</div>
+
+</div><!-- /sec6 -->
+
+<div class="foot">数学 · 必修第二册（人教A版）· 平面向量 每周强化练解析　|　强化练 5 补图后即为连续 1～6</div>
+</div>
+
+<script>
+(function(){
+  var secs = document.querySelectorAll('h2.sec');
+  var data = [];
+  secs.forEach(function(sec, si){
+    var m = sec.textContent.match(/强化练\s*(\d+)/);
+    var num = m ? m[1] : String(si+1);
+    sec.id = 'sec-' + num;
+    var title = (sec.childNodes[0] && sec.childNodes[0].nodeValue ? sec.childNodes[0].nodeValue : sec.textContent).trim();
+    var body = sec.nextElementSibling;
+    var qs = body ? body.querySelectorAll('.q') : [];
+    var items = [];
+    qs.forEach(function(q){
+      var qnEl = q.querySelector('.q-num');
+      var qn = qnEl ? qnEl.textContent.trim() : '';
+      q.id = 'q-' + num + '-' + qn;
+      items.push({qn:qn, id:q.id});
+    });
+    data.push({num:num, title:title, secId:sec.id, items:items});
+  });
+
+  var panel = document.createElement('div');
+  panel.id = 'jumpPanel';
+  var html = '<div class="jp-head">快速跳转<span class="jp-close" role="button" aria-label="关闭">×</span></div><div class="jp-body">';
+  data.forEach(function(s){
+    html += '<div class="jp-sec"><a class="jp-title" href="#'+s.secId+'">'+s.title+'</a><div class="jp-chips">';
+    s.items.forEach(function(it){ html += '<a href="#'+it.id+'">'+it.qn+'</a>'; });
+    html += '</div></div>';
+  });
+  html += '</div>';
+  panel.innerHTML = html;
+  document.body.appendChild(panel);
+
+  var btns = document.createElement('div');
+  btns.id = 'navBtns';
+  btns.innerHTML = '<button id="btnMenu" type="button">☰ 目录</button><button id="btnTop" type="button">↑ 顶部</button>';
+  document.body.appendChild(btns);
+
+  var btnMenu = document.getElementById('btnMenu');
+  var btnTop = document.getElementById('btnTop');
+  btnMenu.addEventListener('click', function(e){ e.stopPropagation(); panel.classList.toggle('open'); });
+  panel.querySelector('.jp-close').addEventListener('click', function(){ panel.classList.remove('open'); });
+  panel.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(){ panel.classList.remove('open'); }); });
+  document.addEventListener('click', function(e){
+    if(panel.classList.contains('open') && !panel.contains(e.target) && e.target !== btnMenu){ panel.classList.remove('open'); }
+  });
+  btnTop.addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
+  function onScroll(){ if(window.scrollY > 400){ btnTop.classList.add('show'); } else { btnTop.classList.remove('show'); } }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+})();
+</script>
+</body>
+</html>

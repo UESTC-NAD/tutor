@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>狗哥的教辅库</title>
+<style>
+  :root{
+    --bg:#f4f6f9; --card:#fff; --ink:#20304d; --muted:#5c6b82; --line:#e3e7ee;
+    --brand:#2f6fb0; --brand-soft:#eaf2fa; --shadow:0 1px 3px rgba(20,40,80,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#12161d; --card:#1b212b; --ink:#e6ebf2; --muted:#9aa7bb; --line:#2a323f;
+           --brand:#6aa9e8; --brand-soft:#1e2a3a; --shadow:0 1px 3px rgba(0,0,0,.3); }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",-apple-system,Segoe UI,Roboto,sans-serif;
+    line-height:1.7; -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1000px; margin:0 auto; padding:0 18px 70px;
+        padding-left:max(18px,env(safe-area-inset-left)); padding-right:max(18px,env(safe-area-inset-right))}
+  header.top{
+    background:linear-gradient(135deg,#23324c,#33507a); color:#fff;
+    padding:30px 22px calc(26px + env(safe-area-inset-top)); padding-top:calc(30px + env(safe-area-inset-top));
+    box-shadow:0 6px 22px rgba(35,50,76,.18); margin-bottom:22px;
+  }
+  header.top .inner{max-width:1000px; margin:0 auto}
+  header.top h1{margin:0 0 4px; font-size:26px; letter-spacing:.5px}
+  header.top p{margin:0; color:#d7e2f2; font-size:14.5px}
+  .tools{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:0 0 18px}
+  #q{
+    flex:1 1 220px; min-height:44px; padding:10px 14px; font-size:16px;
+    border:1px solid var(--line); border-radius:12px; background:var(--card); color:var(--ink);
+    -webkit-appearance:none;
+  }
+  #q:focus{outline:2px solid var(--brand); outline-offset:1px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px}
+  .chip{
+    min-height:44px; padding:0 16px; font-size:15px; cursor:pointer;
+    border:1px solid var(--line); border-radius:22px; background:var(--card); color:var(--ink);
+    font-family:inherit; -webkit-tap-highlight-color:transparent;
+  }
+  .chip.on{background:var(--brand); color:#fff; border-color:var(--brand)}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px}
+  .card{
+    display:block; text-decoration:none; color:inherit; background:var(--card);
+    border:1px solid var(--line); border-radius:14px; padding:16px 18px 14px; box-shadow:var(--shadow);
+    transition:transform .12s ease, box-shadow .12s ease; -webkit-tap-highlight-color:transparent;
+  }
+  .card:active{transform:scale(.985)}
+  @media (hover:hover){ .card:hover{box-shadow:0 6px 18px rgba(20,40,80,.12); border-color:var(--brand)} }
+  .card-top{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px}
+  .badge{font-size:12.5px; font-weight:700; padding:2px 10px; border-radius:6px; background:var(--brand-soft); color:var(--brand)}
+  .badge.s-数学{background:#eaf2fa; color:#2f6fb0}
+  .badge.s-化学{background:#eaf6ee; color:#2e7d46}
+  .badge.s-物理{background:#fdf3e2; color:#a15c00}
+  @media (prefers-color-scheme: dark){
+    .badge.s-数学{background:#1e2a3a; color:#6aa9e8}
+    .badge.s-化学{background:#172a20; color:#6cc38a}
+    .badge.s-物理{background:#2e2417; color:#d9a05b}
+  }
+  time{font-size:12.5px; color:var(--muted)}
+  .card h2{margin:0; font-size:17px; line-height:1.5; font-weight:600}
+  .card .note{margin:6px 0 0; font-size:14px; color:var(--muted)}
+  .meta{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px}
+  .meta span{font-size:12.5px; color:var(--muted); border:1px solid var(--line); border-radius:6px; padding:1px 8px}
+  .empty{display:none; text-align:center; color:var(--muted); padding:40px 0; font-size:15px}
+  footer{margin-top:34px; text-align:center; color:var(--muted); font-size:13px; line-height:1.9}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="inner">
+    <h1>狗哥的教辅库</h1>
+    <p>公式与交互都能正常使用的在线版本</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="tools">
+    <input id="q" type="search" placeholder="搜索标题…" autocomplete="off" enterkeyhint="search">
+    <div class="chips"><button type="button" class="chip on" data-filter="全部">全部</button><button type="button" class="chip" data-filter="化学">化学</button><button type="button" class="chip" data-filter="数学">数学</button></div>
+  </div>
+
+  <div class="grid" id="grid">
+      <a class="card" href="lessons/%E7%BB%BC%E5%90%88%E8%AE%AD%E7%BB%8323_%E8%AF%A6%E7%BB%86%E8%A7%A3%E6%9E%90.html" data-subject="化学" data-search="《综合训练 23》详细解析 化学 ">
+        <div class="card-top"><span class="badge s-化学">化学</span><time>2026-07-23</time></div>
+        <h2>《综合训练 23》详细解析</h2>
+        
+        <div class="meta"><span>公式实时渲染</span></div>
+      </a>
+      <a class="card" href="lessons/%E5%A4%8D%E6%95%B0%E4%B8%8E%E7%AB%8B%E4%BD%93%E5%87%A0%E4%BD%95_%E8%AF%A6%E8%A7%A3%E5%90%88%E9%9B%86.html" data-subject="数学" data-search="复数 &amp; 立体几何 · 详解与答案（合集） 数学 ">
+        <div class="card-top"><span class="badge s-数学">数学</span><time>2026-07-23</time></div>
+        <h2>复数 &amp; 立体几何 · 详解与答案（合集）</h2>
+        
+        <div class="meta"><span>约 16 题</span><span>公式已预渲染</span></div>
+      </a>
+      <a class="card" href="lessons/%E7%AC%AC19%E9%A2%98%E8%AF%A6%E8%A7%A3.html" data-subject="数学" data-search="第19题 · 翻折 · 详解 数学 立体几何翻折专题单题精讲">
+        <div class="card-top"><span class="badge s-数学">数学</span><time>2026-07-23</time></div>
+        <h2>第19题 · 翻折 · 详解</h2>
+        <p class="note">立体几何翻折专题单题精讲</p>
+        <div class="meta"><span>约 1 题</span><span>公式已预渲染</span></div>
+      </a>
+      <a class="card" href="lessons/%E8%A7%A3%E4%B8%89%E8%A7%92%E5%BD%A2%E4%B8%8E%E5%B9%B3%E9%9D%A2%E5%90%91%E9%87%8F_%E4%B9%A0%E9%A2%98%E8%AF%A6%E8%A7%A3.html" data-subject="数学" data-search="解三角形与平面向量 · 习题详解（11–19） 数学 ">
+        <div class="card-top"><span class="badge s-数学">数学</span><time>2026-07-23</time></div>
+        <h2>解三角形与平面向量 · 习题详解（11–19）</h2>
+        
+        <div class="meta"><span>约 9 题</span></div>
+      </a>
+      <a class="card" href="lessons/%E6%95%B0%E5%AD%A6%E5%91%A8%E5%91%A8%E7%BB%831-5_%E5%BC%BA%E5%8C%96%E7%BB%83%E8%A7%A3%E6%9E%90.html" data-subject="数学" data-search="数学·必修第二册 平面向量 每周强化练 详细解析 数学 ">
+        <div class="card-top"><span class="badge s-数学">数学</span><time>2026-07-21</time></div>
+        <h2>数学·必修第二册 平面向量 每周强化练 详细解析</h2>
+        
+        <div class="meta"><span>约 41 题</span><span>含交互按钮</span></div>
+      </a>
+      <a class="card" href="lessons/%E7%BB%BC%E5%90%88%E8%AE%AD%E7%BB%831_%E8%AF%A6%E7%BB%86%E8%A7%A3%E6%9E%90.html" data-subject="化学" data-search="《综合训练（1）》化学详细解析 化学 ">
+        <div class="card-top"><span class="badge s-化学">化学</span><time>2026-07-18</time></div>
+        <h2>《综合训练（1）》化学详细解析</h2>
+        
+        <div class="meta"></div>
+      </a>
+  </div>
+  <p class="empty" id="empty">没有匹配的教辅</p>
+
+  <footer>
+    共 6 份教辅　·　更新于 2026-07-23<br>
+    用 Safari 打开本页面，公式和按钮都能正常使用
+  </footer>
+</div>
+
+<script>
+(function(){
+  var q = document.getElementById('q');
+  var grid = document.getElementById('grid');
+  var empty = document.getElementById('empty');
+  var cards = Array.prototype.slice.call(grid.querySelectorAll('.card'));
+  var chips = Array.prototype.slice.call(document.querySelectorAll('.chip'));
+  var subject = '全部';
+
+  function apply(){
+    var kw = q.value.trim().toLowerCase();
+    var shown = 0;
+    cards.forEach(function(c){
+      var okSub = subject === '全部' || c.dataset.subject === subject;
+      var okKw  = !kw || c.dataset.search.indexOf(kw) !== -1;
+      var ok = okSub && okKw;
+      c.style.display = ok ? '' : 'none';
+      if (ok) shown++;
+    });
+    empty.style.display = shown ? 'none' : 'block';
+  }
+
+  q.addEventListener('input', apply);
+  chips.forEach(function(chip){
+    chip.addEventListener('click', function(){
+      chips.forEach(function(c){ c.classList.remove('on'); });
+      chip.classList.add('on');
+      subject = chip.dataset.filter;
+      apply();
+    });
+  });
+})();
+</script>
+</body>
+</html>
