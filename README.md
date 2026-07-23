@@ -15,14 +15,11 @@
 ## 加一份新教辅
 
 1. 把 AI 生成的 HTML 丢进 `lessons/` 文件夹
-2. 在本目录运行：
+2. **双击 `update.bat`**，按提示写一句改动说明（或直接回车）
+3. 等 1–2 分钟，https://uestc-nad.github.io/tutor/ 就更新了
 
-```bash
-node build.mjs
-```
-
-3. 首页 `index.html` 会自动重建，新教辅出现在最上面（按修改时间排序）
-4. 提交并推送，等一两分钟 GitHub Pages 就更新了
+脚本做的三件事：重建首页 `index.html`（新教辅排在最上面）→ 存档 → 上传。
+只想重建首页不上传的话，单独运行 `node build.mjs` 即可。
 
 ### 改标题 / 学科 / 备注
 
