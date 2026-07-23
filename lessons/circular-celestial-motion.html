@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>圆周运动 · 天体运动 · 高中物理教辅</title>
+<style>
+  :root{
+    --blue:#2563eb; --blue-d:#1e40af; --blue-l:#eff6ff;
+    --amber:#d97706; --amber-l:#fffbeb;
+    --green:#059669; --green-l:#ecfdf5;
+    --rose:#e11d48; --rose-l:#fff1f2;
+    --purple:#7c3aed; --purple-l:#f5f3ff;
+    --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; --bg:#f8fafc;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75; font-size:16px;
+  }
+  .wrap{max-width:1000px; margin:0 auto; padding:0 20px 80px;}
+
+  /* header */
+  header.top{
+    background:linear-gradient(135deg,#1e3a8a,#2563eb 55%,#3b82f6);
+    color:#fff; padding:44px 24px 40px; text-align:center;
+    border-radius:0 0 26px 26px; box-shadow:0 10px 30px rgba(37,99,235,.25);
+  }
+  header.top h1{margin:0 0 8px; font-size:30px; letter-spacing:1px;}
+  header.top p{margin:4px 0; opacity:.92; font-size:15px;}
+  .badge{display:inline-block; margin-top:12px; background:rgba(255,255,255,.18);
+    padding:5px 16px; border-radius:20px; font-size:13px;}
+
+  /* nav */
+  nav.toc{
+    background:#fff; margin:22px auto 0; padding:16px 22px; border-radius:16px;
+    box-shadow:0 4px 14px rgba(0,0,0,.06); border:1px solid var(--line);
+  }
+  nav.toc b{color:var(--blue-d); font-size:15px;}
+  nav.toc ol{margin:8px 0 0; padding-left:22px; columns:2; column-gap:32px;}
+  nav.toc li{margin:3px 0; break-inside:avoid;}
+  nav.toc a{color:var(--ink); text-decoration:none; font-size:14.5px;}
+  nav.toc a:hover{color:var(--blue); text-decoration:underline;}
+
+  h2.sec{
+    font-size:23px; margin:46px 0 6px; padding:10px 18px; color:#fff;
+    background:linear-gradient(90deg,var(--blue),#3b82f6); border-radius:12px;
+    box-shadow:0 4px 12px rgba(37,99,235,.2);
+  }
+  h2.sec.cel{background:linear-gradient(90deg,#6d28d9,#8b5cf6); box-shadow:0 4px 12px rgba(124,58,237,.2);}
+  h3{font-size:18.5px; color:var(--blue-d); border-left:5px solid var(--blue);
+     padding-left:12px; margin:30px 0 10px;}
+  h3.cel{color:#5b21b6; border-left-color:var(--purple);}
+  h4{font-size:16px; margin:18px 0 6px; color:#374151;}
+  p{margin:8px 0;}
+
+  /* formula card */
+  .fcard{
+    background:#fff; border:1px solid var(--line); border-radius:14px;
+    padding:16px 20px; margin:14px 0; box-shadow:0 2px 8px rgba(0,0,0,.04);
+  }
+  .fcard.k{border-left:5px solid var(--blue);}
+  .fcard.c{border-left:5px solid var(--purple);}
+  .flabel{font-weight:700; color:var(--blue-d); font-size:15px; margin-bottom:8px; display:block;}
+  .flabel.c{color:#5b21b6;}
+  .eq{
+    font-family:"Cambria Math","Times New Roman",Georgia,serif; font-size:19px;
+    background:var(--blue-l); border-radius:8px; padding:10px 16px; margin:8px 0;
+    display:block; overflow-x:auto; white-space:nowrap;
+  }
+  .eq.c{background:var(--purple-l);}
+  .eq .var{font-style:italic;}
+  var{font-style:italic; font-family:"Cambria Math","Times New Roman",serif;}
+
+  /* fraction */
+  .frac{display:inline-flex; flex-direction:column; text-align:center; vertical-align:middle; margin:0 .18em; font-style:normal;}
+  .frac .n{border-bottom:1.6px solid currentColor; padding:0 .35em; line-height:1.35;}
+  .frac .d{padding:0 .35em; line-height:1.35;}
+  .rt{border-top:1.6px solid currentColor; padding:0 .1em;}
+  sub,sup{font-size:.72em;}
+
+  /* table */
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:14.5px; background:#fff;
+    border-radius:10px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  th{background:var(--blue-d); color:#fff; padding:9px 12px; text-align:left; font-weight:600;}
+  table.cel th{background:#6d28d9;}
+  td{padding:9px 12px; border-top:1px solid var(--line); vertical-align:top;}
+  tr:nth-child(even) td{background:#fafbff;}
+
+  /* callouts */
+  .note{border-radius:12px; padding:12px 18px; margin:14px 0; font-size:14.8px;}
+  .note .t{font-weight:700; margin-bottom:4px; display:block;}
+  .tip{background:var(--green-l); border-left:5px solid var(--green);}
+  .tip .t{color:var(--green);}
+  .warn{background:var(--rose-l); border-left:5px solid var(--rose);}
+  .warn .t{color:var(--rose);}
+  .key{background:var(--amber-l); border-left:5px solid var(--amber);}
+  .key .t{color:var(--amber);}
+
+  /* figure grid */
+  .figrow{display:flex; flex-wrap:wrap; gap:18px; margin:16px 0;}
+  figure{margin:0; flex:1 1 300px; background:#fff; border:1px solid var(--line);
+    border-radius:14px; padding:14px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,.04);}
+  figure svg{max-width:100%; height:auto;}
+  figcaption{font-size:13.5px; color:var(--muted); margin-top:8px;}
+
+  .svglabel{font:italic 13px "Cambria Math",serif; fill:#1f2937;}
+  .svgtag{font:12px sans-serif; fill:#6b7280;}
+
+  footer{text-align:center; color:var(--muted); font-size:13px; margin-top:50px;
+    padding-top:20px; border-top:1px solid var(--line);}
+
+  .pill{display:inline-block; background:var(--blue-l); color:var(--blue-d);
+    border-radius:6px; padding:1px 8px; font-size:13.5px; margin:0 2px; font-weight:600;}
+
+  @media print{
+    body{background:#fff; font-size:12.5px;}
+    header.top{border-radius:0; box-shadow:none; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+    h2.sec, th, .eq, .note, header.top{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+    nav.toc{display:none;}
+    figure,.fcard,table,.note{break-inside:avoid; box-shadow:none;}
+    h2.sec,h3{break-after:avoid;}
+    .wrap{padding-bottom:0;}
+  }
+  @media(max-width:640px){
+    nav.toc ol{columns:1;} header.top h1{font-size:24px;} .eq{font-size:17px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>圆周运动 · 天体运动</h1>
+  <p>高中物理 · 核心公式 / 图例 / 模型 / 易错点 一册通</p>
+  <span class="badge">适用人群：高中生 · 高考物理力学专题复习</span>
+</header>
+
+<div class="wrap">
+
+<nav class="toc">
+  <b>目录</b>
+  <ol>
+    <li><a href="#s1">一、匀速圆周运动的描述量</a></li>
+    <li><a href="#s2">二、向心加速度与向心力</a></li>
+    <li><a href="#s3">三、传动问题（皮带与同轴）</a></li>
+    <li><a href="#s4">四、常见圆周运动模型</a></li>
+    <li><a href="#s5">五、万有引力定律</a></li>
+    <li><a href="#s6">六、引力提供向心力（核心方程）</a></li>
+    <li><a href="#s7">七、测天体质量与密度</a></li>
+    <li><a href="#s8">八、三种宇宙速度</a></li>
+    <li><a href="#s9">九、同步卫星</a></li>
+    <li><a href="#s10">十、开普勒三定律</a></li>
+    <li><a href="#s11">十一、双星系统与卫星变轨</a></li>
+    <li><a href="#s12">十二、公式速查总表 & 易错清单</a></li>
+  </ol>
+</nav>
+
+<!-- ============ 第一部分：圆周运动 ============ -->
+<h2 class="sec" id="s1">第一部分 · 圆周运动</h2>
+
+<h3>一、匀速圆周运动的描述量</h3>
+<p>物体沿圆周运动、且线速度<b>大小</b>不变，叫匀速圆周运动。它是<b>变速运动</b>——速度方向时刻在变，所以一定有加速度。</p>
+
+<div class="figrow">
+  <figure>
+    <svg viewBox="0 0 260 220" width="260" height="220" role="img" aria-label="圆周运动示意图">
+      <circle cx="120" cy="110" r="80" fill="none" stroke="#cbd5e1" stroke-width="2"/>
+      <circle cx="120" cy="110" r="4" fill="#1f2937"/>
+      <!-- radius -->
+      <line x1="120" y1="110" x2="184" y2="62" stroke="#2563eb" stroke-width="2"/>
+      <text x="150" y="78" class="svglabel" fill="#2563eb">r</text>
+      <!-- particle -->
+      <circle cx="184" cy="62" r="7" fill="#e11d48"/>
+      <!-- velocity tangent -->
+      <line x1="184" y1="62" x2="238" y2="98" stroke="#059669" stroke-width="2.5" marker-end="url(#ar1)"/>
+      <text x="220" y="80" class="svglabel" fill="#059669">v</text>
+      <!-- centripetal accel -->
+      <line x1="184" y1="62" x2="140" y2="95" stroke="#d97706" stroke-width="2.5" marker-end="url(#ar2)"/>
+      <text x="150" y="70" class="svglabel" fill="#d97706">a<tspan dy="3" font-size="9">n</tspan></text>
+      <!-- angle -->
+      <path d="M 150 110 A 30 30 0 0 0 168 86" fill="none" stroke="#7c3aed" stroke-width="1.6"/>
+      <text x="150" y="100" class="svglabel" fill="#7c3aed">θ</text>
+      <defs>
+        <marker id="ar1" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto"><path d="M0,0 L8,3.2 L0,6.4 Z" fill="#059669"/></marker>
+        <marker id="ar2" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto"><path d="M0,0 L8,3.2 L0,6.4 Z" fill="#d97706"/></marker>
+      </defs>
+    </svg>
+    <figcaption>线速度 <var>v</var> 沿切线方向；向心加速度 <var>a</var><sub>n</sub> 指向圆心</figcaption>
+  </figure>
+  <figure style="flex:1 1 340px; text-align:left;">
+    <table style="box-shadow:none;margin:0;">
+      <tr><th>量</th><th>意义</th><th>单位</th></tr>
+      <tr><td>线速度 <var>v</var></td><td>弧长与时间之比，方向沿切线</td><td>m/s</td></tr>
+      <tr><td>角速度 <var>ω</var></td><td>半径转过的角度与时间之比</td><td>rad/s</td></tr>
+      <tr><td>周期 <var>T</var></td><td>转一圈所用时间</td><td>s</td></tr>
+      <tr><td>频率 <var>f</var></td><td>每秒转过的圈数</td><td>Hz</td></tr>
+      <tr><td>转速 <var>n</var></td><td>每秒（或每分）转的圈数</td><td>r/s</td></tr>
+    </table>
+  </figure>
+</div>
+
+<div class="fcard k">
+  <span class="flabel">描述量之间的换算</span>
+  <span class="eq"><var>v</var> = <span class="frac"><span class="n">2π<var>r</var></span><span class="d"><var>T</var></span></span> = 2π<var>r</var><var>f</var> = <var>ω</var><var>r</var></span>
+  <span class="eq"><var>ω</var> = <span class="frac"><span class="n">2π</span><span class="d"><var>T</var></span></span> = 2π<var>f</var> = 2π<var>n</var></span>
+  <span class="eq"><var>T</var> = <span class="frac"><span class="n">1</span><span class="d"><var>f</var></span></span> = <span class="frac"><span class="n">2π</span><span class="d"><var>ω</var></span></span> = <span class="frac"><span class="n">2π<var>r</var></span><span class="d"><var>v</var></span></span></span>
+</div>
+
+<div class="note tip"><span class="t">关键关系　v = ωr</span>
+半径 <var>r</var> 是"桥梁"：知道 <var>ω</var>（转得多快）与 <var>r</var>（离圆心多远），就能求 <var>v</var>。<var>ω</var> 由转动整体决定，同一转盘上各点 <var>ω</var> 相同。</div>
+
+<!-- ============ 二、向心力 ============ -->
+<h3 id="s2">二、向心加速度与向心力</h3>
+<p>匀速圆周运动中，合力（<b>向心力</b>）始终指向圆心，只改变速度方向、不改变速度大小。向心力是<b>按效果命名的力</b>，可能由重力、拉力、弹力、摩擦力或它们的合力充当，<b>不要另外多画一个"向心力"</b>。</p>
+
+<div class="fcard k">
+  <span class="flabel">向心加速度 a<sub>n</sub></span>
+  <span class="eq"><var>a</var><sub>n</sub> = <span class="frac"><span class="n"><var>v</var><sup>2</sup></span><span class="d"><var>r</var></span></span> = <var>ω</var><sup>2</sup><var>r</var> = <var>ωv</var> = <span class="frac"><span class="n">4π<sup>2</sup></span><span class="d"><var>T</var><sup>2</sup></span></span><var>r</var> = 4π<sup>2</sup><var>f</var><sup>2</sup><var>r</var></span>
+</div>
+<div class="fcard k">
+  <span class="flabel">向心力 F<sub>n</sub></span>
+  <span class="eq"><var>F</var><sub>n</sub> = <var>ma</var><sub>n</sub> = <span class="frac"><span class="n"><var>m</var><var>v</var><sup>2</sup></span><span class="d"><var>r</var></span></span> = <var>mω</var><sup>2</sup><var>r</var> = <var>mωv</var> = <span class="frac"><span class="n">4π<sup>2</sup><var>m</var></span><span class="d"><var>T</var><sup>2</sup></span></span><var>r</var></span>
+</div>
+
+<div class="note key"><span class="t">"半径相同 or 角速度相同" 决定选哪个公式</span>
+比较两点谁的 <var>a</var><sub>n</sub>、<var>F</var><sub>n</sub> 大时：<br>
+• 若两点 <b><var>v</var> 相同</b> → 用 <var>a</var>=<var>v</var><sup>2</sup>/<var>r</var>，<b>r 越小 a 越大</b>；<br>
+• 若两点 <b><var>ω</var> 相同</b>（同一转动体）→ 用 <var>a</var>=<var>ω</var><sup>2</sup><var>r</var>，<b>r 越大 a 越大</b>。</div>
+
+<!-- ============ 三、传动 ============ -->
+<h3 id="s3">三、传动问题（皮带传动 vs 同轴转动）</h3>
+<div class="figrow">
+  <figure>
+    <svg viewBox="0 0 300 150" width="300" height="150" aria-label="皮带传动">
+      <circle cx="80" cy="75" r="45" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <circle cx="80" cy="75" r="4" fill="#1f2937"/>
+      <circle cx="225" cy="75" r="28" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <circle cx="225" cy="75" r="4" fill="#1f2937"/>
+      <line x1="80" y1="30" x2="225" y2="47" stroke="#374151" stroke-width="3"/>
+      <line x1="80" y1="120" x2="225" y2="103" stroke="#374151" stroke-width="3"/>
+      <text x="60" y="80" class="svglabel">A</text>
+      <text x="212" y="80" class="svglabel">B</text>
+      <text x="55" y="140" class="svgtag">皮带/齿轮：边缘 v 相同</text>
+    </svg>
+    <figcaption>皮带（或啮合齿轮）传动：<b>边缘线速度 v 相等</b> → <var>ω</var> ∝ 1/<var>r</var></figcaption>
+  </figure>
+  <figure>
+    <svg viewBox="0 0 300 150" width="300" height="150" aria-label="同轴转动">
+      <circle cx="150" cy="75" r="55" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+      <circle cx="150" cy="75" r="28" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+      <circle cx="150" cy="75" r="4" fill="#1f2937"/>
+      <circle cx="205" cy="75" r="5" fill="#e11d48"/><text x="200" y="65" class="svglabel">P</text>
+      <circle cx="178" cy="75" r="5" fill="#059669"/><text x="172" y="65" class="svglabel">Q</text>
+      <text x="95" y="140" class="svgtag">同轴：所有点 ω 相同</text>
+    </svg>
+    <figcaption>同轴（共轴）转动：<b>角速度 ω 相等</b> → <var>v</var> ∝ <var>r</var></figcaption>
+  </figure>
+</div>
+<div class="fcard k">
+  <span class="flabel">两条判据</span>
+  <span class="eq">皮带 / 齿轮传动：　<var>v</var><sub>A</sub> = <var>v</var><sub>B</sub>　⟹　<var>ω</var><sub>A</sub><var>r</var><sub>A</sub> = <var>ω</var><sub>B</sub><var>r</var><sub>B</sub></span>
+  <span class="eq">同轴转动：　　　　<var>ω</var><sub>P</sub> = <var>ω</var><sub>Q</sub>　⟹　<span class="frac"><span class="n"><var>v</var><sub>P</sub></span><span class="d"><var>r</var><sub>P</sub></span></span> = <span class="frac"><span class="n"><var>v</var><sub>Q</sub></span><span class="d"><var>r</var><sub>Q</sub></span></span></span>
+</div>
+
+<!-- ============ 四、模型 ============ -->
+<h3 id="s4">四、常见圆周运动模型</h3>
+
+<h4>① 水平面模型：圆锥摆 / 转弯</h4>
+<div class="figrow">
+  <figure>
+    <svg viewBox="0 0 240 210" width="240" height="210" aria-label="圆锥摆">
+      <line x1="120" y1="20" x2="120" y2="150" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <circle cx="120" cy="20" r="4" fill="#1f2937"/>
+      <line x1="120" y1="20" x2="185" y2="150" stroke="#374151" stroke-width="2.5"/>
+      <text x="140" y="80" class="svglabel">L</text>
+      <ellipse cx="120" cy="150" rx="65" ry="16" fill="none" stroke="#cbd5e1" stroke-width="1.5"/>
+      <circle cx="185" cy="150" r="9" fill="#e11d48"/>
+      <!-- forces -->
+      <line x1="185" y1="150" x2="185" y2="192" stroke="#d97706" stroke-width="2.5" marker-end="url(#ar3)"/>
+      <text x="190" y="182" class="svglabel" fill="#d97706">mg</text>
+      <line x1="185" y1="150" x2="140" y2="61" stroke="#059669" stroke-width="2.5" marker-end="url(#ar4)"/>
+      <text x="150" y="90" class="svglabel" fill="#059669">T</text>
+      <path d="M 120 46 A 26 26 0 0 1 132 60" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="126" y="62" class="svglabel" fill="#7c3aed">θ</text>
+      <defs>
+        <marker id="ar3" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto"><path d="M0,0 L8,3.2 L0,6.4 Z" fill="#d97706"/></marker>
+        <marker id="ar4" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto"><path d="M0,0 L8,3.2 L0,6.4 Z" fill="#059669"/></marker>
+      </defs>
+    </svg>
+    <figcaption>圆锥摆：绳张力 <var>T</var> 与重力 <var>mg</var> 的合力提供向心力</figcaption>
+  </figure>
+  <figure style="flex:1 1 360px; text-align:left;">
+    <div class="fcard k" style="margin:0;">
+      <span class="flabel">圆锥摆 / 水平转弯</span>
+      <span class="eq">tan<var>θ</var> = <span class="frac"><span class="n"><var>v</var><sup>2</sup></span><span class="d"><var>rg</var></span></span> = <span class="frac"><span class="n"><var>ω</var><sup>2</sup><var>r</var></span><span class="d"><var>g</var></span></span></span>
+      <span class="eq"><var>T</var> = 2π<span class="frac"><span class="n"><span class="rt">L cos<var>θ</var></span></span><span class="d"><span class="rt">&nbsp;g&nbsp;</span></span></span>（周期只与摆高 <var>h</var>=Lcos<var>θ</var> 有关）</span>
+    </div>
+    <div class="note tip" style="margin-top:12px;"><span class="t">火车转弯 / 公路弯道</span>
+    设计"合适速度"时轨道对车无侧向挤压：<var>v</var> = <span class="rt">√(rg tan<var>θ</var>)</span>。速度偏大→外轨（外侧）受挤压；偏小→内轨受挤压。</div>
+  </figure>
+</div>
+
+<h4>② 竖直平面模型：绳（轨道内侧）与杆</h4>
+<div class="figrow">
+  <figure>
+    <svg viewBox="0 0 240 210" width="240" height="210" aria-label="竖直圆周最高点">
+      <circle cx="120" cy="105" r="75" fill="none" stroke="#cbd5e1" stroke-width="2"/>
+      <circle cx="120" cy="105" r="4" fill="#1f2937"/>
+      <circle cx="120" cy="30" r="9" fill="#e11d48"/>
+      <text x="132" y="26" class="svgtag">最高点</text>
+      <line x1="120" y1="30" x2="120" y2="72" stroke="#d97706" stroke-width="2.5" marker-end="url(#ar5)"/>
+      <text x="126" y="60" class="svglabel" fill="#d97706">mg</text>
+      <line x1="120" y1="30" x2="120" y2="60" stroke="#059669" stroke-width="6" opacity=".25"/>
+      <circle cx="120" cy="180" r="9" fill="#059669"/>
+      <text x="132" y="195" class="svgtag">最低点</text>
+      <defs><marker id="ar5" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto"><path d="M0,0 L8,3.2 L0,6.4 Z" fill="#d97706"/></marker></defs>
+    </svg>
+    <figcaption>最高点：重力（及弹力）指向圆心，充当向心力</figcaption>
+  </figure>
+  <figure style="flex:1 1 360px; text-align:left;">
+    <table style="box-shadow:none;margin:0;">
+      <tr><th>模型</th><th>最高点受力</th><th>临界速度</th></tr>
+      <tr><td><b>绳 / 轨道内壁</b><br>（只能拉/压，向下）</td>
+        <td>最小时 <var>T</var>=0，仅重力：<br><var>mg</var> = m<var>v</var><sup>2</sup>/<var>r</var></td>
+        <td><var>v</var><sub>min</sub> = <span class="rt">√(gr)</span><br>低于此过不了顶</td></tr>
+      <tr><td><b>杆 / 管道</b><br>（可拉可撑）</td>
+        <td>可提供向上支持力，速度可为 0</td>
+        <td><var>v</var><sub>min</sub> = 0<br>无最小速度限制</td></tr>
+    </table>
+  </figure>
+</div>
+<div class="note warn"><span class="t">最易错：绳模型的临界条件</span>
+"能通过最高点"的临界是<b>绳/轨道弹力为零、重力独自提供向心力</b>，得 <var>v</var><sub>min</sub>=<span class="rt">√(gr)</span>。杆模型没有这个下限，二者一定要区分。</div>
+
+<h4>③ 离心运动</h4>
+<p>当提供的向心力 <b>不足</b>（或突然消失）时，物体做逐渐远离圆心的<b>离心运动</b>——脱水甩干、砂轮甩出火星、转弯打滑冲出，都是这个原理。它<b>不是</b>受到"离心力"，而是合力不够。</p>
+
+<!-- ============ 第二部分：天体运动 ============ -->
+<h2 class="sec cel" id="s5">第二部分 · 天体运动</h2>
+
+<h3 class="cel">五、万有引力定律</h3>
+<div class="fcard c">
+  <span class="flabel c">牛顿万有引力定律</span>
+  <span class="eq c"><var>F</var> = <var>G</var> <span class="frac"><span class="n"><var>m</var><sub>1</sub><var>m</var><sub>2</sub></span><span class="d"><var>r</var><sup>2</sup></span></span>　　<var>G</var> = 6.67×10<sup>−11</sup> N·m<sup>2</sup>/kg<sup>2</sup></span>
+</div>
+<div class="note key"><span class="t">适用与要点</span>
+① 适用于两<b>质点</b>，或两个<b>均匀球体</b>（此时 <var>r</var> 为两球心距离）。<br>
+② <var>r</var> 是<b>距离</b>不是半径，且在分母平方——距离加倍，引力变为 1/4。<br>
+③ <var>G</var> 由卡文迪许扭秤测出，被称为"称量地球质量的人"。</div>
+
+<h3 class="cel" id="s6">六、引力提供向心力（解题核心方程）</h3>
+<p>行星绕恒星、卫星绕行星做（近似）匀速圆周运动，<b>万有引力全部充当向心力</b>。这是天体运动几乎所有题目的出发点：</p>
+
+<div class="figrow">
+  <figure>
+    <svg viewBox="0 0 260 220" width="260" height="220" aria-label="卫星绕行星">
+      <circle cx="120" cy="110" r="95" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 5"/>
+      <circle cx="120" cy="110" r="30" fill="#8b5cf6"/>
+      <text x="106" y="115" class="svgtag" fill="#fff">M</text>
+      <circle cx="215" cy="110" r="9" fill="#e11d48"/>
+      <text x="222" y="105" class="svglabel">m</text>
+      <line x1="215" y1="110" x2="150" y2="110" stroke="#d97706" stroke-width="2.5" marker-end="url(#ar6)"/>
+      <text x="168" y="102" class="svglabel" fill="#d97706">F=G Mm/r²</text>
+      <line x1="215" y1="110" x2="215" y2="55" stroke="#059669" stroke-width="2.5" marker-end="url(#ar7)"/>
+      <text x="220" y="65" class="svglabel" fill="#059669">v</text>
+      <line x1="120" y1="110" x2="205" y2="110" stroke="#2563eb" stroke-width="1.6"/>
+      <text x="150" y="126" class="svglabel" fill="#2563eb">r</text>
+      <defs>
+        <marker id="ar6" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto"><path d="M0,0 L8,3.2 L0,6.4 Z" fill="#d97706"/></marker>
+        <marker id="ar7" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto"><path d="M0,0 L8,3.2 L0,6.4 Z" fill="#059669"/></marker>
+      </defs>
+    </svg>
+    <figcaption>引力提供向心力：<var>r</var> 为轨道半径 = 两天体<b>球心</b>距离</figcaption>
+  </figure>
+  <figure style="flex:1 1 360px; text-align:left;">
+    <div class="fcard c" style="margin:0;">
+      <span class="flabel c">核心等式（万能起点）</span>
+      <span class="eq c"><span class="frac"><span class="n"><var>GMm</var></span><span class="d"><var>r</var><sup>2</sup></span></span> = <span class="frac"><span class="n"><var>mv</var><sup>2</sup></span><span class="d"><var>r</var></span></span> = <var>mω</var><sup>2</sup><var>r</var> = <var>m</var><span class="frac"><span class="n">4π<sup>2</sup></span><span class="d"><var>T</var><sup>2</sup></span></span><var>r</var> = <var>ma</var></span>
+    </div>
+    <div class="note tip" style="margin-top:12px;"><span class="t">由核心等式解出 4 个量</span>
+    <span class="pill">v = √(GM/r)</span> <span class="pill">ω = √(GM/r³)</span> <span class="pill">T = 2π√(r³/GM)</span> <span class="pill">a = GM/r²</span></div>
+  </figure>
+</div>
+
+<div class="note key"><span class="t">口诀：轨道半径 r 越大，"一切都变慢"</span>
+<var>r</var> ↑ ⟹ <var>v</var> ↓、<var>ω</var> ↓、<var>a</var> ↓，但 <b><var>T</var> ↑</b>（周期变长）。即"高轨道、低速度、长周期"。近地卫星是环绕速度最快的卫星。</div>
+
+<div class="fcard c">
+  <span class="flabel c">黄金代换（GM = gR²）</span>
+  <p style="margin:2px 0 8px;">在星球<b>表面</b>，引力≈重力：<span class="eq c" style="display:inline-block;padding:4px 12px;font-size:17px;"><var>mg</var> = <span class="frac"><span class="n"><var>GMm</var></span><span class="d"><var>R</var><sup>2</sup></span></span> ⟹ <var>GM</var> = <var>gR</var><sup>2</sup></span></p>
+  <p style="margin:2px 0;">题目不给 <var>G</var> 和 <var>M</var>、只给表面重力加速度 <var>g</var> 和星球半径 <var>R</var> 时，用它替换 <var>GM</var>。</p>
+</div>
+
+<h3 class="cel" id="s7">七、测天体质量与密度</h3>
+<div class="fcard c">
+  <span class="flabel c">已知环绕天体的 r、T，求中心天体质量 M</span>
+  <span class="eq c"><var>M</var> = <span class="frac"><span class="n">4π<sup>2</sup><var>r</var><sup>3</sup></span><span class="d"><var>GT</var><sup>2</sup></span></span></span>
+</div>
+<div class="fcard c">
+  <span class="flabel c">中心天体密度 ρ（R 为中心天体半径）</span>
+  <span class="eq c"><var>ρ</var> = <span class="frac"><span class="n"><var>M</var></span><span class="d"><span style="font-size:.85em">4</span>⁄<span style="font-size:.85em">3</span> π<var>R</var><sup>3</sup></span></span> = <span class="frac"><span class="n">3π<var>r</var><sup>3</sup></span><span class="d"><var>GT</var><sup>2</sup><var>R</var><sup>3</sup></span></span></span>
+  <span class="eq c" style="font-size:16px;">若卫星<b>贴近表面</b>（<var>r</var> ≈ <var>R</var>）：　<var>ρ</var> = <span class="frac"><span class="n">3π</span><span class="d"><var>GT</var><sup>2</sup></span></span></span>
+</div>
+<div class="note tip"><span class="t">"最简密度公式"</span>
+当卫星近地飞行时，密度只与周期 <var>T</var> 有关——记住 <var>ρ</var>=3π/(<var>GT</var><sup>2</sup>)，是高考高频结论。</div>
+
+<h3 class="cel" id="s8">八、三种宇宙速度</h3>
+<table class="cel">
+  <tr><th>名称</th><th>含义</th><th>数值（对地球）</th><th>公式</th></tr>
+  <tr><td>第一宇宙速度<br>(环绕速度)</td><td>贴近地面做圆周运动的<b>最大环绕速度</b>，也是发射人造卫星的<b>最小</b>速度</td><td><b>7.9 km/s</b></td>
+      <td><var>v</var><sub>1</sub> = <span class="rt">√(gR)</span> = <span class="rt">√(GM/R)</span></td></tr>
+  <tr><td>第二宇宙速度<br>(逃逸速度)</td><td>挣脱地球引力束缚、一去不返所需的最小速度</td><td><b>11.2 km/s</b></td><td>—</td></tr>
+  <tr><td>第三宇宙速度</td><td>挣脱太阳引力、飞出太阳系所需的最小速度</td><td><b>16.7 km/s</b></td><td>—</td></tr>
+</table>
+<div class="note warn"><span class="t">易混：7.9 km/s 的双重身份</span>
+它既是"最大的环绕速度"（轨道越高环绕速度越小），又是"最小的发射速度"（低于它无法入轨）。两句话不矛盾，务必理解。</div>
+
+<h3 class="cel" id="s9">九、地球同步卫星（通信卫星）</h3>
+<div class="figrow">
+  <figure>
+    <svg viewBox="0 0 260 200" width="260" height="200" aria-label="同步卫星">
+      <circle cx="130" cy="100" r="45" fill="#8b5cf6"/>
+      <line x1="130" y1="45" x2="130" y2="155" stroke="#fff" stroke-width="1" stroke-dasharray="3 3" opacity=".6"/>
+      <ellipse cx="130" cy="100" rx="90" ry="90" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 5"/>
+      <circle cx="130" cy="10" r="7" fill="#e11d48"/>
+      <text x="142" y="12" class="svgtag">同步卫星</text>
+      <text x="150" y="105" class="svgtag" fill="#fff">赤道</text>
+      <line x1="130" y1="100" x2="130" y2="17" stroke="#d97706" stroke-width="1.6"/>
+    </svg>
+    <figcaption>必位于<b>赤道正上方</b>，与地面相对静止</figcaption>
+  </figure>
+  <figure style="flex:1 1 360px; text-align:left;">
+    <div class="note key" style="margin:0;"><span class="t">同步卫星"五个一定"</span>
+    ① 周期一定：<var>T</var> = 24 h（与地球自转同步）<br>
+    ② 轨道平面一定：<b>必在赤道正上方</b>（圆心是地心）<br>
+    ③ 高度一定：<var>h</var> ≈ 3.6×10<sup>4</sup> km（距地心约 4.24×10<sup>4</sup> km）<br>
+    ④ 速率一定：<var>v</var> ≈ 3.1 km/s<br>
+    ⑤ 向心加速度大小一定</div>
+  </figure>
+</div>
+<div class="note warn"><span class="t">同步卫星 ≠ 近地卫星 ≠ 地面上的物体</span>
+近地卫星、同步卫星都靠<b>万有引力</b>提供向心力（用 GMm/r² 那套）；而地面上随地球自转的物体，向心力只是引力的<b>一个分力</b>，另一分力才是重力，二者模型不同。地面上物体与同步卫星<b>ω 相同</b>（都=地球自转 ω）。</div>
+
+<h3 class="cel" id="s10">十、开普勒三定律</h3>
+<div class="figrow">
+  <figure>
+    <svg viewBox="0 0 300 190" width="300" height="190" aria-label="开普勒椭圆轨道">
+      <ellipse cx="150" cy="95" rx="120" ry="72" fill="none" stroke="#cbd5e1" stroke-width="2"/>
+      <circle cx="80" cy="95" r="14" fill="#f59e0b"/>
+      <text x="66" y="130" class="svgtag">太阳(焦点)</text>
+      <circle cx="270" cy="95" r="7" fill="#e11d48"/>
+      <text x="238" y="88" class="svgtag">远日点</text>
+      <circle cx="30" cy="95" r="7" fill="#059669"/>
+      <text x="6" y="88" class="svgtag">近日点</text>
+      <path d="M80,95 L30,95 A16 16 0 0 0 44 112 Z" fill="#a7f3d0" opacity=".7"/>
+      <path d="M80,95 L270,95 A16 16 0 0 1 258 111 Z" fill="#fecaca" opacity=".7"/>
+      <text x="34" y="118" class="svgtag">快</text>
+      <text x="250" y="130" class="svgtag">慢</text>
+      <text x="115" y="60" class="svgtag">半长轴 a</text>
+      <line x1="30" y1="150" x2="270" y2="150" stroke="#7c3aed" stroke-width="1.2" marker-start="url(#ar8)" marker-end="url(#ar8)"/>
+      <text x="140" y="168" class="svgtag" fill="#7c3aed">2a</text>
+      <defs><marker id="ar8" markerWidth="8" markerHeight="8" refX="4" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#7c3aed"/></marker></defs>
+    </svg>
+    <figcaption>行星沿椭圆运行，太阳在一个焦点上</figcaption>
+  </figure>
+  <figure style="flex:1 1 360px; text-align:left;">
+    <div class="fcard c" style="margin:0 0 10px;">
+      <span class="flabel c">① 轨道定律</span>
+      所有行星绕太阳的轨道都是<b>椭圆</b>，太阳处在椭圆的一个<b>焦点</b>上。
+    </div>
+    <div class="fcard c" style="margin:0 0 10px;">
+      <span class="flabel c">② 面积定律</span>
+      行星与太阳的连线在相等时间内扫过<b>相等的面积</b> ⟹ <b>近日点最快、远日点最慢</b>。
+    </div>
+    <div class="fcard c" style="margin:0;">
+      <span class="flabel c">③ 周期定律（最常考）</span>
+      <span class="eq c" style="font-size:17px;"><span class="frac"><span class="n"><var>a</var><sup>3</sup></span><span class="d"><var>T</var><sup>2</sup></span></span> = <var>k</var>（<var>k</var> 只由<b>中心天体</b>决定）</span>
+      <var>a</var> 为椭圆半长轴；圆轨道时 <var>a</var> 就是半径 <var>r</var>。
+    </div>
+  </figure>
+</div>
+<div class="note tip"><span class="t">周期定律的由来</span>
+把核心等式 GMm/r² = m·4π²r/T² 整理即得 <span style="white-space:nowrap">r³/T² = GM/4π² = k</span>，与卫星质量无关，只和中心天体 <var>M</var> 有关——这正是开普勒第三定律。</div>
+
+<h3 class="cel" id="s11">十一、双星系统与卫星变轨</h3>
+
+<h4>双星系统</h4>
+<div class="figrow">
+  <figure>
+    <svg viewBox="0 0 300 160" width="300" height="160" aria-label="双星系统">
+      <circle cx="150" cy="80" r="3" fill="#1f2937"/><text x="150" y="70" class="svgtag">质心</text>
+      <circle cx="90" cy="80" r="18" fill="#8b5cf6"/><text x="82" y="86" class="svgtag" fill="#fff">m₁</text>
+      <circle cx="225" cy="80" r="11" fill="#e11d48"/><text x="219" y="84" class="svgtag" fill="#fff">m₂</text>
+      <circle cx="150" cy="80" r="60" fill="none" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4 4"/>
+      <circle cx="150" cy="80" r="75" fill="none" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4 4"/>
+      <line x1="90" y1="80" x2="150" y2="80" stroke="#2563eb" stroke-width="1.4"/><text x="108" y="98" class="svgtag" fill="#2563eb">r₁</text>
+      <line x1="150" y1="80" x2="225" y2="80" stroke="#059669" stroke-width="1.4"/><text x="180" y="98" class="svgtag" fill="#059669">r₂</text>
+    </svg>
+    <figcaption>两星绕公共质心转，<var>T</var> 与 <var>ω</var> 相同</figcaption>
+  </figure>
+  <figure style="flex:1 1 360px; text-align:left;">
+    <div class="fcard c" style="margin:0;">
+      <span class="flabel c">双星关键关系</span>
+      <span class="eq c" style="font-size:16px;">引力互为向心力：<span class="frac"><span class="n"><var>Gm</var><sub>1</sub><var>m</var><sub>2</sub></span><span class="d"><var>L</var><sup>2</sup></span></span> = <var>m</var><sub>1</sub><var>ω</var><sup>2</sup><var>r</var><sub>1</sub> = <var>m</var><sub>2</sub><var>ω</var><sup>2</sup><var>r</var><sub>2</sub></span>
+      <span class="eq c" style="font-size:16px;"><var>r</var><sub>1</sub> + <var>r</var><sub>2</sub> = <var>L</var>　且　<var>m</var><sub>1</sub><var>r</var><sub>1</sub> = <var>m</var><sub>2</sub><var>r</var><sub>2</sub></span>
+      <p style="margin:6px 0 0;font-size:14px;">⟹ <b>质量大的星，轨道半径小</b>（离质心近）。</p>
+    </div>
+  </figure>
+</div>
+
+<h4>卫星变轨</h4>
+<div class="figrow">
+  <figure>
+    <svg viewBox="0 0 260 210" width="260" height="210" aria-label="卫星变轨">
+      <circle cx="110" cy="105" r="22" fill="#8b5cf6"/>
+      <circle cx="110" cy="105" r="45" fill="none" stroke="#059669" stroke-width="2"/>
+      <circle cx="110" cy="105" r="85" fill="none" stroke="#e11d48" stroke-width="2"/>
+      <ellipse cx="130" cy="105" rx="65" ry="60" fill="none" stroke="#d97706" stroke-width="2" stroke-dasharray="5 4"/>
+      <circle cx="65" cy="105" r="5" fill="#1f2937"/><text x="30" y="108" class="svgtag">P近</text>
+      <circle cx="195" cy="105" r="5" fill="#1f2937"/><text x="200" y="108" class="svgtag">Q远</text>
+      <text x="120" y="40" class="svgtag" fill="#059669">低轨Ⅰ</text>
+      <text x="115" y="200" class="svgtag" fill="#e11d48">高轨Ⅲ</text>
+      <text x="150" y="175" class="svgtag" fill="#d97706">转移椭圆Ⅱ</text>
+    </svg>
+    <figcaption>低轨→高轨：P 点加速进椭圆，Q 点再加速圆化</figcaption>
+  </figure>
+  <figure style="flex:1 1 360px; text-align:left;">
+    <div class="note key" style="margin:0;"><span class="t">变轨要点</span>
+    ① 低圆轨道Ⅰ → 高圆轨道Ⅲ，需在近地点 P <b>点火加速</b>，进入椭圆转移轨道Ⅱ；到远地点 Q <b>再加速</b>使轨道圆化。<br>
+    ② <b>加速升轨、减速降轨</b>。<br>
+    ③ 同一点比较：椭圆上的速度介于内外两圆之间；<b>轨道越高，环绕速率越小</b>（<var>v</var><sub>Ⅰ</sub> &gt; <var>v</var><sub>Ⅲ</sub>）。<br>
+    ④ 变轨瞬间引力不突变，靠发动机做功改变机械能。</div>
+  </figure>
+</div>
+
+<!-- ============ 速查表 ============ -->
+<h2 class="sec" id="s12">附录 · 公式速查 & 易错清单</h2>
+
+<h3>公式速查总表</h3>
+<table>
+  <tr><th>主题</th><th>核心公式</th><th>说明</th></tr>
+  <tr><td>描述量换算</td><td><var>v</var>=<var>ωr</var>=2π<var>r</var>/<var>T</var>=2π<var>rf</var>；<var>ω</var>=2π/<var>T</var>=2π<var>f</var></td><td>r 为半径</td></tr>
+  <tr><td>向心加速度</td><td><var>a</var>=<var>v</var><sup>2</sup>/<var>r</var>=<var>ω</var><sup>2</sup><var>r</var>=4π<sup>2</sup><var>r</var>/<var>T</var><sup>2</sup></td><td>方向指向圆心</td></tr>
+  <tr><td>向心力</td><td><var>F</var>=<var>mv</var><sup>2</sup>/<var>r</var>=<var>mω</var><sup>2</sup><var>r</var>=<var>m</var>·4π<sup>2</sup><var>r</var>/<var>T</var><sup>2</sup></td><td>合力，按效果命名</td></tr>
+  <tr><td>皮带 / 同轴</td><td>皮带：<var>v</var> 相同；同轴：<var>ω</var> 相同</td><td>传动两判据</td></tr>
+  <tr><td>圆锥摆 / 转弯</td><td>tan<var>θ</var>=<var>v</var><sup>2</sup>/(<var>rg</var>)</td><td>合力提供向心力</td></tr>
+  <tr><td>竖直圆周（绳）</td><td>最高点 <var>v</var><sub>min</sub>=√(<var>gr</var>)</td><td>杆模型无此限制</td></tr>
+  <tr><td>万有引力</td><td><var>F</var>=<var>GMm</var>/<var>r</var><sup>2</sup></td><td>G=6.67×10⁻¹¹</td></tr>
+  <tr><td>引力=向心力</td><td><var>GMm</var>/<var>r</var><sup>2</sup> = <var>mv</var><sup>2</sup>/<var>r</var> = <var>mω</var><sup>2</sup><var>r</var> = <var>m</var>·4π<sup>2</sup><var>r</var>/<var>T</var><sup>2</sup></td><td>天体运动万能起点</td></tr>
+  <tr><td>轨道量</td><td><var>v</var>=√(<var>GM</var>/<var>r</var>)；<var>T</var>=2π√(<var>r</var><sup>3</sup>/<var>GM</var>)</td><td>r↑则v↓、T↑</td></tr>
+  <tr><td>黄金代换</td><td><var>GM</var>=<var>gR</var><sup>2</sup></td><td>无 G、M 时用</td></tr>
+  <tr><td>测质量</td><td><var>M</var>=4π<sup>2</sup><var>r</var><sup>3</sup>/(<var>GT</var><sup>2</sup>)</td><td>需卫星 r、T</td></tr>
+  <tr><td>测密度（近地）</td><td><var>ρ</var>=3π/(<var>GT</var><sup>2</sup>)</td><td>r≈R 时</td></tr>
+  <tr><td>第一宇宙速度</td><td><var>v</var><sub>1</sub>=√(<var>gR</var>)=7.9 km/s</td><td>最大环绕/最小发射</td></tr>
+  <tr><td>开普勒第三定律</td><td><var>r</var><sup>3</sup>/<var>T</var><sup>2</sup>=<var>k</var>（<var>k</var>=<var>GM</var>/4π<sup>2</sup>）</td><td>k 只与中心天体有关</td></tr>
+  <tr><td>双星</td><td><var>Gm</var><sub>1</sub><var>m</var><sub>2</sub>/<var>L</var><sup>2</sup>=<var>m</var>ω²<var>r</var>；<var>m</var><sub>1</sub><var>r</var><sub>1</sub>=<var>m</var><sub>2</sub><var>r</var><sub>2</sub></td><td>共 ω、共 T</td></tr>
+</table>
+
+<h3>高频易错清单</h3>
+<div class="note warn"><span class="t">⚠ 十个最容易丢分的点</span>
+1. 匀速圆周运动是<b>变速运动</b>，速度方向一直在变。<br>
+2. 向心力是<b>效果力</b>，不要在受力图上额外画一个"向心力"；也没有"离心力"。<br>
+3. 比较 a、F 大小前，先看两点是 <b>v 相同</b>还是 <b>ω 相同</b>，再选公式。<br>
+4. 皮带传动看"<b>v 相同</b>"，同轴转动看"<b>ω 相同</b>"，别记反。<br>
+5. 绳/轨道内侧最高点 <var>v</var><sub>min</sub>=√(gr)；杆/管可以 v=0——两模型分清。<br>
+6. 万有引力公式里 <var>r</var> 是<b>两球心距离</b>，不是半径、也不是高度。<br>
+7. 轨道半径 r 越大，v、ω、a 都变小，唯独 <b>周期 T 变大</b>。<br>
+8. 卫星<b>不能</b>只靠加速就"提速上升"——加速会先进入更高椭圆轨道，最终高轨反而更慢。<br>
+9. 同步卫星<b>只能在赤道正上方</b>、高度唯一；不能定点在北京上空。<br>
+10. 近地物体（随地球自转）与卫星模型不同：前者引力的<b>一个分力</b>才是向心力。</div>
+
+<footer>
+  高中物理 · 圆周运动与天体运动专题教辅　|　公式与图例仅供复习参考，做题时请结合具体情境分析<br>
+  建议：用浏览器打开后按 Ctrl/⌘ + P 可另存为 PDF 或直接打印
+</footer>
+
+</div>
+</body>
+</html>
