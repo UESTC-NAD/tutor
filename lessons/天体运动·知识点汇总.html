@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>《万有引力定律与宇宙航行》知识点汇总</title>
+<style>:root{
+  --ink:#1c242e; --muted:#5a6674; --line:#dfe3e8;
+  --bg:#f4f2ee; --card:#ffffff;
+  --blue:#0e5a8a; --blue-l:#e8f1f7;
+  --red:#b3341f; --red-l:#fbeeea;
+  --green:#1f6d4e; --green-l:#e9f4ef;
+  --gold:#8a6a12; --gold-l:#fbf3dc;
+  --purple:#5a3a86; --purple-l:#f0ebf8;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Noto Serif CJK SC","Source Han Serif SC","Songti SC",STSong,SimSun,Georgia,"Times New Roman",serif;
+  font-size:16.5px; line-height:1.85;
+}
+.wrap{max-width:1000px;margin:0 auto;padding:0 20px 90px}
+
+/* ---------- header ---------- */
+header.top{
+  background:linear-gradient(135deg,#0e5a8a 0%,#16405e 60%,#10293c 100%);
+  color:#fff;padding:46px 20px 38px;margin-bottom:26px;
+}
+header.top .inner{max-width:1000px;margin:0 auto}
+header.top .kicker{font-size:13px;letter-spacing:.32em;opacity:.72;margin:0 0 10px}
+header.top h1{margin:0;font-size:32px;line-height:1.35;letter-spacing:.02em}
+header.top .sub{margin:12px 0 0;opacity:.85;font-size:15px}
+header.top .meta{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px}
+header.top .meta span{
+  background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);
+  border-radius:20px;padding:3px 13px;font-size:13px;
+}
+
+/* ---------- generic blocks ---------- */
+h2.sec{
+  font-size:22px;margin:44px 0 16px;padding:0 0 9px;
+  border-bottom:2.5px solid var(--blue);display:flex;align-items:center;gap:11px;
+}
+h2.sec .num{
+  background:var(--blue);color:#fff;border-radius:6px;
+  font-size:15px;padding:2px 11px;font-family:Georgia,serif;letter-spacing:.05em;
+}
+h3.sub{font-size:18px;margin:28px 0 10px;color:var(--blue);border-left:5px solid var(--blue);padding-left:11px}
+p{margin:.55em 0}
+ul,ol{margin:.5em 0;padding-left:1.5em}
+li{margin:.3em 0}
+b,strong{color:#0b3f61}
+em.k{font-style:normal;background:linear-gradient(transparent 62%,#ffe9a8 62%);padding:0 2px;font-weight:600}
+
+/* ---------- cards ---------- */
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:22px 24px;margin:18px 0;box-shadow:0 1px 3px rgba(20,30,45,.05);
+}
+.q{background:var(--card);border:1px solid var(--line);border-radius:14px;
+   padding:0 0 6px;margin:26px 0 34px;box-shadow:0 2px 10px rgba(20,30,45,.06);overflow:hidden}
+.qhead{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  background:linear-gradient(90deg,#eef4f9,#f8fafc);border-bottom:1px solid var(--line);
+  padding:13px 22px;
+}
+.qno{background:var(--blue);color:#fff;font-family:Georgia,serif;font-size:17px;
+     width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none}
+.qtag{font-size:13.5px;color:var(--blue);background:var(--blue-l);border:1px solid #cfe0ec;border-radius:20px;padding:2px 12px}
+.qtype{font-size:13px;color:var(--red);background:var(--red-l);border:1px solid #f0d3cc;border-radius:20px;padding:2px 12px}
+.qans{margin-left:auto;font-size:15px;font-weight:700;color:var(--green);
+      background:var(--green-l);border:1px solid #c6e2d5;border-radius:8px;padding:3px 14px}
+.qbody{padding:18px 24px 4px}
+.stem{margin:0 0 10px}
+.opts{margin:10px 0 4px}
+.opts .o{display:flex;gap:8px;margin:7px 0;align-items:flex-start}
+.opts .o .lab{font-family:Georgia,serif;font-weight:700;color:var(--blue);flex:none;min-width:1.3em}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px 26px;align-items:center}
+@media(max-width:720px){.two{grid-template-columns:1fr}}
+
+/* ---------- coloured sub-blocks ---------- */
+.blk{border-radius:10px;padding:14px 18px;margin:16px 0}
+.blk>h4{margin:0 0 8px;font-size:15.5px;letter-spacing:.03em;display:flex;align-items:center;gap:8px}
+.blk>h4::before{content:"";width:4px;height:16px;border-radius:2px;background:currentColor;display:inline-block}
+.think{background:#f6f8fa;border:1px solid #e3e8ed}      .think>h4{color:var(--blue)}
+.board{background:#fcfaf3;border:1px solid #ece2c8}      .board>h4{color:var(--gold)}
+.detail{background:#fff;border:1px solid var(--line)}    .detail>h4{color:var(--ink)}
+.warn{background:var(--red-l);border:1px solid #f0d3cc}  .warn>h4{color:var(--red)}
+.ask{background:var(--purple-l);border:1px solid #ddd3ef} .ask>h4{color:var(--purple)}
+.tip{background:var(--green-l);border:1px solid #c6e2d5}  .tip>h4{color:var(--green)}
+
+.opt-line{margin:9px 0;padding-left:1.9em;text-indent:-1.9em}
+.opt-line .ol{font-family:Georgia,serif;font-weight:700;display:inline-block;min-width:1.6em}
+.ok{color:var(--green);font-weight:700}
+.no{color:var(--red);font-weight:700}
+
+/* ---------- board (推导) ---------- */
+.board .step{margin:9px 0;padding-left:1.6em;text-indent:-1.6em}
+.board .step .sn{display:inline-block;min-width:1.4em;color:var(--gold);font-family:Georgia,serif;font-weight:700}
+.eq{display:block;text-align:center;margin:12px 0;font-size:1.04em}
+.eq.boxed{background:#fff;border:1.5px dashed #d8c894;border-radius:8px;padding:10px 8px}
+
+/* ---------- tables ---------- */
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:15px;background:#fff}
+th,td{border:1px solid #d7dde3;padding:8px 10px;text-align:center}
+th{background:var(--blue-l);color:#0b3f61;font-weight:700}
+td.l,th.l{text-align:left}
+tbody tr:nth-child(even) td{background:#fafbfc}
+.answers td{font-family:Georgia,serif;font-weight:700;color:var(--green)}
+.answers th{font-family:Georgia,serif}
+
+/* ---------- figure ---------- */
+figure{margin:16px 0;text-align:center}
+figure svg{max-width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px}
+figcaption{font-size:13.5px;color:var(--muted);margin-top:7px}
+.figrow{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;align-items:flex-start}
+.figrow figure{flex:1 1 300px;margin:8px 0}
+
+/* ---------- math ---------- */
+.m{font-family:"Cambria Math",Cambria,Georgia,"Times New Roman",serif;white-space:nowrap}
+i.v{font-style:italic}
+.f{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .22em;line-height:1.24;font-size:.95em}
+.f>.n{border-bottom:1.25px solid currentColor;padding:0 .34em}
+.f>.d{padding:0 .34em}
+.rt{display:inline-flex;align-items:stretch;vertical-align:middle;position:relative;padding-left:.62em;margin:0 .06em}
+.rt::before{content:"";position:absolute;left:.30em;top:0;height:100%;width:0;border-left:1.3px solid currentColor;transform:skewX(-11deg)}
+.rt::after{content:"";position:absolute;left:.04em;top:62%;width:.30em;border-top:1.3px solid currentColor;transform:rotate(34deg);transform-origin:left center}
+.rt>.rc{border-top:1.3px solid currentColor;padding:.15em .3em 0 .12em;display:block}
+/* 关键：抵消 .step / .opt-line 的悬挂缩进被分式内部块继承，否则分子分母会左移重叠 */
+.m,.f,.rt,.f>.n,.f>.d,.rt>.rc{text-indent:0}
+sup,sub{font-size:.72em;line-height:0}
+/* 含高公式的行自动加大行距，避免上下行重叠（:has 不支持时退化为默认行距） */
+p:has(.f), li:has(.f), td:has(.f), .o:has(.f), .step:has(.f), .opt-line:has(.f), .stem:has(.f){line-height:2.5}
+p:has(.rt), li:has(.rt), td:has(.rt), .o:has(.rt), .step:has(.rt), .opt-line:has(.rt), .stem:has(.rt){line-height:3.3}
+.eq:has(.rt), .eq:has(.f){line-height:1.4}
+.two:has(.rt){gap:14px 26px}
+
+/* ---------- nav ---------- */
+nav.toc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin:22px 0}
+nav.toc h4{margin:0 0 10px;font-size:15px;color:var(--blue);letter-spacing:.06em}
+nav.toc ol{margin:0;padding-left:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:6px 16px}
+nav.toc a{color:var(--ink);text-decoration:none;font-size:14.5px;display:block;padding:3px 0;border-bottom:1px dotted #e2e6ea}
+nav.toc a:hover{color:var(--blue)}
+nav.toc a .n{color:var(--blue);font-family:Georgia,serif;margin-right:6px}
+
+footer.bot{max-width:1000px;margin:40px auto 0;padding:20px;color:var(--muted);font-size:13.5px;border-top:1px solid var(--line);text-align:center}
+
+/* ---------- print ---------- */
+@media print{
+  body{background:#fff;font-size:11.2pt}
+  header.top{background:#10293c !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .q,.card,.blk,figure svg,table{break-inside:avoid;page-break-inside:avoid}
+  .q{box-shadow:none;margin:14px 0}
+  nav.toc{display:none}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="inner">
+    <p class="kicker">高中物理 · 必修第二册 · 知识体系</p>
+    <h1>《万有引力定律与宇宙航行》知识点汇总</h1>
+    <p class="sub">12 个板块 · 全公式推导 · 全模型图解 —— 配套《教师讲义（逐题精讲）》使用</p>
+    <div class="meta">
+      <span>核心公式 30+</span>
+      <span>模型图解 16 幅</span>
+      <span>易错清单 15 条</span>
+      <span>末附公式速查表</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<nav class="toc">
+  <h4>知识地图</h4>
+  <ol>
+    <li><a href="#k1"><span class="n">01</span>开普勒三定律</a></li>
+    <li><a href="#k2"><span class="n">02</span>万有引力定律与球壳定理</a></li>
+    <li><a href="#k3"><span class="n">03</span>两条基本关系（黄金代换）</a></li>
+    <li><a href="#k4"><span class="n">04</span>卫星运行参量与&ldquo;越高越慢&rdquo;</a></li>
+    <li><a href="#k5"><span class="n">05</span>天体质量与密度的估算</a></li>
+    <li><a href="#k6"><span class="n">06</span>三个宇宙速度</a></li>
+    <li><a href="#k7"><span class="n">07</span>同步卫星与&ldquo;三兄弟&rdquo;</a></li>
+    <li><a href="#k8"><span class="n">08</span>变轨、离心近心与能量</a></li>
+    <li><a href="#k9"><span class="n">09</span>双星与多星模型</a></li>
+    <li><a href="#k10"><span class="n">10</span>重力与万有引力&middot;&ldquo;飘起&rdquo;</a></li>
+    <li><a href="#k11"><span class="n">11</span>追及与相遇（会合周期）</a></li>
+    <li><a href="#k12"><span class="n">12</span>易错清单与公式速查表</a></li>
+  </ol>
+</nav>
+
+<!-- ================= 1 ================= -->
+<h2 class="sec" id="k1"><span class="num">01</span>开普勒三定律</h2>
+
+<div class="card">
+  <h3 class="sub">三条定律</h3>
+  <ol>
+    <li><b>轨道定律：</b>所有行星绕太阳运动的轨道都是<b>椭圆</b>，太阳处在椭圆的<b>一个焦点</b>上。</li>
+    <li><b>面积定律：</b>对任意一个行星，它与太阳的连线在<b>相等时间内扫过相等的面积</b>。<br>&rArr; 推论：<b>近日点最快、远日点最慢</b>；在近日点、远日点处速度垂直于矢径，有 <span class="m"><i>r</i><sub>近</sub><i>v</i><sub>近</sub> = <i>r</i><sub>远</sub><i>v</i><sub>远</sub></span>。</li>
+    <li><b>周期定律：</b>所有行星轨道<b>半长轴的三次方</b>与<b>公转周期的二次方</b>的比值都相同：
+      <span class="m"><span class="f"><span class="n"><i>a</i><sup>3</sup></span><span class="d"><i>T</i><sup>2</sup></span></span> = <i>k</i></span>。</li>
+  </ol>
+
+  <figure>
+    <svg viewBox="0 0 620 300" width="620" role="img" aria-label="椭圆轨道与面积定律">
+      <ellipse cx="185" cy="140" rx="150" ry="125" fill="none" stroke="#0e5a8a" stroke-width="1.8"/>
+      <polygon points="102.1,140 35,140 40.1,107.6 55.1,77.5 78.9,51.6 110,31.7 146.2,19.3 185,15" fill="#fbeeea" stroke="#b3341f" stroke-width="1.2"/>
+      <polygon points="102.1,140 335,140 334.1,153.7 331.4,167.3 326.8,180.7" fill="#e9f4ef" stroke="#1f6d4e" stroke-width="1.2"/>
+      <line x1="35" y1="140" x2="335" y2="140" stroke="#9aa6b2" stroke-width="1" stroke-dasharray="4 3"/>
+      <circle cx="102.1" cy="140" r="14" fill="#fdf0c9" stroke="#8a6a12" stroke-width="1.6"/>
+      <text x="102" y="270" font-size="12.5" text-anchor="middle" fill="#8a6a12">太阳位于一个焦点</text>
+      <circle cx="267.9" cy="140" r="3.5" fill="#9aa6b2"/>
+      <text x="268" y="163" font-size="11.5" text-anchor="middle" fill="#9aa6b2">另一焦点</text>
+      <circle cx="35" cy="140" r="5" fill="#b3341f"/>
+      <text x="30" y="160" font-size="12.5" text-anchor="middle" fill="#b3341f">近日点</text>
+      <circle cx="335" cy="140" r="5" fill="#1f6d4e"/>
+      <text x="330" y="130" font-size="12.5" text-anchor="middle" fill="#1f6d4e">远日点</text>
+      <text x="118" y="66" font-size="12" fill="#b3341f">Δt 内扫过（快）</text>
+      <text x="270" y="204" font-size="12" fill="#1f6d4e">同样的 Δt（慢）</text>
+      <text x="185" y="292" font-size="12.5" text-anchor="middle" fill="#5a6674">两块阴影面积相等 ⇒ 近日点弧长更长 ⇒ 速率更大</text>
+      <rect x="376" y="40" width="228" height="204" rx="9" fill="#e8f1f7" stroke="#cfe0ec"/>
+      <text x="392" y="68" font-size="13.5" font-weight="bold" fill="#0e5a8a">周期定律</text>
+      <text x="392" y="98" font-size="15">a³ / T² = k</text>
+      <text x="392" y="128" font-size="14" fill="#b3341f" font-weight="bold">k = GM中心 / 4π²</text>
+      <text x="392" y="156" font-size="12.5">圆轨道：a 取半径 r</text>
+      <text x="392" y="180" font-size="12.5">椭圆轨道：a 取半长轴</text>
+      <text x="392" y="210" font-size="12.5" fill="#5a6674">只对<tspan font-weight="bold" fill="#1c242e">同一中心天体</tspan>的</text>
+      <text x="392" y="230" font-size="12.5" fill="#5a6674">环绕体才能相互比较</text>
+    </svg>
+    <figcaption>图 1&nbsp;&nbsp;椭圆轨道、面积定律与周期定律</figcaption>
+  </figure>
+
+  <div class="blk board">
+    <h4>公式推导 · 开普勒常量 k 与面积定律推论</h4>
+    <p class="step"><span class="sn">①</span><b>由圆轨道推出 k 的表达式。</b>设中心天体质量 <i>M</i>，环绕体质量 <i>m</i>、轨道半径 <i>r</i>、周期 <i>T</i>。万有引力提供向心力：</p>
+    <p class="eq"><span class="m"><i>G</i><span class="f"><span class="n"><i>Mm</i></span><span class="d"><i>r</i><sup>2</sup></span></span> = <i>m</i><span class="f"><span class="n">4&pi;<sup>2</sup></span><span class="d"><i>T</i><sup>2</sup></span></span><i>r</i></span></p>
+    <p class="step"><span class="sn">②</span>两边约去 <i>m</i>，再把 <i>r</i>、<i>T</i> 归到同一侧：</p>
+    <p class="eq"><span class="m"><span class="f"><span class="n"><i>GM</i></span><span class="d"><i>r</i><sup>2</sup></span></span> = <span class="f"><span class="n">4&pi;<sup>2</sup><i>r</i></span><span class="d"><i>T</i><sup>2</sup></span></span> &nbsp;&rArr;&nbsp; <i>GMT</i><sup>2</sup> = 4&pi;<sup>2</sup><i>r</i><sup>3</sup></span></p>
+    <p class="eq boxed"><span class="m"><span class="f"><span class="n"><i>r</i><sup>3</sup></span><span class="d"><i>T</i><sup>2</sup></span></span> = <span class="f"><span class="n"><i>GM</i></span><span class="d">4&pi;<sup>2</sup></span></span> &equiv; <i>k</i></span></p>
+    <p class="step"><span class="sn">③</span><b>椭圆情形。</b>把 <i>r</i> 换成半长轴 <i>a</i>，结论形式不变：<span class="m"><i>a</i><sup>3</sup>/<i>T</i><sup>2</sup> = <i>GM</i><sub>中</sub>/(4&pi;<sup>2</sup>)</span>。式中<b>只出现中心天体质量 M<sub>中</sub></b>与常量 <i>G</i>、&pi; —— 这就是&ldquo;<i>k</i> 只由中心天体决定&rdquo;的根源。</p>
+    <p class="step"><span class="sn">④</span><b>面积定律的定量形式。</b>极短时间 &Delta;<i>t</i> 内，连线扫过的图形近似为三角形（底 = <i>v</i>&Delta;<i>t</i>，此边上的高 = <i>r</i>sin<i>&theta;</i>，<i>&theta;</i> 为 <i>v</i> 与矢径的夹角）：</p>
+    <p class="eq"><span class="m">&Delta;<i>S</i> = <span class="f"><span class="n">1</span><span class="d">2</span></span><i>r</i>&middot;<i>v</i>&Delta;<i>t</i>&middot;sin<i>&theta;</i> &nbsp;&rArr;&nbsp; <span class="f"><span class="n">&Delta;<i>S</i></span><span class="d">&Delta;<i>t</i></span></span> = <span class="f"><span class="n">1</span><span class="d">2</span></span><i>rv</i>sin<i>&theta;</i> = 常量</span></p>
+    <p class="step"><span class="sn">⑤</span>在近日点与远日点，速度恰好<b>垂直</b>于矢径（sin<i>&theta;</i> = 1），代入上式得：</p>
+    <p class="eq boxed"><span class="m"><span class="f"><span class="n">1</span><span class="d">2</span></span><i>r</i><sub>近</sub><i>v</i><sub>近</sub> = <span class="f"><span class="n">1</span><span class="d">2</span></span><i>r</i><sub>远</sub><i>v</i><sub>远</sub> &nbsp;&rArr;&nbsp; <i>r</i><sub>近</sub><i>v</i><sub>近</sub> = <i>r</i><sub>远</sub><i>v</i><sub>远</sub></span></p>
+    <p class="step"><span class="sn">⑥</span>由 &#9313; 反解，即得估算中心天体质量的公式（见第 05 板块）：<span class="m"><i>M</i><sub>中</sub> = 4&pi;<sup>2</sup><i>a</i><sup>3</sup>/(<i>GT</i><sup>2</sup>)</span>。</p>
+  </div>
+  <div class="blk warn">
+    <h4>使用要点</h4>
+    <ul>
+      <li>圆轨道是椭圆的特例，此时 <i>a</i> = <i>r</i>，<i>k</i> 的形式不变。</li>
+      <li><b><i>k</i> 只由中心天体质量决定</b>：绕太阳的用太阳的 <i>k</i>，绕地球的用地球的 <i>k</i>，两者<b>不能画等号</b>（对应讲义第 1 题）。</li>
+      <li>转移椭圆的半长轴 = (近地点半径 + 远地点半径)/2（对应讲义第 5 题）。</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ================= 2 ================= -->
+<h2 class="sec" id="k2"><span class="num">02</span>万有引力定律与球壳定理</h2>
+
+<div class="card">
+  <p class="eq boxed"><span class="m"><i>F</i> = <i>G</i><span class="f"><span class="n"><i>m</i><sub>1</sub><i>m</i><sub>2</sub></span><span class="d"><i>r</i><sup>2</sup></span></span>，&nbsp;&nbsp;<i>G</i> = 6.67&times;10<sup>&minus;11</sup> N&middot;m<sup>2</sup>/kg<sup>2</sup></span></p>
+  <ul>
+    <li><b>适用条件：</b>两个可视为<b>质点</b>的物体；或<b>均匀球体</b>（此时 <i>r</i> 取两<b>球心</b>之间的距离）。</li>
+    <li><b>球壳定理：</b>均匀球壳对<b>壳内</b>任意位置的物体引力<b>为零</b>。</li>
+    <li>由球壳定理可得，均匀球体<b>内部</b>距球心 <i>r</i> 处：只有半径 <i>r</i> 的&ldquo;内球&rdquo;有贡献，
+      <span class="m"><i>M</i>&prime; = <i>M</i>&middot;<span class="f"><span class="n"><i>r</i><sup>3</sup></span><span class="d"><i>R</i><sup>3</sup></span></span></span>，于是
+      <span class="m"><i>F</i> = <span class="f"><span class="n"><i>GM</i>&prime;<i>m</i></span><span class="d"><i>r</i><sup>2</sup></span></span> = <span class="f"><span class="n"><i>GMm</i></span><span class="d"><i>R</i><sup>3</sup></span></span><i>r</i> &prop; <i>r</i></span>，即 <em class="k">球内引力与 r 成正比</em>。</li>
+  </ul>
+
+  <figure>
+      <svg viewBox="0 0 620 330" width="620" role="img" aria-label="球壳定理图解：壳内引力两两抵消与球体内部分层">
+        <!-- ===== 左：壳内引力为零 ===== -->
+        <text x="150" y="22" font-size="13.5" text-anchor="middle" font-weight="bold" fill="#0e5a8a">① 均匀球壳对壳内物体的引力 = 0</text>
+        <circle cx="150" cy="150" r="85" fill="none" stroke="#0e5a8a" stroke-width="4"/>
+        <path d="M175,150 L225.9,111.7 A85,85 0 0,1 231.5,126 Z" fill="#fbeeea" stroke="#b3341f" stroke-width="1.2"/>
+        <path d="M175,150 L76.1,192 A85,85 0 0,0 92.3,212.3 Z" fill="#e9f4ef" stroke="#1f6d4e" stroke-width="1.2"/>
+        <path d="M225.9,111.7 A85,85 0 0,1 231.5,126" fill="none" stroke="#b3341f" stroke-width="4"/>
+        <path d="M76.1,192 A85,85 0 0,0 92.3,212.3" fill="none" stroke="#1f6d4e" stroke-width="4"/>
+        <circle cx="175" cy="150" r="4.5" fill="#1c242e"/>
+        <text x="180" y="168" font-size="13" font-style="italic">P</text>
+        <text x="200" y="155" font-size="12.5" fill="#b3341f" font-style="italic">r₁</text>
+        <text x="141" y="190" font-size="12.5" fill="#1f6d4e" font-style="italic">r₂</text>
+        <text x="243" y="106" font-size="11.5" fill="#b3341f">近面元 m₁</text>
+        <text x="24" y="228" font-size="11.5" fill="#1f6d4e">远面元 m₂</text>
+        <text x="150" y="264" font-size="12.5" text-anchor="middle" fill="#1c242e">对顶圆锥截出两个面元：m ∝ 面积 ∝ r²</text>
+        <text x="150" y="286" font-size="12.5" text-anchor="middle" fill="#1c242e">F = Gm/r² ⇒ Gm₁/r₁² = Gm₂/r₂²，即 <tspan font-weight="bold" fill="#b3341f">F₁ = F₂</tspan></text>
+        <text x="150" y="308" font-size="12.5" text-anchor="middle" fill="#5a6674">两力方向相反 ⇒ 全壳两两抵消 ⇒ <tspan font-weight="bold" fill="#1c242e">合力为零</tspan></text>
+        <line x1="310" y1="34" x2="310" y2="250" stroke="#dfe3e8" stroke-width="1.4"/>
+        <!-- ===== 右：球体内部分层 ===== -->
+        <text x="470" y="22" font-size="13.5" text-anchor="middle" font-weight="bold" fill="#0e5a8a">② 球体内部：只算&ldquo;脚下的内球&rdquo;</text>
+        <circle cx="470" cy="150" r="85" fill="#e7eaed" stroke="#0e5a8a" stroke-width="1.6"/>
+        <circle cx="470" cy="150" r="48" fill="#dceaf5" stroke="#1f6d4e" stroke-width="1.6" stroke-dasharray="5 4"/>
+        <text x="470" y="84" font-size="11.5" text-anchor="middle" fill="#5a6674">外壳：引力为零</text>
+        <text x="470" y="192" font-size="11.5" text-anchor="middle" fill="#1f6d4e">内球 M′</text>
+        <line x1="470" y1="150" x2="555" y2="150" stroke="#5a6674" stroke-width="1.2"/>
+        <line x1="518" y1="144" x2="518" y2="156" stroke="#5a6674" stroke-width="1.2"/>
+        <circle cx="470" cy="150" r="3.5" fill="#1c242e"/>
+        <rect x="512" y="132" width="12" height="12" fill="#b3341f"/>
+        <text x="494" y="142" font-size="12.5" text-anchor="middle" font-style="italic" fill="#1f6d4e">r</text>
+        <text x="537" y="142" font-size="12.5" text-anchor="middle" font-style="italic" fill="#5a6674">d</text>
+        <text x="566" y="126" font-size="11.5" fill="#b3341f">物体</text>
+        <text x="470" y="264" font-size="12.5" text-anchor="middle" fill="#1c242e">灰色外壳整体贡献为零 ⇒ 只留半径 r = R − d 的内球</text>
+        <text x="470" y="286" font-size="12.5" text-anchor="middle" fill="#1c242e"><tspan font-weight="bold">M′ = M·(r/R)³</tspan> ⇒ F = GM′m/r² = (GMm/R³)·r</text>
+        <text x="470" y="308" font-size="12.5" text-anchor="middle" fill="#5a6674">即 <tspan font-weight="bold" fill="#b3341f">球内引力 ∝ r</tspan>（球心处为零，表面处最大）</text>
+      </svg>
+    <figcaption>图 2&nbsp;&nbsp;<b>球壳定理图解</b>：左 —— 壳内两个对顶面元的引力恰好抵消；右 —— 球体内部只有内球有效</figcaption>
+  </figure>
+
+  <figure>
+      <svg viewBox="0 0 620 330" width="620" role="img" aria-label="面元面积正比于r平方的两步论证">
+        <text x="130" y="22" font-size="13.5" text-anchor="middle" font-weight="bold" fill="#0e5a8a">第一步　同一圆锥：截面面积 ∝ r²</text>
+        <line x1="40" y1="150" x2="222" y2="150" stroke="#9aa6b2" stroke-width="1" stroke-dasharray="4 3"/>
+        <path d="M40,150 L210,108" stroke="#5a6674" stroke-width="1.3"/>
+        <path d="M40,150 L210,192" stroke="#5a6674" stroke-width="1.3"/>
+        <ellipse cx="120" cy="150" rx="6" ry="19.8" fill="#fbeeea" stroke="#b3341f" stroke-width="1.6"/>
+        <ellipse cx="200" cy="150" rx="11" ry="39.5" fill="#e9f4ef" stroke="#1f6d4e" stroke-width="1.6"/>
+        <circle cx="40" cy="150" r="4" fill="#1c242e"/>
+        <text x="26" y="146" font-size="13" font-style="italic">P</text>
+        <text x="120" y="122" font-size="12.5" text-anchor="middle" fill="#b3341f">S₁</text>
+        <text x="200" y="100" font-size="12.5" text-anchor="middle" fill="#1f6d4e">S₂</text>
+        <line x1="40" y1="222" x2="120" y2="222" stroke="#b3341f" stroke-width="1.2"/>
+        <line x1="40" y1="216" x2="40" y2="228" stroke="#b3341f" stroke-width="1.2"/>
+        <line x1="120" y1="216" x2="120" y2="228" stroke="#b3341f" stroke-width="1.2"/>
+        <text x="80" y="215" font-size="12.5" text-anchor="middle" font-style="italic" fill="#b3341f">r₁</text>
+        <line x1="40" y1="248" x2="200" y2="248" stroke="#1f6d4e" stroke-width="1.2"/>
+        <line x1="40" y1="242" x2="40" y2="254" stroke="#1f6d4e" stroke-width="1.2"/>
+        <line x1="200" y1="242" x2="200" y2="254" stroke="#1f6d4e" stroke-width="1.2"/>
+        <text x="120" y="241" font-size="12.5" text-anchor="middle" font-style="italic" fill="#1f6d4e">r₂</text>
+        <text x="130" y="274" font-size="12.5" text-anchor="middle" fill="#1c242e">相似三角形 ⇒ 截面<tspan font-weight="bold">半径 ∝ r</tspan> ⇒ <tspan font-weight="bold">面积 ∝ r²</tspan></text>
+        <line x1="310" y1="34" x2="310" y2="262" stroke="#dfe3e8" stroke-width="1.4"/>
+        <text x="470" y="22" font-size="13.5" text-anchor="middle" font-weight="bold" fill="#0e5a8a">第二步　割线两端的倾角相同</text>
+        <circle cx="440" cy="140" r="90" fill="none" stroke="#0e5a8a" stroke-width="2.6"/>
+        <line x1="523.9" y1="107.4" x2="453.7" y2="228.9" stroke="#1c242e" stroke-width="1.4"/>
+        <line x1="440" y1="140" x2="523.9" y2="107.4" stroke="#8a6a12" stroke-width="1.3" stroke-dasharray="5 4"/>
+        <line x1="440" y1="140" x2="453.7" y2="228.9" stroke="#8a6a12" stroke-width="1.3" stroke-dasharray="5 4"/>
+        <path d="M503.4,115.4 A22,22 0 0,0 512.9,126.4" fill="none" stroke="#b3341f" stroke-width="1.6"/>
+        <path d="M450.3,207.2 A22,22 0 0,1 464.7,209.8" fill="none" stroke="#b3341f" stroke-width="1.6"/>
+        <text x="494" y="134" font-size="13" font-style="italic" fill="#b3341f">θ</text>
+        <text x="452" y="205" font-size="13" font-style="italic" fill="#b3341f">θ</text>
+        <circle cx="440" cy="140" r="4" fill="#1c242e"/><text x="422" y="144" font-size="13" font-style="italic">O</text>
+        <circle cx="505" cy="140" r="4" fill="#1c242e"/><text x="503" y="160" font-size="13" font-style="italic">P</text>
+        <circle cx="523.9" cy="107.4" r="4.5" fill="#b3341f"/><text x="532" y="102" font-size="13" font-style="italic" fill="#b3341f">A</text>
+        <circle cx="453.7" cy="228.9" r="4.5" fill="#1f6d4e"/><text x="436" y="246" font-size="13" font-style="italic" fill="#1f6d4e">B</text>
+        <text x="470" y="274" font-size="12.5" text-anchor="middle" fill="#1c242e"><tspan font-weight="bold">OA = OB = R</tspan> ⇒ △OAB 等腰 ⇒ ∠OAB = ∠OBA = θ</text>
+        <text x="310" y="302" font-size="12.5" text-anchor="middle" fill="#1c242e">合起来：S = <tspan font-style="italic">Ω</tspan>r² / cosθ，质量 m = σS ∝ r²（σ 为球壳面密度，<tspan font-style="italic">Ω</tspan> 为立体角）</text>
+        <text x="310" y="322" font-size="12.5" text-anchor="middle" fill="#5a6674">⇒ F = Gm<tspan baseline-shift="sub" font-size="9">0</tspan>m/r² = Gσ<tspan font-style="italic">Ω</tspan>m<tspan baseline-shift="sub" font-size="9">0</tspan>/cosθ，<tspan font-weight="bold" fill="#b3341f">与 r 无关</tspan> ⇒ F₁ = F₂</text>
+      </svg>
+    <figcaption>图 3&nbsp;&nbsp;&ldquo;面元质量 ∝ <i>r</i>²&rdquo;的两步论证：<b>圆锥相似放大</b> + <b>两端倾角相同</b></figcaption>
+  </figure>
+
+  <div class="blk tip">
+    <h4>为什么球壳定理成立（两步论证 · 选讲）</h4>
+
+    <p><b>一、&ldquo;面元质量 ∝ <i>r</i>²&rdquo;从哪来？</b>这句话要拆成两步（见图 3）：</p>
+    <ol>
+      <li><b>圆锥相似放大：</b>从 <i>P</i> 点张开一个<b>张角固定</b>的小圆锥，它在距 <i>P</i> 为 <i>r</i> 处截出的圆面，半径由相似三角形决定，<b>与 <i>r</i> 成正比</b> ⇒ 面积 <span class="m"><i>S</i> ∝ <i>r</i><sup>2</sup></span>。<span style="color:#5a6674">（同&ldquo;手电筒照得越远、光斑越大&rdquo;是一回事。）</span></li>
+      <li><b>两端倾角相同：</b>球壳上的面元是<b>斜切</b>下来的，斜切把面积放大 1/cos<i>&theta;</i> 倍。关键在于 <b><i>OA</i> = <i>OB</i> = <i>R</i></b> ⇒ &#9651;<i>OAB</i> 等腰 ⇒ <b>∠<i>OAB</i> = ∠<i>OBA</i> = <i>&theta;</i></b>；而 <i>OA</i>、<i>OB</i> 正是球面在两处的<b>法线</b>，故两端倾角完全相同，放大因子可以约掉。</li>
+    </ol>
+    <p>于是 <span class="m"><i>S</i> = <i>&Omega;r</i><sup>2</sup>/cos<i>&theta;</i></span>，面密度 <i>&sigma;</i> 均匀 ⇒ <span class="m"><i>m</i> = <i>&sigma;S</i> ∝ <i>r</i><sup>2</sup></span>。代入万有引力（<i>m</i><sub>0</sub> 为壳内物体质量）：</p>
+    <p class="eq boxed"><span class="m"><i>F</i> = <span class="f"><span class="n"><i>Gm</i><sub>0</sub><i>m</i></span><span class="d"><i>r</i><sup>2</sup></span></span> = <span class="f"><span class="n"><i>Gm</i><sub>0</sub><i>&sigma;&Omega;r</i><sup>2</sup></span><span class="d"><i>r</i><sup>2</sup>cos<i>&theta;</i></span></span> = <span class="f"><span class="n"><i>Gm</i><sub>0</sub><i>&sigma;&Omega;</i></span><span class="d">cos<i>&theta;</i></span></span>　—— <b>与 <i>r</i> 无关</b></span></p>
+    <p><em class="k">分母的 r² 被质量带来的 r² 约掉了</em>：<b>远处的面元虽然远（引力削弱 <i>r</i>² 倍），但同时也大（质量增大 <i>r</i>² 倍）</b>，一削一补恰好抵平 ⇒ <i>F</i><sub>1</sub> = <i>F</i><sub>2</sub>、方向相反而抵消 ⇒ 全壳合力为零。</p>
+
+    <p style="margin-top:12px"><b>二、&ldquo;厚外壳整体贡献为零&rdquo;又从哪来？</b>把从半径 <i>r</i> 到 <i>R</i> 的厚外壳，像剥洋葱一样切成无数层<b>同心薄球壳</b>。深度 <i>d</i> 处的物体恰好位于<b>每一层薄壳的内部</b>，由上一条，每层引力都为零：</p>
+    <p class="eq boxed"><span class="m">0 + 0 + 0 + &hellip; = 0</span></p>
+    <p>零累加仍是零 ⇒ 外壳整体合力为零，只剩&ldquo;脚下半径 <i>r</i> 的实心内球&rdquo;在起作用。</p>
+
+    <p style="margin-top:10px"><b>课堂一句话版：</b><em class="k">远的更远，但也更大；远得刚好被大得抵平。</em>&nbsp;&nbsp;<em class="k">洋葱一层层剥，每层都是零，加起来还是零。</em></p>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 560 250" width="560" role="img" aria-label="球内外重力加速度随距离变化图">
+      <line x1="60" y1="200" x2="480" y2="200" stroke="#1c242e" stroke-width="1.4"/>
+      <line x1="60" y1="200" x2="60" y2="40" stroke="#1c242e" stroke-width="1.4"/>
+      <text x="490" y="205" font-size="13" font-style="italic">r</text>
+      <text x="42" y="46" font-size="13" font-style="italic">g</text>
+      <path d="M60 200 L165 70" stroke="#1f6d4e" stroke-width="2.2"/>
+      <path d="M165 70 L184 88 L207 106 L228 120 L270 141 L312 155 L354 165 L396 172 L438 177 L470 180"
+            fill="none" stroke="#b3341f" stroke-width="2.2"/>
+      <line x1="165" y1="200" x2="165" y2="70" stroke="#9aa6b2" stroke-width="1.1" stroke-dasharray="4 3"/>
+      <line x1="60" y1="70" x2="165" y2="70" stroke="#9aa6b2" stroke-width="1.1" stroke-dasharray="4 3"/>
+      <text x="165" y="218" font-size="13" text-anchor="middle" font-style="italic">R</text>
+      <text x="270" y="218" font-size="13" text-anchor="middle" font-style="italic">2R</text>
+      <text x="375" y="218" font-size="13" text-anchor="middle" font-style="italic">3R</text>
+      <line x1="270" y1="196" x2="270" y2="204" stroke="#1c242e"/>
+      <line x1="375" y1="196" x2="375" y2="204" stroke="#1c242e"/>
+      <text x="40" y="75" font-size="12.5" fill="#8a6a12">g₀</text>
+      <text x="86" y="118" font-size="12.5" fill="#1f6d4e" font-weight="bold">g ∝ r</text>
+      <text x="98" y="138" font-size="11.5" fill="#1f6d4e">（球体内部）</text>
+      <text x="290" y="126" font-size="12.5" fill="#b3341f" font-weight="bold">g ∝ 1/r²</text>
+      <text x="300" y="146" font-size="11.5" fill="#b3341f">（球体外部）</text>
+      <text x="270" y="60" font-size="12.5" fill="#5a6674">表面处 g 最大 = GM/R²</text>
+      <text x="270" y="242" font-size="12.5" text-anchor="middle" fill="#5a6674">深度 d 处：g′ = g₀(R−d)/R　　高度 h 处：g′ = g₀R²/(R+h)²</text>
+    </svg>
+    <figcaption>图 4&nbsp;&nbsp;均匀球体<b>内部线性、外部平方反比</b>（对应讲义第 12 题）</figcaption>
+  </figure>
+  <div class="blk board">
+    <h4>公式推导 · 球体内部与外部的 g</h4>
+    <p class="step"><span class="sn">①</span>均匀球体密度 <span class="m">&rho; = <i>M</i>/[(4/3)&pi;<i>R</i><sup>3</sup>]</span>。距球心 <i>r</i>（<i>r</i> &le; <i>R</i>）处，由球壳定理只有半径 <i>r</i> 的内球有效：</p>
+    <p class="eq"><span class="m"><i>M</i>&prime; = &rho;&middot;<span class="f"><span class="n">4</span><span class="d">3</span></span>&pi;<i>r</i><sup>3</sup> = <span class="f"><span class="n"><i>M</i></span><span class="d">(4/3)&pi;<i>R</i><sup>3</sup></span></span>&middot;<span class="f"><span class="n">4</span><span class="d">3</span></span>&pi;<i>r</i><sup>3</sup> = <i>M</i><span class="f"><span class="n"><i>r</i><sup>3</sup></span><span class="d"><i>R</i><sup>3</sup></span></span></span></p>
+    <p class="step"><span class="sn">②</span>该处物体受到的引力：</p>
+    <p class="eq"><span class="m"><i>F</i> = <span class="f"><span class="n"><i>GM</i>&prime;<i>m</i></span><span class="d"><i>r</i><sup>2</sup></span></span> = <span class="f"><span class="n"><i>G</i>(<i>Mr</i><sup>3</sup>/<i>R</i><sup>3</sup>)<i>m</i></span><span class="d"><i>r</i><sup>2</sup></span></span> = <span class="f"><span class="n"><i>GMm</i></span><span class="d"><i>R</i><sup>3</sup></span></span>&middot;<i>r</i></span></p>
+    <p class="eq boxed"><span class="m"><i>F</i> &prop; <i>r</i>&nbsp;&nbsp;（球心处为零，表面处最大）</span></p>
+    <p class="step"><span class="sn">③</span>两边除以 <i>m</i> 得该处重力加速度，再用表面值 <span class="m"><i>g</i><sub>0</sub> = <i>GM</i>/<i>R</i><sup>2</sup></span> 化简：</p>
+    <p class="eq"><span class="m"><i>g</i>&prime; = <span class="f"><span class="n"><i>GM</i></span><span class="d"><i>R</i><sup>3</sup></span></span><i>r</i> = <span class="f"><span class="n"><i>GM</i></span><span class="d"><i>R</i><sup>2</sup></span></span>&middot;<span class="f"><span class="n"><i>r</i></span><span class="d"><i>R</i></span></span> = <i>g</i><sub>0</sub><span class="f"><span class="n"><i>r</i></span><span class="d"><i>R</i></span></span></span></p>
+    <p class="step"><span class="sn">④</span>用<b>深度 d</b> 表示（<i>r</i> = <i>R</i> &minus; <i>d</i>）：</p>
+    <p class="eq boxed"><span class="m"><i>g</i>&prime; = <i>g</i><sub>0</sub><span class="f"><span class="n"><i>R</i> &minus; <i>d</i></span><span class="d"><i>R</i></span></span>&nbsp;&nbsp;（内部：<b>线性</b>下降）</span></p>
+    <p class="step"><span class="sn">⑤</span>球体<b>外部</b>（<i>r</i> = <i>R</i>+<i>h</i> &gt; <i>R</i>）则要用整个球的质量：</p>
+    <p class="eq boxed"><span class="m"><i>g</i>&prime; = <span class="f"><span class="n"><i>GM</i></span><span class="d">(<i>R</i>+<i>h</i>)<sup>2</sup></span></span> = <span class="f"><span class="n"><i>g</i><sub>0</sub><i>R</i><sup>2</sup></span><span class="d">(<i>R</i>+<i>h</i>)<sup>2</sup></span></span>&nbsp;&nbsp;（外部：<b>平方反比</b>）</span></p>
+  </div>
+</div>
+
+<!-- ================= 3 ================= -->
+<h2 class="sec" id="k3"><span class="num">03</span>两条基本关系（&ldquo;地上&rdquo;与&ldquo;天上&rdquo;）</h2>
+
+<div class="card">
+  <h3 class="sub">关系一：天体表面（忽略自转）</h3>
+  <p class="eq boxed"><span class="m"><i>G</i><span class="f"><span class="n"><i>Mm</i></span><span class="d"><i>R</i><sup>2</sup></span></span> = <i>mg</i> &nbsp;&rArr;&nbsp; <b><i>GM</i> = <i>gR</i><sup>2</sup></b>（黄金代换）</span></p>
+  <p>作用：把不易测量的 <i>G</i>、<i>M</i> 换成容易测量的 <i>g</i>、<i>R</i>。凡题目<b>给 g 和 R 却不给 G 和 M</b>，一律先写这一步。</p>
+
+  <h3 class="sub">关系二：环绕天体（万有引力提供向心力）</h3>
+  <p class="eq boxed"><span class="m"><i>G</i><span class="f"><span class="n"><i>Mm</i></span><span class="d"><i>r</i><sup>2</sup></span></span> = <i>ma</i> = <i>m</i><span class="f"><span class="n"><i>v</i><sup>2</sup></span><span class="d"><i>r</i></span></span> = <i>m&omega;</i><sup>2</sup><i>r</i> = <i>m</i><span class="f"><span class="n">4&pi;<sup>2</sup></span><span class="d"><i>T</i><sup>2</sup></span></span><i>r</i></span></p>
+
+  <figure>
+    <svg viewBox="0 0 560 210" width="560" role="img" aria-label="黄金代换连接地面与轨道">
+      <rect x="14" y="20" width="220" height="172" rx="10" fill="#fbf3dc" stroke="#ece2c8"/>
+      <text x="124" y="48" font-size="14.5" text-anchor="middle" font-weight="bold" fill="#8a6a12">地面（已知 g、R）</text>
+      <text x="124" y="80" font-size="14" text-anchor="middle">GMm/R² = mg</text>
+      <text x="124" y="122" font-size="21" text-anchor="middle" font-weight="bold" fill="#b3341f">GM = gR²</text>
+      <text x="124" y="152" font-size="12.5" text-anchor="middle" fill="#5a6674">可求 M = gR²/G</text>
+      <text x="124" y="176" font-size="12.5" text-anchor="middle" fill="#5a6674">可求 ρ = 3g/(4πGR)</text>
+      <path d="M242 106 L292 106" stroke="#8a6a12" stroke-width="2.4" marker-end="url(#arrZ)"/>
+      <defs><marker id="arrZ" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#8a6a12"/></marker></defs>
+      <text x="266" y="96" font-size="12" text-anchor="middle" fill="#8a6a12">代换</text>
+      <rect x="300" y="20" width="246" height="172" rx="10" fill="#e8f1f7" stroke="#cfe0ec"/>
+      <text x="423" y="48" font-size="14.5" text-anchor="middle" font-weight="bold" fill="#0e5a8a">轨道（已知 r、T）</text>
+      <text x="423" y="78" font-size="13.5" text-anchor="middle">v = √(GM/r) = R√(g/r)</text>
+      <text x="423" y="104" font-size="13.5" text-anchor="middle">ω = √(GM/r³)　a = GM/r²</text>
+      <text x="423" y="130" font-size="13.5" text-anchor="middle">T = 2π√(r³/GM)</text>
+      <text x="423" y="160" font-size="13" text-anchor="middle" fill="#1f6d4e" font-weight="bold">M中心 = 4π²r³/(GT²)</text>
+      <text x="423" y="182" font-size="12.5" text-anchor="middle" fill="#5a6674">环绕体自身质量 m 恒被约去</text>
+    </svg>
+    <figcaption>图 5&nbsp;&nbsp;<b>黄金代换 GM = gR²</b> 是全章最重要的一座桥</figcaption>
+  </figure>
+</div>
+
+<!-- ================= 4 ================= -->
+<h2 class="sec" id="k4"><span class="num">04</span>卫星运行参量与&ldquo;越高越慢&rdquo;</h2>
+
+<div class="card">
+  <table>
+    <thead><tr><th style="width:14%">物理量</th><th style="width:30%">表达式</th><th style="width:18%">与 r 的关系</th><th class="l">记忆要点</th></tr></thead>
+    <tbody>
+      <tr><td>线速度 <i>v</i></td><td><span class="m"><span class="rt"><span class="rc"><span class="f"><span class="n"><i>GM</i></span><span class="d"><i>r</i></span></span></span></span></span></td><td><i>v</i> &prop; <i>r</i><sup>&minus;1/2</sup></td><td class="l">半径大 &rarr; 速度小</td></tr>
+      <tr><td>角速度 <i>&omega;</i></td><td><span class="m"><span class="rt"><span class="rc"><span class="f"><span class="n"><i>GM</i></span><span class="d"><i>r</i><sup>3</sup></span></span></span></span></span></td><td><i>&omega;</i> &prop; <i>r</i><sup>&minus;3/2</sup></td><td class="l">半径大 &rarr; 角速度小</td></tr>
+      <tr><td>周期 <i>T</i></td><td><span class="m">2&pi;<span class="rt"><span class="rc"><span class="f"><span class="n"><i>r</i><sup>3</sup></span><span class="d"><i>GM</i></span></span></span></span></span></td><td><i>T</i> &prop; <i>r</i><sup>3/2</sup></td><td class="l">半径大 &rarr; 周期长</td></tr>
+      <tr><td>向心加速度 <i>a</i></td><td><span class="m"><span class="f"><span class="n"><i>GM</i></span><span class="d"><i>r</i><sup>2</sup></span></span></span></td><td><i>a</i> &prop; <i>r</i><sup>&minus;2</sup></td><td class="l">半径大 &rarr; 加速度小</td></tr>
+    </tbody>
+  </table>
+  <p class="eq boxed"><span class="m">口诀：<b>高轨低速大周期，低轨高速小周期</b>（<i>v</i>、<i>&omega;</i>、<i>a</i> 同减，只有 <i>T</i> 增）</span></p>
+
+  <figure>
+    <svg viewBox="0 0 560 240" width="560" role="img" aria-label="v和T随轨道半径变化的定性图像">
+      <line x1="66" y1="190" x2="330" y2="190" stroke="#1c242e" stroke-width="1.4"/>
+      <line x1="66" y1="190" x2="66" y2="34" stroke="#1c242e" stroke-width="1.4"/>
+      <text x="340" y="195" font-size="13" font-style="italic">r</text>
+      <text x="46" y="42" font-size="12.5">相对值</text>
+      <path d="M78 70 L112 96 L146 112 L180 124 L214 133 L248 141 L282 147 L316 152" fill="none" stroke="#b3341f" stroke-width="2.2"/>
+      <text x="196" y="122" font-size="12.5" fill="#b3341f" font-weight="bold">v ∝ 1/√r</text>
+      <path d="M78 175 L112 167 L146 153 L180 134 L214 110 L248 82 L282 50 L300 34" fill="none" stroke="#0e5a8a" stroke-width="2.2"/>
+      <text x="236" y="70" font-size="12.5" fill="#0e5a8a" font-weight="bold">T ∝ r³ᐟ²</text>
+      <text x="78" y="206" font-size="12" text-anchor="middle" font-style="italic">R</text>
+      <text x="180" y="206" font-size="12" text-anchor="middle" font-style="italic">2R</text>
+      <text x="282" y="206" font-size="12" text-anchor="middle" font-style="italic">3R</text>
+      <text x="198" y="228" font-size="12.5" text-anchor="middle" fill="#5a6674">两条曲线&ldquo;一降一升&rdquo;，是判断大小关系的直观依据</text>
+      <rect x="366" y="30" width="184" height="180" rx="9" fill="#f0ebf8" stroke="#ddd3ef"/>
+      <text x="380" y="56" font-size="13.5" font-weight="bold" fill="#5a3a86">比较题两步法</text>
+      <text x="380" y="84" font-size="12.5">① 先分类：是&ldquo;卫星&rdquo;吗？</text>
+      <text x="380" y="106" font-size="12.5" fill="#5a6674">　 地面物体不是卫星！</text>
+      <text x="380" y="132" font-size="12.5">② 同 ω 组：v = ωr、a = ω²r</text>
+      <text x="380" y="152" font-size="12.5" fill="#5a6674">　（半径大者反而大）</text>
+      <text x="380" y="178" font-size="12.5">　 卫星组：用 GM/r² 系列</text>
+      <text x="380" y="198" font-size="12.5" fill="#5a6674">　（半径大者小）</text>
+    </svg>
+    <figcaption>图 6&nbsp;&nbsp;<i>v</i>&ndash;<i>r</i> 与 <i>T</i>&ndash;<i>r</i> 定性图像（对应讲义第 2、3 题）</figcaption>
+  </figure>
+  <div class="blk board">
+    <h4>公式推导 · 四个环绕参量全部来自同一条式子</h4>
+    <p class="step"><span class="sn">①</span>出发点只有一条 —— 万有引力提供向心力，而向心力有四种等价写法：</p>
+    <p class="eq"><span class="m"><i>G</i><span class="f"><span class="n"><i>Mm</i></span><span class="d"><i>r</i><sup>2</sup></span></span> = <i>ma</i> = <i>m</i><span class="f"><span class="n"><i>v</i><sup>2</sup></span><span class="d"><i>r</i></span></span> = <i>m&omega;</i><sup>2</sup><i>r</i> = <i>m</i><span class="f"><span class="n">4&pi;<sup>2</sup></span><span class="d"><i>T</i><sup>2</sup></span></span><i>r</i></span></p>
+    <p class="step"><span class="sn">②</span>取 <span class="m">= <i>ma</i></span>：约去 <i>m</i> 得 <span class="m"><i>a</i> = <i>GM</i>/<i>r</i><sup>2</sup></span>，即 <i>a</i> &prop; <i>r</i><sup>&minus;2</sup>。</p>
+    <p class="step"><span class="sn">③</span>取 <span class="m">= <i>mv</i><sup>2</sup>/<i>r</i></span>：<span class="m"><i>GM</i>/<i>r</i><sup>2</sup> = <i>v</i><sup>2</sup>/<i>r</i></span> &rArr; <span class="m"><i>v</i><sup>2</sup> = <i>GM</i>/<i>r</i></span> &rArr;</p>
+    <p class="eq boxed"><span class="m"><i>v</i> = <span class="rt"><span class="rc"><span class="f"><span class="n"><i>GM</i></span><span class="d"><i>r</i></span></span></span></span>&nbsp;&nbsp;(<i>v</i> &prop; <i>r</i><sup>&minus;1/2</sup>)</span></p>
+    <p class="step"><span class="sn">④</span>取 <span class="m">= <i>m&omega;</i><sup>2</sup><i>r</i></span>：<span class="m"><i>GM</i>/<i>r</i><sup>2</sup> = <i>&omega;</i><sup>2</sup><i>r</i></span> &rArr; <span class="m"><i>&omega;</i><sup>2</sup> = <i>GM</i>/<i>r</i><sup>3</sup></span> &rArr;</p>
+    <p class="eq boxed"><span class="m"><i>&omega;</i> = <span class="rt"><span class="rc"><span class="f"><span class="n"><i>GM</i></span><span class="d"><i>r</i><sup>3</sup></span></span></span></span>&nbsp;&nbsp;(<i>&omega;</i> &prop; <i>r</i><sup>&minus;3/2</sup>)</span></p>
+    <p class="step"><span class="sn">⑤</span>取 <span class="m">= <i>m</i>(4&pi;<sup>2</sup>/<i>T</i><sup>2</sup>)<i>r</i></span>：<span class="m"><i>GM</i>/<i>r</i><sup>2</sup> = 4&pi;<sup>2</sup><i>r</i>/<i>T</i><sup>2</sup></span> &rArr; <span class="m"><i>T</i><sup>2</sup> = 4&pi;<sup>2</sup><i>r</i><sup>3</sup>/(<i>GM</i>)</span> &rArr;</p>
+    <p class="eq boxed"><span class="m"><i>T</i> = 2&pi;<span class="rt"><span class="rc"><span class="f"><span class="n"><i>r</i><sup>3</sup></span><span class="d"><i>GM</i></span></span></span></span>&nbsp;&nbsp;(<i>T</i> &prop; <i>r</i><sup>3/2</sup>)</span></p>
+    <p class="step"><span class="sn">⑥</span>若题目<b>只给 g、R 而不给 G、M</b>，把 <span class="m"><i>GM</i> = <i>gR</i><sup>2</sup></span> 代进去即可：</p>
+    <p class="eq"><span class="m"><i>v</i> = <i>R</i><span class="rt"><span class="rc"><span class="f"><span class="n"><i>g</i></span><span class="d"><i>r</i></span></span></span></span>，&nbsp;<i>&omega;</i> = <i>R</i><span class="rt"><span class="rc"><span class="f"><span class="n"><i>g</i></span><span class="d"><i>r</i><sup>3</sup></span></span></span></span>，&nbsp;<i>T</i> = <span class="f"><span class="n">2&pi;</span><span class="d"><i>R</i></span></span><span class="rt"><span class="rc"><span class="f"><span class="n"><i>r</i><sup>3</sup></span><span class="d"><i>g</i></span></span></span></span>，&nbsp;<i>a</i> = <span class="f"><span class="n"><i>gR</i><sup>2</sup></span><span class="d"><i>r</i><sup>2</sup></span></span></span></p>
+    <p class="step"><span class="sn">⑦</span>四个指数摆在一起，&ldquo;越高越慢&rdquo;就一目了然：<i>r</i> 增大时 <i>v</i>、<i>&omega;</i>、<i>a</i> 全部变小，<b>只有 T 变大</b>。</p>
+  </div>
+</div>
+
+<!-- ================= 5 ================= -->
+<h2 class="sec" id="k5"><span class="num">05</span>天体质量与密度的估算</h2>
+
+<div class="card">
+  <table>
+    <thead><tr><th style="width:24%">已知条件</th><th style="width:30%">中心天体质量</th><th style="width:30%">中心天体密度</th><th class="l">备注</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>环绕体的 <i>r</i>、<i>T</i></td>
+        <td><span class="m"><i>M</i> = <span class="f"><span class="n">4&pi;<sup>2</sup><i>r</i><sup>3</sup></span><span class="d"><i>GT</i><sup>2</sup></span></span></span></td>
+        <td><span class="m">&rho; = <span class="f"><span class="n">3&pi;<i>r</i><sup>3</sup></span><span class="d"><i>GT</i><sup>2</sup><i>R</i><sup>3</sup></span></span></span></td>
+        <td class="l">求密度还需中心天体半径 <i>R</i></td>
+      </tr>
+      <tr>
+        <td><b>近地</b>环绕（<i>r</i> &asymp; <i>R</i>）只给 <i>T</i></td>
+        <td>&mdash;</td>
+        <td><span class="m">&rho; = <span class="f"><span class="n">3&pi;</span><span class="d"><i>GT</i><sup>2</sup></span></span></span></td>
+        <td class="l"><b>只需周期</b>！最常考的秒杀式</td>
+      </tr>
+      <tr>
+        <td>表面 <i>g</i>、半径 <i>R</i></td>
+        <td><span class="m"><i>M</i> = <span class="f"><span class="n"><i>gR</i><sup>2</sup></span><span class="d"><i>G</i></span></span></span></td>
+        <td><span class="m">&rho; = <span class="f"><span class="n">3<i>g</i></span><span class="d">4&pi;<i>GR</i></span></span></span></td>
+        <td class="l">密度式<b>别漏 G</b></td>
+      </tr>
+      <tr>
+        <td>双星的 <i>L</i>、<i>T</i></td>
+        <td><span class="m"><i>m</i><sub>1</sub>+<i>m</i><sub>2</sub> = <span class="f"><span class="n">4&pi;<sup>2</sup><i>L</i><sup>3</sup></span><span class="d"><i>GT</i><sup>2</sup></span></span></span></td>
+        <td>&mdash;</td>
+        <td class="l">只能得<b>总质量</b>，需另给条件才可拆分</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="blk board">
+    <h4>公式推导 · 四类估算式逐条来历</h4>
+    <p class="step"><span class="sn">①</span><b>由环绕体的 r、T 求中心天体质量。</b>万有引力提供向心力：</p>
+    <p class="eq boxed"><span class="m"><i>G</i><span class="f"><span class="n"><i>Mm</i></span><span class="d"><i>r</i><sup>2</sup></span></span> = <i>m</i><span class="f"><span class="n">4&pi;<sup>2</sup></span><span class="d"><i>T</i><sup>2</sup></span></span><i>r</i> &nbsp;&rArr;&nbsp; <i>M</i> = <span class="f"><span class="n">4&pi;<sup>2</sup><i>r</i><sup>3</sup></span><span class="d"><i>GT</i><sup>2</sup></span></span></span></p>
+    <p class="step"><span class="sn">②</span><b>再求密度。</b>注意分母是<u>中心天体自身</u>的体积（半径 <i>R</i>，不是轨道半径 <i>r</i>）：</p>
+    <p class="eq boxed"><span class="m">&rho; = <span class="f"><span class="n"><i>M</i></span><span class="d">(4/3)&pi;<i>R</i><sup>3</sup></span></span> = <span class="f"><span class="n">4&pi;<sup>2</sup><i>r</i><sup>3</sup></span><span class="d"><i>GT</i><sup>2</sup></span></span>&middot;<span class="f"><span class="n">3</span><span class="d">4&pi;<i>R</i><sup>3</sup></span></span> = <span class="f"><span class="n">3&pi;<i>r</i><sup>3</sup></span><span class="d"><i>GT</i><sup>2</sup><i>R</i><sup>3</sup></span></span></span></p>
+    <p class="step"><span class="sn">③</span><b>近地退化。</b>当环绕体贴近表面飞行时 <i>r</i> &asymp; <i>R</i>，上式中 <i>r</i><sup>3</sup>/<i>R</i><sup>3</sup> = 1：</p>
+    <p class="eq boxed"><span class="m">&rho; = <span class="f"><span class="n">3&pi;</span><span class="d"><i>GT</i><sup>2</sup></span></span>&nbsp;&nbsp;—— <b>只要一个周期就够了</b></span></p>
+    <p class="step"><span class="sn">④</span><b>由表面 g、R 求质量。</b>忽略自转时表面处引力等于重力：</p>
+    <p class="eq boxed"><span class="m"><i>G</i><span class="f"><span class="n"><i>Mm</i></span><span class="d"><i>R</i><sup>2</sup></span></span> = <i>mg</i> &nbsp;&rArr;&nbsp; <i>M</i> = <span class="f"><span class="n"><i>gR</i><sup>2</sup></span><span class="d"><i>G</i></span></span></span></p>
+    <p class="step"><span class="sn">⑤</span><b>由表面 g、R 求密度。</b>把 &#9315; 代入密度定义：</p>
+    <p class="eq boxed"><span class="m">&rho; = <span class="f"><span class="n"><i>gR</i><sup>2</sup>/<i>G</i></span><span class="d">(4/3)&pi;<i>R</i><sup>3</sup></span></span> = <span class="f"><span class="n"><i>gR</i><sup>2</sup></span><span class="d"><i>G</i></span></span>&middot;<span class="f"><span class="n">3</span><span class="d">4&pi;<i>R</i><sup>3</sup></span></span> = <span class="f"><span class="n">3<i>g</i></span><span class="d">4&pi;<i>GR</i></span></span></span></p>
+    <p class="step"><span class="sn">⑥</span>以上每一步中，<b>环绕体（或被称量物体）的质量 m 都被约掉了</b> —— 这就是&ldquo;只能求中心天体质量&rdquo;的原因。</p>
+  </div>
+  <div class="blk warn">
+    <h4>三条铁律</h4>
+    <ul>
+      <li><b>只能求中心天体的质量</b>，环绕体质量必被约去。</li>
+      <li><b>轨道半径 <i>r</i> = <i>R</i> + <i>h</i></b>，&ldquo;距表面高度&rdquo;绝不是轨道半径（讲义第 6 题）。</li>
+      <li>密度公式记为 <b>&rho; = 3&pi;<i>r</i><sup>3</sup>/(<i>GT</i><sup>2</sup><i>R</i><sup>3</sup>)</b>，令 <i>r</i> = <i>R</i> 立刻退化为 3&pi;/<i>GT</i><sup>2</sup>，一式两用。</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ================= 6 ================= -->
+<h2 class="sec" id="k6"><span class="num">06</span>三个宇宙速度</h2>
+
+<div class="card">
+  <table>
+    <thead><tr><th style="width:18%">名称</th><th style="width:16%">数值</th><th style="width:26%">表达式</th><th class="l">物理意义</th></tr></thead>
+    <tbody>
+      <tr><td>第一宇宙速度</td><td>7.9 km/s</td><td><span class="m"><i>v</i><sub>1</sub> = <span class="rt"><span class="rc"><span class="f"><span class="n"><i>GM</i></span><span class="d"><i>R</i></span></span></span></span> = <span class="rt"><span class="rc"><i>gR</i></span></span></span></td><td class="l"><b>最大环绕速度</b>、<b>最小发射速度</b>（贴地飞行）</td></tr>
+      <tr><td>第二宇宙速度</td><td>11.2 km/s</td><td><span class="m"><i>v</i><sub>2</sub> = <span class="rt"><span class="rc">2</span></span><i>v</i><sub>1</sub></span></td><td class="l">挣脱地球引力束缚（脱离速度）</td></tr>
+      <tr><td>第三宇宙速度</td><td>16.7 km/s</td><td>&mdash;</td><td class="l">挣脱太阳引力束缚，飞出太阳系</td></tr>
+    </tbody>
+  </table>
+  <p class="eq boxed"><span class="m">卫星绕地运行的发射速度范围：<b>7.9 km/s &le; <i>v</i><sub>发</sub> &lt; 11.2 km/s</b></span></p>
+  <div class="blk board">
+    <h4>公式推导 · 第一、第二宇宙速度是怎么算出来的</h4>
+    <p class="step"><span class="sn">①</span><b>第一宇宙速度</b>：设想卫星贴着地面做圆周运动（<i>r</i> = <i>R</i>），引力全部作向心力：</p>
+    <p class="eq"><span class="m"><i>G</i><span class="f"><span class="n"><i>Mm</i></span><span class="d"><i>R</i><sup>2</sup></span></span> = <i>m</i><span class="f"><span class="n"><i>v</i><sub>1</sub><sup>2</sup></span><span class="d"><i>R</i></span></span> &nbsp;&rArr;&nbsp; <i>v</i><sub>1</sub> = <span class="rt"><span class="rc"><span class="f"><span class="n"><i>GM</i></span><span class="d"><i>R</i></span></span></span></span></span></p>
+    <p class="step"><span class="sn">②</span>用黄金代换 <span class="m"><i>GM</i> = <i>gR</i><sup>2</sup></span> 消去 <i>G</i>、<i>M</i>：</p>
+    <p class="eq boxed"><span class="m"><i>v</i><sub>1</sub> = <span class="rt"><span class="rc"><span class="f"><span class="n"><i>gR</i><sup>2</sup></span><span class="d"><i>R</i></span></span></span></span> = <span class="rt"><span class="rc"><i>gR</i></span></span></span></p>
+    <p class="step"><span class="sn">③</span>代数字（<i>g</i> = 9.8 m/s<sup>2</sup>，<i>R</i> = 6.4&times;10<sup>6</sup> m）：<span class="m"><i>v</i><sub>1</sub> = &radic;(9.8&times;6.4&times;10<sup>6</sup>) = &radic;(6.27&times;10<sup>7</sup>) &asymp; 7.9&times;10<sup>3</sup> m/s</span></p>
+    <p class="step"><span class="sn">④</span><b>第二宇宙速度</b>：&ldquo;恰好逃逸&rdquo;＝飞到无穷远时速度恰好减为零。取无穷远处引力势能为零，机械能守恒：</p>
+    <p class="eq"><span class="m"><span class="f"><span class="n">1</span><span class="d">2</span></span><i>mv</i><sub>2</sub><sup>2</sup> + (&minus;<span class="f"><span class="n"><i>GMm</i></span><span class="d"><i>R</i></span></span>) = 0 + 0</span></p>
+    <p class="step"><span class="sn">⑤</span>解得：</p>
+    <p class="eq boxed"><span class="m"><i>v</i><sub>2</sub> = <span class="rt"><span class="rc"><span class="f"><span class="n">2<i>GM</i></span><span class="d"><i>R</i></span></span></span></span> = <span class="rt"><span class="rc">2</span></span>&middot;<i>v</i><sub>1</sub> = 1.414 &times; 7.9 &asymp; 11.2 km/s</span></p>
+    <p class="step"><span class="sn">⑥</span>两个速度一夹，就得到卫星发射速度的范围：<span class="m">7.9 km/s &le; <i>v</i><sub>发</sub> &lt; 11.2 km/s</span>。低于 7.9 上不了天，达到 11.2 就飞出地球。</p>
+  </div>
+  <div class="blk warn">
+    <h4>最高频误区</h4>
+    <ul>
+      <li>&ldquo;发射速度必须大于 11.2 km/s&rdquo; —— <b>错</b>，超过就飞走了（讲义第 4 题 A 项）。</li>
+      <li>&ldquo;卫星越高速度越大&rdquo; —— <b>错</b>，7.9 km/s 是<b>上限</b>，所有卫星运行速度都小于它。</li>
+      <li>第一宇宙速度是&ldquo;环绕速度的最大值&rdquo;与&ldquo;发射速度的最小值&rdquo;，两个&ldquo;最&rdquo;方向相反，配套记忆。</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ================= 7 ================= -->
+<h2 class="sec" id="k7"><span class="num">07</span>同步卫星与&ldquo;三兄弟&rdquo;比较</h2>
+
+<div class="card">
+  <h3 class="sub">同步卫星的&ldquo;五定一不定&rdquo;</h3>
+  <ul>
+    <li><b>周期一定：</b><i>T</i> = 地球自转周期 = 24 h</li>
+    <li><b>角速度一定：</b><i>&omega;</i> = 7.3&times;10<sup>&minus;5</sup> rad/s</li>
+    <li><b>轨道平面一定：</b>必在<b>赤道正上方</b>（轨道平面与赤道平面重合）</li>
+    <li><b>高度一定：</b><i>h</i> &asymp; 3.6&times;10<sup>4</sup> km，轨道半径 <i>r</i> &asymp; 6.6<i>R</i><sub>地</sub></li>
+    <li><b>速率一定：</b><i>v</i> &asymp; 3.1 km/s</li>
+    <li><b>质量不定：</b>与卫星自身质量无关</li>
+  </ul>
+
+  <figure>
+    <svg viewBox="0 0 560 250" width="560" role="img" aria-label="赤道物体、近地卫星、同步卫星三者比较">
+      <circle cx="150" cy="130" r="110" fill="none" stroke="#0e5a8a" stroke-width="1.3" stroke-dasharray="6 4"/>
+      <circle cx="150" cy="130" r="62" fill="none" stroke="#b3341f" stroke-width="1.3" stroke-dasharray="6 4"/>
+      <circle cx="150" cy="130" r="56" fill="#eef4f9" stroke="#1c242e" stroke-width="1.5"/>
+      <text x="150" y="135" font-size="13" text-anchor="middle" fill="#5a6674">地球</text>
+      <circle cx="206" cy="130" r="5.5" fill="#1f6d4e"/><text x="196" y="120" font-size="14" font-style="italic" fill="#1f6d4e">a</text>
+      <circle cx="212" cy="130" r="5.5" fill="#b3341f"/><text x="216" y="120" font-size="14" font-style="italic" fill="#b3341f">b</text>
+      <circle cx="260" cy="130" r="5.5" fill="#0e5a8a"/><text x="256" y="118" font-size="14" font-style="italic" fill="#0e5a8a">c</text>
+      <text x="150" y="238" font-size="12.5" text-anchor="middle" fill="#5a6674">a：赤道上的物体　b：近地卫星　c：同步卫星</text>
+      <rect x="308" y="20" width="244" height="196" rx="9" fill="#e9f4ef" stroke="#c6e2d5"/>
+      <text x="322" y="46" font-size="13.5" font-weight="bold" fill="#1f6d4e">桥梁：a 与 c 同 ω，b 与 c 同规律</text>
+      <text x="322" y="76" font-size="13.5">角速度：ω_b &gt; ω_c = ω_a</text>
+      <text x="322" y="104" font-size="13.5">线速度：v_b &gt; v_c &gt; v_a</text>
+      <text x="322" y="132" font-size="13.5">周　期：T_b &lt; T_c = T_a</text>
+      <text x="322" y="160" font-size="13.5">加速度：a_b &gt; a_c &gt; a_a</text>
+      <text x="322" y="192" font-size="12.5" fill="#5a6674">口诀：&ldquo;b 最大，a 最小，c 居中&rdquo;（周期相反）</text>
+    </svg>
+    <figcaption>图 7&nbsp;&nbsp;三兄弟比较（对应讲义第 3 题，必须默写）</figcaption>
+  </figure>
+  <div class="blk board">
+    <h4>公式推导 · 同步卫星的高度、速率是算出来的，不是背出来的</h4>
+    <p class="step"><span class="sn">①</span>同步 &rArr; <span class="m"><i>T</i></span> ＝ 地球自转周期 ＝ 24 h ＝ 8.64&times;10<sup>4</sup> s。由万有引力提供向心力：</p>
+    <p class="eq"><span class="m"><i>G</i><span class="f"><span class="n"><i>Mm</i></span><span class="d"><i>r</i><sup>2</sup></span></span> = <i>m</i><span class="f"><span class="n">4&pi;<sup>2</sup></span><span class="d"><i>T</i><sup>2</sup></span></span><i>r</i> &nbsp;&rArr;&nbsp; <i>r</i><sup>3</sup> = <span class="f"><span class="n"><i>GMT</i><sup>2</sup></span><span class="d">4&pi;<sup>2</sup></span></span> = <span class="f"><span class="n"><i>gR</i><sup>2</sup><i>T</i><sup>2</sup></span><span class="d">4&pi;<sup>2</sup></span></span></span></p>
+    <p class="step"><span class="sn">②</span>代数字：<span class="m"><i>gR</i><sup>2</sup><i>T</i><sup>2</sup> = 9.8&times;(6.4&times;10<sup>6</sup>)<sup>2</sup>&times;(8.64&times;10<sup>4</sup>)<sup>2</sup> &asymp; 3.0&times;10<sup>24</sup></span>，再除以 4&pi;<sup>2</sup> &asymp; 39.5：</p>
+    <p class="eq boxed"><span class="m"><i>r</i><sup>3</sup> &asymp; 7.6&times;10<sup>22</sup> m<sup>3</sup> &nbsp;&rArr;&nbsp; <i>r</i> &asymp; 4.2&times;10<sup>7</sup> m &asymp; 6.6<i>R</i><sub>地</sub></span></p>
+    <p class="step"><span class="sn">③</span>高度：<span class="m"><i>h</i> = <i>r</i> &minus; <i>R</i> = 4.2&times;10<sup>7</sup> &minus; 0.64&times;10<sup>7</sup> &asymp; 3.6&times;10<sup>7</sup> m = 3.6&times;10<sup>4</sup> km</span></p>
+    <p class="step"><span class="sn">④</span>速率：<span class="m"><i>v</i> = 2&pi;<i>r</i>/<i>T</i> = 6.28&times;4.2&times;10<sup>7</sup> / (8.64&times;10<sup>4</sup>) &asymp; 3.1&times;10<sup>3</sup> m/s</span></p>
+    <p class="step"><span class="sn">⑤</span>角速度：<span class="m"><i>&omega;</i> = 2&pi;/<i>T</i> = 6.28/(8.64&times;10<sup>4</sup>) &asymp; 7.3&times;10<sup>&minus;5</sup> rad/s</span></p>
+    <p class="step"><span class="sn">⑥</span><b>为什么必须在赤道正上方？</b>卫星做圆周运动，向心力是指向<b>地心</b>的万有引力 &rArr; 圆心必须是地心 &rArr; 轨道平面必过地心；又要与地面某点始终相对静止 &rArr; 轨道平面还必须与赤道平面重合。两条一夹，只剩赤道正上方一个圆。</p>
+    <p class="step"><span class="sn">⑦</span><b>&ldquo;三兄弟&rdquo;关系的推法。</b>a（赤道物体）与 c（同步卫星）<b>同 &omega;</b>，用 <span class="m"><i>v</i> = <i>&omega;r</i></span>、<span class="m"><i>a</i> = <i>&omega;</i><sup>2</sup><i>r</i></span>（半径大者<b>大</b>）；b（近地卫星）与 c <b>同为卫星</b>，用 <span class="m"><i>v</i> = &radic;(<i>GM</i>/<i>r</i>)</span> 一族（半径大者<b>小</b>）。以 c 为桥梁串起来：</p>
+    <p class="eq boxed"><span class="m"><i>&omega;</i><sub>b</sub> &gt; <i>&omega;</i><sub>c</sub> = <i>&omega;</i><sub>a</sub>，&nbsp; <i>v</i><sub>b</sub> &gt; <i>v</i><sub>c</sub> &gt; <i>v</i><sub>a</sub>，&nbsp; <i>T</i><sub>b</sub> &lt; <i>T</i><sub>c</sub> = <i>T</i><sub>a</sub>，&nbsp; <i>a</i><sub>b</sub> &gt; <i>a</i><sub>c</sub> &gt; <i>a</i><sub>a</sub></span></p>
+  </div>
+</div>
+
+<!-- ================= 8 ================= -->
+<h2 class="sec" id="k8"><span class="num">08</span>变轨、离心近心与能量</h2>
+
+<div class="card">
+  <figure>
+    <svg viewBox="0 0 560 260" width="560" role="img" aria-label="卫星变轨与能量关系">
+      <circle cx="140" cy="130" r="100" fill="none" stroke="#0e5a8a" stroke-width="1.5"/>
+      <circle cx="140" cy="130" r="46" fill="none" stroke="#1f6d4e" stroke-width="1.5"/>
+      <ellipse cx="167" cy="130" rx="73" ry="65.6" fill="none" stroke="#b3341f" stroke-width="1.6" stroke-dasharray="6 4"/>
+      <circle cx="140" cy="130" r="15" fill="#dceaf5" stroke="#0e5a8a" stroke-width="1.4"/>
+      <circle cx="94" cy="130" r="5" fill="#1f6d4e"/>
+      <text x="72" y="124" font-size="13" font-style="italic" fill="#1f6d4e">P</text>
+      <circle cx="240" cy="130" r="5" fill="#0e5a8a"/>
+      <text x="246" y="124" font-size="13" font-style="italic" fill="#0e5a8a">Q</text>
+      <path d="M88 118 L74 104" stroke="#b3341f" stroke-width="1.8" marker-end="url(#arrY)"/>
+      <path d="M246 118 L262 102" stroke="#b3341f" stroke-width="1.8" marker-end="url(#arrY)"/>
+      <defs><marker id="arrY" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#b3341f"/></marker></defs>
+      <text x="24" y="96" font-size="12" fill="#b3341f">P 点加速</text>
+      <text x="248" y="94" font-size="12" fill="#b3341f">Q 点加速</text>
+      <text x="140" y="248" font-size="12.5" text-anchor="middle" fill="#5a6674">低圆轨道 → 转移椭圆 → 高圆轨道（两次加速）</text>
+      <rect x="300" y="16" width="252" height="112" rx="9" fill="#e9f4ef" stroke="#c6e2d5"/>
+      <text x="314" y="40" font-size="13.5" font-weight="bold" fill="#1f6d4e">加速 → 离心 → 升轨</text>
+      <text x="314" y="64" font-size="12.5">v↑ ⇒ mv²/r &gt; GMm/r² ⇒ r 变大</text>
+      <text x="314" y="88" font-size="12.5">稳定在高轨后 v 反而变小</text>
+      <text x="314" y="112" font-size="12.5" fill="#5a6674">同一点上加速度不变（只看 r）</text>
+      <rect x="300" y="140" width="252" height="106" rx="9" fill="#fbeeea" stroke="#f0d3cc"/>
+      <text x="314" y="164" font-size="13.5" font-weight="bold" fill="#b3341f">减速 → 近心 → 降轨</text>
+      <text x="314" y="188" font-size="12.5">v↓ ⇒ mv²/r &lt; GMm/r² ⇒ r 变小</text>
+      <text x="314" y="212" font-size="12.5">稳定在低轨后 v 反而变大</text>
+      <text x="314" y="236" font-size="12.5" fill="#5a6674">大气阻力 ⇒ &ldquo;越阻越快&rdquo;</text>
+    </svg>
+    <figcaption>图 8&nbsp;&nbsp;变轨判据与霍曼转移（对应讲义第 4、5、13 题）</figcaption>
+  </figure>
+
+  <h3 class="sub">圆轨道上的能量关系</h3>
+  <p class="eq boxed"><span class="m"><i>E</i><sub>k</sub> = <span class="f"><span class="n"><i>GMm</i></span><span class="d">2<i>r</i></span></span>，&nbsp;<i>E</i><sub>p</sub> = &minus;<span class="f"><span class="n"><i>GMm</i></span><span class="d"><i>r</i></span></span>，&nbsp;<i>E</i> = <i>E</i><sub>k</sub>+<i>E</i><sub>p</sub> = &minus;<span class="f"><span class="n"><i>GMm</i></span><span class="d">2<i>r</i></span></span></span></p>
+  <ul>
+    <li><i>r</i> 增大：<b>总机械能增大</b>，但<b>动能减小</b>（升轨要&ldquo;花钱&rdquo;，结果却更慢）。</li>
+    <li>受阻力时 <i>E</i> 减小 &rArr; <i>r</i> 减小 &rArr; <i>E</i><sub>k</sub> 增大 &rArr; <b>速率变大</b>。</li>
+    <li>椭圆轨道上：近地点速率最大、加速度最大；远地点相反；全过程机械能守恒。</li>
+  </ul>
+  <div class="blk board">
+    <h4>公式推导 · 能量表达式与离心/近心判据</h4>
+    <p class="step"><span class="sn">①</span><b>动能。</b>圆轨道上 <span class="m"><i>v</i><sup>2</sup> = <i>GM</i>/<i>r</i></span>，代入动能定义：</p>
+    <p class="eq boxed"><span class="m"><i>E</i><sub>k</sub> = <span class="f"><span class="n">1</span><span class="d">2</span></span><i>mv</i><sup>2</sup> = <span class="f"><span class="n">1</span><span class="d">2</span></span><i>m</i>&middot;<span class="f"><span class="n"><i>GM</i></span><span class="d"><i>r</i></span></span> = <span class="f"><span class="n"><i>GMm</i></span><span class="d">2<i>r</i></span></span></span></p>
+    <p class="step"><span class="sn">②</span><b>势能。</b>取无穷远处为零势能，引力势能 <span class="m"><i>E</i><sub>p</sub> = &minus;<i>GMm</i>/<i>r</i></span>（由变力做功得到，高中直接引用）。</p>
+    <p class="step"><span class="sn">③</span><b>总机械能。</b>两者相加：</p>
+    <p class="eq boxed"><span class="m"><i>E</i> = <i>E</i><sub>k</sub> + <i>E</i><sub>p</sub> = <span class="f"><span class="n"><i>GMm</i></span><span class="d">2<i>r</i></span></span> &minus; <span class="f"><span class="n"><i>GMm</i></span><span class="d"><i>r</i></span></span> = &minus;<span class="f"><span class="n"><i>GMm</i></span><span class="d">2<i>r</i></span></span></span></p>
+    <p class="step"><span class="sn">④</span>由此可直接读出：<i>r</i> 增大 &rArr; <i>E</i> 增大（负得更少，要烧燃料），但 <i>E</i><sub>k</sub> = <i>GMm</i>/2<i>r</i> <b>减小</b> —— 升轨要花钱，结果却飞得更慢。</p>
+    <p class="step"><span class="sn">⑤</span><b>离心 / 近心判据。</b>设在半径 <i>r</i> 处速率被突然改成 <i>v</i>&prime;，比较&ldquo;做圆周运动所<u>需</u>的向心力&rdquo;与&ldquo;实际提供的引力&rdquo;：</p>
+    <p class="eq"><span class="m"><i>F</i><sub>需</sub> = <span class="f"><span class="n"><i>mv</i>&prime;<sup>2</sup></span><span class="d"><i>r</i></span></span>，&nbsp;&nbsp; <i>F</i><sub>引</sub> = <span class="f"><span class="n"><i>GMm</i></span><span class="d"><i>r</i><sup>2</sup></span></span></span></p>
+    <p class="eq"><span class="m"><i>v</i>&prime; &gt; <span class="rt"><span class="rc"><span class="f"><span class="n"><i>GM</i></span><span class="d"><i>r</i></span></span></span></span> &rArr; <i>F</i><sub>需</sub> &gt; <i>F</i><sub>引</sub> &rArr; <b>离心</b>，<i>r</i> 增大（加速升轨）</span></p>
+    <p class="eq"><span class="m"><i>v</i>&prime; &lt; <span class="rt"><span class="rc"><span class="f"><span class="n"><i>GM</i></span><span class="d"><i>r</i></span></span></span></span> &rArr; <i>F</i><sub>需</sub> &lt; <i>F</i><sub>引</sub> &rArr; <b>近心</b>，<i>r</i> 减小（减速降轨）</span></p>
+    <p class="step"><span class="sn">⑥</span><b>&ldquo;越阻越快&rdquo;的定量说明。</b>阻力做负功 &rArr; <span class="m"><i>E</i> = &minus;<i>GMm</i>/2<i>r</i></span> 减小 &rArr; <i>r</i> 减小 &rArr; <span class="m"><i>E</i><sub>k</sub> = <i>GMm</i>/2<i>r</i></span> 增大。换句话说：<b>势能降了 2&Delta;<i>E</i><sub>k</sub>，其中一半变成动能、一半被阻力耗掉</b>。</p>
+    <p class="step"><span class="sn">⑦</span><b>转移椭圆的时间。</b>近地点 <i>r</i><sub>1</sub>、远地点 <i>r</i><sub>2</sub> &rArr; 半长轴 <span class="m"><i>a</i> = (<i>r</i><sub>1</sub>+<i>r</i><sub>2</sub>)/2</span>；由开普勒第三定律</p>
+    <p class="eq boxed"><span class="m"><span class="f"><span class="n"><i>T</i><sub>椭</sub><sup>2</sup></span><span class="d"><i>a</i><sup>3</sup></span></span> = <span class="f"><span class="n"><i>T</i><sub>1</sub><sup>2</sup></span><span class="d"><i>r</i><sub>1</sub><sup>3</sup></span></span> &rArr; <i>T</i><sub>椭</sub> = <i>T</i><sub>1</sub><span class="rt"><span class="rc"><span class="f"><span class="n">(<i>r</i><sub>1</sub>+<i>r</i><sub>2</sub>)<sup>3</sup></span><span class="d">8<i>r</i><sub>1</sub><sup>3</sup></span></span></span></span>，转移时间 <i>t</i> = <span class="f"><span class="n"><i>T</i><sub>椭</sub></span><span class="d">2</span></span> = <i>T</i><sub>1</sub><span class="rt"><span class="rc"><span class="f"><span class="n">(<i>r</i><sub>1</sub>+<i>r</i><sub>2</sub>)<sup>3</sup></span><span class="d">32<i>r</i><sub>1</sub><sup>3</sup></span></span></span></span></span></p>
+  </div>
+  <div class="blk warn">
+    <h4>变轨三判断</h4>
+    <ol>
+      <li><b>判方向：</b>加速升轨、减速降轨。</li>
+      <li><b>判加速度：</b>同一位置点上，无论在哪条轨道，<i>a</i> = <i>GM</i>/<i>r</i><sup>2</sup> <b>都相同</b>。</li>
+      <li><b>判速度：</b>同一点上，<b>外层轨道速度更大</b>（因为是加速后才上去的）。</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ================= 9 ================= -->
+<h2 class="sec" id="k9"><span class="num">09</span>双星与多星模型</h2>
+
+<div class="card">
+  <h3 class="sub">双星模型</h3>
+  <div class="figrow">
+    <figure>
+      <svg viewBox="0 0 360 210" width="360" role="img" aria-label="双星模型">
+        <circle cx="180" cy="100" r="82" fill="none" stroke="#c7ced6" stroke-width="1.2" stroke-dasharray="5 4"/>
+        <circle cx="180" cy="100" r="34" fill="none" stroke="#c7ced6" stroke-width="1.2" stroke-dasharray="5 4"/>
+        <line x1="98" y1="100" x2="262" y2="100" stroke="#5a6674" stroke-width="1.2"/>
+        <circle cx="146" cy="100" r="15" fill="#dceaf5" stroke="#0e5a8a" stroke-width="1.6"/>
+        <text x="146" y="105" font-size="12" text-anchor="middle" fill="#0e5a8a">m₁</text>
+        <circle cx="262" cy="100" r="9" fill="#eef0f2" stroke="#5a6674" stroke-width="1.5"/>
+        <text x="274" y="94" font-size="12" fill="#5a6674">m₂</text>
+        <circle cx="180" cy="100" r="4" fill="#b3341f"/>
+        <text x="176" y="124" font-size="13" font-style="italic" fill="#b3341f">O</text>
+        <text x="163" y="80" font-size="12" text-anchor="middle" font-style="italic" fill="#0e5a8a">r₁</text>
+        <text x="221" y="80" font-size="12" text-anchor="middle" font-style="italic" fill="#5a6674">r₂</text>
+        <text x="180" y="176" font-size="12.5" text-anchor="middle" font-style="italic">L = r₁ + r₂</text>
+        <text x="180" y="198" font-size="12.5" text-anchor="middle" fill="#5a6674">m₁r₁ = m₂r₂（质量大的离 O 近）</text>
+      </svg>
+      <figcaption>图 9&nbsp;&nbsp;双星：<b>同周期、同角速度</b></figcaption>
+    </figure>
+    <div style="flex:1 1 300px">
+      <p class="eq"><span class="m"><i>G</i><span class="f"><span class="n"><i>m</i><sub>1</sub><i>m</i><sub>2</sub></span><span class="d"><i>L</i><sup>2</sup></span></span> = <i>m</i><sub>1</sub><i>&omega;</i><sup>2</sup><i>r</i><sub>1</sub> = <i>m</i><sub>2</sub><i>&omega;</i><sup>2</sup><i>r</i><sub>2</sub></span></p>
+      <p class="eq boxed"><span class="m"><i>m</i><sub>1</sub> + <i>m</i><sub>2</sub> = <span class="f"><span class="n">4&pi;<sup>2</sup><i>L</i><sup>3</sup></span><span class="d"><i>GT</i><sup>2</sup></span></span></span></p>
+      <ul>
+        <li>引力式的分母是<b>星心距 L</b>，向心力式用<b>各自的轨道半径</b> <i>r</i><sub>1</sub>、<i>r</i><sub>2</sub>。</li>
+        <li><i>r</i><sub>1</sub> + <i>r</i><sub>2</sub> = <i>L</i>，<i>m</i><sub>1</sub><i>r</i><sub>1</sub> = <i>m</i><sub>2</sub><i>r</i><sub>2</sub>。</li>
+        <li>把两式相加即消去 <i>r</i><sub>1</sub>、<i>r</i><sub>2</sub>，得<b>总质量</b>（讲义第 10 题）。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="sub">三星模型</h3>
+  <table>
+    <thead><tr><th style="width:22%">类型</th><th style="width:26%">轨道半径</th><th style="width:26%">引力合力</th><th class="l">结论</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>直线型</b><br>（两星绕中央星）</td>
+        <td><i>r</i> = <i>L</i></td>
+        <td><span class="m"><span class="f"><span class="n">5</span><span class="d">4</span></span><span class="f"><span class="n"><i>Gm</i><sup>2</sup></span><span class="d"><i>L</i><sup>2</sup></span></span></span></td>
+        <td class="l"><span class="m"><i>v</i> = <span class="f"><span class="n">1</span><span class="d">2</span></span><span class="rt"><span class="rc"><span class="f"><span class="n">5<i>Gm</i></span><span class="d"><i>L</i></span></span></span></span>，<i>T</i> = 4&pi;<span class="rt"><span class="rc"><span class="f"><span class="n"><i>L</i><sup>3</sup></span><span class="d">5<i>Gm</i></span></span></span></span></span></td>
+      </tr>
+      <tr>
+        <td><b>三角型</b><br>（等边三角形）</td>
+        <td><span class="m"><i>r</i> = <span class="f"><span class="n"><i>L</i></span><span class="d">2cos30&deg;</span></span> = <span class="f"><span class="n"><span class="rt"><span class="rc">3</span></span><i>L</i></span><span class="d">3</span></span></span></td>
+        <td><span class="m">2&middot;<span class="f"><span class="n"><i>Gm</i><sup>2</sup></span><span class="d"><i>L</i><sup>2</sup></span></span>cos30&deg; = <span class="f"><span class="n"><span class="rt"><span class="rc">3</span></span><i>Gm</i><sup>2</sup></span><span class="d"><i>L</i><sup>2</sup></span></span></span></td>
+        <td class="l"><span class="m"><i>a</i> = <span class="f"><span class="n"><span class="rt"><span class="rc">3</span></span><i>Gm</i></span><span class="d"><i>L</i><sup>2</sup></span></span>，<i>&omega;</i> = <span class="rt"><span class="rc"><span class="f"><span class="n">3<i>Gm</i></span><span class="d"><i>L</i><sup>3</sup></span></span></span></span></span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="figrow">
+    <figure>
+      <svg viewBox="0 0 320 180" width="320" role="img" aria-label="直线三星">
+        <circle cx="160" cy="90" r="76" fill="none" stroke="#c7ced6" stroke-width="1.2" stroke-dasharray="5 4"/>
+        <line x1="84" y1="90" x2="236" y2="90" stroke="#5a6674" stroke-width="1.2"/>
+        <circle cx="84" cy="90" r="8" fill="#dceaf5" stroke="#0e5a8a" stroke-width="1.5"/>
+        <circle cx="160" cy="90" r="10" fill="#fdf0c9" stroke="#8a6a12" stroke-width="1.5"/>
+        <circle cx="236" cy="90" r="8" fill="#dceaf5" stroke="#0e5a8a" stroke-width="1.5"/>
+        <text x="122" y="82" font-size="12.5" text-anchor="middle" font-style="italic">L</text>
+        <text x="198" y="82" font-size="12.5" text-anchor="middle" font-style="italic">L</text>
+        <text x="160" y="122" font-size="12" text-anchor="middle" fill="#8a6a12">中央星静止</text>
+        <text x="160" y="166" font-size="12.5" text-anchor="middle" fill="#5a6674">两个引力同向：F = Gm²/L² + Gm²/4L²</text>
+      </svg>
+      <figcaption>图 10&nbsp;&nbsp;直线三星</figcaption>
+    </figure>
+    <figure>
+      <svg viewBox="0 0 320 180" width="320" role="img" aria-label="三角形三星">
+        <circle cx="160" cy="96" r="58" fill="none" stroke="#c7ced6" stroke-width="1.2" stroke-dasharray="5 4"/>
+        <polygon points="160,38 210,125 110,125" fill="none" stroke="#5a6674" stroke-width="1.3"/>
+        <circle cx="160" cy="38" r="7" fill="#dceaf5" stroke="#0e5a8a" stroke-width="1.5"/>
+        <circle cx="210" cy="125" r="7" fill="#dceaf5" stroke="#0e5a8a" stroke-width="1.5"/>
+        <circle cx="110" cy="125" r="7" fill="#dceaf5" stroke="#0e5a8a" stroke-width="1.5"/>
+        <circle cx="160" cy="96" r="3.5" fill="#8a6a12"/>
+        <text x="168" y="102" font-size="12" font-style="italic" fill="#8a6a12">O</text>
+        <path d="M160 45 L160 90" stroke="#1f6d4e" stroke-width="2" marker-end="url(#arrX)"/>
+        <defs><marker id="arrX" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#1f6d4e"/></marker></defs>
+        <text x="150" y="60" font-size="11" fill="#8a6a12">30°</text>
+        <text x="160" y="146" font-size="12.5" text-anchor="middle" font-style="italic">L</text>
+        <text x="160" y="170" font-size="12.5" text-anchor="middle" fill="#5a6674">合力 = 2Fcos30° = √3·Gm²/L²</text>
+      </svg>
+      <figcaption>图 11&nbsp;&nbsp;三角形三星</figcaption>
+    </figure>
+  </div>
+
+  <div class="blk board">
+    <h4>公式推导 · 双星</h4>
+    <p class="step"><span class="sn">①</span>两星相距恒为 <i>L</i>，绕连线上同一点 <i>O</i> 转，<b>周期、角速度必然相同</b>（<i>&omega;</i> = 2&pi;/<i>T</i>）。分别列式 —— <u>引力用星心距 L，向心力用各自的轨道半径</u>：</p>
+    <p class="eq"><span class="m"><i>G</i><span class="f"><span class="n"><i>m</i><sub>1</sub><i>m</i><sub>2</sub></span><span class="d"><i>L</i><sup>2</sup></span></span> = <i>m</i><sub>1</sub><i>&omega;</i><sup>2</sup><i>r</i><sub>1</sub>&nbsp;&nbsp;……&#9312;&nbsp;&nbsp;&nbsp;&nbsp;<i>G</i><span class="f"><span class="n"><i>m</i><sub>1</sub><i>m</i><sub>2</sub></span><span class="d"><i>L</i><sup>2</sup></span></span> = <i>m</i><sub>2</sub><i>&omega;</i><sup>2</sup><i>r</i><sub>2</sub>&nbsp;&nbsp;……&#9313;</span></p>
+    <p class="step"><span class="sn">②</span>&#9312; 两边除以 <i>m</i><sub>1</sub>，&#9313; 两边除以 <i>m</i><sub>2</sub>：</p>
+    <p class="eq"><span class="m"><i>G</i><span class="f"><span class="n"><i>m</i><sub>2</sub></span><span class="d"><i>L</i><sup>2</sup></span></span> = <i>&omega;</i><sup>2</sup><i>r</i><sub>1</sub>&nbsp;&nbsp;&nbsp;&nbsp;<i>G</i><span class="f"><span class="n"><i>m</i><sub>1</sub></span><span class="d"><i>L</i><sup>2</sup></span></span> = <i>&omega;</i><sup>2</sup><i>r</i><sub>2</sub></span></p>
+    <p class="step"><span class="sn">③</span>两式<b>相加</b>，右边恰好凑出 <i>r</i><sub>1</sub> + <i>r</i><sub>2</sub> = <i>L</i>：</p>
+    <p class="eq"><span class="m"><i>G</i><span class="f"><span class="n"><i>m</i><sub>1</sub>+<i>m</i><sub>2</sub></span><span class="d"><i>L</i><sup>2</sup></span></span> = <i>&omega;</i><sup>2</sup>(<i>r</i><sub>1</sub>+<i>r</i><sub>2</sub>) = <i>&omega;</i><sup>2</sup><i>L</i></span></p>
+    <p class="step"><span class="sn">④</span>代入 <i>&omega;</i> = 2&pi;/<i>T</i>：<span class="m"><i>G</i>(<i>m</i><sub>1</sub>+<i>m</i><sub>2</sub>)/<i>L</i><sup>2</sup> = 4&pi;<sup>2</sup><i>L</i>/<i>T</i><sup>2</sup></span>，整理得</p>
+    <p class="eq boxed"><span class="m"><i>m</i><sub>1</sub> + <i>m</i><sub>2</sub> = <span class="f"><span class="n">4&pi;<sup>2</sup><i>L</i><sup>3</sup></span><span class="d"><i>GT</i><sup>2</sup></span></span></span></p>
+    <p class="step"><span class="sn">⑤</span>另一方面，&#9312;、&#9313; <b>左边完全相同</b>，故 <span class="m"><i>m</i><sub>1</sub><i>&omega;</i><sup>2</sup><i>r</i><sub>1</sub> = <i>m</i><sub>2</sub><i>&omega;</i><sup>2</sup><i>r</i><sub>2</sub></span>，约去 <i>&omega;</i><sup>2</sup>：</p>
+    <p class="eq boxed"><span class="m"><i>m</i><sub>1</sub><i>r</i><sub>1</sub> = <i>m</i><sub>2</sub><i>r</i><sub>2</sub>&nbsp;&nbsp;（质量大的离公共圆心 <i>O</i> 更近）</span></p>
+  </div>
+
+  <div class="blk board">
+    <h4>公式推导 · 直线三星与三角形三星</h4>
+    <p><b>甲 · 直线三星</b></p>
+    <p class="step"><span class="sn">①</span>外侧星受<b>两个</b>引力：来自中央星（距 <i>L</i>）与来自另一外侧星（距 2<i>L</i>），二者<b>方向相同</b>，都指向中央星（＝圆心），轨道半径 <i>r</i> = <i>L</i>：</p>
+    <p class="eq"><span class="m"><i>F</i><sub>合</sub> = <i>G</i><span class="f"><span class="n"><i>m</i><sup>2</sup></span><span class="d"><i>L</i><sup>2</sup></span></span> + <i>G</i><span class="f"><span class="n"><i>m</i><sup>2</sup></span><span class="d">(2<i>L</i>)<sup>2</sup></span></span> = <i>G</i><span class="f"><span class="n"><i>m</i><sup>2</sup></span><span class="d"><i>L</i><sup>2</sup></span></span>(1 + <span class="f"><span class="n">1</span><span class="d">4</span></span>) = <span class="f"><span class="n">5</span><span class="d">4</span></span><i>G</i><span class="f"><span class="n"><i>m</i><sup>2</sup></span><span class="d"><i>L</i><sup>2</sup></span></span></span></p>
+    <p class="step"><span class="sn">②</span>令 <span class="m"><i>F</i><sub>合</sub> = <i>mv</i><sup>2</sup>/<i>L</i></span>，约去一个 <i>m</i>：</p>
+    <p class="eq boxed"><span class="m"><span class="f"><span class="n">5</span><span class="d">4</span></span><i>G</i><span class="f"><span class="n"><i>m</i></span><span class="d"><i>L</i><sup>2</sup></span></span> = <span class="f"><span class="n"><i>v</i><sup>2</sup></span><span class="d"><i>L</i></span></span> &rArr; <i>v</i><sup>2</sup> = <span class="f"><span class="n">5<i>Gm</i></span><span class="d">4<i>L</i></span></span> &rArr; <i>v</i> = <span class="f"><span class="n">1</span><span class="d">2</span></span><span class="rt"><span class="rc"><span class="f"><span class="n">5<i>Gm</i></span><span class="d"><i>L</i></span></span></span></span></span></p>
+    <p class="step"><span class="sn">③</span>周期：</p>
+    <p class="eq boxed"><span class="m"><i>T</i> = <span class="f"><span class="n">2&pi;<i>L</i></span><span class="d"><i>v</i></span></span> = <span class="f"><span class="n">2&pi;<i>L</i>&middot;2</span><span class="d">&radic;(5<i>Gm</i>/<i>L</i>)</span></span> = 4&pi;<i>L</i><span class="rt"><span class="rc"><span class="f"><span class="n"><i>L</i></span><span class="d">5<i>Gm</i></span></span></span></span> = 4&pi;<span class="rt"><span class="rc"><span class="f"><span class="n"><i>L</i><sup>3</sup></span><span class="d">5<i>Gm</i></span></span></span></span></span></p>
+    <p class="step"><span class="sn">④</span><b>换一条路校验</b>：令 <span class="m"><i>F</i><sub>合</sub> = <i>m</i>(4&pi;<sup>2</sup>/<i>T</i><sup>2</sup>)<i>L</i></span> &rArr; <span class="m">(5/4)<i>Gm</i>/<i>L</i><sup>2</sup> = 4&pi;<sup>2</sup><i>L</i>/<i>T</i><sup>2</sup></span> &rArr; <span class="m"><i>T</i><sup>2</sup> = 16&pi;<sup>2</sup><i>L</i><sup>3</sup>/(5<i>Gm</i>)</span>，开方与上式一致 &#10003;</p>
+    <p style="margin-top:14px"><b>乙 · 三角形三星</b></p>
+    <p class="step"><span class="sn">①</span><b>先定轨道半径</b>：三星在正三角形顶点上，圆心是外接圆圆心。取一条中线，半边长 <i>L</i>/2，与该顶点连线成 30&deg;：</p>
+    <p class="eq boxed"><span class="m"><i>r</i> = <span class="f"><span class="n"><i>L</i>/2</span><span class="d">cos30&deg;</span></span> = <span class="f"><span class="n"><i>L</i></span><span class="d">2 &times; (&radic;3/2)</span></span> = <span class="f"><span class="n"><i>L</i></span><span class="d">&radic;3</span></span> = <span class="f"><span class="n"><span class="rt"><span class="rc">3</span></span><i>L</i></span><span class="d">3</span></span></span></p>
+    <p class="step"><span class="sn">②</span><b>再求引力合力</b>：每颗星受另两颗的引力，大小同为 <span class="m"><i>Gm</i><sup>2</sup>/<i>L</i><sup>2</sup></span>，二者夹角 60&deg;，各与指向圆心的中线成 30&deg;，故只有沿中线的分量留下：</p>
+    <p class="eq boxed"><span class="m"><i>F</i><sub>合</sub> = 2&middot;<span class="f"><span class="n"><i>Gm</i><sup>2</sup></span><span class="d"><i>L</i><sup>2</sup></span></span>&middot;cos30&deg; = 2&middot;<span class="f"><span class="n"><i>Gm</i><sup>2</sup></span><span class="d"><i>L</i><sup>2</sup></span></span>&middot;<span class="f"><span class="n"><span class="rt"><span class="rc">3</span></span></span><span class="d">2</span></span> = <span class="f"><span class="n"><span class="rt"><span class="rc">3</span></span><i>Gm</i><sup>2</sup></span><span class="d"><i>L</i><sup>2</sup></span></span></span></p>
+    <p class="step"><span class="sn">③</span><b>加速度</b>（直接除以质量，与轨道半径无关）：</p>
+    <p class="eq boxed"><span class="m"><i>a</i> = <span class="f"><span class="n"><i>F</i><sub>合</sub></span><span class="d"><i>m</i></span></span> = <span class="f"><span class="n"><span class="rt"><span class="rc">3</span></span><i>Gm</i></span><span class="d"><i>L</i><sup>2</sup></span></span></span></p>
+    <p class="step"><span class="sn">④</span><b>角速度</b>：令 <span class="m"><i>F</i><sub>合</sub> = <i>m&omega;</i><sup>2</sup><i>r</i></span>，代入 <i>r</i> = <i>L</i>/&radic;3：</p>
+    <p class="eq"><span class="m"><span class="f"><span class="n"><span class="rt"><span class="rc">3</span></span><i>Gm</i><sup>2</sup></span><span class="d"><i>L</i><sup>2</sup></span></span> = <i>m&omega;</i><sup>2</sup>&middot;<span class="f"><span class="n"><i>L</i></span><span class="d"><span class="rt"><span class="rc">3</span></span></span></span> &rArr; <i>&omega;</i><sup>2</sup> = <span class="f"><span class="n"><span class="rt"><span class="rc">3</span></span>&middot;<span class="rt"><span class="rc">3</span></span><i>Gm</i></span><span class="d"><i>L</i><sup>3</sup></span></span> = <span class="f"><span class="n">3<i>Gm</i></span><span class="d"><i>L</i><sup>3</sup></span></span></span></p>
+    <p class="eq boxed"><span class="m"><i>&omega;</i> = <span class="rt"><span class="rc"><span class="f"><span class="n">3<i>Gm</i></span><span class="d"><i>L</i><sup>3</sup></span></span></span></span>&nbsp;&nbsp;（<b>前面没有系数 2</b>）</span></p>
+    <p class="step"><span class="sn">⑤</span><b>线速度与周期</b>：</p>
+    <p class="eq boxed"><span class="m"><i>v</i> = <i>&omega;r</i> = <span class="rt"><span class="rc"><span class="f"><span class="n">3<i>Gm</i></span><span class="d"><i>L</i><sup>3</sup></span></span></span></span>&middot;<span class="f"><span class="n"><i>L</i></span><span class="d"><span class="rt"><span class="rc">3</span></span></span></span> = <span class="rt"><span class="rc"><span class="f"><span class="n"><i>Gm</i></span><span class="d"><i>L</i></span></span></span></span>，&nbsp;&nbsp;<i>T</i> = <span class="f"><span class="n">2&pi;</span><span class="d"><i>&omega;</i></span></span> = 2&pi;<span class="rt"><span class="rc"><span class="f"><span class="n"><i>L</i><sup>3</sup></span><span class="d">3<i>Gm</i></span></span></span></span></span></p>
+  </div>
+  <div class="blk tip">
+    <h4>多星问题三步法</h4>
+    <ol>
+      <li><b>找圆心、定半径</b>：直线型圆心在中央星，三角型圆心在外接圆中心（<i>r</i> = &radic;3<i>L</i>/3）。</li>
+      <li><b>受力分析、求合力</b>：把<b>所有</b>其他星对它的引力都算上，按几何关系合成。</li>
+      <li><b>合力 = 向心力</b>：<i>F</i><sub>合</sub> = <i>ma</i> = <i>m&omega;</i><sup>2</sup><i>r</i> = <i>mv</i><sup>2</sup>/<i>r</i> = <i>m</i>(4&pi;<sup>2</sup>/<i>T</i><sup>2</sup>)<i>r</i>。</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ================= 10 ================= -->
+<h2 class="sec" id="k10"><span class="num">10</span>重力与万有引力 &middot; 赤道&ldquo;飘起&rdquo;</h2>
+
+<div class="card">
+  <p>考虑地球自转时，物体所受万有引力分成两部分：<b>一部分提供随地球自转所需的向心力，其余才是重力</b>。</p>
+  <p class="eq boxed"><span class="m"><i>F</i><sub>引</sub> = <i>mg</i> + <i>mω</i><sup>2</sup><i>r</i><sub>纬</sub>（矢量式）&nbsp;&nbsp;&rArr;&nbsp;&nbsp;<b>两极 g 最大，赤道 g 最小</b></span></p>
+  <ul>
+    <li><b>两极</b>：<i>r</i><sub>纬</sub> = 0，向心力为零，<i>mg</i> = <i>GMm</i>/<i>R</i><sup>2</sup>，重力＝万有引力（大小、方向都一致）。</li>
+    <li><b>赤道</b>：<i>GMm</i>/<i>R</i><sup>2</sup> &minus; <i>mg</i> = <i>m&omega;</i><sup>2</sup><i>R</i>，重力最小，且重力与万有引力方向一致。</li>
+    <li><b>一般纬度</b>：重力方向<b>不指向地心</b>（略偏向赤道一侧）。</li>
+  </ul>
+
+  <figure>
+    <svg viewBox="0 0 560 230" width="560" role="img" aria-label="赤道飘起临界与视重">
+      <circle cx="130" cy="115" r="76" fill="#eef4f9" stroke="#0e5a8a" stroke-width="1.5"/>
+      <ellipse cx="130" cy="115" rx="76" ry="21" fill="none" stroke="#9aa6b2" stroke-width="1" stroke-dasharray="4 3"/>
+      <line x1="130" y1="26" x2="130" y2="204" stroke="#9aa6b2" stroke-width="1" stroke-dasharray="5 4"/>
+      <rect x="124" y="32" width="12" height="12" fill="#1f6d4e"/>
+      <text x="146" y="42" font-size="12" fill="#1f6d4e">两极：g 最大</text>
+      <rect x="200" y="109" width="12" height="12" fill="#b3341f"/>
+      <text x="218" y="112" font-size="12" fill="#b3341f">赤道：g 最小</text>
+      <text x="218" y="130" font-size="12" fill="#5a6674">自转越快，g 越小</text>
+      <rect x="286" y="16" width="266" height="94" rx="9" fill="#fbf3dc" stroke="#ece2c8"/>
+      <text x="300" y="40" font-size="13.5" font-weight="bold" fill="#8a6a12">临界&ldquo;飘起&rdquo;（N = 0）</text>
+      <text x="300" y="64" font-size="13">GMm/R² = m(2π/T)²R，M = ρ·(4/3)πR³</text>
+      <text x="300" y="94" font-size="15" font-weight="bold" fill="#b3341f">T_min = √(3π/Gρ)　（与 R 无关）</text>
+      <rect x="286" y="122" width="266" height="94" rx="9" fill="#e9f4ef" stroke="#c6e2d5"/>
+      <text x="300" y="146" font-size="13.5" font-weight="bold" fill="#1f6d4e">视重（弹簧测力计示数）</text>
+      <text x="300" y="170" font-size="13">示数 = 万有引力 − 该处所需向心力</text>
+      <text x="300" y="194" font-size="13">绕行飞船内：引力全做向心力 ⇒ 示数 = 0</text>
+      <text x="300" y="212" font-size="12.5" fill="#5a6674">完全失重 ≠ 不受引力</text>
+    </svg>
+    <figcaption>图 12&nbsp;&nbsp;g 随纬度变化、临界自转周期与视重（对应讲义第 11、12 题）</figcaption>
+  </figure>
+
+  <div class="blk board">
+    <h4>公式推导 · g 随纬度变化与临界自转周期</h4>
+    <p class="step"><span class="sn">①</span>纬度 <i>&phi;</i> 处的物体随地球自转做圆周运动，<b>转动半径是 R cos&phi;</b>（不是 <i>R</i>），所需向心力</p>
+    <p class="eq"><span class="m"><i>F</i><sub>n</sub> = <i>m&omega;</i><sup>2</sup><i>R</i>cos<i>&phi;</i>&nbsp;&nbsp;（方向垂直指向自转轴）</span></p>
+    <p class="step"><span class="sn">②</span>万有引力 <span class="m"><i>F</i><sub>引</sub> = <i>GMm</i>/<i>R</i><sup>2</sup></span> 指向地心。重力是引力<b>扣掉</b>那一份向心力后剩下的：<span class="m"><i>mg</i> = <i>F</i><sub>引</sub> &minus; <i>F</i><sub>n</sub></span>（矢量差，所以一般纬度重力不指向地心）。</p>
+    <p class="step"><span class="sn">③</span><b>两极</b>（<i>&phi;</i> = 90&deg;）：cos<i>&phi;</i> = 0 &rArr; <i>F</i><sub>n</sub> = 0</p>
+    <p class="eq boxed"><span class="m"><i>mg</i><sub>极</sub> = <span class="f"><span class="n"><i>GMm</i></span><span class="d"><i>R</i><sup>2</sup></span></span> &rArr; <i>g</i><sub>极</sub> = <span class="f"><span class="n"><i>GM</i></span><span class="d"><i>R</i><sup>2</sup></span></span>&nbsp;&nbsp;（<b>最大</b>，且重力＝万有引力）</span></p>
+    <p class="step"><span class="sn">④</span><b>赤道</b>（<i>&phi;</i> = 0&deg;）：引力、向心力、重力三者共线，可写成代数式</p>
+    <p class="eq boxed"><span class="m"><span class="f"><span class="n"><i>GMm</i></span><span class="d"><i>R</i><sup>2</sup></span></span> &minus; <i>mg</i><sub>赤</sub> = <i>m&omega;</i><sup>2</sup><i>R</i> &rArr; <i>g</i><sub>赤</sub> = <span class="f"><span class="n"><i>GM</i></span><span class="d"><i>R</i><sup>2</sup></span></span> &minus; <i>&omega;</i><sup>2</sup><i>R</i>&nbsp;&nbsp;（<b>最小</b>）</span></p>
+    <p class="step"><span class="sn">⑤</span>数值感受：<span class="m"><i>&omega;</i><sup>2</sup><i>R</i> = (7.3&times;10<sup>&minus;5</sup>)<sup>2</sup>&times;6.4&times;10<sup>6</sup> &asymp; 0.034 m/s<sup>2</sup></span>，只有 <i>g</i> 的约 1/290 —— 所以平时可以忽略地球自转。</p>
+    <p class="step"><span class="sn">⑥</span><b>临界&ldquo;飘起&rdquo;</b>：赤道上支持力 <i>N</i> = 0，即 <i>g</i><sub>赤</sub> = 0，万有引力<b>全部</b>用作向心力：</p>
+    <p class="eq"><span class="m"><span class="f"><span class="n"><i>GMm</i></span><span class="d"><i>R</i><sup>2</sup></span></span> = <i>m</i><span class="f"><span class="n">4&pi;<sup>2</sup></span><span class="d"><i>T</i><sup>2</sup></span></span><i>R</i></span></p>
+    <p class="step"><span class="sn">⑦</span>题目只给密度，故把 <span class="m"><i>M</i> = &rho;&middot;(4/3)&pi;<i>R</i><sup>3</sup></span> 代入：</p>
+    <p class="eq"><span class="m"><i>G</i>&middot;<span class="f"><span class="n">&rho;(4/3)&pi;<i>R</i><sup>3</sup></span><span class="d"><i>R</i><sup>2</sup></span></span> = <span class="f"><span class="n">4&pi;<sup>2</sup><i>R</i></span><span class="d"><i>T</i><sup>2</sup></span></span> &rArr; <span class="f"><span class="n">4</span><span class="d">3</span></span>&pi;<i>G</i>&rho;<i>R</i> = <span class="f"><span class="n">4&pi;<sup>2</sup><i>R</i></span><span class="d"><i>T</i><sup>2</sup></span></span></span></p>
+    <p class="step"><span class="sn">⑧</span>两边<b>约去 R</b>（这正是&ldquo;与天体大小无关&rdquo;的来源），解出 <i>T</i>：</p>
+    <p class="eq boxed"><span class="m"><i>T</i><sup>2</sup> = <span class="f"><span class="n">4&pi;<sup>2</sup></span><span class="d">(4/3)&pi;<i>G</i>&rho;</span></span> = <span class="f"><span class="n">3&pi;</span><span class="d"><i>G</i>&rho;</span></span> &rArr; <i>T</i><sub>min</sub> = <span class="rt"><span class="rc"><span class="f"><span class="n">3&pi;</span><span class="d"><i>G</i>&rho;</span></span></span></span>，&nbsp;反解 &rho; = <span class="f"><span class="n">3&pi;</span><span class="d"><i>GT</i><sup>2</sup></span></span></span></p>
+    <p class="step"><span class="sn">⑨</span><b>视重公式</b>：弹簧测力计示数 <span class="m"><i>N</i> = <i>F</i><sub>引</sub> &minus; <i>F</i><sub>n</sub></span>（该处<u>所需</u>的向心力）。绕行飞船中 <i>F</i><sub>n</sub> 恰好等于 <i>F</i><sub>引</sub> &rArr; <i>N</i> = 0，即完全失重 —— 但引力并不为零。</p>
+  </div>
+  <div class="blk warn">
+    <h4>要点提醒</h4>
+    <ul>
+      <li>临界周期 <i>T</i> = &radic;(3&pi;/<i>G</i>&rho;) <b>与天体半径无关</b>，只由密度决定；它与&ldquo;近地卫星周期&rdquo;是同一个式子。</li>
+      <li>反解得 &rho; = 3&pi;/(<i>GT</i><sup>2</sup>)，与&ldquo;近地卫星测密度&rdquo;完全一致 —— 两个考点其实是一个。</li>
+      <li><b>完全失重</b>指视重为零，物体依然受万有引力（它正是向心力的来源）。</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ================= 11 ================= -->
+<h2 class="sec" id="k11"><span class="num">11</span>追及与相遇（会合周期）</h2>
+
+<div class="card">
+  <figure>
+    <svg viewBox="0 0 560 220" width="560" role="img" aria-label="追及相遇相位关系">
+      <circle cx="130" cy="110" r="88" fill="none" stroke="#0e5a8a" stroke-width="1.3" stroke-dasharray="6 4"/>
+      <circle cx="130" cy="110" r="48" fill="none" stroke="#1f6d4e" stroke-width="1.3" stroke-dasharray="6 4"/>
+      <circle cx="130" cy="110" r="12" fill="#fdf0c9" stroke="#8a6a12" stroke-width="1.4"/>
+      <line x1="130" y1="110" x2="178" y2="110" stroke="#9aa6b2" stroke-width="1.1" stroke-dasharray="4 3"/>
+      <line x1="130" y1="110" x2="174" y2="34" stroke="#9aa6b2" stroke-width="1.1" stroke-dasharray="4 3"/>
+      <path d="M158 110 A 28 28 0 0 0 144 85.8" fill="none" stroke="#b3341f" stroke-width="1.5"/>
+      <text x="156" y="94" font-size="13" font-style="italic" fill="#b3341f">Δθ</text>
+      <circle cx="178" cy="110" r="5.5" fill="#1f6d4e"/><text x="188" y="116" font-size="13" font-weight="bold" fill="#1f6d4e">1</text>
+      <circle cx="174" cy="34" r="5.5" fill="#0e5a8a"/><text x="184" y="30" font-size="13" font-weight="bold" fill="#0e5a8a">2</text>
+      <text x="130" y="212" font-size="12" text-anchor="middle" fill="#5a6674">内圈角速度大，不断&ldquo;吃掉&rdquo;角度差</text>
+      <rect x="256" y="14" width="296" height="192" rx="9" fill="#f0ebf8" stroke="#ddd3ef"/>
+      <text x="270" y="40" font-size="13.5" font-weight="bold" fill="#5a3a86">通用关系：Δθ = (ω₁ − ω₂)·t</text>
+      <text x="270" y="70" font-size="13">再次<tspan font-weight="bold">相距最近</tspan>（同方位）：Δθ = 2nπ</text>
+      <text x="270" y="96" font-size="13" fill="#b3341f" font-weight="bold">t = n·T₁T₂/(T₂ − T₁)</text>
+      <text x="270" y="126" font-size="13">首次<tspan font-weight="bold">相距最远</tspan>（反方位）：Δθ = (2n−1)π</text>
+      <text x="270" y="152" font-size="13" fill="#b3341f" font-weight="bold">t′ = T₁T₂/[2(T₂ − T₁)]</text>
+      <text x="270" y="180" font-size="13">追上初始相位差 α：t = αT₁T₂/[2π(T₂−T₁)]</text>
+      <text x="270" y="200" font-size="12.5" fill="#5a6674">反向绕行时把分母换成 T₁ + T₂</text>
+    </svg>
+    <figcaption>图 13&nbsp;&nbsp;追及相遇的相位分析（对应讲义第 13、14 题）</figcaption>
+  </figure>
+
+  <p class="eq boxed"><span class="m">会合周期：<span class="f"><span class="n">1</span><span class="d"><i>T</i><sub>会</sub></span></span> = <span class="f"><span class="n">1</span><span class="d"><i>T</i><sub>1</sub></span></span> &minus; <span class="f"><span class="n">1</span><span class="d"><i>T</i><sub>2</sub></span></span>&nbsp;&nbsp;&rArr;&nbsp;&nbsp;<i>T</i><sub>会</sub> = <span class="f"><span class="n"><i>T</i><sub>1</sub><i>T</i><sub>2</sub></span><span class="d"><i>T</i><sub>2</sub> &minus; <i>T</i><sub>1</sub></span></span>&nbsp;&nbsp;（<i>T</i><sub>1</sub> &lt; <i>T</i><sub>2</sub>）</span></p>
+
+  <div class="blk board">
+    <h4>公式推导 · 会合周期、最近与最远条件</h4>
+    <p class="step"><span class="sn">①</span>同向绕行，设 <i>T</i><sub>1</sub> &lt; <i>T</i><sub>2</sub>（内圈快）。<i>t</i> 时刻两者各自转过的角度：</p>
+    <p class="eq"><span class="m"><i>&theta;</i><sub>1</sub> = <i>&omega;</i><sub>1</sub><i>t</i> = <span class="f"><span class="n">2&pi;</span><span class="d"><i>T</i><sub>1</sub></span></span><i>t</i>，&nbsp;&nbsp;<i>&theta;</i><sub>2</sub> = <i>&omega;</i><sub>2</sub><i>t</i> = <span class="f"><span class="n">2&pi;</span><span class="d"><i>T</i><sub>2</sub></span></span><i>t</i></span></p>
+    <p class="step"><span class="sn">②</span>两者拉开的角度差：</p>
+    <p class="eq"><span class="m">&Delta;<i>&theta;</i> = (<i>&omega;</i><sub>1</sub> &minus; <i>&omega;</i><sub>2</sub>)<i>t</i> = 2&pi;(<span class="f"><span class="n">1</span><span class="d"><i>T</i><sub>1</sub></span></span> &minus; <span class="f"><span class="n">1</span><span class="d"><i>T</i><sub>2</sub></span></span>)<i>t</i></span></p>
+    <p class="step"><span class="sn">③</span><b>再次&ldquo;最近&rdquo;</b>（回到同一方位）：内圈比外圈多转整数圈，&Delta;<i>&theta;</i> = 2<i>n</i>&pi;</p>
+    <p class="eq"><span class="m">2&pi;(<span class="f"><span class="n">1</span><span class="d"><i>T</i><sub>1</sub></span></span> &minus; <span class="f"><span class="n">1</span><span class="d"><i>T</i><sub>2</sub></span></span>)<i>t</i> = 2<i>n</i>&pi; &rArr; <i>t</i> = <span class="f"><span class="n"><i>n</i></span><span class="d">1/<i>T</i><sub>1</sub> &minus; 1/<i>T</i><sub>2</sub></span></span> = <i>n</i>&middot;<span class="f"><span class="n"><i>T</i><sub>1</sub><i>T</i><sub>2</sub></span><span class="d"><i>T</i><sub>2</sub> &minus; <i>T</i><sub>1</sub></span></span></span></p>
+    <p class="eq boxed"><span class="m">会合周期 <i>T</i><sub>会</sub> = <span class="f"><span class="n"><i>T</i><sub>1</sub><i>T</i><sub>2</sub></span><span class="d"><i>T</i><sub>2</sub> &minus; <i>T</i><sub>1</sub></span></span>，&nbsp;即&nbsp;<span class="f"><span class="n">1</span><span class="d"><i>T</i><sub>会</sub></span></span> = <span class="f"><span class="n">1</span><span class="d"><i>T</i><sub>1</sub></span></span> &minus; <span class="f"><span class="n">1</span><span class="d"><i>T</i><sub>2</sub></span></span></span></p>
+    <p class="step"><span class="sn">④</span><b>&ldquo;最远&rdquo;</b>（转到同一直径的两端）：多转半圈的奇数倍，&Delta;<i>&theta;</i> = (2<i>n</i>&minus;1)&pi;。第一次取 <i>n</i> = 1：</p>
+    <p class="eq boxed"><span class="m"><i>t</i>&prime; = <span class="f"><span class="n"><i>T</i><sub>1</sub><i>T</i><sub>2</sub></span><span class="d">2(<i>T</i><sub>2</sub> &minus; <i>T</i><sub>1</sub>)</span></span> = <span class="f"><span class="n">1</span><span class="d">2</span></span><i>T</i><sub>会</sub></span></p>
+    <p class="step"><span class="sn">⑤</span><b>追上给定的初始相位差 &alpha;</b>：令 &Delta;<i>&theta;</i> = <i>&alpha;</i></p>
+    <p class="eq boxed"><span class="m"><i>t</i> = <span class="f"><span class="n"><i>&alpha;</i></span><span class="d"><i>&omega;</i><sub>1</sub> &minus; <i>&omega;</i><sub>2</sub></span></span> = <span class="f"><span class="n"><i>&alpha;T</i><sub>1</sub><i>T</i><sub>2</sub></span><span class="d">2&pi;(<i>T</i><sub>2</sub> &minus; <i>T</i><sub>1</sub>)</span></span>&nbsp;&nbsp;（<i>&alpha;</i> = &pi;/3 时即 <span class="f"><span class="n"><i>T</i><sub>1</sub><i>T</i><sub>2</sub></span><span class="d">6(<i>T</i><sub>2</sub> &minus; <i>T</i><sub>1</sub>)</span></span>）</span></p>
+    <p class="step"><span class="sn">⑥</span><b>反向绕行</b>：相对角速度变成 <i>&omega;</i><sub>1</sub> + <i>&omega;</i><sub>2</sub>，把上面所有的 (<i>T</i><sub>2</sub> &minus; <i>T</i><sub>1</sub>) 换成 (<i>T</i><sub>1</sub> + <i>T</i><sub>2</sub>) 即可。</p>
+    <p class="step"><span class="sn">⑦</span><b>极限检验</b>：<i>T</i><sub>1</sub> &rarr; <i>T</i><sub>2</sub> 时 <i>T</i><sub>会</sub> &rarr; &infin;（两者步调一致，永不再相遇），与直觉相符。</p>
+  </div>
+  <div class="blk tip">
+    <h4>交会对接的&ldquo;反直觉&rdquo;</h4>
+    <p>追踪飞行器要与前方高轨目标对接，<b>不能直接加速</b>（加速会升轨反而变慢），正确顺序是：<b>在低轨等待追上 &rarr; 再加速抬高轨道 &rarr; 对接</b>。这与&ldquo;加速升轨、升轨变慢&rdquo;的规律完全自洽。</p>
+  </div>
+</div>
+
+<!-- ================= 12 ================= -->
+<h2 class="sec" id="k12"><span class="num">12</span>易错清单与公式速查表</h2>
+
+<div class="card">
+  <div class="blk warn">
+    <h4>15 条易错清单（考前 3 分钟速览）</h4>
+    <ol>
+      <li>开普勒常量 <i>k</i> 只对<b>同一中心天体</b>成立，不同系统不能画等号。</li>
+      <li>轨道半径 <b><i>r</i> = <i>R</i> + <i>h</i></b>，&ldquo;高度&rdquo;不是&ldquo;半径&rdquo;。</li>
+      <li>密度公式 &rho; = 3<i>g</i>/(4&pi;<b><i>G</i></b><i>R</i>)，<b>别漏 G</b>。</li>
+      <li>只能求<b>中心天体</b>的质量，环绕体质量必被约去。</li>
+      <li>第一宇宙速度 7.9 km/s：<b>最大</b>环绕速度 &amp; <b>最小</b>发射速度。</li>
+      <li>发射速度必须<b>小于</b> 11.2 km/s 才能成为地球卫星。</li>
+      <li>同步卫星只能定点在<b>赤道正上方</b>，不能在北京上空。</li>
+      <li>赤道上的物体<b>不是卫星</b>，不能套用 <i>v</i> = &radic;(<i>GM</i>/<i>r</i>)。</li>
+      <li>比较向心加速度只看 <i>r</i>；比较向心<b>力</b>还要看<b>质量</b>。</li>
+      <li>变轨点上：<b>加速度相同、速度不同</b>。</li>
+      <li>转移椭圆半长轴 = (<i>r</i><sub>1</sub>+<i>r</i><sub>2</sub>)/2，转移时间取<b>半个周期</b>。</li>
+      <li>阻力使卫星<b>机械能减小</b>，但<b>动能增大</b>（越阻越快）。</li>
+      <li>双星：引力用<b>星心距 L</b>，向心力用<b>各自半径</b>；<i>r</i><sub>1</sub>+<i>r</i><sub>2</sub> = <i>L</i>。</li>
+      <li>三角形三星的轨道半径是<b>外接圆半径</b> &radic;3<i>L</i>/3，不是边长 <i>L</i>。</li>
+      <li>&ldquo;完全失重&rdquo;是<b>视重为零</b>，不是&ldquo;不受引力&rdquo;。</li>
+    </ol>
+  </div>
+
+  <h3 class="sub">公式速查表</h3>
+  <table>
+    <thead><tr><th style="width:30%">主题</th><th class="l">核心公式</th></tr></thead>
+    <tbody>
+      <tr><td>万有引力</td><td class="l"><span class="m"><i>F</i> = <i>Gm</i><sub>1</sub><i>m</i><sub>2</sub>/<i>r</i><sup>2</sup></span>；<i>G</i> = 6.67&times;10<sup>&minus;11</sup> N&middot;m<sup>2</sup>/kg<sup>2</sup></td></tr>
+      <tr><td>开普勒第三定律</td><td class="l"><span class="m"><i>a</i><sup>3</sup>/<i>T</i><sup>2</sup> = <i>k</i> = <i>GM</i><sub>中心</sub>/(4&pi;<sup>2</sup>)</span></td></tr>
+      <tr><td>黄金代换</td><td class="l"><span class="m"><i>GM</i> = <i>gR</i><sup>2</sup></span></td></tr>
+      <tr><td>环绕参量</td><td class="l"><span class="m"><i>v</i> = &radic;(<i>GM</i>/<i>r</i>)，<i>&omega;</i> = &radic;(<i>GM</i>/<i>r</i><sup>3</sup>)，<i>T</i> = 2&pi;&radic;(<i>r</i><sup>3</sup>/<i>GM</i>)，<i>a</i> = <i>GM</i>/<i>r</i><sup>2</sup></span></td></tr>
+      <tr><td>中心天体质量</td><td class="l"><span class="m"><i>M</i> = 4&pi;<sup>2</sup><i>r</i><sup>3</sup>/(<i>GT</i><sup>2</sup>) = <i>gR</i><sup>2</sup>/<i>G</i></span></td></tr>
+      <tr><td>中心天体密度</td><td class="l"><span class="m">&rho; = 3&pi;<i>r</i><sup>3</sup>/(<i>GT</i><sup>2</sup><i>R</i><sup>3</sup>)</span>；近地时 <span class="m">&rho; = 3&pi;/(<i>GT</i><sup>2</sup>)</span>；由 g 时 <span class="m">&rho; = 3<i>g</i>/(4&pi;<i>GR</i>)</span></td></tr>
+      <tr><td>宇宙速度</td><td class="l">7.9 / 11.2 / 16.7 km/s；<span class="m"><i>v</i><sub>1</sub> = &radic;(<i>gR</i>)</span></td></tr>
+      <tr><td>球体内部</td><td class="l"><span class="m"><i>M</i>&prime; = <i>M</i>(<i>r</i>/<i>R</i>)<sup>3</sup></span>，<span class="m"><i>g</i>&prime; = <i>g</i>&middot;<i>r</i>/<i>R</i></span>（<i>F</i> &prop; <i>r</i>）</td></tr>
+      <tr><td>圆轨道能量</td><td class="l"><span class="m"><i>E</i><sub>k</sub> = <i>GMm</i>/(2<i>r</i>)，<i>E</i> = &minus;<i>GMm</i>/(2<i>r</i>)</span></td></tr>
+      <tr><td>双星</td><td class="l"><span class="m"><i>m</i><sub>1</sub>+<i>m</i><sub>2</sub> = 4&pi;<sup>2</sup><i>L</i><sup>3</sup>/(<i>GT</i><sup>2</sup>)</span>，<span class="m"><i>m</i><sub>1</sub><i>r</i><sub>1</sub> = <i>m</i><sub>2</sub><i>r</i><sub>2</sub></span></td></tr>
+      <tr><td>直线三星</td><td class="l"><span class="m"><i>v</i> = &frac12;&radic;(5<i>Gm</i>/<i>L</i>)，<i>T</i> = 4&pi;&radic;(<i>L</i><sup>3</sup>/5<i>Gm</i>)</span></td></tr>
+      <tr><td>三角三星</td><td class="l"><span class="m"><i>r</i> = &radic;3<i>L</i>/3，<i>a</i> = &radic;3<i>Gm</i>/<i>L</i><sup>2</sup>，<i>&omega;</i> = &radic;(3<i>Gm</i>/<i>L</i><sup>3</sup>)</span></td></tr>
+      <tr><td>临界自转</td><td class="l"><span class="m"><i>T</i><sub>min</sub> = &radic;(3&pi;/<i>G</i>&rho;)</span></td></tr>
+      <tr><td>追及相遇</td><td class="l"><span class="m">(<i>&omega;</i><sub>1</sub>&minus;<i>&omega;</i><sub>2</sub>)<i>t</i> = &Delta;&theta;</span>；最近 &Delta;&theta; = 2<i>n</i>&pi;，最远 &Delta;&theta; = (2<i>n</i>&minus;1)&pi;</td></tr>
+    </tbody>
+  </table>
+</div>
+
+</div>
+<footer class="bot">
+  《万有引力定律与宇宙航行》知识点汇总 &nbsp;|&nbsp; 根据所给习题与参考答案整理编写 &nbsp;|&nbsp; 配套文件：《教师讲义（逐题精讲）》
+</footer>
+</body>
+</html>
