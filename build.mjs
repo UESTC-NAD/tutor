@@ -127,7 +127,7 @@ const items = readdirSync(LESSONS)
       title: over.title || extractTitle(html, name.replace(/\.html?$/i, '')),
       subject: over.subject || guessSubject(text),
       note: over.note || '',
-      student: over.student || DEFAULT_STUDENT,
+      student: over.student || DEFAULT_STUDENT,   // 字符串或数组：一份教辅可同时归多个学生
       count: countQuestions(html),
       tags: features(html),
       date,
@@ -145,8 +145,11 @@ if (!existsSync(MANIFEST)) {
   writeFileSync(MANIFEST, JSON.stringify(tpl, null, 2) + '\n', 'utf8');
 }
 
+// manifest 里 student 可写成 "s01"（归一个）或 ["s01","s02"]（归多个），统一取成数组
+const studentsOf = i => Array.isArray(i.student) ? i.student : [i.student];
+
 // 归属到未登记学生的教辅，提示但不中断
-const unknown = [...new Set(items.map(i => i.student))].filter(s => !students[s]);
+const unknown = [...new Set(items.flatMap(studentsOf))].filter(s => !students[s]);
 for (const s of unknown) {
   console.warn(`提示：代号 "${s}" 不在 students.json 里，已按代号原样生成页面。`);
   students[s] = { name: s, sub: '' };
@@ -359,7 +362,7 @@ ${cards || '      <p class="note">students.json 里还没有学生。</p>'}
 
 const groups = {};
 for (const id of Object.keys(students)) groups[id] = [];
-for (const i of items) (groups[i.student] ||= []).push(i);
+for (const i of items) for (const s of studentsOf(i)) (groups[s] ||= []).push(i);
 
 for (const [id, list] of Object.entries(groups)) {
   const dir = join(ROOT, id);

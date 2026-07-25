@@ -54,6 +54,7 @@ node build.mjs
 
 - 缺省时 `title`/`subject` 自动推断，`note` 为空，`student` 落到 `s01`
 - **给非默认学生的教辅必须显式写 `student` 字段**，否则会被归到 `s01`
+- `student` 可写成数组，让一份教辅同时出现在多个学生页面：`"student": ["s01", "s02"]`。教辅文件仍只存一份（平铺在 `lessons/`），只是两个入口页都会列出它
 - 学科目前支持 `数学` / `化学` / `物理` / `其他`；想加新学科，在 `build.mjs` 顶部的 `SUBJECTS` 里加一行关键词
 
 ### students.json
