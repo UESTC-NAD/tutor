@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第12题深度讲解 · 斜面内圆周运动 + 类平抛</title>
+<style>
+:root{--ink:#1f2937;--muted:#6b7280;--line:#e2e8f0;--accent:#1d4ed8;--red:#dc2626;--green:#059669;--amber:#b45309}
+*{box-sizing:border-box}
+body{margin:0;background:#eef2f7;color:var(--ink);line-height:1.85;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:900px;margin:0 auto;background:#fff;padding:26px 20px 80px;box-shadow:0 0 30px rgba(15,23,42,.06)}
+h1{font-size:24px;margin:0 0 4px}
+.sub{color:var(--muted);font-size:14px;margin-bottom:20px}
+h2{font-size:18px;margin:34px 0 12px;padding:9px 14px;color:#fff;border-radius:8px;background:linear-gradient(90deg,#1e3a8a,#2563eb)}
+h3{font-size:16px;margin:24px 0 8px;padding-left:10px;border-left:4px solid var(--accent)}
+p{margin:8px 0}
+.stem{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:10px;padding:12px 14px;font-size:14.5px;color:#334155;margin:10px 0 16px}
+.eq{background:#f8fafc;border-left:3px solid var(--accent);padding:8px 12px;margin:10px 0;overflow-x:auto;white-space:nowrap;font-size:15px}
+.ans{background:#ecfdf5;border:1px solid #a7f3d0;border-radius:8px;padding:12px 14px;margin:14px 0;font-weight:700;color:#065f46;font-size:16px}
+.tip{background:#fffbeb;border-left:3px solid #f59e0b;padding:9px 12px;margin:12px 0;font-size:14px;color:#78350f}
+.warn{background:#fef2f2;border-left:3px solid #dc2626;padding:9px 12px;margin:12px 0;font-size:14px;color:#7f1d1d}
+.ok{color:var(--green);font-weight:700}.no{color:var(--red);font-weight:700}
+.fig{margin:16px 0;text-align:center}
+.fig svg{max-width:100%;height:auto;border:1px solid var(--line);border-radius:10px;background:#fdfefe}
+figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px}
+th,td{border:1px solid var(--line);padding:8px 9px}
+th{background:#f1f5f9;text-align:center}
+td.c{text-align:center}
+.rt{border-top:1.2px solid currentColor;padding:0 .15em}
+.key{background:linear-gradient(transparent 62%,#fde68a 62%);font-weight:600}
+.small{font-size:13.5px;color:var(--muted)}
+ul{margin:6px 0;padding-left:22px}li{margin:5px 0}
+.badge{display:inline-block;background:#1d4ed8;color:#fff;border-radius:6px;padding:1px 9px;font-size:13px;margin-right:6px}
+hr{border:0;border-top:1px dashed var(--line);margin:26px 0}
+svg text{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>第 12 题 · 深度讲解</h1>
+<div class="sub">斜面内的圆周运动 ⊕ 斜面内的类平抛　｜　答案：<b>BD</b></div>
+
+<div class="stem">
+<b>【原题】</b>如图，倾角均为 30° 的两个<b>光滑</b>斜面体固定放置，两个斜面 ABCD、abcd 均是正方形，ABCD 的边长为 2L，abcd 的边长未知，a 是 CD 的中点，O 是 ABCD 的中心，a、C、b 在同一条直线上。质量为 m 的小球（视为质点）用长为 L 的轻质细线系于 O 点，在 a 点给小球一个沿 ab 方向、大小为 v<sub>a</sub> = 2√(gL) 的初速度，绕 O 点在斜面内做圆周运动。当小球再次运动到 a 点时，突然剪断细线（不影响小球速度），此后小球沿斜面 abcd 运动并从 c 点离开。重力加速度为 g，不计空气阻力。下列说法正确的是（多选）<br><br>
+A．剪断细线前，小球在 a 点时细线的拉力大小为 4mg<br>
+B．小球在 c 点的速度大小为 2√(5gL)<br>
+C．abcd 的边长为 14L<br>
+D．剪断细线后，小球从 a 到 c 的运动时间为 8√(L/g)
+</div>
+
+<h2>第一步｜看懂这道题在考什么</h2>
+<p>题干很长，但骨架只有<b>两段运动</b>：</p>
+<table>
+<tr><th style="width:16%">阶段</th><th style="width:34%">发生什么</th><th>物理模型</th></tr>
+<tr><td class="c"><b>① a → 绕 O 一圈 → a</b></td><td>细线拴着小球在<b>光滑斜面内</b>做圆周运动</td><td>"竖直平面内圆周运动"的<b>等效版</b>（把 g 换成 g sin30°）</td></tr>
+<tr><td class="c"><b>② a → c</b></td><td>剪断线后在第二个光滑斜面上滑动</td><td><b>类平抛</b>：沿 ab 匀速 + 沿 ad 匀加速</td></tr>
+</table>
+<p>两段的共同钥匙是同一个：<span class="key">光滑斜面上，物体只受沿斜面向下的 mg·sinα 这一个"有效重力"</span>。</p>
+
+<div class="fig"><svg viewBox="0 0 620 250" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="b" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#1d4ed8"/></marker>
+<marker id="r" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#dc2626"/></marker>
+<marker id="g" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#059669"/></marker>
+</defs>
+<text x="24" y="26" font-size="14" font-weight="bold">侧视图：斜面上"有效重力"的由来</text>
+<line x1="60" y1="200" x2="420" y2="200" stroke="#475569" stroke-width="2.4"/>
+<path d="M100,200 L400,200 L400,27 z" fill="#f1f5f9" stroke="#334155" stroke-width="2"/>
+<path d="M150,200 A 50 50 0 0 0 148,177" fill="none" stroke="#b45309" stroke-width="1.6"/>
+<text x="156" y="194" font-size="13" fill="#b45309">30°</text>
+<circle cx="290" cy="90" r="9" fill="#94a3b8" stroke="#334155" stroke-width="1.6"/>
+<!-- mg -->
+<line x1="290" y1="90" x2="290" y2="180" stroke="#dc2626" stroke-width="2.6" marker-end="url(#r)"/>
+<text x="296" y="164" font-size="13.5" fill="#dc2626">mg</text>
+<!-- 沿斜面分量 -->
+<line x1="290" y1="90" x2="245" y2="116" stroke="#059669" stroke-width="2.8" marker-end="url(#g)"/>
+<text x="176" y="112" font-size="13" fill="#059669" font-weight="bold">mg sin30° = mg/2</text>
+<!-- 垂直斜面分量 -->
+<line x1="290" y1="90" x2="335" y2="168" stroke="#94a3b8" stroke-width="2.2" stroke-dasharray="4 3" marker-end="url(#r)"/>
+<text x="338" y="146" font-size="12.5" fill="#6b7280">mg cos30°</text>
+<line x1="245" y1="116" x2="290" y2="194" stroke="#cbd5e1" stroke-dasharray="3 3"/>
+<line x1="335" y1="168" x2="290" y2="194" stroke="#cbd5e1" stroke-dasharray="3 3"/>
+<!-- N -->
+<line x1="290" y1="90" x2="245" y2="64" stroke="#1d4ed8" stroke-width="2.4" marker-end="url(#b)"/>
+<text x="212" y="56" font-size="12.5" fill="#1d4ed8">N（被抵消）</text>
+<!-- 结论 -->
+<text x="440" y="86" font-size="14" font-weight="bold">等效重力场：</text>
+<text x="440" y="116" font-size="17" fill="#059669" font-weight="bold">g′ = g sin30°</text>
+<text x="466" y="146" font-size="17" fill="#059669" font-weight="bold">= g / 2</text>
+<text x="440" y="180" font-size="12.5" fill="#6b7280">方向：沿斜面</text>
+<text x="440" y="200" font-size="12.5" fill="#6b7280">"向下坡"</text>
+</svg><figcaption>图1　垂直斜面方向 N 与 mg cosα 平衡；沿斜面只剩 mg sinα，它扮演"重力"的角色</figcaption></div>
+
+<div class="tip"><b>一句话通法：</b>光滑斜面内的一切运动（圆周、类平抛、单摆…），把课本公式里的 <b>g 换成 g·sinα</b>，其余<b>一字不改</b>。本题 α = 30°，所以 <b>g′ = g/2</b>。</div>
+
+<h2>第二步｜把几何关系抠清楚（本题最大的门槛）</h2>
+
+<div class="fig"><svg viewBox="0 0 620 300" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="b2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#1d4ed8"/></marker>
+<marker id="r2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#dc2626"/></marker>
+<marker id="g2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#059669"/></marker>
+</defs>
+<text x="20" y="24" font-size="14" font-weight="bold">正对斜面看（视线垂直于斜面）</text>
+<!-- 坡度方向 -->
+<line x1="546" y1="60" x2="546" y2="220" stroke="#059669" stroke-width="2.6" marker-end="url(#g2)"/>
+<text x="500" y="52" font-size="12.5" fill="#059669">沿斜面</text>
+<text x="500" y="70" font-size="12.5" fill="#059669">"向下坡"</text>
+<text x="502" y="244" font-size="12.5" fill="#059669">g′ = g/2</text>
+<!-- 正方形 -->
+<rect x="120" y="60" width="200" height="200" fill="#f8fafc" stroke="#334155" stroke-width="2.4"/>
+<text x="104" y="54" font-size="14" font-weight="bold">A</text>
+<text x="326" y="54" font-size="14" font-weight="bold">B</text>
+<text x="326" y="280" font-size="14" font-weight="bold">C</text>
+<text x="104" y="280" font-size="14" font-weight="bold">D</text>
+<!-- 圆 -->
+<circle cx="220" cy="160" r="100" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-dasharray="6 4"/>
+<circle cx="220" cy="160" r="4" fill="#334155"/><text x="228" y="154" font-size="14">O</text>
+<line x1="220" y1="160" x2="220" y2="260" stroke="#334155" stroke-width="2"/>
+<text x="228" y="216" font-size="13" fill="#475569">L</text>
+<circle cx="220" cy="260" r="6" fill="#dc2626"/>
+<text x="206" y="284" font-size="14" fill="#dc2626" font-weight="bold">a</text>
+<!-- 边长标注 -->
+<line x1="120" y1="44" x2="320" y2="44" stroke="#6b7280"/>
+<text x="196" y="38" font-size="12.5" fill="#6b7280">2L</text>
+<!-- 直角标记 -->
+<path d="M220,246 h14 v14" fill="none" stroke="#b45309" stroke-width="1.6"/>
+<!-- 初速度 -->
+<line x1="220" y1="260" x2="330" y2="260" stroke="#1d4ed8" stroke-width="2.8" marker-end="url(#b2)"/>
+<text x="250" y="252" font-size="13" fill="#1d4ed8" font-weight="bold">v<tspan font-size="10">a</tspan>（沿 ab = 沿 CD）</text>
+<line x1="320" y1="260" x2="420" y2="260" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 4"/>
+<text x="380" y="280" font-size="13">→ b</text>
+<!-- 说明文字 -->
+<text x="20" y="128" font-size="12.5" fill="#334155">① 圆半径 L = 边长的一半</text>
+<text x="20" y="150" font-size="12.5" fill="#334155">　⟹ 圆<b>内切</b>于正方形，</text>
+<text x="20" y="172" font-size="12.5" fill="#334155">　切点正是四边中点</text>
+<text x="20" y="204" font-size="12.5" fill="#334155">② a 是 CD 中点 ⟹ Oa ⊥ CD</text>
+<text x="20" y="226" font-size="12.5" fill="#334155">　⟹ v<tspan font-size="9">a</tspan> 沿 CD 恰为<b>切线</b> ✓</text>
+</svg><figcaption>图2　CD 是水平边、AD 与 BC 沿最大坡度线；圆内切于正方形，a 是切点</figcaption></div>
+
+<h3>要抠出来的三条几何事实</h3>
+<ul>
+<li><b>圆恰好内切于正方形。</b>边长 2L、半径 L、圆心在中心 ⟹ 圆与四条边相切，切点是各边中点。a 就是 CD 边上的切点。</li>
+<li><b>初速度确实是切线方向。</b>a、C、b 共线，而 a 是 CD 的中点，所以"直线 aCb"就是 <b>CD 边所在的直线</b>；又因 Oa ⊥ CD，故沿 ab 方向的 v<sub>a</sub> 垂直于半径 Oa —— 正是圆周运动要求的切线方向。</li>
+<li><b class="ok">a 是圆周上的"最低点"。</b>由图，AD、BC 沿最大坡度线（与水平面成 30°），AB、CD 是<b>水平</b>边。O 在 a 的正上坡方向、相距 L，所以沿斜面方向 a 比 O 低，是整个圆周的最低点（实际竖直高度差 = L·sin30° = L/2）。</li>
+</ul>
+
+<div class="warn"><b>这里就是 A 项设的陷阱。</b>很多同学看到 a 在"图的下面"，却忘了追问"a 到底是不是圆周的最低点"，或者认定是最低点后又忘了写重力分量，于是只写 T = mv²/L = 4mg，正中出题人下怀。</div>
+
+<h2>第三步｜A 项：a 点细线的拉力</h2>
+
+<div class="fig"><svg viewBox="0 0 620 250" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="b3" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#059669"/></marker>
+<marker id="r3" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#dc2626"/></marker>
+<marker id="k3" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#1d4ed8"/></marker>
+</defs>
+<text x="20" y="26" font-size="14" font-weight="bold">在 a 点（圆周最低点）沿斜面受力</text>
+<circle cx="200" cy="170" r="100" fill="none" stroke="#cbd5e1" stroke-width="1.8" stroke-dasharray="6 4"/>
+<circle cx="200" cy="70" r="4" fill="#334155"/><text x="208" y="66" font-size="13">O</text>
+<circle cx="200" cy="170" r="7" fill="#dc2626"/><text x="184" y="196" font-size="14" fill="#dc2626" font-weight="bold">a</text>
+<line x1="200" y1="170" x2="200" y2="86" stroke="#059669" stroke-width="2.8" marker-end="url(#b3)"/>
+<text x="208" y="126" font-size="13.5" fill="#059669" font-weight="bold">T（指向圆心 O）</text>
+<line x1="200" y1="170" x2="200" y2="238" stroke="#dc2626" stroke-width="2.8" marker-end="url(#r3)"/>
+<text x="96" y="232" font-size="13" fill="#dc2626">mg sin30° = 0.5mg</text>
+<line x1="200" y1="170" x2="300" y2="170" stroke="#1d4ed8" stroke-width="2.6" marker-end="url(#k3)"/>
+<text x="238" y="162" font-size="13" fill="#1d4ed8">v<tspan font-size="10">a</tspan> = 2√(gL)</text>
+<!-- 方程 -->
+<text x="360" y="80" font-size="14" font-weight="bold">牛顿第二定律（指向圆心为正）：</text>
+<text x="360" y="112" font-size="15" fill="#1d4ed8">T − mg sin30° = m v<tspan font-size="10">a</tspan>² / L</text>
+<text x="360" y="146" font-size="15">T = m·4gL/L + 0.5mg</text>
+<text x="360" y="180" font-size="17" fill="#dc2626" font-weight="bold">T = 4.5 mg ≠ 4mg</text>
+<text x="360" y="212" font-size="12.5" fill="#6b7280">A 项漏掉了 0.5mg 这一项</text>
+</svg><figcaption>图3　最低点：拉力必须既提供向心力，又"扛住"沿斜面向下的重力分量</figcaption></div>
+
+<p><b>为什么小球回到 a 点时速度还是 v<sub>a</sub>？</b>斜面光滑、绳的拉力始终垂直于速度不做功，小球从 a 出发绕一圈回到<b>同一点 a</b>，高度没变 ⟹ 机械能守恒 ⟹ 速率不变，仍是 2√(gL)。所以剪线前后这一刻的受力分析可以直接用 v<sub>a</sub>。</p>
+
+<div class="eq">T − mg·sin30° = m·v<sub>a</sub>² / L</div>
+<div class="eq">T = m·(2√<span class="rt">gL</span>)² / L + 0.5mg = <b>4mg + 0.5mg = 4.5mg</b></div>
+<p class="no">A 项错误。</p>
+
+<p class="small"><b>顺带一验：小球能转完整圈吗？</b>最高点在 O 的上坡方向 L 处，与 a 的"等效高度差"为 2L：<br>
+v<sub>顶</sub>² = v<sub>a</sub>² − 2g′·(2L) = 4gL − 2·(g/2)·2L = 2gL；<br>
+而"过顶"临界条件是 v<sub>顶</sub>² ≥ g′L = 0.5gL。因 2gL &gt; 0.5gL，小球顺利通过最高点，能回到 a 点 ✓</p>
+
+<h2>第四步｜剪断细线后：一个漂亮的"类平抛"</h2>
+
+<div class="fig"><svg viewBox="0 0 620 340" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="b4" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#1d4ed8"/></marker>
+<marker id="r4" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#dc2626"/></marker>
+<marker id="g4" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#059669"/></marker>
+</defs>
+<text x="20" y="24" font-size="14" font-weight="bold">正对第二个斜面看：a → c 是"类平抛"，落点恰在对角</text>
+<rect x="70" y="50" width="250" height="250" fill="#f8fafc" stroke="#334155" stroke-width="2.4"/>
+<text x="54" y="46" font-size="14" font-weight="bold" fill="#dc2626">a</text>
+<text x="326" y="46" font-size="14" font-weight="bold">b</text>
+<text x="326" y="318" font-size="14" font-weight="bold" fill="#dc2626">c</text>
+<text x="54" y="318" font-size="14" font-weight="bold">d</text>
+<circle cx="70" cy="50" r="6" fill="#dc2626"/>
+<circle cx="320" cy="300" r="6" fill="#dc2626"/>
+<!-- 初速度 -->
+<line x1="70" y1="50" x2="176" y2="50" stroke="#1d4ed8" stroke-width="2.8" marker-end="url(#b4)"/>
+<text x="92" y="40" font-size="13" fill="#1d4ed8" font-weight="bold">v<tspan font-size="10">a</tspan> = 2√(gL)（匀速）</text>
+<!-- 加速度 -->
+<line x1="70" y1="50" x2="70" y2="156" stroke="#dc2626" stroke-width="2.8" marker-end="url(#r4)"/>
+<text x="-4" y="120" font-size="13" fill="#dc2626" font-weight="bold" transform="rotate(-90 30 120)">g′ = g/2（匀加速）</text>
+<!-- 抛物线 -->
+<path d="M70,50 Q210,50 320,300" fill="none" stroke="#059669" stroke-width="3"/>
+<text x="180" y="150" font-size="13.5" fill="#059669" font-weight="bold">抛物线</text>
+<!-- 边长标注 -->
+<line x1="70" y1="322" x2="320" y2="322" stroke="#6b7280"/>
+<text x="168" y="338" font-size="13" fill="#6b7280">s = 16L</text>
+<line x1="344" y1="50" x2="344" y2="300" stroke="#6b7280"/>
+<text x="352" y="180" font-size="13" fill="#6b7280">s = 16L</text>
+<!-- c 点速度分解 -->
+<line x1="320" y1="300" x2="400" y2="300" stroke="#1d4ed8" stroke-width="2.6" marker-end="url(#b4)"/>
+<text x="404" y="296" font-size="12.5" fill="#1d4ed8">v∥ = 2√(gL)</text>
+<line x1="320" y1="300" x2="320" y2="300" stroke="none"/>
+<line x1="400" y1="300" x2="400" y2="300" stroke="none"/>
+<!-- 位移对角线 -->
+<line x1="70" y1="50" x2="320" y2="300" stroke="#94a3b8" stroke-width="1.8" stroke-dasharray="6 4"/>
+<text x="150" y="240" font-size="12.5" fill="#6b7280">位移沿对角线（45°）</text>
+<path d="M100,50 A 30 30 0 0 0 91,71" fill="none" stroke="#b45309" stroke-width="1.5"/>
+<text x="102" y="72" font-size="11.5" fill="#b45309">45°</text>
+<!-- 速度三角形 单列 -->
+<text x="410" y="80" font-size="13.5" font-weight="bold">c 点速度合成：</text>
+<line x1="430" y1="100" x2="500" y2="100" stroke="#1d4ed8" stroke-width="2.4" marker-end="url(#b4)"/>
+<text x="440" y="94" font-size="11.5" fill="#1d4ed8">v∥ = 2√(gL)</text>
+<line x1="430" y1="100" x2="430" y2="240" stroke="#dc2626" stroke-width="2.4" marker-end="url(#r4)"/>
+<text x="436" y="180" font-size="11.5" fill="#dc2626">v⊥ = 4√(gL)</text>
+<line x1="430" y1="100" x2="497" y2="234" stroke="#059669" stroke-width="2.8" marker-end="url(#g4)"/>
+<text x="500" y="200" font-size="12.5" fill="#059669" font-weight="bold">v_c = 2√(5gL)</text>
+<line x1="500" y1="100" x2="500" y2="240" stroke="#cbd5e1" stroke-dasharray="3 3"/>
+<line x1="430" y1="240" x2="500" y2="240" stroke="#cbd5e1" stroke-dasharray="3 3"/>
+<text x="404" y="272" font-size="12" fill="#6b7280">v⊥ : v∥ = 2 : 1</text>
+</svg><figcaption>图4　位移沿对角线（1:1）⟹ 速度分量之比必为 2:1，这是平抛的黄金比例</figcaption></div>
+
+<h3>为什么"从 c 点离开"就等于"走了正方形的对角线"？</h3>
+<p>剪线瞬间小球速度仍为 v<sub>a</sub>，方向沿 ab（第二个正方形的<b>上边</b>）。进入第二个斜面后：</p>
+<ul>
+<li><b>沿 ab 方向</b>（水平、垂直于最大坡度线）：不受力 ⟹ <b>匀速</b>，速度恒为 v<sub>a</sub>；</li>
+<li><b>沿 ad 方向</b>（最大坡度线、向下坡）：加速度 g′ = g/2 ⟹ <b>初速为零的匀加速</b>。</li>
+</ul>
+<p>两方向垂直，标准的类平抛。小球从顶点 a 出发，"从 c 点离开"意味着它恰好到达<b>对角顶点 c</b>，所以两个方向的位移<b>都等于边长 s</b>。</p>
+
+<h3>D 项：运动时间</h3>
+<div class="eq">沿 ab：s = v<sub>a</sub>·t　　　沿 ad：s = ½·g′·t² = ½·(g/2)·t² = g t²/4</div>
+<p>两式相等（都等于 s），消去 s：</p>
+<div class="eq">v<sub>a</sub>·t = g t²/4　⟹　t = 4v<sub>a</sub>/g = 4 × 2√<span class="rt">gL</span> / g</div>
+<div class="eq">t = 8√<span class="rt">gL</span>/g = <b>8√<span class="rt">L/g</span></b>　<span class="ok">D 项正确</span></div>
+<p class="small">化简技巧：√(gL)/g = √(gL/g²) = √(L/g)。</p>
+
+<h3>C 项：正方形 abcd 的边长</h3>
+<div class="eq">s = v<sub>a</sub>·t = 2√<span class="rt">gL</span> × 8√<span class="rt">L/g</span> = 16·√<span class="rt">gL · L/g</span> = <b>16L</b>　<span class="no">C 项错误（不是 14L）</span></div>
+
+<h3>B 项：c 点的速度大小</h3>
+<p><b>解法一（直接算分量）：</b></p>
+<div class="eq">v<sub>∥</sub> = v<sub>a</sub> = 2√<span class="rt">gL</span>　（沿 ab，一直没变）</div>
+<div class="eq">v<sub>⊥</sub> = g′·t = (g/2) × 8√<span class="rt">L/g</span> = 4√<span class="rt">gL</span>　（沿 ad）</div>
+<div class="eq">v<sub>c</sub> = √<span class="rt">(2√(gL))² + (4√(gL))²</span> = √<span class="rt">4gL + 16gL</span> = √<span class="rt">20gL</span> = <b>2√<span class="rt">5gL</span></b>　<span class="ok">B 项正确</span></div>
+
+<p><b>解法二（用平抛黄金比例，秒杀）：</b>平抛/类平抛中</p>
+<div class="eq">tanθ<sub>速度</sub> = 2 · tanα<sub>位移</sub></div>
+<p>位移沿正方形对角线，tanα = s/s = 1 ⟹ tanθ = 2 ⟹ v<sub>⊥</sub> = 2v<sub>∥</sub> = 4√(gL)，同样得 v<sub>c</sub> = √5·v<sub>∥</sub> = 2√(5gL)。</p>
+
+<p><b>解法三（能量校验，强烈推荐用来查错）：</b>光滑斜面，只有重力沿斜面的分量做功：</p>
+<div class="eq">W = mg·sin30°·s = mg × 0.5 × 16L = 8mgL</div>
+<div class="eq">½mv<sub>c</sub>² − ½mv<sub>a</sub>² = ½m(20gL − 4gL) = 8mgL　✓ 完全吻合</div>
+
+<div class="ans">最终答案：<b>BD</b>　（A 应为 4.5mg；C 应为 16L）</div>
+
+<h2>第五步｜四个选项对照总表</h2>
+<table>
+<tr><th style="width:8%">选项</th><th style="width:22%">题目说法</th><th style="width:24%">正确结果</th><th>错在哪 / 对在哪</th></tr>
+<tr><td class="c"><b class="no">A</b></td><td class="c">T = 4mg</td><td class="c"><b>T = 4.5mg</b></td><td>a 是圆周<b>最低点</b>，拉力除了提供向心力 4mg，还要平衡沿斜面向下的 mg sin30° = 0.5mg</td></tr>
+<tr><td class="c"><b class="ok">B</b></td><td class="c">v<sub>c</sub> = 2√(5gL)</td><td class="c"><b>2√(5gL)</b></td><td>v<sub>∥</sub>=2√(gL)、v<sub>⊥</sub>=4√(gL)，合成即得；能量法可交叉验证</td></tr>
+<tr><td class="c"><b class="no">C</b></td><td class="c">边长 14L</td><td class="c"><b>16L</b></td><td>s = v<sub>a</sub>t = 2√(gL)·8√(L/g) = 16L；14L 是凑出来的干扰项</td></tr>
+<tr><td class="c"><b class="ok">D</b></td><td class="c">t = 8√(L/g)</td><td class="c"><b>8√(L/g)</b></td><td>由 v<sub>a</sub>t = ½g′t² 解出 t = 2v<sub>a</sub>/g′ = 4v<sub>a</sub>/g</td></tr>
+</table>
+
+<h2>第六步｜可迁移的方法与易错清单</h2>
+
+<h3>三条能带走的结论</h3>
+<ul>
+<li><b>等效重力法：</b>光滑斜面（倾角 α）内的运动 ⟺ 竖直平面内的运动，只需 g → g sinα。圆周运动的"最高点临界条件"也随之变为 v<sub>顶</sub>² ≥ g sinα · R。</li>
+<li><b>类平抛"落到对角"模型：</b>若两方向位移相等（比值 1:1），则 t = 2v₀/a′，速度分量比恒为 2:1，末速度 = √5·v₀。这个结构在"平抛落到 45° 斜面"里一模一样地出现。</li>
+<li><b>位移偏角与速度偏角：</b>tanθ<sub>速度</sub> = 2·tanα<sub>位移</sub>，平抛、类平抛通用，能省掉大量计算。</li>
+</ul>
+
+<div class="warn"><b>易错清单（按踩坑频率排序）：</b>
+<ol style="margin:6px 0 0;padding-left:20px">
+<li>圆周最低点只写 T = mv²/R，<b>漏掉 mg sinα</b>（A 项）。</li>
+<li>忘了把 g 换成 g sinα，直接用 g 算类平抛，时间和边长全错。</li>
+<li>误以为"再次回到 a 点"速度会变小（其实斜面光滑，绳张力不做功，速率不变）。</li>
+<li>看不出"从 c 点离开"= 走完对角线，两方向位移都是 s。</li>
+<li>√(gL)、√(L/g) 的化简出错——记住 √(gL)/g = √(L/g)。</li>
+</ol></div>
+
+<div class="tip"><b>变式自测：</b>若把第二个斜面的倾角改成 53°（第一个仍 30°、v<sub>a</sub> 不变），abcd 的边长和 c 点速度分别是多少？<br>
+<span class="small">提示：g′ = g sin53° = 0.8g，t = 2v<sub>a</sub>/g′ = 5√(L/g)，s = v<sub>a</sub>t = 10L，v<sub>c</sub> = √5·v<sub>a</sub> = 2√(5gL)（末速度大小与倾角无关，因为位移比恒为 1:1！）。</span></div>
+
+<hr>
+<p class="small" style="text-align:center">第 12 题深度讲解 · 答案 BD</p>
+</div>
+</body>
+</html>
