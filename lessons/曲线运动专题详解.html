@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>曲线运动与抛体运动 专题详解（16题·含图解与全推导）</title>
+<style>
+:root{
+  --ink:#1f2937; --muted:#6b7280; --line:#e2e8f0; --accent:#1d4ed8;
+  --red:#dc2626; --green:#059669; --amber:#b45309;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#eef2f7;color:var(--ink);line-height:1.8;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  -webkit-text-size-adjust:100%;}
+.wrap{max-width:920px;margin:0 auto;background:#fff;padding:28px 20px 90px;
+  box-shadow:0 0 30px rgba(15,23,42,.06)}
+h1{font-size:26px;margin:0 0 6px;letter-spacing:.5px}
+.sub{color:var(--muted);font-size:14px;margin-bottom:22px}
+h2{font-size:19px;margin:38px 0 14px;padding:9px 14px;color:#fff;border-radius:8px;
+  background:linear-gradient(90deg,#1e3a8a,#2563eb)}
+h3{font-size:16px;margin:26px 0 10px;padding-left:10px;border-left:4px solid var(--accent)}
+p{margin:8px 0}
+.q{border:1px solid var(--line);border-radius:12px;padding:16px 16px 12px;margin:18px 0 26px;background:#fff}
+.qhead{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.num{flex:none;width:32px;height:32px;border-radius:50%;background:#1d4ed8;color:#fff;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px}
+.multi{background:var(--amber)}
+.calc{background:#0f766e}
+.stem{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:8px;padding:10px 12px;
+  font-size:14.5px;color:#334155;margin:6px 0 12px}
+.opt{margin:2px 0 2px 4px;font-size:14.5px}
+.eq{background:#f8fafc;border-left:3px solid var(--accent);padding:8px 12px;margin:10px 0;
+  overflow-x:auto;white-space:nowrap;font-size:15px}
+.eq b{color:var(--accent)}
+.ans{background:#ecfdf5;border:1px solid #a7f3d0;border-radius:8px;padding:10px 14px;
+  margin:14px 0 4px;font-weight:700;color:#065f46}
+.tip{background:#fffbeb;border-left:3px solid #f59e0b;padding:8px 12px;margin:12px 0;
+  font-size:14px;color:#78350f}
+.wrongopt{color:var(--red);font-weight:600}
+.rightopt{color:var(--green);font-weight:600}
+.fig{margin:16px 0;text-align:center}
+.fig svg{max-width:100%;height:auto;border:1px solid var(--line);border-radius:10px;background:#fdfefe}
+figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:center}
+th{background:#f1f5f9}
+td.a{font-weight:700;color:#065f46}
+.rt{border-top:1.2px solid currentColor;padding:0 .15em;margin-left:-.1em}
+.key{background:linear-gradient(transparent 62%,#fde68a 62%);font-weight:600}
+.small{font-size:13.5px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:640px){.grid2{grid-template-columns:1fr 1fr}}
+svg text{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+hr{border:0;border-top:1px dashed var(--line);margin:26px 0}
+ul{margin:6px 0 6px 0;padding-left:22px}
+li{margin:4px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>曲线运动 · 抛体运动 专题详解</h1>
+<div class="sub">共 16 题 ｜ 每题含 <b>图解 + 完整推导 + 逐项辨析</b> ｜ 取 g = 10 m/s²，sin37°=0.6，cos37°=0.8</div>
+
+<h3 style="margin-top:10px">答案速查表</h3>
+<table>
+<tr><th>题号</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6(多)</th><th>7(多)</th><th>8</th></tr>
+<tr><td>答案</td><td class="a">B</td><td class="a">B</td><td class="a">B</td><td class="a">B</td><td class="a">B</td><td class="a">ACD</td><td class="a">AB</td><td class="a">B</td></tr>
+<tr><th>题号</th><th>9</th><th>10</th><th>11</th><th>12(多)</th><th>13</th><th>14</th><th>15</th><th>16</th></tr>
+<tr><td>答案</td><td class="a">A</td><td class="a">A</td><td class="a">A</td><td class="a">BD</td><td class="a">C</td>
+<td class="a">3 m/s<br>1.5 s<br>2.4 m</td><td class="a">1.8 m<br>1.6 s<br>12.8 m</td><td class="a">0.9 m<br>≈52.7 N<br>3 J</td></tr>
+</table>
+
+<div class="tip"><b>本专题四大核心模型：</b>①曲线运动条件（合力指向轨迹凹侧）；②关联速度（沿绳分量相等）与小船渡河（运动合成）；③平抛（水平匀速 + 竖直自由落体，两方向独立）；④斜抛（对称性 + 分解为平抛的逆过程）。</div>
+
+<h2>题型 1 ｜ 曲线运动条件与轨迹分析</h2>
+
+<div class="q">
+<div class="qhead"><div class="num">1</div><b>风中小球的轨迹判断</b></div>
+<div class="stem">小球从某高度处以速度 <i>v</i>（斜向右下）抛出，此时吹来<b>水平向左</b>的风，风对小球产生恒定的水平作用力，不计空气阻力。虚线表示以后一段时间内小球的轨迹，其中可能正确的是（&nbsp;&nbsp;）　A.① B.② C.③ D.④</div>
+
+<div class="fig"><svg viewBox="0 0 620 300" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#1d4ed8"/></marker>
+<marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#dc2626"/></marker>
+<marker id="arg" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#059669"/></marker>
+</defs>
+<!-- 左：轨迹图 -->
+<circle cx="160" cy="55" r="7" fill="#94a3b8" stroke="#475569"/>
+<line x1="160" y1="55" x2="196" y2="135" stroke="#1d4ed8" stroke-width="2.4" marker-end="url(#ar)"/>
+<text x="203" y="128" font-size="14" fill="#1d4ed8" font-style="italic">v</text>
+<path d="M160,55 Q200,145 290,205" fill="none" stroke="#64748b" stroke-width="1.8" stroke-dasharray="6 4"/>
+<text x="296" y="212" font-size="14">①</text>
+<path d="M160,55 Q200,150 205,250" fill="none" stroke="#059669" stroke-width="2.2" stroke-dasharray="6 4"/>
+<text x="200" y="268" font-size="14" fill="#059669">②</text>
+<path d="M160,55 Q138,140 95,220" fill="none" stroke="#64748b" stroke-width="1.8" stroke-dasharray="6 4"/>
+<text x="80" y="234" font-size="14">③</text>
+<path d="M160,55 Q255,40 330,85" fill="none" stroke="#64748b" stroke-width="1.8" stroke-dasharray="6 4"/>
+<text x="338" y="90" font-size="14">④</text>
+<text x="30" y="30" font-size="13" fill="#6b7280">抛出点</text>
+<line x1="70" y1="55" x2="120" y2="55" stroke="#dc2626" stroke-width="2" marker-end="url(#arr)" transform="translate(-30,0) scale(1,1)"/>
+<text x="40" y="72" font-size="12.5" fill="#dc2626">风 ←</text>
+<!-- 右：受力分析 -->
+<line x1="420" y1="30" x2="420" y2="270" stroke="#e2e8f0"/>
+<text x="455" y="52" font-size="14" font-weight="bold">受力（合力）分析</text>
+<circle cx="520" cy="110" r="6" fill="#94a3b8" stroke="#475569"/>
+<line x1="520" y1="110" x2="520" y2="180" stroke="#dc2626" stroke-width="2.2" marker-end="url(#arr)"/>
+<text x="527" y="165" font-size="13.5" fill="#dc2626">mg</text>
+<line x1="520" y1="110" x2="450" y2="110" stroke="#dc2626" stroke-width="2.2" marker-end="url(#arr)"/>
+<text x="452" y="102" font-size="13.5" fill="#dc2626">F风</text>
+<line x1="520" y1="110" x2="450" y2="180" stroke="#059669" stroke-width="2.6" marker-end="url(#arg)"/>
+<text x="435" y="200" font-size="13.5" fill="#059669" font-weight="bold">F合（左下）</text>
+<path d="M450,110 L450,180 L520,180" fill="none" stroke="#94a3b8" stroke-dasharray="4 3"/>
+<text x="452" y="240" font-size="12.5" fill="#6b7280">合力恒定 → 轨迹是抛物线</text>
+<text x="452" y="258" font-size="12.5" fill="#6b7280">凹侧必须朝左下方</text>
+</svg>
+<figcaption>图1-1　小球受重力与水平向左的风力，合力方向为“左下方”</figcaption></div>
+
+<p><b>【推导】</b>曲线运动的两条铁律：</p>
+<ul>
+<li><span class="key">轨迹必与初速度 v 相切</span>（v 是轨迹的切线方向）；</li>
+<li><span class="key">轨迹凹侧必指向合力（加速度）方向</span>，且轨迹夹在 v 的延长线与 F 合方向之间。</li>
+</ul>
+<div class="eq">F<sub>合</sub> = mg（竖直向下）+ F<sub>风</sub>（水平向左）　⟹　<b>方向：左下方</b></div>
+<p>初速度 v 指向<b>右下方</b>，合力指向<b>左下方</b>，故轨迹从 v 的方向出发，逐渐向<b>左</b>弯曲（水平分速度先向右减小、可能反向），凹侧朝左下。</p>
+<p class="opt"><span class="wrongopt">①</span> 起点虽与 v 相切，但向<b>右</b>弯（凹侧朝右下），需要向右的水平力，与风向矛盾。</p>
+<p class="opt"><span class="rightopt">②</span> 起点与 v 相切，随后向左弯、凹侧朝左下 —— 与合力方向一致。<b>正确</b></p>
+<p class="opt"><span class="wrongopt">③</span> 从抛出点就指向左下方，<b>不与初速度 v 相切</b>，违反“速度沿切线”。</p>
+<p class="opt"><span class="wrongopt">④</span> 轨迹向上弯曲，说明合力有竖直向上的分量，重力不允许。</p>
+<div class="ans">答案：B（②）</div>
+<div class="tip"><b>易错点：</b>只记“凹侧朝合力”而忘了“切线朝初速度”，就会误选 ③。判断轨迹永远是<b>两个条件同时用</b>。</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num">2</div><b>曲线运动的基本概念辨析</b></div>
+<div class="stem">下列说法正确的是（&nbsp;&nbsp;）<br>
+A. 做圆周运动的物体受到的合力方向一定指向圆心<br>
+B. 平抛运动属于匀变速运动<br>
+C. 物体在变力作用下一定做曲线运动<br>
+D. 只受恒力的物体不可能做曲线运动</div>
+
+<div class="fig"><svg viewBox="0 0 620 210" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#dc2626"/></marker>
+<marker id="a2b" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#1d4ed8"/></marker></defs>
+<!-- 变速圆周 -->
+<circle cx="110" cy="105" r="60" fill="none" stroke="#94a3b8" stroke-dasharray="4 3"/>
+<circle cx="110" cy="105" r="3" fill="#475569"/><text x="114" y="100" font-size="12">O</text>
+<circle cx="163" cy="77" r="5" fill="#1d4ed8"/>
+<line x1="163" y1="77" x2="110" y2="105" stroke="#dc2626" stroke-width="2" marker-end="url(#a2)"/>
+<text x="122" y="128" font-size="12" fill="#dc2626">F向</text>
+<line x1="163" y1="77" x2="200" y2="140" stroke="#dc2626" stroke-width="2" marker-end="url(#a2)"/>
+<text x="196" y="158" font-size="12" fill="#dc2626">F切</text>
+<text x="20" y="196" font-size="13">A错：变速圆周，合力不指向圆心</text>
+<!-- 弹簧振子 -->
+<line x1="270" y1="120" x2="420" y2="120" stroke="#475569" stroke-width="2"/>
+<path d="M280,105 l10,-12 l10,24 l10,-24 l10,24 l10,-24 l10,24 l8,-12" fill="none" stroke="#94a3b8" stroke-width="2"/>
+<rect x="348" y="90" width="30" height="30" fill="#cbd5e1" stroke="#475569"/>
+<line x1="363" y1="75" x2="410" y2="75" stroke="#1d4ed8" stroke-width="2" marker-end="url(#a2b)"/>
+<text x="270" y="60" font-size="12.5" fill="#1d4ed8">变力，但沿直线运动</text>
+<text x="272" y="196" font-size="13">C错：反例——弹簧振子</text>
+<!-- 平抛 -->
+<path d="M470,60 Q530,60 590,140" fill="none" stroke="#059669" stroke-width="2.2"/>
+<circle cx="470" cy="60" r="5" fill="#059669"/>
+<line x1="470" y1="60" x2="520" y2="60" stroke="#1d4ed8" stroke-width="2" marker-end="url(#a2b)"/>
+<text x="524" y="56" font-size="12" fill="#1d4ed8">v₀</text>
+<line x1="530" y1="80" x2="530" y2="130" stroke="#dc2626" stroke-width="2" marker-end="url(#a2)"/>
+<text x="536" y="115" font-size="12" fill="#dc2626">g</text>
+<text x="452" y="196" font-size="13">B对 / D错：恒力 g 下的曲线运动</text>
+</svg><figcaption>图2-1　三个判据的典型反例</figcaption></div>
+
+<p class="opt"><span class="wrongopt">A 错：</span>只有<b>匀速</b>圆周运动，合力才恒指向圆心。变速圆周运动（如竖直平面内的圆周）中，合力=向心力+切向力，方向<b>不</b>指向圆心。</p>
+<p class="opt"><span class="rightopt">B 对：</span>平抛只受重力，a = g 大小方向都不变 ⟹ 是<b>匀变速</b>曲线运动。</p>
+<p class="opt"><span class="wrongopt">C 错：</span>变力也可做直线运动。反例：弹簧振子（回复力大小方向都在变，但沿直线）；竖直上抛考虑空气阻力时也是变力直线运动。</p>
+<p class="opt"><span class="wrongopt">D 错：</span>只要<b>恒力方向与初速度不共线</b>，恒力也能产生曲线运动，平抛就是最典型的例子。</p>
+<div class="ans">答案：B</div>
+<div class="tip"><b>做曲线运动的充要条件：</b>合力（加速度）方向与速度方向<b>不在同一直线上</b>。与力恒定还是变化无关。</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num">3</div><b>由分运动图像还原合运动（m = 2 kg，光滑水平面，水平恒力）</b></div>
+<div class="stem">图甲：沿 x 方向的 <i>x–t</i> 图像（抛物线）；图乙：沿 y 方向的 <i>v–t</i> 图像（过原点的斜直线）。判断 A 轨迹为曲线／B t=2 s 时坐标 (8 m, 6 m)／C t=2 s 时速度大小 14 m/s／D 恒力大小 5 N。</div>
+
+<div class="fig"><svg viewBox="0 0 620 240" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a3" markerWidth="8" markerHeight="8" refX="6" refY="2.6" orient="auto"><path d="M0,0 L6,2.6 L0,5.2 z" fill="#334155"/></marker></defs>
+<!-- 甲 -->
+<line x1="40" y1="180" x2="185" y2="180" stroke="#334155" stroke-width="1.6" marker-end="url(#a3)"/>
+<line x1="40" y1="180" x2="40" y2="35" stroke="#334155" stroke-width="1.6" marker-end="url(#a3)"/>
+<text x="188" y="196" font-size="12">t/s</text><text x="22" y="32" font-size="12">x/m</text>
+<path d="M40,180 Q80,178 130,50" fill="none" stroke="#dc2626" stroke-width="2"/>
+<line x1="130" y1="50" x2="40" y2="50" stroke="#94a3b8" stroke-dasharray="3 3"/>
+<line x1="130" y1="50" x2="130" y2="180" stroke="#94a3b8" stroke-dasharray="3 3"/>
+<line x1="85" y1="147" x2="40" y2="147" stroke="#94a3b8" stroke-dasharray="3 3"/>
+<line x1="85" y1="147" x2="85" y2="180" stroke="#94a3b8" stroke-dasharray="3 3"/>
+<text x="26" y="54" font-size="11">8</text><text x="26" y="151" font-size="11">2</text>
+<text x="82" y="194" font-size="11">1</text><text x="127" y="194" font-size="11">2</text>
+<text x="88" y="216" font-size="13" font-weight="bold">甲：x = 2t²，a<tspan font-size="10">x</tspan> = 4 m/s²</text>
+<!-- 乙 -->
+<line x1="250" y1="180" x2="395" y2="180" stroke="#334155" stroke-width="1.6" marker-end="url(#a3)"/>
+<line x1="250" y1="180" x2="250" y2="35" stroke="#334155" stroke-width="1.6" marker-end="url(#a3)"/>
+<text x="398" y="196" font-size="12">t/s</text><text x="228" y="32" font-size="12">v/(m·s⁻¹)</text>
+<line x1="250" y1="180" x2="340" y2="60" stroke="#1d4ed8" stroke-width="2"/>
+<line x1="340" y1="60" x2="250" y2="60" stroke="#94a3b8" stroke-dasharray="3 3"/>
+<line x1="340" y1="60" x2="340" y2="180" stroke="#94a3b8" stroke-dasharray="3 3"/>
+<text x="236" y="64" font-size="11">6</text><text x="336" y="194" font-size="11">2</text>
+<text x="286" y="216" font-size="13" font-weight="bold">乙：v<tspan font-size="10">y</tspan> = 3t，a<tspan font-size="10">y</tspan> = 3 m/s²</text>
+<!-- 轨迹 -->
+<line x1="450" y1="180" x2="600" y2="180" stroke="#334155" stroke-width="1.6" marker-end="url(#a3)"/>
+<line x1="450" y1="180" x2="450" y2="35" stroke="#334155" stroke-width="1.6" marker-end="url(#a3)"/>
+<text x="600" y="196" font-size="12">x/m</text><text x="432" y="32" font-size="12">y/m</text>
+<line x1="450" y1="180" x2="570" y2="90" stroke="#059669" stroke-width="2.6"/>
+<circle cx="570" cy="90" r="4" fill="#059669"/>
+<text x="524" y="82" font-size="11.5" fill="#059669">(8,6)</text>
+<text x="462" y="216" font-size="13" font-weight="bold" fill="#059669">轨迹：y/x = 3/4 恒定 → 直线！</text>
+</svg><figcaption>图3-1　两个分运动均为“初速为零的匀加速”，合运动必为直线</figcaption></div>
+
+<p><b>【读图】</b>甲为过原点的抛物线：x = 2t²（t=1 s 时 x=2 m，t=2 s 时 x=8 m）</p>
+<div class="eq">x = ½a<sub>x</sub>t² = 2t² ⟹ <b>a<sub>x</sub> = 4 m/s²，v<sub>0x</sub> = 0</b></div>
+<p>乙为过原点的斜直线：v<sub>y</sub> = 3t</p>
+<div class="eq">a<sub>y</sub> = 6/2 = <b>3 m/s²，v<sub>0y</sub> = 0</b></div>
+
+<p class="opt"><span class="wrongopt">A 错：</span>两分运动都是<b>初速为零</b>的匀加速直线运动，速度比 v<sub>y</sub>/v<sub>x</sub> = 3t/4t = 3/4 恒定 ⟹ 合速度方向不变 ⟹ <b>轨迹是直线</b>（合力与初速度共线）。</p>
+<p class="opt"><span class="rightopt">B 对：</span>t = 2 s 时　x = 2×2² = <b>8 m</b>；y = ½×3×2² = <b>6 m</b>，坐标 (8 m, 6 m)。</p>
+<p class="opt"><span class="wrongopt">C 错：</span>v<sub>x</sub> = 4×2 = 8 m/s，v<sub>y</sub> = 3×2 = 6 m/s</p>
+<div class="eq">v = √<span class="rt">8² + 6²</span> = √<span class="rt">100</span> = <b>10 m/s</b>　（不是 14 m/s，速度是<b>矢量合成</b>不是代数相加）</div>
+<p class="opt"><span class="wrongopt">D 错：</span>a = √<span class="rt">4² + 3²</span> = 5 m/s²，F = ma = 2×5 = <b>10 N</b>。</p>
+<div class="ans">答案：B</div>
+<div class="tip"><b>易错点：</b>C 项 8+6=14 是把矢量当标量相加；D 项 5 N 是把加速度 5 m/s² 直接抄成了力。另外要警惕“两分运动都初速为零 ⟹ 直线”这个隐藏结论。</div>
+</div>
+
+<h2>题型 2 ｜ 关联速度与小船渡河问题</h2>
+
+<div class="tip"><b>模型口诀：</b>关联速度——把速度沿<b>绳（杆）方向</b>和<b>垂直绳方向</b>分解，<span class="key">沿绳分量必相等</span>（绳不可伸长）。小船渡河——船的实际运动 = 划船速度 ⊕ 水流速度，两分运动<b>独立、等时</b>。</div>
+
+<div class="q">
+<div class="qhead"><div class="num">4</div><b>晾衣绳的关联速度</b></div>
+<div class="stem">甲、乙两同学分别握住晾衣绳两端，在同一水平面内以相同速率 <i>v</i> 匀速靠近，晾衣绳与竖直方向的夹角 θ 逐渐减小，则晾衣架向下运动的过程中速率逐渐（&nbsp;&nbsp;）　A.增加 B.减小 C.不变 D.先增加后减小</div>
+
+<div class="fig"><svg viewBox="0 0 620 280" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a4" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#1d4ed8"/></marker>
+<marker id="a4g" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#059669"/></marker></defs>
+<!-- 绳 -->
+<line x1="70" y1="60" x2="230" y2="185" stroke="#475569" stroke-width="2.2"/>
+<line x1="390" y1="60" x2="230" y2="185" stroke="#475569" stroke-width="2.2"/>
+<line x1="230" y1="60" x2="230" y2="255" stroke="#94a3b8" stroke-dasharray="4 4"/>
+<path d="M230,120 A 66 66 0 0 0 268,132" fill="none" stroke="#b45309" stroke-width="1.6"/>
+<text x="250" y="118" font-size="14" fill="#b45309">θ</text>
+<!-- 手 -->
+<rect x="52" y="50" width="26" height="14" rx="4" fill="#cbd5e1" stroke="#475569"/>
+<rect x="382" y="50" width="26" height="14" rx="4" fill="#cbd5e1" stroke="#475569"/>
+<line x1="110" y1="45" x2="160" y2="45" stroke="#1d4ed8" stroke-width="2.2" marker-end="url(#a4)"/>
+<text x="126" y="36" font-size="13" fill="#1d4ed8" font-style="italic">v</text>
+<line x1="350" y1="45" x2="300" y2="45" stroke="#1d4ed8" stroke-width="2.2" marker-end="url(#a4)"/>
+<text x="316" y="36" font-size="13" fill="#1d4ed8" font-style="italic">v</text>
+<!-- 衣架 -->
+<circle cx="230" cy="185" r="5" fill="#475569"/>
+<path d="M210,200 h40 l-8,26 h-24 z" fill="#e2e8f0" stroke="#475569"/>
+<line x1="230" y1="185" x2="230" y2="245" stroke="#059669" stroke-width="2.4" marker-end="url(#a4g)"/>
+<text x="238" y="240" font-size="13" fill="#059669" font-style="italic">u</text>
+<!-- 分解：手端 -->
+<line x1="390" y1="60" x2="352" y2="60" stroke="#1d4ed8" stroke-width="2" marker-end="url(#a4)"/>
+<line x1="390" y1="60" x2="366" y2="79" stroke="#dc2626" stroke-width="2" stroke-dasharray="3 2"/>
+<text x="405" y="86" font-size="12" fill="#dc2626">v sinθ（沿绳）</text>
+<line x1="352" y1="60" x2="366" y2="79" stroke="#94a3b8" stroke-dasharray="3 2"/>
+<!-- 分解：衣架端 -->
+<line x1="230" y1="185" x2="196" y2="212" stroke="#dc2626" stroke-width="2" stroke-dasharray="3 2"/>
+<text x="96" y="228" font-size="12" fill="#dc2626">u cosθ（沿绳）</text>
+<!-- 结论 -->
+<text x="430" y="150" font-size="14" font-weight="bold">沿绳分量相等：</text>
+<text x="430" y="176" font-size="15" fill="#1d4ed8">v sinθ = u cosθ</text>
+<text x="430" y="204" font-size="15" fill="#059669" font-weight="bold">u = v·tanθ</text>
+<text x="430" y="232" font-size="13">θ↓ ⟹ tanθ↓ ⟹ u↓</text>
+</svg><figcaption>图4-1　手的水平速度与衣架竖直速度沿绳分量相等</figcaption></div>
+
+<p><b>【推导】</b>设某时刻绳与竖直方向夹角为 θ，衣架下降速率为 <i>u</i>。</p>
+<ul>
+<li>手的速度 <i>v</i> <b>水平</b>，与绳的夹角为 (90°−θ)，其沿绳分量 = v·sinθ；</li>
+<li>衣架的速度 <i>u</i> <b>竖直向下</b>，与绳的夹角为 θ，其沿绳分量 = u·cosθ。</li>
+</ul>
+<p>绳不可伸长，两端沿绳方向的速度分量必须相等（否则绳被拉长或松弛）：</p>
+<div class="eq">v·sinθ = u·cosθ　⟹　<b>u = v·tanθ</b></div>
+<p>两人靠近的过程中绳越来越“竖直”，θ <b>减小</b>，而 v 恒定，故 tanθ 减小 ⟹ <span class="key">u 逐渐减小</span>。</p>
+<div class="ans">答案：B（减小）</div>
+<div class="tip"><b>方法提醒：</b>关联速度问题一定要先明确“<b>谁是实际速度</b>”。手的实际速度是水平的 v，衣架的实际速度是竖直的 u，二者分别分解，绝不能把 v 直接当成沿绳速度。</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num">5</div><b>曲轴—连杆—活塞（关联速度）</b></div>
+<div class="stem">曲轴绕固定点 O 转动，连杆两端连接曲轴上的 A 点和活塞上的 B 点。曲轴以 ω = 180 rad/s 匀速转动，OA = 20 cm，AB = 40 cm。当 OA 与 OB 连线垂直时，活塞的速度为（&nbsp;&nbsp;）　A.24√3 m/s B.36 m/s C.18√3 m/s D.18 m/s</div>
+
+<div class="fig"><svg viewBox="0 0 620 280" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a5" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#1d4ed8"/></marker>
+<marker id="a5r" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#dc2626"/></marker></defs>
+<circle cx="150" cy="180" r="60" fill="none" stroke="#cbd5e1" stroke-dasharray="5 4"/>
+<circle cx="150" cy="180" r="4" fill="#334155"/><text x="140" y="200" font-size="14">O</text>
+<circle cx="150" cy="120" r="5" fill="#334155"/><text x="140" y="112" font-size="14">A</text>
+<line x1="150" y1="180" x2="150" y2="120" stroke="#334155" stroke-width="2.4"/>
+<text x="96" y="152" font-size="12" fill="#475569">OA=0.2 m</text>
+<!-- 活塞水平线 -->
+<line x1="150" y1="180" x2="470" y2="180" stroke="#94a3b8" stroke-dasharray="4 4"/>
+<line x1="150" y1="120" x2="360" y2="180" stroke="#334155" stroke-width="2.4"/>
+<text x="240" y="134" font-size="12" fill="#475569">连杆 AB = 0.4 m</text>
+<circle cx="360" cy="180" r="5" fill="#334155"/><text x="356" y="204" font-size="14">B</text>
+<rect x="360" y="163" width="46" height="34" fill="#e2e8f0" stroke="#475569"/>
+<text x="410" y="184" font-size="12" fill="#475569">活塞</text>
+<!-- 直角标记 -->
+<path d="M150,164 h16 v16" fill="none" stroke="#b45309" stroke-width="1.6"/>
+<text x="158" y="160" font-size="11" fill="#b45309">90°</text>
+<!-- 30°角 -->
+<path d="M330,180 A 30 30 0 0 0 336,164" fill="none" stroke="#b45309" stroke-width="1.6"/>
+<text x="316" y="172" font-size="12" fill="#b45309">30°</text>
+<!-- 速度 -->
+<line x1="150" y1="120" x2="230" y2="120" stroke="#1d4ed8" stroke-width="2.6" marker-end="url(#a5)"/>
+<text x="182" y="110" font-size="13" fill="#1d4ed8">v<tspan font-size="10">A</tspan>=36 m/s</text>
+<line x1="360" y1="180" x2="440" y2="180" stroke="#059669" stroke-width="2.6" marker-end="url(#a5)"/>
+<text x="392" y="216" font-size="13" fill="#059669">v<tspan font-size="10">B</tspan></text>
+<!-- 沿杆分量 -->
+<line x1="150" y1="120" x2="219" y2="140" stroke="#dc2626" stroke-width="2" stroke-dasharray="3 2"/>
+<line x1="360" y1="180" x2="429" y2="200" stroke="#dc2626" stroke-width="2" stroke-dasharray="3 2"/>
+<text x="470" y="120" font-size="13.5" font-weight="bold">OA ⊥ OB</text>
+<text x="470" y="146" font-size="13">⟹ v<tspan font-size="10">A</tspan> ⊥ OA ⟹ v<tspan font-size="10">A</tspan> ∥ OB</text>
+<text x="470" y="172" font-size="13">v<tspan font-size="10">A</tspan>cos30° = v<tspan font-size="10">B</tspan>cos30°</text>
+<text x="470" y="198" font-size="14" font-weight="bold" fill="#059669">v<tspan font-size="10">B</tspan> = v<tspan font-size="10">A</tspan> = 36 m/s</text>
+</svg><figcaption>图5-1　OA⊥OB 时，A、B 两点速度都沿水平方向，沿杆分量相等</figcaption></div>
+
+<p><b>【第一步】求 A 点速度</b>（A 做匀速圆周运动，v<sub>A</sub> ⊥ OA）：</p>
+<div class="eq">v<sub>A</sub> = ω·r<sub>OA</sub> = 180 × 0.20 = <b>36 m/s</b>　（方向垂直 OA）</div>
+
+<p><b>【第二步】几何关系</b>：活塞沿 OB 所在的水平线运动。题设 OA ⊥ OB，则</p>
+<ul>
+<li>OA 竖直，v<sub>A</sub> ⊥ OA ⟹ <b>v<sub>A</sub> 沿水平方向，恰与 OB 平行</b>；</li>
+<li>OB = √<span class="rt">AB² − OA²</span> = √<span class="rt">0.4² − 0.2²</span> = 0.2√3 m；</li>
+<li>连杆 AB 与水平方向夹角 α：sinα = OA/AB = 0.2/0.4 = 0.5 ⟹ <b>α = 30°</b>。</li>
+</ul>
+
+<p><b>【第三步】沿杆分量相等</b>（连杆是刚性杆，长度不变）：</p>
+<div class="eq">v<sub>A</sub>·cos30° = v<sub>B</sub>·cos30°　⟹　<b>v<sub>B</sub> = v<sub>A</sub> = 36 m/s</b></div>
+<p>数值上：18√3 = 18√3，两边完全相同。<span class="key">此瞬间连杆做平动</span>（A、B 速度相同，杆的角速度为零），这正是 OA⊥OB 这一特殊位置的物理含义。</p>
+<div class="ans">答案：B（36 m/s）</div>
+<div class="tip"><b>易错点：</b>C 项 18√3 就是“只算了 v<sub>A</sub> 的沿杆分量就当成 v<sub>B</sub>”——漏掉了 v<sub>B</sub> 也要投影到杆上这一步。</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num multi">6</div><b>（多选）快艇渡河：v<sub>船</sub> &gt; v<sub>水</sub></b></div>
+<div class="stem">河宽 d = 240 m，水速 v<sub>水</sub> = 3 m/s，快艇静水速 v<sub>船</sub> = 5 m/s。判断：A 渡河时间可能为 60 s；B 最短时间渡河时航程 384 m；C 航程可能为 240 m；D 最短航程渡河时船头指向上游且与河岸夹角 53°。</div>
+
+<div class="fig"><svg viewBox="0 0 620 300" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a6" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#1d4ed8"/></marker>
+<marker id="a6r" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#dc2626"/></marker>
+<marker id="a6g" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#059669"/></marker></defs>
+<!-- 左图：最短时间 -->
+<rect x="30" y="60" width="240" height="150" fill="#eff6ff" stroke="#bfdbfe"/>
+<line x1="30" y1="60" x2="270" y2="60" stroke="#475569" stroke-width="2"/>
+<line x1="30" y1="210" x2="270" y2="210" stroke="#475569" stroke-width="2"/>
+<text x="34" y="228" font-size="12" fill="#475569">出发岸</text>
+<text x="90" y="50" font-size="12" fill="#475569">对岸　水流 →</text>
+<line x1="70" y1="210" x2="70" y2="90" stroke="#1d4ed8" stroke-width="2.4" marker-end="url(#a6)"/>
+<text x="30" y="150" font-size="12" fill="#1d4ed8">v船=5</text>
+<line x1="70" y1="90" x2="142" y2="90" stroke="#dc2626" stroke-width="2.4" marker-end="url(#a6r)"/>
+<text x="90" y="82" font-size="12" fill="#dc2626">v水=3</text>
+<line x1="70" y1="210" x2="150" y2="76" stroke="#059669" stroke-width="2.6" marker-end="url(#a6g)"/>
+<text x="152" y="130" font-size="12" fill="#059669">v合=√34</text>
+<text x="46" y="252" font-size="13" font-weight="bold">最短时间：船头⊥河岸</text>
+<text x="46" y="272" font-size="12.5">t=240/5=48 s，位移 x=144 m</text>
+<!-- 右图：最短位移 -->
+<rect x="340" y="60" width="240" height="150" fill="#eff6ff" stroke="#bfdbfe"/>
+<line x1="340" y1="60" x2="580" y2="60" stroke="#475569" stroke-width="2"/>
+<line x1="340" y1="210" x2="580" y2="210" stroke="#475569" stroke-width="2"/>
+<line x1="420" y1="210" x2="348" y2="114" stroke="#1d4ed8" stroke-width="2.4" marker-end="url(#a6)"/>
+<text x="340" y="150" font-size="12" fill="#1d4ed8">v船=5</text>
+<line x1="348" y1="114" x2="420" y2="114" stroke="#dc2626" stroke-width="2.4" marker-end="url(#a6r)"/>
+<text x="366" y="106" font-size="12" fill="#dc2626">v水=3</text>
+<line x1="420" y1="210" x2="420" y2="100" stroke="#059669" stroke-width="2.8" marker-end="url(#a6g)"/>
+<text x="426" y="160" font-size="12" fill="#059669">v合=4 ⊥岸</text>
+<path d="M420,190 A 20 20 0 0 0 405,183" fill="none" stroke="#b45309" stroke-width="1.6"/>
+<text x="376" y="196" font-size="11.5" fill="#b45309">53°</text>
+<text x="356" y="252" font-size="13" font-weight="bold">最短位移：v合 ⊥ 河岸</text>
+<text x="356" y="272" font-size="12.5">sinθ=3/5 → 船头偏上游 37°，与岸成 53°</text>
+</svg><figcaption>图6-1　v<sub>船</sub>&gt;v<sub>水</sub> 时两种极值情形的矢量三角形</figcaption></div>
+
+<p><b>【基础】</b>渡河时间只由<b>垂直河岸方向</b>的分速度决定：t = d / v<sub>⊥</sub>，而 v<sub>⊥</sub> ≤ v<sub>船</sub> = 5 m/s。</p>
+<div class="eq">t<sub>min</sub> = d / v<sub>船</sub> = 240 / 5 = <b>48 s</b>　（船头正对河岸时）</div>
+
+<p class="opt"><span class="rightopt">A 对：</span>要 t = 60 s，需 v<sub>⊥</sub> = 240/60 = 4 m/s &lt; 5 m/s，可行（船头偏转 37° 即可，偏上游或偏下游均可）。所有 t ≥ 48 s 的时间都能实现。</p>
+
+<p class="opt"><span class="wrongopt">B 错：</span>最短时间渡河时，沿岸被冲下的距离</p>
+<div class="eq">x = v<sub>水</sub>·t<sub>min</sub> = 3 × 48 = 144 m　⟹　航程 s = √<span class="rt">240² + 144²</span> = √<span class="rt">78336</span> ≈ <b>279.9 m ≠ 384 m</b></div>
+<p class="small">也可用合速度算：v<sub>合</sub> = √<span class="rt">5²+3²</span> = √34 m/s，s = √34 × 48 ≈ 279.9 m。</p>
+
+<p class="opt"><span class="rightopt">C 对：</span>航程的最小可能值就是河宽 240 m（合速度垂直河岸时）。因 v<sub>船</sub> = 5 &gt; v<sub>水</sub> = 3，船可以让静水速的逆流分量抵消水流：</p>
+<div class="eq">v<sub>船</sub>·sinθ = v<sub>水</sub> ⟹ sinθ = 3/5 = 0.6 ⟹ θ = 37°（船头偏离河岸法线 37°）</div>
+<p>此时合速度垂直河岸，航程 = 240 m，<b>可以实现</b>。</p>
+
+<p class="opt"><span class="rightopt">D 对：</span>由上式，船头指向<b>上游</b>，与法线成 37°，即与<b>河岸</b>夹角 = 90° − 37° = <b>53°</b>。此时 v<sub>合</sub> = √<span class="rt">5²−3²</span> = 4 m/s，t = 240/4 = 60 s（与 A 项自洽）。</p>
+<div class="ans">答案：ACD</div>
+<div class="tip"><b>结论卡：</b>当 v<sub>船</sub> &gt; v<sub>水</sub> 时，最短航程 = 河宽 d；当 v<sub>船</sub> &lt; v<sub>水</sub> 时，最短航程 &gt; d（见第 7 题）。两种情形的判据一定要先比较 v<sub>船</sub> 与 v<sub>水</sub>。</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num multi">7</div><b>（多选）小船渡河：v<sub>船</sub> &lt; v<sub>水</sub>（含暗礁约束）</b></div>
+<div class="stem">河宽 12 m，水速 v<sub>水</sub> = 4 m/s，划船最大速度 v<sub>船</sub> = 3 m/s。A 点与暗礁区域边缘连线与河岸的最大夹角 37°。判断：A 安全渡河最小划船速度 2.4 m/s；B 最短渡河时间 4 s；C 可以到达正对岸；D 最短位移 20 m。</div>
+
+<div class="fig"><svg viewBox="0 0 620 320" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a7" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#1d4ed8"/></marker>
+<marker id="a7r" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#dc2626"/></marker>
+<marker id="a7g" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#059669"/></marker></defs>
+<!-- 左：速度圆 -->
+<text x="24" y="26" font-size="13" font-weight="bold">速度矢量圆（v船 &lt; v水，合速度方向受限）</text>
+<line x1="40" y1="250" x2="300" y2="250" stroke="#475569" stroke-width="2"/>
+<text x="44" y="268" font-size="12" fill="#475569">河岸方向</text>
+<circle cx="40" cy="250" r="4" fill="#334155"/><text x="26" y="246" font-size="13">A</text>
+<line x1="40" y1="250" x2="200" y2="250" stroke="#dc2626" stroke-width="2.6" marker-end="url(#a7r)"/>
+<text x="112" y="270" font-size="12.5" fill="#dc2626">v水 = 4</text>
+<circle cx="200" cy="250" r="120" fill="none" stroke="#93c5fd" stroke-dasharray="5 4"/>
+<text x="238" y="146" font-size="12" fill="#1d4ed8">半径 = v船 = 3</text>
+<!-- 切线：最小偏角 -->
+<line x1="40" y1="250" x2="264" y2="130" stroke="#059669" stroke-width="2.4" marker-end="url(#a7g)"/>
+<line x1="200" y1="250" x2="245" y2="167" stroke="#1d4ed8" stroke-width="2.2" marker-end="url(#a7)"/>
+<text x="204" y="200" font-size="12" fill="#1d4ed8">v船</text>
+<path d="M200,250 A 22 22 0 0 0 216,235" fill="none" stroke="#b45309" stroke-width="1.4"/>
+<path d="M80,250 A 40 40 0 0 0 76,230" fill="none" stroke="#b45309" stroke-width="1.6"/>
+<text x="84" y="238" font-size="12" fill="#b45309">α</text>
+<text x="272" y="126" font-size="12" fill="#059669">v合</text>
+<text x="24" y="300" font-size="13">相切时 α 最大：sinα = v船/v水 = 3/4</text>
+<!-- 右：暗礁 -->
+<line x1="350" y1="250" x2="600" y2="250" stroke="#475569" stroke-width="2"/>
+<line x1="350" y1="90" x2="600" y2="90" stroke="#475569" stroke-width="2"/>
+<rect x="350" y="90" width="250" height="160" fill="#eff6ff" stroke="none"/>
+<line x1="350" y1="250" x2="600" y2="250" stroke="#475569" stroke-width="2"/>
+<text x="356" y="82" font-size="12" fill="#475569">对岸　　水流 →</text>
+<circle cx="380" cy="250" r="4" fill="#334155"/><text x="366" y="268" font-size="13">A</text>
+<ellipse cx="545" cy="160" rx="42" ry="30" fill="#fecaca" stroke="#dc2626"/>
+<text x="514" y="164" font-size="12" fill="#b91c1c">暗礁区</text>
+<line x1="380" y1="250" x2="596" y2="88" stroke="#b45309" stroke-width="1.8" stroke-dasharray="5 3"/>
+<path d="M420,250 A 40 40 0 0 0 412,225" fill="none" stroke="#b45309" stroke-width="1.6"/>
+<text x="424" y="240" font-size="12" fill="#b45309">37°</text>
+<line x1="380" y1="250" x2="470" y2="92" stroke="#059669" stroke-width="2.4" marker-end="url(#a7g)"/>
+<text x="452" y="130" font-size="12" fill="#059669">安全路线（α&gt;37°）</text>
+<text x="352" y="300" font-size="13">安全条件：v船 ≥ v水·sin37° = 2.4 m/s</text>
+</svg><figcaption>图7-1　左：合速度方向的极限由“圆的切线”决定；右：避开暗礁的临界路线</figcaption></div>
+
+<p><b>【关键判断】</b>v<sub>船</sub>(3) &lt; v<sub>水</sub>(4)，船<b>无法</b>使合速度垂直河岸，必然被冲向下游 ⟹ <span class="wrongopt">C 错</span>（到不了正对岸）。</p>
+
+<p class="opt"><span class="rightopt">B 对：</span>渡河时间由垂直河岸的分速度决定，水流方向平行河岸不影响过河时间：</p>
+<div class="eq">t<sub>min</sub> = d / v<sub>船</sub> = 12 / 3 = <b>4 s</b>　（船头正对河岸，此时垂直分速度最大）</div>
+
+<p class="opt"><span class="wrongopt">D 错：</span>最短位移即合速度与河岸夹角 α 最大。用矢量圆法：以 v<sub>水</sub> 矢量末端为圆心、v<sub>船</sub> = 3 为半径作圆，A 点向圆作<b>切线</b>时 α 最大：</p>
+<div class="eq">sinα<sub>max</sub> = v<sub>船</sub> / v<sub>水</sub> = 3/4 = 0.75</div>
+<div class="eq">s<sub>min</sub> = d / sinα<sub>max</sub> = 12 / 0.75 = <b>16 m</b>　（不是 20 m）</div>
+<p class="small">注：20 m 是误用 37°（12/0.6）得到的干扰值。</p>
+
+<p class="opt"><span class="rightopt">A 对：</span>暗礁区在下游，A 与暗礁边缘连线与河岸最大夹角 37°，所以航线与河岸夹角必须 <b>大于 37°</b> 才能从暗礁上游侧安全通过。设划船速度为 v，其合速度与河岸的最大夹角满足 sinα<sub>max</sub> = v / v<sub>水</sub>，要求：</p>
+<div class="eq">sinα<sub>max</sub> ≥ sin37°　⟹　v / 4 ≥ 0.6　⟹　<b>v ≥ 2.4 m/s</b></div>
+<p>即最小划船速度 v<sub>min</sub> = v<sub>水</sub>·sin37° = 4 × 0.6 = 2.4 m/s，此时船头方向<b>垂直于合速度</b>（相切条件）。</p>
+<div class="ans">答案：AB</div>
+<div class="tip"><b>核心技巧：</b>v<sub>船</sub> &lt; v<sub>水</sub> 时，"最短位移／最大偏角"一律用<b>矢量圆＋切线</b>，切点处 v<sub>船</sub> ⊥ v<sub>合</sub>，得 sinα<sub>max</sub> = v<sub>船</sub>/v<sub>水</sub>。</div>
+</div>
+
+<h2>题型 3 ｜ 平抛运动规律的应用（核心）</h2>
+
+<div class="tip"><b>平抛三组基本关系：</b>x = v₀t；y = ½gt²；v<sub>y</sub> = gt。<br>
+<b>两个重要角度关系：</b>位移偏角 tanα = y/x = gt/(2v₀)；速度偏角 tanθ = v<sub>y</sub>/v₀ = gt/v₀，故 <span class="key">tanθ = 2·tanα</span>。<br>
+<b>推论（"中点法则"）：</b>某点速度的反向延长线，必过该点与抛出点<b>水平位移的中点</b>所在的竖直线与抛出点水平线的交点。</div>
+
+<div class="q">
+<div class="qhead"><div class="num">8</div><b>半圆轨道内的两次平抛</b></div>
+<div class="stem">半圆形轨道 ACB 竖直固定在水平地面上，AB 是水平直径，C 是最低点，D 是 B 在地面上的投影，圆弧上 E 点有小孔。质量相同的甲、乙从 A 点<b>水平向左</b>以不同初速度抛出，甲落到 C 点，乙通过小孔 E 落在 D 点。判断 A 乙到 E 时速度反向延长线过 O；B 甲乙在 A 点速度之比 1:2；C 增大甲的初速度可垂直打在轨道上；D 重力平均功率甲比乙大。</div>
+
+<div class="fig"><svg viewBox="0 0 620 300" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a8" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#1d4ed8"/></marker></defs>
+<!-- 地面 -->
+<line x1="60" y1="240" x2="560" y2="240" stroke="#475569" stroke-width="2.4"/>
+<g stroke="#94a3b8" stroke-width="1">
+<line x1="70" y1="240" x2="60" y2="252"/><line x1="100" y1="240" x2="90" y2="252"/><line x1="130" y1="240" x2="120" y2="252"/>
+<line x1="160" y1="240" x2="150" y2="252"/><line x1="190" y1="240" x2="180" y2="252"/><line x1="220" y1="240" x2="210" y2="252"/>
+<line x1="250" y1="240" x2="240" y2="252"/><line x1="280" y1="240" x2="270" y2="252"/><line x1="310" y1="240" x2="300" y2="252"/>
+<line x1="340" y1="240" x2="330" y2="252"/><line x1="370" y1="240" x2="360" y2="252"/><line x1="400" y1="240" x2="390" y2="252"/>
+<line x1="430" y1="240" x2="420" y2="252"/><line x1="460" y1="240" x2="450" y2="252"/><line x1="490" y1="240" x2="480" y2="252"/>
+</g>
+<!-- 半圆 -->
+<path d="M180,120 A 120 120 0 0 0 420,120" fill="none" stroke="#334155" stroke-width="2.6"/>
+<line x1="180" y1="120" x2="420" y2="120" stroke="#334155" stroke-width="2" stroke-dasharray="6 4"/>
+<circle cx="300" cy="120" r="4" fill="#334155"/><text x="292" y="112" font-size="14">O</text>
+<circle cx="420" cy="120" r="5" fill="#334155"/><text x="428" y="116" font-size="14">A</text>
+<circle cx="180" cy="120" r="5" fill="#334155"/><text x="160" y="116" font-size="14">B</text>
+<circle cx="300" cy="240" r="5" fill="#334155"/><text x="300" y="264" font-size="14">C</text>
+<circle cx="180" cy="240" r="5" fill="#334155"/><text x="168" y="264" font-size="14">D</text>
+<line x1="180" y1="120" x2="180" y2="240" stroke="#94a3b8" stroke-dasharray="4 3"/>
+<text x="298" y="180" font-size="12" fill="#6b7280">R</text>
+<line x1="300" y1="120" x2="300" y2="240" stroke="#94a3b8" stroke-dasharray="4 3"/>
+<!-- 轨迹甲 A->C -->
+<path d="M420,120 Q360,120 300,240" fill="none" stroke="#dc2626" stroke-width="2.2"/>
+<text x="356" y="164" font-size="13" fill="#dc2626">甲</text>
+<!-- 轨迹乙 A->D -->
+<path d="M420,120 Q300,120 180,240" fill="none" stroke="#1d4ed8" stroke-width="2.2"/>
+<text x="238" y="180" font-size="13" fill="#1d4ed8">乙</text>
+<circle cx="216" cy="206" r="4.5" fill="#fff" stroke="#1d4ed8" stroke-width="2"/>
+<text x="216" y="200" font-size="13" fill="#1d4ed8">E</text>
+<line x1="420" y1="120" x2="366" y2="120" stroke="#059669" stroke-width="2.4" marker-end="url(#a8)"/>
+<text x="374" y="106" font-size="12" fill="#059669">v₀（水平向左）</text>
+<!-- 说明 -->
+<text x="452" y="176" font-size="12.5">甲：x=R, y=R</text>
+<text x="452" y="198" font-size="12.5">乙：x=2R, y=R</text>
+<text x="452" y="220" font-size="12.5" font-weight="bold" fill="#059669">下落高度相同 ⟹ 时间相同</text>
+</svg><figcaption>图8-1　圆与地面相切于 C，故 C(0,−R)、D(−R,−R)，两球下落高度都是 R</figcaption></div>
+
+<p><b>【建系】</b>取 O 为原点，半径 R。则 A(R, 0)，B(−R, 0)，C(0, −R)（最低点，圆与地面相切），D(−R, −R)。</p>
+
+<p><b>甲：A → C</b>　水平位移 R，竖直下落 R：</p>
+<div class="eq">R = ½g t₁² ⟹ t₁ = √<span class="rt">2R/g</span>；　v₁ = R / t₁ = √<span class="rt">gR/2</span></div>
+<p><b>乙：A → D</b>　水平位移 2R，竖直下落 R：</p>
+<div class="eq">R = ½g t₂² ⟹ <b>t₂ = t₁ = √<span class="rt">2R/g</span></b>；　v₂ = 2R / t₂ = 2√<span class="rt">gR/2</span></div>
+
+<p class="opt"><span class="rightopt">B 对：</span>v₁ : v₂ = R/t : 2R/t = <b>1 : 2</b>。</p>
+
+<p class="opt"><span class="wrongopt">A 错：</span>由"中点法则"，某点速度反向延长线交抛出点水平线于<b>水平位移中点</b>。乙落到 D 时水平位移 2R，中点在 A 左侧 R 处即 O 点——所以<b>只有到达 D 点时</b>速度反向延长线才过 O。E 点在 D 之前（水平位移 &lt; 2R），其反向延长线交点在 O 的<b>右侧</b>，不过 O。</p>
+<p class="small">定量核验：设 τ = t/t₁，则乙的坐标 x = R−2Rτ、y = −Rτ²，代入圆方程 x²+y²=R² 得 τ³+4τ−4 = 0，解得 τ ≈ 0.85 &lt; 1，确实还没到 D。</p>
+
+<p class="opt"><span class="wrongopt">C 错：</span>"垂直打在圆轨道上"意味着速度沿半径方向、其反向延长线过 O。由中点法则，这要求水平位移 = 2R，即落点横坐标 x = R − 2R = −R；而圆上横坐标为 −R 的点<b>只有 B 点</b>（y = 0，与抛出点同高），小球下落后 y &lt; 0，矛盾。所以<b>无论初速度多大都不可能垂直打在 ACB 上</b>。</p>
+
+<p class="opt"><span class="wrongopt">D 错：</span>重力平均功率</p>
+<div class="eq">P̄ = W<sub>G</sub> / t = mgh / t</div>
+<p>甲、乙质量相同、下落高度都是 R、运动时间也相同（t₁ = t₂），故 <b>P̄<sub>甲</sub> = P̄<sub>乙</sub></b>。</p>
+<div class="ans">答案：B</div>
+<div class="tip"><b>高频结论：</b>平抛中"速度反向延长线过某点"⟺ 该点是<b>水平位移的中点</b>；"垂直打在斜面/圆面上"是这条结论最常见的考法。</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num">9</div><b>跳台滑雪：平抛落到 30° 斜坡</b></div>
+<div class="stem">运动员从 a 处水平飞出做平抛，落在倾角 30° 的斜坡 b 处，ab 直线距离 40 m，g = 10 m/s²。判断：A 时间 2 s；B 离斜坡最远处时间 √2 s；C 初速度 10 m/s；D 离斜坡最大距离 2.5 m。</div>
+
+<div class="fig"><svg viewBox="0 0 620 300" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a9" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#1d4ed8"/></marker>
+<marker id="a9r" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#dc2626"/></marker></defs>
+<!-- 斜坡 -->
+<line x1="500" y1="70" x2="140" y2="278" stroke="#334155" stroke-width="2.6"/>
+<g stroke="#cbd5e1" stroke-width="1">
+<line x1="470" y1="87" x2="478" y2="100"/><line x1="430" y1="110" x2="438" y2="123"/><line x1="390" y1="133" x2="398" y2="146"/>
+<line x1="350" y1="156" x2="358" y2="169"/><line x1="310" y1="179" x2="318" y2="192"/><line x1="270" y1="202" x2="278" y2="215"/>
+<line x1="230" y1="225" x2="238" y2="238"/><line x1="190" y1="248" x2="198" y2="261"/>
+</g>
+<line x1="500" y1="70" x2="500" y2="278" stroke="#94a3b8" stroke-dasharray="4 3"/>
+<line x1="180" y1="278" x2="520" y2="278" stroke="#94a3b8" stroke-dasharray="4 3"/>
+<path d="M220,278 A 60 60 0 0 0 210,246" fill="none" stroke="#b45309" stroke-width="1.6"/>
+<text x="226" y="270" font-size="12.5" fill="#b45309">30°</text>
+<!-- a 点 -->
+<circle cx="500" cy="70" r="5" fill="#334155"/><text x="508" y="64" font-size="14">a</text>
+<line x1="500" y1="70" x2="440" y2="70" stroke="#1d4ed8" stroke-width="2.4" marker-end="url(#a9)"/>
+<text x="440" y="58" font-size="13" fill="#1d4ed8">v₀</text>
+<!-- 轨迹 -->
+<path d="M500,70 Q400,70 300,185" fill="none" stroke="#dc2626" stroke-width="2.4"/>
+<circle cx="300" cy="185" r="5" fill="#dc2626"/><text x="278" y="180" font-size="14" fill="#dc2626">b</text>
+<!-- ab 线与分解 -->
+<line x1="500" y1="70" x2="300" y2="185" stroke="#059669" stroke-width="2" stroke-dasharray="6 4"/>
+<text x="372" y="106" font-size="12.5" fill="#059669">ab = 40 m</text>
+<line x1="500" y1="70" x2="300" y2="70" stroke="#94a3b8" stroke-dasharray="3 3"/>
+<line x1="300" y1="70" x2="300" y2="185" stroke="#94a3b8" stroke-dasharray="3 3"/>
+<text x="356" y="64" font-size="12" fill="#6b7280">x = 40cos30° = 20√3</text>
+<text x="238" y="130" font-size="12" fill="#6b7280">y = 40sin30° = 20</text>
+<!-- 最远点 -->
+<circle cx="396" cy="102" r="4" fill="#b45309"/>
+<line x1="396" y1="102" x2="352" y2="127" stroke="#b45309" stroke-width="2" marker-end="url(#a9r)"/>
+<text x="300" y="122" font-size="11.5" fill="#b45309">d<tspan font-size="9">max</tspan>=2.5√3 m</text>
+<line x1="396" y1="102" x2="344" y2="72" stroke="#1d4ed8" stroke-width="2" marker-end="url(#a9)"/>
+<text x="322" y="66" font-size="11.5" fill="#1d4ed8">v ∥ 斜面</text>
+</svg><figcaption>图9-1　位移沿斜面 → 用位移分解定 t；离斜面最远 → 速度平行斜面</figcaption></div>
+
+<p><b>【第一步】位移分解（沿 ab 方向与斜面平行，与水平成 30°）</b></p>
+<div class="eq">x = L·cos30° = 40 × (√3/2) = 20√3 m　；　y = L·sin30° = 40 × 0.5 = <b>20 m</b></div>
+<p class="opt"><span class="rightopt">A 对：</span>由 y = ½gt²：</p>
+<div class="eq">20 = ½ × 10 × t² ⟹ t² = 4 ⟹ <b>t = 2 s</b></div>
+<p class="opt"><span class="wrongopt">C 错：</span>v₀ = x / t = 20√3 / 2 = <b>10√3 ≈ 17.3 m/s</b>（不是 10 m/s）。</p>
+
+<p><b>【第二步】离斜坡最远的条件：速度方向平行于斜面</b>（此时垂直斜面的分速度为零，垂直斜面方向的"位移"取极值）。</p>
+<div class="eq">tan30° = v<sub>y</sub> / v₀ ⟹ v<sub>y</sub> = 10√3 × (√3/3) = 10 m/s</div>
+<p class="opt"><span class="wrongopt">B 错：</span>t′ = v<sub>y</sub> / g = 10/10 = <b>1 s</b>（不是 √2 s）。</p>
+
+<p><b>【第三步】最大距离</b>——取 t′ = 1 s 时的位置，再把位移投影到<b>垂直斜面</b>方向：</p>
+<div class="eq">x′ = v₀t′ = 10√3 m　，　y′ = ½gt′² = 5 m</div>
+<div class="eq">d<sub>max</sub> = x′·sin30° − y′·cos30° = 10√3×0.5 − 5×(√3/2) = 5√3 − 2.5√3 = <b>2.5√3 ≈ 4.33 m</b></div>
+<p class="opt"><span class="wrongopt">D 错：</span>正确值为 2.5√3 m ≈ 4.3 m，而非 2.5 m。</p>
+<p class="small">通用公式：d<sub>max</sub> = v₀²·sinθ·tanθ / (2g)。代入 v₀=10√3、θ=30°：300×0.5×(√3/3)/20 = 2.5√3 ✓</p>
+<div class="ans">答案：A</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num">10</div><b>平抛后垂直撞击斜面</b></div>
+<div class="stem">以 v₀ = 10 m/s 水平抛出的物体，飞行一段时间后<b>垂直</b>撞在倾角 θ = 30° 的斜面上，g = 10 m/s²。判断：A 飞行时间 √3 s；B 撞击速度 10√3 m/s；C 位移 15√3 m；D 下落竖直距离 10 m。</div>
+
+<div class="fig"><svg viewBox="0 0 620 290" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a10" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#1d4ed8"/></marker>
+<marker id="a10r" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#dc2626"/></marker>
+<marker id="a10g" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#059669"/></marker></defs>
+<!-- 斜面 -->
+<line x1="120" y1="250" x2="470" y2="250" stroke="#475569" stroke-width="2"/>
+<line x1="180" y1="250" x2="450" y2="94" stroke="#334155" stroke-width="2.6"/>
+<path d="M240,250 A 60 60 0 0 0 236,220" fill="none" stroke="#b45309" stroke-width="1.6"/>
+<text x="246" y="242" font-size="12.5" fill="#b45309">30°</text>
+<g stroke="#cbd5e1" stroke-width="1">
+<line x1="140" y1="250" x2="130" y2="262"/><line x1="180" y1="250" x2="170" y2="262"/><line x1="220" y1="250" x2="210" y2="262"/>
+<line x1="260" y1="250" x2="250" y2="262"/><line x1="300" y1="250" x2="290" y2="262"/><line x1="340" y1="250" x2="330" y2="262"/>
+<line x1="380" y1="250" x2="370" y2="262"/><line x1="420" y1="250" x2="410" y2="262"/>
+</g>
+<!-- 抛出 -->
+<circle cx="130" cy="60" r="5" fill="#334155"/>
+<line x1="130" y1="60" x2="196" y2="60" stroke="#1d4ed8" stroke-width="2.4" marker-end="url(#a10)"/>
+<text x="150" y="50" font-size="13" fill="#1d4ed8">v₀ = 10 m/s</text>
+<path d="M130,60 Q250,60 320,169" fill="none" stroke="#dc2626" stroke-width="2.4"/>
+<circle cx="320" cy="169" r="5" fill="#dc2626"/>
+<!-- 撞击速度 垂直斜面 -->
+<line x1="320" y1="169" x2="368" y2="197" stroke="#059669" stroke-width="2.8" marker-end="url(#a10g)"/>
+<text x="356" y="220" font-size="13" fill="#059669">v ⊥ 斜面</text>
+<path d="M334,177 l8,-14 l14,8" fill="none" stroke="#b45309" stroke-width="1.5"/>
+<!-- 速度分解三角形 -->
+<line x1="470" y1="70" x2="530" y2="70" stroke="#1d4ed8" stroke-width="2.4" marker-end="url(#a10)"/>
+<text x="484" y="62" font-size="12" fill="#1d4ed8">v₀=10</text>
+<line x1="470" y1="70" x2="470" y2="174" stroke="#dc2626" stroke-width="2.4" marker-end="url(#a10r)"/>
+<text x="410" y="130" font-size="12" fill="#dc2626">v<tspan font-size="10">y</tspan>=10√3</text>
+<line x1="470" y1="70" x2="522" y2="164" stroke="#059669" stroke-width="2.6" marker-end="url(#a10g)"/>
+<line x1="530" y1="70" x2="530" y2="174" stroke="#94a3b8" stroke-dasharray="3 3"/>
+<line x1="470" y1="174" x2="530" y2="174" stroke="#94a3b8" stroke-dasharray="3 3"/>
+<path d="M470,102 A 32 32 0 0 0 486,96" fill="none" stroke="#b45309" stroke-width="1.5"/>
+<text x="478" y="112" font-size="11.5" fill="#b45309">30°</text>
+<text x="446" y="206" font-size="12.5">tan30° = v₀ / v<tspan font-size="10">y</tspan></text>
+<text x="446" y="228" font-size="12.5" font-weight="bold" fill="#059669">v = 2v₀ = 20 m/s</text>
+</svg><figcaption>图10-1　垂直撞击 ⟹ 速度沿斜面法线 ⟹ v₀ 与 v<sub>y</sub> 的夹角关系由 30° 确定</figcaption></div>
+
+<p><b>【关键几何】</b>速度垂直斜面 ⟺ 速度沿斜面法线 ⟺ 速度<b>沿斜面方向的分量为零</b>。斜面倾角 30°，法线与竖直方向成 30°，故末速度与<b>竖直方向</b>成 30°、与水平方向成 60°。等价地：</p>
+<div class="eq">tan30° = v₀ / v<sub>y</sub>　⟹　v<sub>y</sub> = v₀ / tan30° = 10 × √3 = <b>10√3 m/s</b></div>
+
+<p class="opt"><span class="rightopt">A 对：</span>t = v<sub>y</sub> / g = 10√3 / 10 = <b>√3 s</b>。</p>
+<p class="opt"><span class="wrongopt">B 错：</span>撞击速率</p>
+<div class="eq">v = √<span class="rt">v₀² + v<sub>y</sub>²</span> = √<span class="rt">100 + 300</span> = <b>20 m/s</b>　（也可由 v = v₀/sin30° = 20 直接得）</div>
+<p class="opt"><span class="wrongopt">D 错：</span>竖直下落距离</p>
+<div class="eq">y = ½gt² = ½ × 10 × (√3)² = <b>15 m</b>　（不是 10 m）</div>
+<p class="opt"><span class="wrongopt">C 错：</span>水平位移 x = v₀t = 10√3 m，总位移</p>
+<div class="eq">s = √<span class="rt">(10√3)² + 15²</span> = √<span class="rt">300 + 225</span> = √<span class="rt">525</span> = 5√21 ≈ <b>22.9 m</b>　（不是 15√3 ≈ 26 m）</div>
+<div class="ans">答案：A</div>
+<div class="tip"><b>两种"斜面"模型别混：</b><br>
+① <b>落到斜面上</b>（位移沿斜面）：tanθ = y/x = gt/(2v₀)；<br>
+② <b>垂直打在斜面上</b>（速度⊥斜面）：tanθ = v₀/v<sub>y</sub>。<br>
+一个用位移比，一个用速度比，两式相差因子 2，务必分清。</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num">11</div><b>排球扣杀的临界范围</b></div>
+<div class="stem">场地长 l = 18 m，球网高 h = 2 m。在<b>右侧场地距网 3 m</b> 处于离地 h₁ = 2.45 m 高度水平击出球，要保证球<b>过网</b>且<b>落在对方场地内</b>，求初速度范围。</div>
+
+<div class="fig"><svg viewBox="0 0 620 260" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a11" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#1d4ed8"/></marker></defs>
+<line x1="40" y1="210" x2="580" y2="210" stroke="#475569" stroke-width="2.4"/>
+<!-- 网 -->
+<line x1="420" y1="210" x2="420" y2="130" stroke="#334155" stroke-width="3"/>
+<rect x="414" y="130" width="12" height="80" fill="#e2e8f0" stroke="#334155"/>
+<text x="428" y="126" font-size="12.5">网高 2 m</text>
+<!-- 击球点 -->
+<circle cx="510" cy="112" r="5" fill="#dc2626"/>
+<line x1="510" y1="112" x2="450" y2="112" stroke="#1d4ed8" stroke-width="2.4" marker-end="url(#a11)"/>
+<text x="470" y="102" font-size="12.5" fill="#1d4ed8">v</text>
+<line x1="510" y1="112" x2="510" y2="210" stroke="#94a3b8" stroke-dasharray="3 3"/>
+<text x="516" y="170" font-size="12" fill="#6b7280">2.45 m</text>
+<text x="440" y="228" font-size="12" fill="#6b7280">3 m</text>
+<line x1="420" y1="220" x2="510" y2="220" stroke="#6b7280" stroke-width="1"/>
+<!-- 场地 -->
+<line x1="150" y1="220" x2="420" y2="220" stroke="#6b7280" stroke-width="1"/>
+<text x="256" y="238" font-size="12" fill="#6b7280">对方半场 9 m</text>
+<line x1="150" y1="210" x2="150" y2="188" stroke="#dc2626" stroke-width="2.4"/>
+<text x="118" y="182" font-size="12" fill="#dc2626">底线</text>
+<!-- 轨迹 -->
+<path d="M510,112 Q470,112 420,146" fill="none" stroke="#059669" stroke-width="2.2"/>
+<path d="M420,146 Q330,206 296,210" fill="none" stroke="#059669" stroke-width="2.2" stroke-dasharray="5 3"/>
+<text x="318" y="176" font-size="12" fill="#059669">v 偏小：刚好擦网</text>
+<path d="M510,112 Q380,112 150,210" fill="none" stroke="#b45309" stroke-width="2.2"/>
+<text x="176" y="146" font-size="12" fill="#b45309">v 偏大：落在底线</text>
+</svg><figcaption>图11-1　两个临界：①恰好过网（下落 0.45 m 用了 3 m）；②恰好落在底线（水平 12 m）</figcaption></div>
+
+<p><b>【临界一：恰好过网】</b>球到达网的正上方时下落高度不能超过 2.45 − 2 = 0.45 m。<br>
+到达网处所需时间 t₁ = 3 / v，此期间下落：</p>
+<div class="eq">½g t₁² &lt; 0.45　⟹　5 × (3/v)² &lt; 0.45　⟹　45 / v² &lt; 0.45　⟹　v² &gt; 100</div>
+<div class="eq"><b>v &gt; 10 m/s</b></div>
+
+<p><b>【临界二：不出界】</b>球落地时下落 2.45 m，落地总时间：</p>
+<div class="eq">2.45 = ½ × 10 × t² ⟹ t² = 0.49 ⟹ <b>t = 0.7 s</b></div>
+<p>水平射程不得超过 3 m（到网）+ 9 m（对方半场，18/2 = 9 m）= 12 m：</p>
+<div class="eq">v × 0.7 &lt; 12　⟹　<b>v &lt; 120/7 ≈ 17.1 m/s</b></div>
+
+<div class="eq">综合：<b>10 m/s &lt; v &lt; 120/7 m/s</b></div>
+<div class="ans">答案：A</div>
+<div class="tip"><b>易错点：</b>① 对方半场是 18/2 = 9 m，不是 18 m；② 过网判据比较的是"<b>到网处的下落高度</b>"，不是"落点位置"；③ 两个临界一个给下限、一个给上限，缺一不可（故 C、D 都只答对一半）。</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num multi">12</div><b>（多选）斜面内的圆周运动 + "类平抛"</b></div>
+<div class="stem">两个倾角均为 30° 的光滑斜面，正方形 ABCD 边长 2L，abcd 边长未知；a 是 CD 中点，O 是 ABCD 中心，a、C、b 共线。质量 m 的小球用长 L 的细线系于 O，在 a 点获得沿 ab 方向、大小 v<sub>a</sub> = 2√(gL) 的初速度，绕 O 在斜面内做圆周运动；再次运动到 a 点时剪断细线，此后小球沿斜面 abcd 运动并从 c 点离开。判断 A 剪断前 a 点绳张力 4mg；B c 点速度 2√(5gL)；C abcd 边长 14L；D 从 a 到 c 用时 8√(L/g)。</div>
+
+<div class="fig"><svg viewBox="0 0 620 330" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a12" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#1d4ed8"/></marker>
+<marker id="a12r" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#dc2626"/></marker></defs>
+<text x="20" y="22" font-size="13" font-weight="bold">正视斜面（沿斜面向下 = 图中向下）</text>
+<!-- 正方形 ABCD -->
+<rect x="40" y="45" width="150" height="150" fill="#f1f5f9" stroke="#334155" stroke-width="2"/>
+<text x="30" y="42" font-size="13">A</text><text x="192" y="42" font-size="13">B</text>
+<text x="192" y="212" font-size="13">C</text><text x="30" y="212" font-size="13">D</text>
+<circle cx="115" cy="120" r="75" fill="none" stroke="#1d4ed8" stroke-width="1.8" stroke-dasharray="5 4"/>
+<circle cx="115" cy="120" r="3.5" fill="#334155"/><text x="120" y="114" font-size="13">O</text>
+<line x1="115" y1="120" x2="115" y2="195" stroke="#334155" stroke-width="1.6"/>
+<text x="120" y="164" font-size="12" fill="#475569">L</text>
+<circle cx="115" cy="195" r="5" fill="#dc2626"/><text x="104" y="216" font-size="13" fill="#dc2626">a</text>
+<text x="52" y="70" font-size="12" fill="#475569">边长 2L</text>
+<!-- a点受力 -->
+<line x1="115" y1="195" x2="115" y2="140" stroke="#059669" stroke-width="2.2" marker-end="url(#a12)"/>
+<text x="76" y="146" font-size="11.5" fill="#059669">T（指向O）</text>
+<line x1="115" y1="195" x2="115" y2="250" stroke="#dc2626" stroke-width="2.2" marker-end="url(#a12r)"/>
+<text x="120" y="244" font-size="11.5" fill="#dc2626">mg sin30°</text>
+<line x1="115" y1="195" x2="188" y2="195" stroke="#1d4ed8" stroke-width="2.2" marker-end="url(#a12)"/>
+<text x="140" y="188" font-size="11.5" fill="#1d4ed8">v<tspan font-size="9">a</tspan></text>
+<text x="24" y="286" font-size="12.5">a 是圆周<b>最低点</b>（沿斜面方向最低）</text>
+<text x="24" y="308" font-size="12.5" font-weight="bold">T = mv<tspan font-size="9">a</tspan>²/L + mg sin30° = 4.5mg</text>
+<!-- 第二斜面 -->
+<rect x="270" y="45" width="230" height="230" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
+<text x="258" y="42" font-size="13" fill="#dc2626">a</text><text x="504" y="42" font-size="13">b</text>
+<text x="504" y="292" font-size="13">c</text><text x="258" y="292" font-size="13">d</text>
+<circle cx="270" cy="45" r="5" fill="#dc2626"/>
+<circle cx="500" cy="275" r="5" fill="#dc2626"/>
+<line x1="270" y1="45" x2="360" y2="45" stroke="#1d4ed8" stroke-width="2.4" marker-end="url(#a12)"/>
+<text x="300" y="36" font-size="12" fill="#1d4ed8">v<tspan font-size="9">a</tspan> = 2√(gL)</text>
+<line x1="270" y1="45" x2="270" y2="130" stroke="#dc2626" stroke-width="2.4" marker-end="url(#a12r)"/>
+<text x="276" y="112" font-size="12" fill="#dc2626">a′ = g sin30° = g/2</text>
+<path d="M270,45 Q400,45 500,275" fill="none" stroke="#059669" stroke-width="2.6"/>
+<text x="386" y="150" font-size="12.5" fill="#059669">类平抛（抛物线）</text>
+<line x1="270" y1="292" x2="500" y2="292" stroke="#6b7280"/>
+<text x="352" y="310" font-size="12.5">边长 s = 16L</text>
+<!-- 侧视 -->
+<line x1="540" y1="240" x2="600" y2="240" stroke="#475569" stroke-width="1.6"/>
+<path d="M540,240 L600,240 L600,205 z" fill="#e2e8f0" stroke="#475569"/>
+<text x="562" y="236" font-size="10" fill="#b45309">30°</text>
+<text x="530" y="262" font-size="11" fill="#6b7280">侧视：等效重力</text>
+<text x="530" y="278" font-size="11" fill="#6b7280">g′ = g sin30°</text>
+</svg><figcaption>图12-1　左：斜面内圆周运动，a 为"最低点"；右：剪断线后在光滑斜面上做类平抛（a→c 为对角线）</figcaption></div>
+
+<p><b>【模型转换】</b>光滑斜面内的运动，只有沿斜面的重力分量起作用，相当于一个"等效重力场"：</p>
+<div class="eq">g′ = g·sin30° = <b>g/2</b>　（方向：沿斜面向下）</div>
+
+<p><b>A 项 —— a 点的绳张力。</b>正方形 ABCD 边长 2L，O 是中心，a 是 CD 中点 ⟹ Oa ⊥ CD 且 Oa = L（即圆恰好与四边相切于中点）。由于 CD 是水平边（AD、BC 沿最大坡度方向），a 位于 O 的<b>正下坡方向</b>，是圆周运动的"最低点"。小球回到 a 点时速率仍为 v<sub>a</sub>（斜面光滑、同一点、机械能守恒）。沿斜面对 a 点列向心力方程：</p>
+<div class="eq">T − mg·sin30° = m v<sub>a</sub>² / L</div>
+<div class="eq">T = m(4gL)/L + 0.5mg = 4mg + 0.5mg = <b>4.5mg</b>　⟹　<span class="wrongopt">A 错（不是 4mg，漏了重力分量）</span></div>
+
+<p><b>剪断细线后：类平抛。</b>初速度 v<sub>a</sub> 沿 ab（水平方向），加速度 g′ = g/2 沿 ad（下坡方向），二者垂直 ⟹ 标准"类平抛"。设正方形 abcd 边长为 s，小球从 a 运动到<b>对角</b> c，则两方向位移都等于 s：</p>
+<div class="eq">沿 ab：s = v<sub>a</sub>·t　　沿 ad：s = ½·(g/2)·t² = g t²/4</div>
+<p>两式相等：</p>
+<div class="eq">v<sub>a</sub>t = g t²/4 ⟹ t = 4v<sub>a</sub>/g = 4 × 2√<span class="rt">gL</span> / g = <b>8√<span class="rt">L/g</span></b>　⟹　<span class="rightopt">D 对</span></div>
+
+<p><b>C 项 —— 边长：</b></p>
+<div class="eq">s = v<sub>a</sub>·t = 2√<span class="rt">gL</span> × 8√<span class="rt">L/g</span> = <b>16L</b>　⟹　<span class="wrongopt">C 错（不是 14L）</span></div>
+
+<p><b>B 项 —— c 点速度：</b></p>
+<div class="eq">v<sub>∥</sub> = v<sub>a</sub> = 2√<span class="rt">gL</span>　；　v<sub>⊥</sub> = (g/2)·t = (g/2)×8√<span class="rt">L/g</span> = 4√<span class="rt">gL</span></div>
+<div class="eq">v<sub>c</sub> = √<span class="rt">(2√(gL))² + (4√(gL))²</span> = √<span class="rt">4gL + 16gL</span> = √<span class="rt">20gL</span> = <b>2√<span class="rt">5gL</span></b>　⟹　<span class="rightopt">B 对</span></div>
+<p class="small">校验能量：½mv<sub>c</sub>² − ½mv<sub>a</sub>² = ½m(20gL−4gL) = 8mgL；重力做功 = mg·sin30°·s = mg×0.5×16L = 8mgL ✓ 完全吻合。</p>
+<p class="small">另可校验小球能完成圆周运动：最高点 v<sub>顶</sub>² = v<sub>a</sub>² − 2g′(2L) = 4gL − 2gL = 2gL &gt; g′L = 0.5gL ✓</p>
+<div class="ans">答案：BD</div>
+<div class="tip"><b>通法：</b>光滑斜面内的一切"竖直面内圆周运动 / 平抛"问题，把 g 换成 g sinα 后，公式<b>原封不动</b>照搬。这是本题的全部窍门。</div>
+</div>
+
+<h2>题型 4 ｜ 斜抛运动分析</h2>
+
+<div class="tip"><b>斜抛拆解：</b>水平方向匀速 v₀cosθ；竖直方向竖直上抛 v₀sinθ。<br>
+<b>对称性：</b>最高点竖直分速度为 0；上升与下降（回到同一高度）时间相等、速率相等。<br>
+<b>关键公式：</b>射高 H = v₀²sin²θ/(2g)；总时间（同高度）t = 2v₀sinθ/g；射程 x = v₀²sin2θ/g。</div>
+
+<div class="q">
+<div class="qhead"><div class="num">13</div><b>三条最高点等高的高尔夫球轨迹</b></div>
+<div class="stem">甲、乙、丙从同一点 O 沿不同方向斜向上击出的球分别落在水平地面上的 A、B、C，<b>三条路径的最高点在同一水平面内</b>，不计空气阻力。判断：A 乙落地速率最大；B 丙在空中运动时间最短；C 三球初速度<b>竖直分量</b>相等；D 三球初速度<b>水平分量</b>相等。</div>
+
+<div class="fig"><svg viewBox="0 0 620 260" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a13" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#1d4ed8"/></marker></defs>
+<line x1="40" y1="210" x2="580" y2="210" stroke="#475569" stroke-width="2.4"/>
+<g stroke="#cbd5e1" stroke-width="1">
+<line x1="60" y1="210" x2="50" y2="222"/><line x1="120" y1="210" x2="110" y2="222"/><line x1="180" y1="210" x2="170" y2="222"/>
+<line x1="240" y1="210" x2="230" y2="222"/><line x1="300" y1="210" x2="290" y2="222"/><line x1="360" y1="210" x2="350" y2="222"/>
+<line x1="420" y1="210" x2="410" y2="222"/><line x1="480" y1="210" x2="470" y2="222"/><line x1="540" y1="210" x2="530" y2="222"/>
+</g>
+<line x1="40" y1="70" x2="580" y2="70" stroke="#b45309" stroke-width="1.6" stroke-dasharray="7 5"/>
+<text x="46" y="62" font-size="12.5" fill="#b45309">三条轨迹最高点等高 ⟹ 竖直分量相同</text>
+<!-- O 点在右 -->
+<circle cx="540" cy="210" r="5" fill="#334155"/><text x="546" y="230" font-size="13">O</text>
+<path d="M540,210 Q330,-60 100,210" fill="none" stroke="#dc2626" stroke-width="2.2"/>
+<path d="M540,210 Q400,-20 240,210" fill="none" stroke="#1d4ed8" stroke-width="2.2"/>
+<path d="M540,210 Q450,10 350,210" fill="none" stroke="#059669" stroke-width="2.2"/>
+<circle cx="100" cy="210" r="4.5" fill="#dc2626"/><text x="92" y="230" font-size="13">A</text>
+<circle cx="240" cy="210" r="4.5" fill="#1d4ed8"/><text x="232" y="230" font-size="13">B</text>
+<circle cx="350" cy="210" r="4.5" fill="#059669"/><text x="342" y="230" font-size="13">C</text>
+<text x="180" y="96" font-size="13" fill="#dc2626">甲</text>
+<text x="330" y="86" font-size="13" fill="#1d4ed8">乙</text>
+<text x="446" y="98" font-size="13" fill="#059669">丙</text>
+<!-- 初速分解 -->
+<line x1="540" y1="210" x2="470" y2="150" stroke="#dc2626" stroke-width="2" marker-end="url(#a13)"/>
+<line x1="540" y1="210" x2="512" y2="146" stroke="#059669" stroke-width="2" marker-end="url(#a13)"/>
+<text x="426" y="188" font-size="11.5" fill="#6b7280">v₀y 相同、v₀x 不同</text>
+</svg><figcaption>图13-1　最高点等高 ⟹ v<sub>0y</sub> 相同 ⟹ 飞行时间相同；射程大者 v<sub>0x</sub> 大、落地速率大</figcaption></div>
+
+<p><b>【核心突破口】三条轨迹最高点在同一水平面</b> ⟹ 射高 H 相同。竖直方向是竖直上抛：</p>
+<div class="eq">H = v<sub>0y</sub>² / (2g)　⟹　H 相同 ⟹ <b>v<sub>0y</sub> = √<span class="rt">2gH</span> 相同</b>　⟹　<span class="rightopt">C 对</span></div>
+
+<p class="opt"><span class="wrongopt">B 错：</span>落回同一水平地面，飞行时间</p>
+<div class="eq">t = 2v<sub>0y</sub> / g　⟹　三球 <b>时间完全相同</b>，不存在"最短"。</div>
+
+<p class="opt"><span class="wrongopt">D 错：</span>时间相同而水平射程 OA &gt; OB &gt; OC，由 x = v<sub>0x</sub>·t 知</p>
+<div class="eq">v<sub>0x甲</sub> &gt; v<sub>0x乙</sub> &gt; v<sub>0x丙</sub>　（水平分量<b>不</b>相等）</div>
+
+<p class="opt"><span class="wrongopt">A 错：</span>落地速率（落回抛出高度，由对称性等于初速率）</p>
+<div class="eq">v = √<span class="rt">v<sub>0x</sub>² + v<sub>0y</sub>²</span>，v<sub>0y</sub> 相同 ⟹ v<sub>0x</sub> 最大者速率最大 ⟹ <b>甲最大</b>（不是乙）。</div>
+<div class="ans">答案：C</div>
+<div class="tip"><b>思维模板：</b>斜抛题看到"最高点等高"就写 v<sub>0y</sub> 相同；看到"落地时间相同"也是 v<sub>0y</sub> 相同；看到"射程"再去比 v<sub>0x</sub>。竖直、水平两条线索<b>永远分开处理</b>。</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num calc">14</div><b>桃子落屋顶 → 沿屋顶滑行 → 斜抛落地（多过程计算题）</b></div>
+<div class="stem">m = 0.1 kg 的桃子自由下落 h = 1.25 m 落到屋顶 c 点，碰后瞬间速度是碰前的 3/5、方向沿屋顶向下；沿屋顶滑到末端 d 点后做斜抛。cd 长 L₀ = 6.75 m，与水平面夹角 θ = 37°，d 点离地 H = 3.05 m，动摩擦因数 μ = 0.5。求：(1) v<sub>c</sub>；(2) c→d 时间 t₀；(3) 落地点与 d 的水平距离 L。</div>
+
+<div class="fig"><svg viewBox="0 0 620 320" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a14" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#1d4ed8"/></marker>
+<marker id="a14r" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#dc2626"/></marker></defs>
+<line x1="40" y1="286" x2="580" y2="286" stroke="#475569" stroke-width="2.4"/>
+<g stroke="#cbd5e1" stroke-width="1">
+<line x1="60" y1="286" x2="50" y2="298"/><line x1="140" y1="286" x2="130" y2="298"/><line x1="220" y1="286" x2="210" y2="298"/>
+<line x1="300" y1="286" x2="290" y2="298"/><line x1="380" y1="286" x2="370" y2="298"/><line x1="460" y1="286" x2="450" y2="298"/>
+<line x1="540" y1="286" x2="530" y2="298"/>
+</g>
+<!-- 屋顶 -->
+<line x1="430" y1="60" x2="200" y2="190" stroke="#334155" stroke-width="3"/>
+<line x1="430" y1="60" x2="430" y2="130" stroke="#334155" stroke-width="2"/>
+<text x="440" y="56" font-size="14">c</text>
+<circle cx="430" cy="60" r="5" fill="#dc2626"/>
+<circle cx="200" cy="190" r="5" fill="#dc2626"/><text x="180" y="184" font-size="14">d</text>
+<!-- 自由落体 -->
+<line x1="430" y1="10" x2="430" y2="52" stroke="#1d4ed8" stroke-width="2.4" marker-end="url(#a14)"/>
+<text x="438" y="30" font-size="12" fill="#1d4ed8">h = 1.25 m 自由落体</text>
+<!-- 37度 -->
+<line x1="200" y1="190" x2="330" y2="190" stroke="#94a3b8" stroke-dasharray="4 3"/>
+<path d="M250,190 A 50 50 0 0 0 244,163" fill="none" stroke="#b45309" stroke-width="1.6"/>
+<text x="256" y="182" font-size="12" fill="#b45309">37°</text>
+<text x="286" y="140" font-size="12" fill="#475569">L₀ = 6.75 m</text>
+<!-- H -->
+<line x1="200" y1="190" x2="200" y2="286" stroke="#94a3b8" stroke-dasharray="4 3"/>
+<text x="150" y="244" font-size="12" fill="#6b7280">H = 3.05 m</text>
+<!-- 斜抛 -->
+<path d="M200,190 Q160,214 128,286" fill="none" stroke="#059669" stroke-width="2.4"/>
+<circle cx="128" cy="286" r="4.5" fill="#059669"/>
+<line x1="200" y1="286" x2="128" y2="286" stroke="#059669" stroke-width="2"/>
+<text x="96" y="306" font-size="12" fill="#059669">L = ?</text>
+<line x1="200" y1="190" x2="160" y2="214" stroke="#1d4ed8" stroke-width="2.4" marker-end="url(#a14)"/>
+<text x="140" y="206" font-size="12" fill="#1d4ed8">v<tspan font-size="9">d</tspan></text>
+<!-- 受力 -->
+<text x="450" y="150" font-size="13" font-weight="bold">c→d 沿屋顶受力：</text>
+<text x="450" y="176" font-size="12.5" fill="#dc2626">下滑：mg sinθ = 0.6mg</text>
+<text x="450" y="200" font-size="12.5" fill="#1d4ed8">阻碍：μmg cosθ = 0.4mg</text>
+<text x="450" y="226" font-size="13" font-weight="bold" fill="#059669">a = 2 m/s²（沿屋顶向下）</text>
+<text x="450" y="256" font-size="12.5">v<tspan font-size="9">c</tspan>=3 → v<tspan font-size="9">d</tspan>=6 m/s</text>
+</svg><figcaption>图14-1　自由落体 → 碰撞突变 → 斜面匀加速 → 斜下抛，四段过程串联</figcaption></div>
+
+<p><b>(1) 求 v<sub>c</sub></b>　自由下落 h = 1.25 m 到达 c 点前瞬间：</p>
+<div class="eq">v = √<span class="rt">2gh</span> = √<span class="rt">2 × 10 × 1.25</span> = <b>5 m/s</b></div>
+<div class="eq">v<sub>c</sub> = (3/5) × 5 = <b>3 m/s</b>　（方向沿屋顶向下）</div>
+
+<p><b>(2) 求 t₀</b>　c→d 段沿屋顶下滑，受重力沿面分量与滑动摩擦力：</p>
+<div class="eq">ma = mg·sinθ − μ·mg·cosθ</div>
+<div class="eq">a = 10 × 0.6 − 0.5 × 10 × 0.8 = 6 − 4 = <b>2 m/s²</b>　（沿屋顶向下，匀加速）</div>
+<p>由 L₀ = v<sub>c</sub>t₀ + ½at₀²：</p>
+<div class="eq">6.75 = 3t₀ + t₀²　⟹　t₀² + 3t₀ − 6.75 = 0</div>
+<div class="eq">t₀ = [−3 + √<span class="rt">9 + 27</span>] / 2 = (−3 + 6)/2 = <b>1.5 s</b>　（负根舍去）</div>
+
+<p><b>(3) 求水平距离 L</b>　先求 d 点速度：</p>
+<div class="eq">v<sub>d</sub> = v<sub>c</sub> + a t₀ = 3 + 2 × 1.5 = <b>6 m/s</b>　（沿屋顶向下，与水平成 37°）</div>
+<p>分解（斜向下抛）：</p>
+<div class="eq">v<sub>dx</sub> = 6 cos37° = 6 × 0.8 = 4.8 m/s　；　v<sub>dy</sub> = 6 sin37° = 6 × 0.6 = 3.6 m/s（向下）</div>
+<p>竖直方向：初速度向下 3.6 m/s，下落 H = 3.05 m：</p>
+<div class="eq">H = v<sub>dy</sub>t + ½g t²　⟹　3.05 = 3.6t + 5t²</div>
+<div class="eq">5t² + 3.6t − 3.05 = 0　⟹　t = [−3.6 + √<span class="rt">12.96 + 61</span>] / 10 = (−3.6 + 8.6)/10 = <b>0.5 s</b></div>
+<p>水平方向匀速：</p>
+<div class="eq">L = v<sub>dx</sub>·t = 4.8 × 0.5 = <b>2.4 m</b></div>
+<div class="ans">答案：(1) v<sub>c</sub> = 3 m/s　(2) t₀ = 1.5 s　(3) L = 2.4 m</div>
+<div class="tip"><b>多过程题的通用步骤：</b>①分段（自由落体｜碰撞｜斜面滑行｜斜抛）；②每段画受力图定加速度；③<b>上一段的末速度 = 下一段的初速度</b>（碰撞处按题给突变关系处理）；④斜抛段一定要先把 v<sub>d</sub> 分解成水平、竖直两个分量。</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num calc">15</div><b>高处斜向上抛出（基本计算）</b></div>
+<div class="stem">在离地面 3.2 m 高处，将 1 kg 的小球以 v₀ = 10 m/s、与水平方向成 37° 斜向上抛出，不计空气阻力。求：(1) 从抛出点上升的最大高度；(2) 空中运动时间；(3) 落地点与抛出点的水平距离。</div>
+
+<div class="fig"><svg viewBox="0 0 620 300" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a15" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#1d4ed8"/></marker>
+<marker id="a15r" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#dc2626"/></marker></defs>
+<line x1="40" y1="260" x2="580" y2="260" stroke="#475569" stroke-width="2.4"/>
+<g stroke="#cbd5e1" stroke-width="1">
+<line x1="60" y1="260" x2="50" y2="272"/><line x1="140" y1="260" x2="130" y2="272"/><line x1="220" y1="260" x2="210" y2="272"/>
+<line x1="300" y1="260" x2="290" y2="272"/><line x1="380" y1="260" x2="370" y2="272"/><line x1="460" y1="260" x2="450" y2="272"/>
+<line x1="540" y1="260" x2="530" y2="272"/>
+</g>
+<circle cx="90" cy="180" r="5" fill="#dc2626"/>
+<line x1="90" y1="180" x2="90" y2="260" stroke="#94a3b8" stroke-dasharray="4 3"/>
+<text x="30" y="228" font-size="12" fill="#6b7280">3.2 m</text>
+<line x1="90" y1="180" x2="164" y2="132" stroke="#1d4ed8" stroke-width="2.6" marker-end="url(#a15)"/>
+<text x="126" y="122" font-size="13" fill="#1d4ed8">v₀=10 m/s</text>
+<line x1="90" y1="180" x2="190" y2="180" stroke="#94a3b8" stroke-dasharray="4 3"/>
+<path d="M136,180 A 46 46 0 0 0 130,157" fill="none" stroke="#b45309" stroke-width="1.6"/>
+<text x="142" y="174" font-size="12" fill="#b45309">37°</text>
+<!-- 轨迹 -->
+<path d="M90,180 Q230,52 340,124" fill="none" stroke="#059669" stroke-width="2.6"/>
+<path d="M340,124 Q420,176 470,260" fill="none" stroke="#059669" stroke-width="2.6"/>
+<line x1="40" y1="118" x2="500" y2="118" stroke="#b45309" stroke-dasharray="6 4"/>
+<text x="342" y="110" font-size="12" fill="#b45309">最高点（v<tspan font-size="9">y</tspan>=0）</text>
+<line x1="90" y1="180" x2="90" y2="118" stroke="#dc2626" stroke-width="2" marker-end="url(#a15r)"/>
+<text x="34" y="152" font-size="12" fill="#dc2626">h=1.8 m</text>
+<circle cx="470" cy="260" r="5" fill="#059669"/>
+<line x1="90" y1="278" x2="470" y2="278" stroke="#059669" stroke-width="1.6"/>
+<text x="256" y="296" font-size="12.5" fill="#059669">水平距离 x = 12.8 m</text>
+<!-- 分解 -->
+<text x="470" y="60" font-size="13" font-weight="bold">初速度分解：</text>
+<text x="470" y="84" font-size="12.5" fill="#1d4ed8">v₀x = 10cos37° = 8 m/s</text>
+<text x="470" y="106" font-size="12.5" fill="#dc2626">v₀y = 10sin37° = 6 m/s</text>
+</svg><figcaption>图15-1　斜抛 = 水平匀速 ⊕ 竖直上抛；落地比抛出点低 3.2 m</figcaption></div>
+
+<p><b>【分解初速度】</b></p>
+<div class="eq">v<sub>0x</sub> = v₀cos37° = 10 × 0.8 = <b>8 m/s</b>　；　v<sub>0y</sub> = v₀sin37° = 10 × 0.6 = <b>6 m/s</b></div>
+
+<p><b>(1) 上升最大高度</b>（竖直方向为竖直上抛，最高点 v<sub>y</sub> = 0）：</p>
+<div class="eq">h = v<sub>0y</sub>² / (2g) = 6² / (2×10) = 36/20 = <b>1.8 m</b></div>
+<p class="small">此时距地面 3.2 + 1.8 = 5.0 m；上升用时 t₁ = v<sub>0y</sub>/g = 0.6 s。</p>
+
+<p><b>(2) 空中运动时间</b>　取<b>竖直向上为正</b>，落地时位移 y = −3.2 m：</p>
+<div class="eq">y = v<sub>0y</sub>t − ½g t²　⟹　−3.2 = 6t − 5t²</div>
+<div class="eq">5t² − 6t − 3.2 = 0　⟹　t = [6 + √<span class="rt">36 + 64</span>] / 10 = (6 + 10)/10 = <b>1.6 s</b></div>
+<p class="small">分段校验：上升 0.6 s 到最高点（离地 5.0 m），再自由下落 5.0 m 需 t₂ = √(2×5/10) = 1.0 s，合计 1.6 s ✓</p>
+
+<p><b>(3) 水平距离</b>（水平方向匀速）：</p>
+<div class="eq">x = v<sub>0x</sub>·t = 8 × 1.6 = <b>12.8 m</b></div>
+<div class="ans">答案：(1) 1.8 m　(2) 1.6 s　(3) 12.8 m</div>
+<div class="tip"><b>易错点：</b>落地点<b>低于</b>抛出点时不能直接用对称公式 t = 2v<sub>0y</sub>/g（那只给出 1.2 s，是回到抛出点高度的时间）。要用带符号的位移方程，或"上升 + 自由下落"分段法。</div>
+</div>
+
+<h2>题型 5 ｜ 平抛结合圆周、传送带、板块的多过程综合</h2>
+
+<div class="q">
+<div class="qhead"><div class="num calc">16</div><b>传送带 → 平抛 → 圆弧 → 双木板（压轴综合）</b></div>
+<div class="stem">光滑圆弧 BC 固定在水平地面上，圆心角 θ = 53°，半径 R = 3 m，末端 C 切线水平。木板 D、E 质量 M = 1 kg、长 L = 4.5 m，静止在粗糙地面上，上表面与 C 端等高平滑衔接。m = 2 kg 的物块 A 轻放于顺时针转动的传送带左端，离开传送带后从 B 点沿切线方向进入 BC 轨道，最终滑上木板 E。已知 μ₁ = 0.5（A 与传送带），μ₂ = 0.4（A 与木板），μ₃ = 0.2（D 与地面，E 下表面光滑），A、B 两点竖直高度差 h = 0.8 m。求：(1) A 从开始到与传送带共速时相对地面的位移；(2) A 滑到 C 点时受到的轨道支持力；(3) A 在木板 D 上运动过程中，D 克服地面摩擦力做的功。</div>
+
+<div class="fig"><svg viewBox="0 0 620 340" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a16" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#1d4ed8"/></marker>
+<marker id="a16r" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#dc2626"/></marker></defs>
+<!-- 传送带 -->
+<rect x="40" y="66" width="150" height="12" fill="#cbd5e1" stroke="#475569"/>
+<circle cx="46" cy="72" r="12" fill="none" stroke="#475569" stroke-width="2"/>
+<circle cx="184" cy="72" r="12" fill="none" stroke="#475569" stroke-width="2"/>
+<rect x="52" y="48" width="26" height="18" fill="#94a3b8" stroke="#334155"/>
+<text x="58" y="42" font-size="12">A</text>
+<path d="M150,52 a 14 14 0 0 1 22 6" fill="none" stroke="#1d4ed8" stroke-width="2" marker-end="url(#a16)"/>
+<text x="96" y="102" font-size="12" fill="#475569">μ₁=0.5，传送带速 3 m/s</text>
+<!-- 平抛 -->
+<path d="M196,72 Q230,74 262,112" fill="none" stroke="#059669" stroke-width="2.2" stroke-dasharray="5 3"/>
+<line x1="196" y1="72" x2="196" y2="112" stroke="#94a3b8" stroke-dasharray="3 3"/>
+<text x="200" y="98" font-size="11.5" fill="#6b7280">h=0.8 m</text>
+<!-- 圆弧 -->
+<circle cx="330" cy="112" r="4" fill="#334155"/><text x="336" y="106" font-size="12">O′</text>
+<path d="M262,112 A 90 90 0 0 0 330,202" fill="none" stroke="#334155" stroke-width="3"/>
+<line x1="330" y1="112" x2="262" y2="112" stroke="#94a3b8" stroke-dasharray="4 3"/>
+<line x1="330" y1="112" x2="330" y2="202" stroke="#94a3b8" stroke-dasharray="4 3"/>
+<text x="286" y="130" font-size="11.5" fill="#b45309">53°</text>
+<path d="M300,112 A 30 30 0 0 0 306,132" fill="none" stroke="#b45309" stroke-width="1.5"/>
+<circle cx="262" cy="112" r="5" fill="#dc2626"/><text x="240" y="108" font-size="13">B</text>
+<circle cx="330" cy="202" r="5" fill="#dc2626"/><text x="322" y="224" font-size="13">C</text>
+<text x="256" y="164" font-size="11.5" fill="#475569">R=3 m</text>
+<!-- 地面与木板 -->
+<line x1="200" y1="202" x2="600" y2="202" stroke="#475569" stroke-width="2.4"/>
+<g stroke="#cbd5e1" stroke-width="1">
+<line x1="360" y1="202" x2="350" y2="214"/><line x1="410" y1="202" x2="400" y2="214"/><line x1="460" y1="202" x2="450" y2="214"/>
+<line x1="510" y1="202" x2="500" y2="214"/><line x1="560" y1="202" x2="550" y2="214"/>
+</g>
+<rect x="336" y="188" width="120" height="14" fill="#e2e8f0" stroke="#475569"/>
+<rect x="456" y="188" width="120" height="14" fill="#e2e8f0" stroke="#475569"/>
+<text x="386" y="181" font-size="13">D</text><text x="508" y="181" font-size="13">E</text>
+<text x="336" y="240" font-size="11.5" fill="#6b7280">μ₃=0.2（粗糙）</text>
+<text x="470" y="240" font-size="11.5" fill="#6b7280">下表面光滑</text>
+<text x="352" y="258" font-size="11.5" fill="#6b7280">L=4.5 m 每块，μ₂=0.4</text>
+<!-- 数据框 -->
+<text x="410" y="60" font-size="13" font-weight="bold">关键量：</text>
+<text x="410" y="82" font-size="12.5">v<tspan font-size="9">y</tspan>=√(2gh)=4，v<tspan font-size="9">x</tspan>=v<tspan font-size="9">y</tspan>/tan53°=3</text>
+<text x="410" y="104" font-size="12.5">v<tspan font-size="9">B</tspan>=5 m/s，v<tspan font-size="9">C</tspan>=7 m/s</text>
+<text x="410" y="126" font-size="12.5" fill="#059669">带速 = v<tspan font-size="9">x</tspan> = 3 m/s</text>
+<!-- 受力小图 C -->
+<line x1="330" y1="202" x2="330" y2="160" stroke="#1d4ed8" stroke-width="2.2" marker-end="url(#a16)"/>
+<text x="286" y="196" font-size="11.5" fill="#1d4ed8">N</text>
+<line x1="330" y1="202" x2="330" y2="244" stroke="#dc2626" stroke-width="2.2" marker-end="url(#a16r)"/>
+<text x="336" y="248" font-size="11.5" fill="#dc2626">mg</text>
+</svg><figcaption>图16-1　五段过程：传送带加速 → 平抛 → 光滑圆弧 → 在 D 上相对滑动 → 滑上 E</figcaption></div>
+
+<p><b>【逆推突破口】</b>题目没有直接给传送带速度，但给了"从 B 点<b>沿切线方向</b>进入轨道"和 h = 0.8 m。由圆心角 53°、C 端切线水平可知：<span class="key">B 点切线与水平方向成 53°</span>，即平抛末速度方向偏离水平 53°。</p>
+<div class="eq">v<sub>y</sub> = √<span class="rt">2gh</span> = √<span class="rt">2 × 10 × 0.8</span> = <b>4 m/s</b></div>
+<div class="eq">tan53° = v<sub>y</sub> / v<sub>x</sub> = 4/3　⟹　v<sub>x</sub> = 4 × (0.6/0.8) = <b>3 m/s</b> = 传送带速度</div>
+
+<p><b>(1) 传送带上的位移</b>　A 轻放（v=0），带面向右运动，滑动摩擦力向右使 A 加速：</p>
+<div class="eq">a₁ = μ₁g = 0.5 × 10 = <b>5 m/s²</b></div>
+<div class="eq">s₁ = v<sub>x</sub>² / (2a₁) = 3² / (2×5) = <b>0.9 m</b>　（用时 t = 3/5 = 0.6 s）</div>
+
+<p><b>(2) C 点的支持力</b>　先求 B 点速度：</p>
+<div class="eq">v<sub>B</sub> = √<span class="rt">v<sub>x</sub>² + v<sub>y</sub>²</span> = √<span class="rt">3² + 4²</span> = <b>5 m/s</b></div>
+<p>B、C 高度差（C 为圆弧最低点，圆心 O′ 在 C 正上方）：</p>
+<div class="eq">Δh = R − R·cos53° = 3 × (1 − 0.6) = <b>1.2 m</b></div>
+<p>圆弧光滑，B→C 机械能守恒：</p>
+<div class="eq">½mv<sub>C</sub>² = ½mv<sub>B</sub>² + mgΔh　⟹　v<sub>C</sub>² = 25 + 2×10×1.2 = 49　⟹　<b>v<sub>C</sub> = 7 m/s</b></div>
+<p>在 C 点（最低点），合力提供向心力，方向竖直向上：</p>
+<div class="eq">N − mg = m v<sub>C</sub>² / R</div>
+<div class="eq">N = 2×10 + 2×49/3 = 20 + 98/3 = 158/3 ≈ <b>52.7 N</b></div>
+<p class="small">由牛顿第三定律，A 对轨道的压力也约为 52.7 N，方向竖直向下。</p>
+
+<p><b>(3) D 克服地面摩擦力做的功</b></p>
+<p>① <b>A 的减速</b>（A 在木板上，受滑动摩擦）：</p>
+<div class="eq">a<sub>A</sub> = μ₂g = 0.4 × 10 = <b>4 m/s²</b>（方向向左，减速）</div>
+<p>② <b>D、E 是否被推动？</b>取 D + E 整体为研究对象：</p>
+<ul>
+<li>驱动力：A 施加的滑动摩擦 f₂ = μ₂mg = 0.4 × 2 × 10 = <b>8 N</b>（作用在 D 上，向右）；</li>
+<li>阻力：地面对 D 的摩擦 f₃ = μ₃(m + M)g = 0.2 × (2+1) × 10 = <b>6 N</b>（A 压在 D 上，正压力含 A 的重力）；E 下表面光滑，地面对 E 无摩擦。</li>
+</ul>
+<p>因 8 N &gt; 6 N，D、E 一起向右加速（D 推着 E，接触面只能推不能拉，此处正是挤压）：</p>
+<div class="eq">a<sub>DE</sub> = (8 − 6) / (M<sub>D</sub> + M<sub>E</sub>) = 2 / 2 = <b>1 m/s²</b></div>
+<p class="small">校验 D、E 间的挤压力：对 E，N<sub>DE</sub> = M<sub>E</sub>·a = 1 × 1 = 1 N &gt; 0，确实是挤压，二者共同运动成立。</p>
+
+<p>③ <b>A 滑过木板 D 所需时间</b>（A 相对 D 位移 = 板长 L = 4.5 m）：</p>
+<div class="eq">Δs = (v<sub>C</sub>t − ½a<sub>A</sub>t²) − (½a<sub>DE</sub>t²) = 7t − 2t² − 0.5t² = 4.5</div>
+<div class="eq">2.5t² − 7t + 4.5 = 0　⟹　t = (7 ± 2)/5 ⟹ t = <b>1 s</b>（另一根 1.8 s 舍去）</div>
+<p class="small">须校验此前未达共速：共速时刻 7 − 4t = t ⟹ t = 1.4 s &gt; 1 s，故 A 在 1 s 时确实还在相对 D 前滑，随后滑上 E ✓（A 位移 5 m，D 位移 0.5 m，相对位移恰为 4.5 m ✓）</p>
+
+<p>④ <b>D 的位移与克服摩擦做的功</b>：</p>
+<div class="eq">s<sub>D</sub> = ½ a<sub>DE</sub> t² = ½ × 1 × 1² = <b>0.5 m</b></div>
+<div class="eq">W = f₃ · s<sub>D</sub> = 6 × 0.5 = <b>3 J</b></div>
+<div class="ans">答案：(1) 0.9 m　(2) N = 158/3 N ≈ 52.7 N　(3) W = 3 J</div>
+<div class="tip"><b>本题三个"坑"：</b><br>
+① 传送带速度需由"<b>沿切线进入 B 点</b>"逆推，不能凭空假设；<br>
+② 地面对 D 的正压力是 <b>(m<sub>A</sub> + M<sub>D</sub>)g = 30 N</b>，不是 M<sub>D</sub>g，因为 A 压在 D 上；<br>
+③ E 下表面光滑，所以 D 必须推着 E 一起加速，"有效质量"是 2 kg 而非 1 kg，否则 a 算成 2 m/s² 全盘错。<br>
+④ 解出 t 的二次方程有两根，要用"是否已共速"来筛选物理上有效的根。</div>
+</div>
+
+<hr>
+<h3>本专题方法总纲</h3>
+<table>
+<tr><th style="width:22%">模型</th><th>识别特征</th><th>核心方程 / 结论</th></tr>
+<tr><td><b>曲线运动条件</b></td><td>判断轨迹、判断加速减速</td><td>合力与速度不共线；轨迹凹侧朝合力；F 与 v 夹角为锐角加速、钝角减速</td></tr>
+<tr><td><b>关联速度</b></td><td>绳、杆、竿连接两物体</td><td>沿绳（杆）方向的速度分量相等</td></tr>
+<tr><td><b>小船渡河</b></td><td>河宽 d，v<sub>船</sub>、v<sub>水</sub></td><td>t<sub>min</sub> = d/v<sub>船</sub>；v<sub>船</sub>&gt;v<sub>水</sub> 时 s<sub>min</sub> = d；v<sub>船</sub>&lt;v<sub>水</sub> 时 s<sub>min</sub> = d·v<sub>水</sub>/v<sub>船</sub></td></tr>
+<tr><td><b>平抛</b></td><td>只受重力、初速水平</td><td>x = v₀t，y = ½gt²，tanθ<sub>速度</sub> = 2tanα<sub>位移</sub></td></tr>
+<tr><td><b>平抛 + 斜面</b></td><td>落到斜面 / 垂直打斜面</td><td>落到斜面：tanα = y/x；垂直打：tanα = v₀/v<sub>y</sub>；离斜面最远：v ∥ 斜面</td></tr>
+<tr><td><b>类平抛</b></td><td>光滑斜面内、匀强电场中</td><td>把 g 换成等效加速度（如 g sinα），公式照搬</td></tr>
+<tr><td><b>斜抛</b></td><td>初速度斜向上</td><td>拆成水平匀速 + 竖直上抛；最高点 v<sub>y</sub>=0；同高对称</td></tr>
+<tr><td><b>多过程综合</b></td><td>传送带 / 圆弧 / 板块串联</td><td>分段 → 每段定 a → 末速接初速 → 板块用相对位移 = 板长</td></tr>
+</table>
+
+<p class="small" style="margin-top:26px;text-align:center">— 全 16 题解析完 ｜ 建议先遮住答案自行推导，再对照本文档的分析框架逐条核查 —</p>
+</div>
+</body>
+</html>
