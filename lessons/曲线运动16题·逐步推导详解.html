@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>曲线运动与抛体运动 16 题 · 逐步推导详解</title>
+<style>
+:root{--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--accent:#1d4ed8;--red:#dc2626;--green:#059669;--amber:#b45309;--purple:#7c3aed}
+*{box-sizing:border-box}
+body{margin:0;background:#eef2f7;color:var(--ink);line-height:1.85;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:920px;margin:0 auto;background:#fff;padding:26px 18px 80px;box-shadow:0 0 30px rgba(15,23,42,.06)}
+h1{font-size:24px;margin:0 0 4px}
+.sub{color:var(--muted);font-size:14px;margin-bottom:18px}
+h2{font-size:18px;margin:36px 0 14px;padding:9px 14px;color:#fff;border-radius:8px;background:linear-gradient(90deg,#1e3a8a,#2563eb)}
+.q{border:1px solid var(--line);border-radius:12px;padding:14px 14px 10px;margin:20px 0 28px;background:#fff}
+.qhead{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.num{flex:none;width:34px;height:34px;border-radius:9px;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px}
+.num.m{background:var(--amber)}.num.c{background:#0f766e}
+.stem{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:8px;padding:10px 12px;font-size:14.5px;color:#334155;margin:6px 0 14px}
+.given{background:#f5f8ff;border:1px solid #c7d7fe;border-radius:8px;padding:9px 12px;margin:10px 0;font-size:14px}
+.given b{color:#1e40af}
+.step{margin:16px 0 12px;padding-left:12px;border-left:3px solid #cbd5e1}
+.sn{display:inline-block;background:#1e3a8a;color:#fff;font-size:12.5px;border-radius:5px;padding:1px 9px;margin-right:8px;vertical-align:2px}
+.stitle{font-weight:700;font-size:15px}
+.eq{background:#f8fafc;border-left:3px solid var(--accent);padding:7px 12px;margin:8px 0;overflow-x:auto;white-space:nowrap;font-size:15px}
+.eq.res{border-left-color:var(--green);background:#f0fdf6;font-weight:600}
+.note{font-size:13px;color:var(--muted);margin:2px 0 8px 6px;font-style:italic}
+.why{background:#f5f3ff;border-left:3px solid var(--purple);padding:7px 11px;margin:8px 0;font-size:13.5px;color:#4c1d95}
+.chk{background:#f0fdf6;border-left:3px solid var(--green);padding:7px 11px;margin:8px 0;font-size:13.5px;color:#065f46}
+.ans{background:#ecfdf5;border:1px solid #a7f3d0;border-radius:8px;padding:11px 14px;margin:14px 0 4px;font-weight:700;color:#065f46;font-size:15.5px}
+.tip{background:#fffbeb;border-left:3px solid #f59e0b;padding:8px 12px;margin:10px 0;font-size:13.8px;color:#78350f}
+.warn{background:#fef2f2;border-left:3px solid #dc2626;padding:8px 12px;margin:10px 0;font-size:13.8px;color:#7f1d1d}
+.opt{margin:8px 0;font-size:14.5px}
+.ok{color:var(--green);font-weight:700}.no{color:var(--red);font-weight:700}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:6px 8px}
+th{background:#f1f5f9;text-align:center;font-size:13.5px}
+td.c{text-align:center}
+.rt{border-top:1.2px solid currentColor;padding:0 .15em}
+.key{background:linear-gradient(transparent 62%,#fde68a 62%);font-weight:600}
+.small{font-size:13px;color:var(--muted)}
+ul,ol{margin:6px 0;padding-left:22px}li{margin:4px 0}
+hr{border:0;border-top:1px dashed var(--line);margin:24px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>曲线运动与抛体运动 16 题 · 逐步推导详解</h1>
+<div class="sub">加强版：每步都标注<b>依据</b>、写出<b>代入过程</b>与<b>中间数值</b>，并给出<b>交叉验算</b>　｜　g = 10 m/s²</div>
+
+<div class="tip"><b>阅读说明：</b><span class="sn">步骤</span>标记推导次序；<span style="color:#4c1d95">紫框</span>解释"为什么这么列式"；<span style="color:#065f46">绿框</span>是换一种方法的验算。所有数字代入都<b>不跳步</b>。</div>
+
+<h2>题型 1 ｜ 曲线运动条件与轨迹分析</h2>
+
+<div class="q">
+<div class="qhead"><div class="num">1</div><b>风中小球的轨迹判断</b></div>
+<div class="stem">小球以速度 v（斜向<b>右下</b>）抛出，同时受<b>水平向左</b>的恒定风力，不计空气阻力。虚线为随后一段时间的轨迹，可能正确的是（&nbsp;&nbsp;）A.① B.② C.③ D.④</div>
+
+<div class="step"><span class="sn">步骤 1</span><span class="stitle">建立坐标系，写出受力</span>
+<p>取抛出点为原点，<b>水平向右为 x 正方向，竖直向上为 y 正方向</b>。设风力大小为 F（恒定），方向沿 −x。</p>
+<div class="eq">F<sub>x</sub> = −F　　F<sub>y</sub> = −mg</div>
+<div class="note">两个分力都是恒力 ⟹ 合力恒定 ⟹ 加速度恒定 ⟹ 轨迹必为<b>抛物线</b>（或直线）。</div>
+<div class="eq">a<sub>x</sub> = −F/m　　a<sub>y</sub> = −g</div>
+<div class="eq res">合力方向：既有 −x 分量又有 −y 分量 ⟹ 指向<b>左下方</b></div>
+</div>
+
+<div class="step"><span class="sn">步骤 2</span><span class="stitle">写出运动学方程，看轨迹怎么弯</span>
+<p>设初速度 v 与水平方向夹角为 β（斜向右下），则 v<sub>0x</sub> = v cosβ &gt; 0，v<sub>0y</sub> = −v sinβ &lt; 0。</p>
+<div class="eq">v<sub>x</sub>(t) = v cosβ − (F/m)·t　　v<sub>y</sub>(t) = −v sinβ − g t</div>
+<div class="eq">x(t) = v cosβ·t − ½(F/m)t²　　y(t) = −v sinβ·t − ½g t²</div>
+<p>由 v<sub>x</sub>(t) 可见：水平速度<b>从正值单调减小</b>，在</p>
+<div class="eq">t₁ = m·v cosβ / F</div>
+<p>时刻变为 0，之后变为负值（小球开始向左运动）。而 v<sub>y</sub> 始终为负且越来越负。</p>
+<div class="eq res">结论：轨迹起点沿 v（右下）出发，随后<b>持续向左弯曲</b>，凹侧朝左下方。</div>
+</div>
+
+<div class="step"><span class="sn">步骤 3</span><span class="stitle">用两条判据逐一淘汰</span>
+<div class="why"><b>为什么要两条判据？</b>只看"凹侧朝合力"会漏掉起点条件。完整判据是：<br>
+（i）轨迹在<b>起点必须与 v 相切</b>；（ii）轨迹<b>凹侧指向合力</b>，即轨迹夹在 v 的延长线与 F<sub>合</sub> 之间。</div>
+<table>
+<tr><th style="width:10%">曲线</th><th style="width:26%">起点是否切于 v（右下）</th><th style="width:26%">凹侧朝向</th><th>判定</th></tr>
+<tr><td class="c">①</td><td class="c">是</td><td class="c">右下方</td><td>需要向<b>右</b>的水平力，与风向矛盾 <span class="no">✗</span></td></tr>
+<tr><td class="c">②</td><td class="c">是</td><td class="c">左下方</td><td>与 F<sub>合</sub> 方向一致 <span class="ok">✓</span></td></tr>
+<tr><td class="c">③</td><td class="c"><b>否</b>（一出发就朝左下）</td><td class="c">—</td><td>违反"速度沿切线" <span class="no">✗</span></td></tr>
+<tr><td class="c">④</td><td class="c">否（朝右上）</td><td class="c">上方</td><td>需要向上的合力，重力不允许 <span class="no">✗</span></td></tr>
+</table>
+</div>
+<div class="ans">答案：B（②）</div>
+<div class="warn"><b>③ 为什么不行？</b>虽然经过足够长时间后小球确实会"折返向左"，但那时它已经先向右走了一段。③ 画成从抛出点直接向左下延伸，起点切线方向错了，所以不可能。</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num">2</div><b>曲线运动概念辨析</b></div>
+<div class="stem">A 圆周运动合力一定指向圆心；B 平抛属于匀变速运动；C 变力一定做曲线运动；D 只受恒力不可能做曲线运动。</div>
+
+<div class="step"><span class="sn">A</span><span class="stitle">合力一定指向圆心？——错</span>
+<p>把合力沿"半径方向 + 切线方向"分解：</p>
+<div class="eq">F<sub>n</sub> = m v²/R（改变速度<b>方向</b>）　　F<sub>t</sub> = m·dv/dt（改变速度<b>大小</b>）</div>
+<p>只有当速率不变（<b>匀速</b>圆周）时 F<sub>t</sub> = 0，合力才纯粹指向圆心。竖直平面内的圆周运动（如过山车、绳系小球）中 F<sub>t</sub> ≠ 0。</p>
+<div class="eq res">A 错</div>
+</div>
+
+<div class="step"><span class="sn">B</span><span class="stitle">平抛是匀变速运动？——对</span>
+<p>"匀变速"的定义是<b>加速度大小、方向都不变</b>。平抛只受重力：</p>
+<div class="eq">a = F/m = mg/m = g = 10 m/s²，方向恒为竖直向下</div>
+<div class="eq res">B 对（注意：匀变速 ≠ 直线，匀变速曲线运动完全合法）</div>
+</div>
+
+<div class="step"><span class="sn">C</span><span class="stitle">变力一定曲线？——错</span>
+<p>反例：水平面上的弹簧振子，回复力 F = −kx，大小方向都在变，但始终与速度<b>共线</b>：</p>
+<div class="eq">F ∥ v　⟹　只改变速度大小，不改变方向 ⟹ 直线运动</div>
+<div class="eq res">C 错</div>
+</div>
+
+<div class="step"><span class="sn">D</span><span class="stitle">恒力不可能曲线？——错</span>
+<p>反例即平抛：恒力 mg 竖直向下，初速度 v₀ 水平，二者<b>不共线</b>，轨迹为抛物线。</p>
+<div class="eq res">D 错</div>
+</div>
+<div class="ans">答案：B</div>
+<div class="tip"><b>统一判据：</b>直线还是曲线，只看 <b>F<sub>合</sub> 与 v 是否共线</b>；匀变速还是变加速，只看 <b>a 是否恒定</b>。这两件事互相独立，四种组合都存在。</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num">3</div><b>由分运动图像还原合运动（m = 2 kg）</b></div>
+<div class="stem">光滑水平面上，质点受水平恒力。甲：x 方向的 x–t 图（抛物线，过原点，t=1 s 时 x=2 m，t=2 s 时 x=8 m）；乙：y 方向的 v–t 图（过原点直线，t=2 s 时 v=6 m/s）。判断 A 轨迹为曲线／B t=2 s 坐标 (8,6)／C t=2 s 速度 14 m/s／D 恒力 5 N。</div>
+
+<div class="step"><span class="sn">步骤 1</span><span class="stitle">从甲图提取 x 方向的运动规律</span>
+<div class="why">图线是<b>过原点的抛物线</b>，说明 x ∝ t²，对应"初速度为零的匀加速直线运动"，通式 x = ½a<sub>x</sub>t²。</div>
+<p>设 x = A t²，代入 t = 1 s、x = 2 m：</p>
+<div class="eq">2 = A × 1²　⟹　A = 2 m/s²</div>
+<p>用第二个点检验 t = 2 s：</p>
+<div class="eq">x = 2 × 2² = 2 × 4 = 8 m　✓ 与图一致</div>
+<p>对比 x = ½a<sub>x</sub>t² 得：</p>
+<div class="eq res">½a<sub>x</sub> = 2　⟹　a<sub>x</sub> = 4 m/s²，且 v<sub>0x</sub> = 0</div>
+</div>
+
+<div class="step"><span class="sn">步骤 2</span><span class="stitle">从乙图提取 y 方向的运动规律</span>
+<p>v–t 图为过原点直线 ⟹ v<sub>y</sub> = a<sub>y</sub>t，且 v<sub>0y</sub> = 0。斜率即加速度：</p>
+<div class="eq">a<sub>y</sub> = Δv/Δt = (6 − 0)/(2 − 0) = 3 m/s²</div>
+<div class="eq res">v<sub>y</sub> = 3t　，　y = ½a<sub>y</sub>t² = 1.5 t²</div>
+</div>
+
+<div class="step"><span class="sn">步骤 3</span><span class="stitle">A 项：轨迹是直线还是曲线？</span>
+<div class="why">判据是"合加速度方向与合速度方向是否共线"。两方向<b>都从静止开始</b>，这是关键。</div>
+<p>速度方向：</p>
+<div class="eq">v<sub>y</sub>/v<sub>x</sub> = (a<sub>y</sub>t)/(a<sub>x</sub>t) = 3t/4t = 3/4 = 常数</div>
+<p>比值与 t 无关 ⟹ 速度方向始终不变。再看轨迹方程，消去 t：</p>
+<div class="eq">y/x = (1.5t²)/(2t²) = 0.75　⟹　y = 0.75x</div>
+<div class="eq res">这是一条过原点、斜率 0.75 的<b>直线</b> ⟹ <span class="no">A 错</span></div>
+</div>
+
+<div class="step"><span class="sn">步骤 4</span><span class="stitle">B 项：t = 2 s 的坐标</span>
+<div class="eq">x = 2t² = 2 × 2² = 2 × 4 = 8 m</div>
+<div class="eq">y = 1.5t² = 1.5 × 4 = 6 m</div>
+<div class="eq res">坐标 (8 m, 6 m) ⟹ <span class="ok">B 对</span></div>
+</div>
+
+<div class="step"><span class="sn">步骤 5</span><span class="stitle">C 项：t = 2 s 的速度大小</span>
+<div class="eq">v<sub>x</sub> = a<sub>x</sub>t = 4 × 2 = 8 m/s</div>
+<div class="eq">v<sub>y</sub> = a<sub>y</sub>t = 3 × 2 = 6 m/s</div>
+<p>速度是<b>矢量</b>，两个互相垂直的分量按勾股定理合成：</p>
+<div class="eq">v = √<span class="rt">v<sub>x</sub>² + v<sub>y</sub>²</span> = √<span class="rt">8² + 6²</span> = √<span class="rt">64 + 36</span> = √<span class="rt">100</span> = 10 m/s</div>
+<div class="eq res">10 m/s ≠ 14 m/s ⟹ <span class="no">C 错</span>（14 = 8 + 6 是把矢量当标量加）</div>
+</div>
+
+<div class="step"><span class="sn">步骤 6</span><span class="stitle">D 项：恒力大小</span>
+<div class="eq">a = √<span class="rt">a<sub>x</sub>² + a<sub>y</sub>²</span> = √<span class="rt">4² + 3²</span> = √<span class="rt">16 + 9</span> = √<span class="rt">25</span> = 5 m/s²</div>
+<div class="eq">F = ma = 2 kg × 5 m/s² = 10 N</div>
+<div class="eq res">10 N ≠ 5 N ⟹ <span class="no">D 错</span>（5 是加速度的数值，被当成了力）</div>
+<div class="chk"><b>验算（用动能定理）：</b>t = 2 s 时位移 s = √(8²+6²) = 10 m，方向与力同向（因为是直线运动）。<br>
+W = Fs = 10 × 10 = 100 J；ΔE<sub>k</sub> = ½mv² = ½ × 2 × 10² = 100 J ✓ 完全吻合。</div>
+</div>
+<div class="ans">答案：B</div>
+</div>
+
+<h2>题型 2 ｜ 关联速度与小船渡河</h2>
+
+<div class="q">
+<div class="qhead"><div class="num">4</div><b>晾衣绳：衣架下降速率如何变化</b></div>
+<div class="stem">两人握绳两端，在同一水平面内以相同速率 v 匀速靠近，绳与竖直方向夹角 θ 逐渐减小。衣架向下运动过程中速率逐渐（&nbsp;&nbsp;）A.增加 B.减小 C.不变 D.先增后减</div>
+
+<div class="step"><span class="sn">解法一</span><span class="stitle">速度分解法（通用做法）</span>
+<div class="why"><b>第一步永远是：分清谁的"实际速度"是什么。</b>手的实际速度是<b>水平</b>的 v；衣架的实际速度是<b>竖直向下</b>的 u。二者都要各自沿绳、垂直绳分解。</div>
+<p>设某时刻绳与竖直方向夹角为 θ。取右侧半根绳，方向从衣架指向手（斜向右上）。</p>
+<p><b>① 手端</b>：v 水平，与绳的夹角是 (90° − θ)，所以</p>
+<div class="eq">v<sub>沿绳</sub> = v·cos(90° − θ) = v·sinθ　（方向：使绳"变短"）</div>
+<p><b>② 衣架端</b>：u 竖直向下，与绳的夹角就是 θ，所以</p>
+<div class="eq">u<sub>沿绳</sub> = u·cosθ　（方向：使绳"变长"）</div>
+<p><b>③ 绳不可伸长</b>，两端沿绳的速度分量必须相等：</p>
+<div class="eq">v·sinθ = u·cosθ</div>
+<div class="eq res">u = v·(sinθ/cosθ) = <b>v·tanθ</b></div>
+</div>
+
+<div class="step"><span class="sn">解法二</span><span class="stitle">几何微分法（更严格，可用来自查）</span>
+<p>设绳的半长为 ℓ（常量），手到衣架的水平距离为 b，竖直距离为 h，则</p>
+<div class="eq">b² + h² = ℓ²　（勾股定理，ℓ 恒定）</div>
+<p>两边对时间求导：</p>
+<div class="eq">2b·(db/dt) + 2h·(dh/dt) = 0</div>
+<p>手向内靠近 ⟹ db/dt = −v；衣架下降使 h 增大 ⟹ dh/dt = +u。代入：</p>
+<div class="eq">2b(−v) + 2h(u) = 0　⟹　u = v·(b/h)</div>
+<p>而由几何关系 b/h = tanθ（b 是水平边、h 是竖直边、θ 是绳与竖直方向夹角），故</p>
+<div class="eq res">u = v·tanθ　✓ 与解法一完全一致</div>
+</div>
+
+<div class="step"><span class="sn">步骤 3</span><span class="stitle">判断单调性</span>
+<p>两人靠近 ⟹ b 减小、h 增大 ⟹ 绳越来越"竖直" ⟹ θ 减小（题目也明说了）。</p>
+<p>在 0° &lt; θ &lt; 90° 范围内 tanθ 是<b>单调增函数</b>，θ 减小 ⟹ tanθ 减小；而 v 恒定，所以</p>
+<div class="eq res">u = v·tanθ 单调<b>减小</b></div>
+<div class="chk"><b>极限检验：</b>当两手几乎合拢，θ → 0°，tanθ → 0，u → 0（衣架几乎不再下降，符合直觉：此时绳快竖直了，再靠近也换不来多少下降）。当两手很开，θ → 90°，u → ∞（绳快拉直，微小的靠近就带来巨大下降）。逻辑自洽。</div>
+</div>
+<div class="ans">答案：B（减小）</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num">5</div><b>曲轴—连杆—活塞</b></div>
+<div class="stem">曲轴绕 O 以 ω = 180 rad/s 匀速转动，OA = 20 cm，AB = 40 cm，B 为活塞（沿过 O 的水平线运动）。当 OA ⊥ OB 时活塞速度为（&nbsp;&nbsp;）A.24√3 B.36 C.18√3 D.18（m/s）</div>
+
+<div class="given"><b>已知：</b>ω = 180 rad/s；r = OA = 20 cm = 0.20 m；AB = 40 cm = 0.40 m。<br><b>注意单位换算</b>：题目给的是 cm，必须先化成 m。</div>
+
+<div class="step"><span class="sn">步骤 1</span><span class="stitle">求 A 点的实际速度</span>
+<p>A 随曲轴做<b>匀速圆周运动</b>，半径 r = OA：</p>
+<div class="eq">v<sub>A</sub> = ω·r = 180 rad/s × 0.20 m = 36 m/s</div>
+<div class="eq res">v<sub>A</sub> = 36 m/s，方向<b>垂直于 OA</b>（圆周运动速度沿切线）</div>
+</div>
+
+<div class="step"><span class="sn">步骤 2</span><span class="stitle">画出 OA ⊥ OB 这一瞬间的几何图形</span>
+<p>活塞 B 沿过 O 的水平直线运动，取 OB 为水平方向。题设 OA ⊥ OB ⟹ <b>OA 竖直</b>。</p>
+<p>△OAB 是直角三角形（直角在 O），由勾股定理：</p>
+<div class="eq">OB = √<span class="rt">AB² − OA²</span> = √<span class="rt">0.40² − 0.20²</span> = √<span class="rt">0.16 − 0.04</span> = √<span class="rt">0.12</span></div>
+<div class="eq">= √<span class="rt">0.04 × 3</span> = 0.2√3 ≈ 0.346 m</div>
+<p>连杆 AB 与水平方向（即 OB 方向）的夹角 α：</p>
+<div class="eq">sinα = 对边/斜边 = OA/AB = 0.20/0.40 = 0.5　⟹　α = 30°</div>
+</div>
+
+<div class="step"><span class="sn">步骤 3</span><span class="stitle">确定两个速度的方向</span>
+<ul>
+<li>v<sub>A</sub> ⊥ OA，而 OA 竖直 ⟹ <b>v<sub>A</sub> 水平</b>；</li>
+<li>v<sub>B</sub> 沿活塞运动方向 ⟹ 也<b>水平</b>。</li>
+</ul>
+<div class="eq res">这一瞬间 v<sub>A</sub> 与 v<sub>B</sub> <b>互相平行</b>（都沿 OB 方向），且各自与连杆 AB 成 30°</div>
+</div>
+
+<div class="step"><span class="sn">步骤 4</span><span class="stitle">用"沿杆分量相等"求解</span>
+<div class="why">连杆是刚性杆，A、B 间距离不变 ⟹ 两端速度<b>沿杆方向的投影必须相等</b>，否则杆会被拉长或压短。</div>
+<div class="eq">v<sub>A</sub>·cos30° = v<sub>B</sub>·cos30°</div>
+<p>左边代入数值：36 × (√3/2) = 18√3 ≈ 31.2 m/s；右边为 v<sub>B</sub> × (√3/2)。两边同除 cos30°：</p>
+<div class="eq res">v<sub>B</sub> = v<sub>A</sub> = 36 m/s</div>
+<div class="chk"><b>物理意义检验：</b>此瞬间 A、B 速度大小相等、方向相同 ⟹ 连杆做<b>瞬时平动</b>（角速度为零）。用刚体条件复核：(v<sub>B</sub> − v<sub>A</sub>)·(AB 方向单位矢量) = 0 ⟹ (v<sub>B</sub> − 36)·cos30° = 0 ⟹ v<sub>B</sub> = 36 ✓</div>
+<div class="warn"><b>C 选项 18√3 的来历：</b>只算了 v<sub>A</sub> 在杆上的投影 36cos30° = 18√3，就直接当成活塞速度——漏了"v<sub>B</sub> 也要投影"这一步。这是本题唯一的坑。</div>
+</div>
+<div class="ans">答案：B（36 m/s）</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num m">6</div><b>（多选）快艇渡河：v<sub>船</sub> &gt; v<sub>水</sub></b></div>
+<div class="stem">d = 240 m，v<sub>水</sub> = 3 m/s，v<sub>船</sub> = 5 m/s，sin37°=0.6，cos37°=0.8。A 时间可能 60 s；B 最短时间渡河航程 384 m；C 航程可能 240 m；D 最短航程时船头指上游且与河岸成 53°。</div>
+
+<div class="step"><span class="sn">步骤 0</span><span class="stitle">先做类型判断</span>
+<div class="eq">v<sub>船</sub> = 5 m/s &gt; v<sub>水</sub> = 3 m/s</div>
+<div class="note">⟹ 属于"能垂直过河"的类型，最短航程等于河宽。这一步决定后面所有公式的选择。</div>
+</div>
+
+<div class="step"><span class="sn">步骤 1</span><span class="stitle">建立通用关系式</span>
+<p>设船头方向与"河岸法线"（垂直河岸方向）成角 φ，规定偏向上游为正。把 v<sub>船</sub> 分解：</p>
+<div class="eq">垂直河岸分量：v<sub>⊥</sub> = v<sub>船</sub>·cosφ　（唯一决定渡河时间）</div>
+<div class="eq">平行河岸分量：v<sub>∥</sub> = v<sub>水</sub> − v<sub>船</sub>·sinφ　（决定被冲下多远）</div>
+<div class="eq res">渡河时间 t = d / v<sub>⊥</sub> = d / (v<sub>船</sub>cosφ)</div>
+<div class="why">水流平行河岸，对"过河"这个垂直方向<b>毫无贡献</b>，所以渡河时间与水速无关。</div>
+</div>
+
+<div class="step"><span class="sn">A 项</span><span class="stitle">渡河时间能否为 60 s</span>
+<p>先求时间的最小值（φ = 0，船头正对岸时 cosφ 最大）：</p>
+<div class="eq">t<sub>min</sub> = d/v<sub>船</sub> = 240/5 = 48 s</div>
+<p>要 t = 60 s，需要的垂直分量为：</p>
+<div class="eq">v<sub>⊥</sub> = d/t = 240/60 = 4 m/s</div>
+<p>检验可行性：需 v<sub>船</sub>cosφ = 4 ⟹ cosφ = 4/5 = 0.8 ⟹ φ = 37°，这是合法角度（|cosφ| ≤ 1）。</p>
+<div class="eq res">可以实现 ⟹ <span class="ok">A 对</span>（一切 t ≥ 48 s 的时间都能实现）</div>
+</div>
+
+<div class="step"><span class="sn">B 项</span><span class="stitle">最短时间渡河的航程</span>
+<p>最短时间对应 φ = 0，t = 48 s。此时：</p>
+<div class="eq">沿岸被冲下的距离 x = v<sub>水</sub>·t = 3 × 48 = 144 m</div>
+<div class="eq">垂直位移 = 河宽 = 240 m</div>
+<p>两位移互相垂直，合位移（即航程，因为轨迹是直线）：</p>
+<div class="eq">s = √<span class="rt">240² + 144²</span> = √<span class="rt">57600 + 20736</span> = √<span class="rt">78336</span></div>
+<p>化简：78336 = 256 × 306，所以</p>
+<div class="eq">s = 16√<span class="rt">306</span> ≈ 16 × 17.493 ≈ 279.9 m</div>
+<div class="eq res">≈ 280 m ≠ 384 m ⟹ <span class="no">B 错</span></div>
+<div class="chk"><b>换个算法验证：</b>合速度 v<sub>合</sub> = √(5² + 3²) = √34 ≈ 5.831 m/s，航程 = v<sub>合</sub>·t = 5.831 × 48 ≈ 279.9 m ✓</div>
+</div>
+
+<div class="step"><span class="sn">C、D 项</span><span class="stitle">最短航程的条件与结果</span>
+<div class="why">航程 = 实际轨迹长度。轨迹是直线，长度 = d/sinα（α 是合速度与河岸的夹角）。α 越大航程越短，α 最大是 90°（合速度垂直河岸），此时航程 = d。</div>
+<p>要让合速度垂直河岸，必须让 v<sub>船</sub> 沿岸的分量<b>恰好抵消</b>水流：</p>
+<div class="eq">v<sub>船</sub>·sinφ = v<sub>水</sub>　⟹　sinφ = 3/5 = 0.6</div>
+<p>由题给 sin37° = 0.6，得 φ = 37°（船头偏向<b>上游</b>）。因为 0.6 ≤ 1，这个方程有解，说明确实办得到：</p>
+<div class="eq res">最短航程 = 河宽 = 240 m ⟹ <span class="ok">C 对</span></div>
+<p>φ 是船头与<b>法线</b>的夹角，题目问的是与<b>河岸</b>的夹角：</p>
+<div class="eq">船头与河岸夹角 = 90° − φ = 90° − 37° = 53°</div>
+<div class="eq res">船头指上游、与河岸成 53° ⟹ <span class="ok">D 对</span></div>
+<div class="chk"><b>自洽性检验：</b>此时合速度 v<sub>合</sub> = √(5² − 3²) = √16 = 4 m/s，渡河时间 t = 240/4 = 60 s——恰好就是 A 项的 60 s，两项互相印证。</div>
+</div>
+<div class="ans">答案：ACD</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num m">7</div><b>（多选）小船渡河：v<sub>船</sub> &lt; v<sub>水</sub>，且要避开暗礁</b></div>
+<div class="stem">河宽 d = 12 m，v<sub>水</sub> = 4 m/s，划船速度最大 3 m/s。A 处下游有暗礁区，A 与暗礁边缘连线与河岸的<b>最大</b>夹角 37°。A 安全渡河最小划船速度 2.4 m/s；B 最短时间 4 s；C 可到正对岸；D 最短位移 20 m。</div>
+
+<div class="step"><span class="sn">步骤 0</span><span class="stitle">类型判断</span>
+<div class="eq">v<sub>船,max</sub> = 3 m/s &lt; v<sub>水</sub> = 4 m/s</div>
+<div class="note">⟹ 船<b>不可能</b>让合速度垂直河岸（沿岸方向的水流永远抵消不掉），必然被冲向下游。</div>
+<div class="eq res">直接判定 <span class="no">C 错</span>（到不了正对岸）</div>
+</div>
+
+<div class="step"><span class="sn">B 项</span><span class="stitle">最短渡河时间</span>
+<p>渡河时间只由垂直河岸的分速度决定，该分量最大值为 v<sub>船</sub>（船头正对岸时）：</p>
+<div class="eq">t<sub>min</sub> = d / v<sub>船</sub> = 12 / 3 = 4 s</div>
+<div class="eq res"><span class="ok">B 对</span></div>
+<div class="note">此时被冲下 x = 4 × 4 = 16 m，航程 = √(12²+16²) = 20 m（注意：这是<b>最短时间</b>时的航程，不是最短航程）。</div>
+</div>
+
+<div class="step"><span class="sn">D 项</span><span class="stitle">最短位移——矢量圆 + 切线法</span>
+<div class="why"><b>为什么要用圆？</b>v<sub>水</sub> 是固定矢量（大小方向都定）；v<sub>船</sub> 大小固定但方向可选，它的末端画出一个<b>半径为 v<sub>船</sub> 的圆</b>。合速度 = 从起点到圆上任一点的矢量。位移最短 ⟺ 合速度与河岸夹角 α 最大 ⟺ 该矢量与圆<b>相切</b>。</div>
+<p>相切时，半径 v<sub>船</sub> ⊥ 合速度，构成直角三角形（斜边为 v<sub>水</sub>）：</p>
+<div class="eq">sinα<sub>max</sub> = v<sub>船</sub>/v<sub>水</sub> = 3/4 = 0.75　⟹　α<sub>max</sub> ≈ 48.6°</div>
+<p>位移与河宽的关系（河宽是位移在垂直方向的投影）：</p>
+<div class="eq">d = s·sinα　⟹　s<sub>min</sub> = d/sinα<sub>max</sub> = 12/0.75 = 16 m</div>
+<div class="eq res">16 m ≠ 20 m ⟹ <span class="no">D 错</span></div>
+<div class="chk"><b>补充计算（可验证自洽）：</b>此时合速度大小 v<sub>合</sub> = √(v<sub>水</sub>² − v<sub>船</sub>²) = √(16−9) = √7 ≈ 2.646 m/s；<br>
+所用时间 t = s/v<sub>合</sub> = 16/2.646 ≈ 6.05 s；<br>
+另一算法：垂直分量 = v<sub>合</sub>sinα = 2.646 × 0.75 ≈ 1.984 m/s，t = 12/1.984 ≈ 6.05 s ✓</div>
+</div>
+
+<div class="step"><span class="sn">A 项</span><span class="stitle">避开暗礁所需的最小划船速度</span>
+<p><b>① 几何条件。</b>暗礁在下游，A 与礁区边缘连线与河岸的最大夹角是 37°，意味着礁区完全落在"与河岸夹角 ≤ 37°"的扇形内。船走直线，要安全通过必须：</p>
+<div class="eq">航线与河岸的夹角 α &gt; 37°</div>
+<p><b>② 能力条件。</b>设划船速度为 v（可调，v ≤ 3 m/s），由上一步的切线结论，该速度下能达到的最大偏角满足：</p>
+<div class="eq">sinα<sub>max</sub> = v / v<sub>水</sub> = v / 4</div>
+<p><b>③ 联立。</b>要求 α<sub>max</sub> 至少能达到 37°：</p>
+<div class="eq">sinα<sub>max</sub> ≥ sin37°　⟹　v/4 ≥ 0.6　⟹　v ≥ 2.4 m/s</div>
+<div class="eq res">v<sub>min</sub> = v<sub>水</sub>·sin37° = 4 × 0.6 = 2.4 m/s ⟹ <span class="ok">A 对</span></div>
+<div class="chk"><b>临界情形的完整数据（顺便揭穿 D 项的 20 m 从哪来）：</b><br>
+v = 2.4 m/s 时，合速度 v<sub>合</sub> = √(4² − 2.4²) = √(16 − 5.76) = √10.24 = 3.2 m/s，方向与河岸成 37°；<br>
+此时位移 s = d/sin37° = 12/0.6 = <b>20 m</b>，时间 t = 20/3.2 = 6.25 s。<br>
+可见 20 m 是"<b>临界安全航线</b>"的位移，不是最短位移（最短是 16 m）。出题人正是拿这个数字做干扰项。</div>
+</div>
+<div class="ans">答案：AB</div>
+</div>
+
+<h2>题型 3 ｜ 平抛运动的应用</h2>
+
+<div class="q">
+<div class="qhead"><div class="num">8</div><b>半圆轨道内的两次平抛</b></div>
+<div class="stem">半圆轨道 ACB 竖直固定在地面，AB 水平直径，C 最低点，D 是 B 在地面的投影，E 是弧上小孔。甲、乙（质量相同）从 A 水平向左抛出，甲落到 C，乙过小孔 E 落到 D。判断 A 乙到 E 时速度反向延长线过 O；B 甲乙初速度之比 1:2；C 增大甲初速度可垂直打在 ACB 上；D 重力平均功率甲比乙大。</div>
+
+<div class="step"><span class="sn">步骤 1</span><span class="stitle">建系，写出四个关键点的坐标</span>
+<p>设半径为 R，取圆心 O 为原点，水平向右为 x 正，竖直向上为 y 正。</p>
+<ul>
+<li>A（抛出点，直径右端）：<b>(R, 0)</b></li>
+<li>B（直径左端）：<b>(−R, 0)</b></li>
+<li>C（最低点）：<b>(0, −R)</b>；圆与水平地面相切于 C ⟹ <b>地面所在直线为 y = −R</b></li>
+<li>D（B 在地面的投影）：<b>(−R, −R)</b></li>
+</ul>
+<div class="why">"C 是最低点"+"半圆竖直固定在水平地面上" ⟹ 圆与地面相切于 C，地面高度就是 y = −R。这是 D 点纵坐标的来源，务必先定下来。</div>
+</div>
+
+<div class="step"><span class="sn">步骤 2</span><span class="stitle">甲球：A → C</span>
+<p>位移分量：水平 x₁ = R − 0 = R（向左）；竖直 y₁ = 0 − (−R) = R（下落）。</p>
+<p>竖直方向自由落体：</p>
+<div class="eq">y₁ = ½g t₁²　⟹　R = ½g t₁²　⟹　t₁ = √<span class="rt">2R/g</span></div>
+<p>水平方向匀速：</p>
+<div class="eq">v₁ = x₁/t₁ = R / √<span class="rt">2R/g</span> = R·√<span class="rt">g/(2R)</span> = √<span class="rt">gR/2</span></div>
+</div>
+
+<div class="step"><span class="sn">步骤 3</span><span class="stitle">乙球：A → D，并比较（B 项）</span>
+<p>位移分量：水平 x₂ = R − (−R) = <b>2R</b>；竖直 y₂ = 0 − (−R) = <b>R</b>。</p>
+<div class="why"><b>关键洞察：</b>两球<b>下落高度相同</b>（都是 R）。平抛的运动时间只由下落高度决定，与初速度无关 ⟹ <b>两球飞行时间相同</b>。</div>
+<div class="eq">t₂ = √<span class="rt">2y₂/g</span> = √<span class="rt">2R/g</span> = t₁</div>
+<div class="eq">v₂ = x₂/t₂ = 2R/t₁</div>
+<p>作比：</p>
+<div class="eq">v₁ : v₂ = (R/t₁) : (2R/t₁) = R : 2R = 1 : 2</div>
+<div class="eq res"><span class="ok">B 对</span></div>
+</div>
+
+<div class="step"><span class="sn">步骤 4</span><span class="stitle">A 项：乙在 E 点时速度反向延长线过 O 吗？</span>
+<p><b>① 先回忆"中点法则"及其证明。</b>平抛任意时刻速度方向满足 tanθ = v<sub>y</sub>/v<sub>x</sub> = gt/v₀；把速度反向延长，交抛出点水平线于某点，该点到抛出点的水平距离为</p>
+<div class="eq">Δ = y/tanθ = (½gt²)/(gt/v₀) = ½v₀t = x/2</div>
+<div class="eq res">即：反向延长线必过<b>水平位移的中点</b>。</div>
+
+<p><b>② 对乙球用这条法则。</b>若在某点反向延长线过 O(0,0)，需要该点的水平位移中点落在 O，即水平位移 = R − 0 = R 的两倍 = 2R。而水平位移 2R 对应的正是<b>落点 D</b>，不是 E。</p>
+
+<p><b>③ 定量求 E 的位置，确认 E 在 D 之前。</b>引入无量纲时间 τ = t/t₁，则</p>
+<div class="eq">x(τ) = R − v₂t = R − 2Rτ　，　y(τ) = −½gt² = −Rτ²</div>
+<div class="note">（因为 ½g(τt₁)² = ½g·τ²·(2R/g) = Rτ²）</div>
+<p>E 在圆上，代入圆方程 x² + y² = R²：</p>
+<div class="eq">(R − 2Rτ)² + (−Rτ²)² = R²</div>
+<div class="eq">R²(1 − 2τ)² + R²τ⁴ = R²　⟹　1 − 4τ + 4τ² + τ⁴ = 1</div>
+<div class="eq">τ⁴ + 4τ² − 4τ = 0　⟹　τ(τ³ + 4τ − 4) = 0</div>
+<p>τ = 0 是抛出点（不合），解 τ³ + 4τ − 4 = 0。试算：τ=0.84 时左边 = 0.593+3.36−4 = −0.047；τ=0.85 时 = 0.614+3.40−4 = +0.014。故</p>
+<div class="eq">τ<sub>E</sub> ≈ 0.848 &lt; 1</div>
+<p><b>④ 算出交点的横坐标。</b>在 E 点，速度分量 v<sub>x</sub> = v₂ = √(2gR)，v<sub>y</sub> = gt = τ√(2gR)，故 v<sub>y</sub>/v<sub>x</sub> = τ。反向延长线上升 |y<sub>E</sub>| = Rτ² 时，向右退回的水平距离为</p>
+<div class="eq">Δx = |y<sub>E</sub>| / (v<sub>y</sub>/v<sub>x</sub>) = Rτ²/τ = Rτ</div>
+<div class="eq">交点横坐标 = x<sub>E</sub> + Δx = (R − 2Rτ) + Rτ = R(1 − τ) ≈ R(1 − 0.848) ≈ 0.15R</div>
+<div class="eq res">交点在 O <b>右侧</b> 0.15R 处，不过 O ⟹ <span class="no">A 错</span></div>
+</div>
+
+<div class="step"><span class="sn">步骤 5</span><span class="stitle">C 项：能否垂直打在圆轨道上？</span>
+<p><b>① 翻译条件。</b>"垂直打在圆轨道上" ⟺ 速度沿<b>半径</b>方向 ⟺ 速度所在直线<b>过圆心 O</b>。</p>
+<p><b>② 用中点法则。</b>速度反向延长线过 O(0,0)，而它必过水平位移中点，故要求</p>
+<div class="eq">(x<sub>A</sub> + x<sub>P</sub>)/2 = 0　⟹　(R + x<sub>P</sub>)/2 = 0　⟹　x<sub>P</sub> = −R</div>
+<p><b>③ 检查可行性。</b>圆上横坐标为 −R 的点，由 x²+y² = R² 得 y² = R² − R² = 0 ⟹ y = 0，即<b>只有 B 点</b>。而 B 与抛出点 A 同高，小球从 A 抛出后必然已经下落（y &lt; 0），不可能出现在 y = 0 处。</p>
+<div class="eq res">矛盾 ⟹ <b>无论初速度多大都做不到</b> ⟹ <span class="no">C 错</span></div>
+<div class="note">注意这个结论与 v₀ 无关——所以"增大初速度"这条路根本不通。</div>
+</div>
+
+<div class="step"><span class="sn">步骤 6</span><span class="stitle">D 项：重力的平均功率</span>
+<p>平均功率定义为总功除以总时间：</p>
+<div class="eq">P̄ = W<sub>G</sub>/t = mgh/t</div>
+<p>逐项比较：质量 m 相同（题给）；下落高度 h 都是 R（步骤 2、3 已算）；时间 t₁ = t₂（步骤 3）。</p>
+<div class="eq res">P̄<sub>甲</sub> = P̄<sub>乙</sub>，不存在"甲比乙大" ⟹ <span class="no">D 错</span></div>
+<div class="note">若问的是<b>落地瞬时</b>重力功率 P = mgv<sub>y</sub>，因两球 v<sub>y</sub> = gt 也相同，同样相等。</div>
+</div>
+<div class="ans">答案：B</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num">9</div><b>跳台滑雪：平抛落到 30° 斜坡</b></div>
+<div class="stem">从 a 处水平飞出做平抛，落在倾角 30° 的斜坡 b 处，ab 直线距离 40 m。判断 A t = 2 s；B 离斜坡最远时 t = √2 s；C v₀ = 10 m/s；D 离斜坡最大距离 2.5 m。</div>
+
+<div class="given"><b>已知：</b>L<sub>ab</sub> = 40 m，θ = 30°，g = 10 m/s²，初速度水平。<br>
+<b>隐含条件：</b>a 在斜坡顶端，故位移 ab 的方向<b>沿斜面</b>，与水平成 30°。</div>
+
+<div class="step"><span class="sn">步骤 1</span><span class="stitle">位移分解（求时间与初速度）</span>
+<div class="why">题目给的是<b>位移</b>大小和方向，所以从位移入手：把 40 m 的斜向位移分解成水平 x 和竖直 y 两个分量，再分别用平抛的两个方程。</div>
+<div class="eq">x = L·cos30° = 40 × (√3/2) = 20√3 ≈ 34.64 m</div>
+<div class="eq">y = L·sin30° = 40 × 0.5 = 20 m</div>
+<p>竖直方向自由落体 y = ½gt²：</p>
+<div class="eq">20 = ½ × 10 × t² = 5t²　⟹　t² = 20/5 = 4　⟹　t = 2 s</div>
+<div class="eq res"><span class="ok">A 对</span></div>
+<p>水平方向匀速 x = v₀t：</p>
+<div class="eq">v₀ = x/t = 20√3 / 2 = 10√3 ≈ 17.3 m/s</div>
+<div class="eq res">10√3 m/s ≠ 10 m/s ⟹ <span class="no">C 错</span></div>
+<div class="chk"><b>另一条通用公式验证：</b>落到斜面时 tanθ = y/x = gt/(2v₀)，代入 tan30° = √3/3、v₀ = 10√3：<br>
+gt/(2v₀) = 10×2/(2×10√3) = 20/(20√3) = 1/√3 = √3/3 ✓</div>
+</div>
+
+<div class="step"><span class="sn">步骤 2</span><span class="stitle">离斜面最远的时刻（B 项）</span>
+<div class="why"><b>为什么是"速度平行斜面"？</b>把运动分解到<b>沿斜面</b>和<b>垂直斜面</b>两个方向。垂直斜面方向上，小球先远离再靠近，距离取极大值时该方向速度为零，也就是总速度<b>平行于斜面</b>。</div>
+<p>速度平行斜面 ⟹ 速度偏角 = 30°：</p>
+<div class="eq">tan30° = v<sub>y</sub>/v₀　⟹　v<sub>y</sub> = v₀·tan30° = 10√3 × (√3/3) = 10 m/s</div>
+<div class="eq">t′ = v<sub>y</sub>/g = 10/10 = 1 s</div>
+<div class="eq res">1 s ≠ √2 s ⟹ <span class="no">B 错</span></div>
+</div>
+
+<div class="step"><span class="sn">步骤 3</span><span class="stitle">最大距离（D 项）——两种算法</span>
+<p><b>算法一：先求位置，再投影。</b>t′ = 1 s 时：</p>
+<div class="eq">x′ = v₀t′ = 10√3 × 1 = 10√3 ≈ 17.32 m</div>
+<div class="eq">y′ = ½gt′² = ½ × 10 × 1 = 5 m</div>
+<p>点到斜面（过 a、与水平成 30° 向下的直线）的垂直距离：</p>
+<div class="eq">d = x′·sin30° − y′·cos30°</div>
+<div class="note">（把位移分别投影到"垂直斜面"方向：水平位移贡献 x′sin30°，竖直下落贡献 −y′cos30°）</div>
+<div class="eq">d = 10√3 × 0.5 − 5 × (√3/2) = 5√3 − 2.5√3 = 2.5√3 ≈ 4.33 m</div>
+
+<p><b>算法二：换斜面坐标系（更本质）。</b>取沿斜面向下为 ξ 轴、垂直斜面向外为 η 轴。</p>
+<div class="eq">初速度：v<sub>0ξ</sub> = v₀cos30°，v<sub>0η</sub> = v₀sin30°</div>
+<div class="eq">重力加速度：a<sub>ξ</sub> = +g sin30°，a<sub>η</sub> = −g cos30°</div>
+<p>η 方向是"竖直上抛"型运动，最大值由 v<sub>η</sub> = 0 给出：</p>
+<div class="eq">t′ = v<sub>0η</sub>/|a<sub>η</sub>| = v₀sin30°/(g cos30°) = v₀tan30°/g = 10√3×(√3/3)/10 = 1 s ✓</div>
+<div class="eq">d<sub>max</sub> = v<sub>0η</sub>²/(2|a<sub>η</sub>|) = (10√3 × 0.5)² / (2 × 10 × (√3/2))</div>
+<div class="eq">= (5√3)² / (10√3) = 75 / (10√3) = 7.5/√3 = 2.5√3 ≈ 4.33 m</div>
+<div class="eq res">2.5√3 ≈ 4.33 m ≠ 2.5 m ⟹ <span class="no">D 错</span></div>
+<div class="note">通用公式：d<sub>max</sub> = v₀²·sinθ·tanθ/(2g)。代入 300 × 0.5 × 0.5774 / 20 = 4.33 ✓</div>
+</div>
+<div class="ans">答案：A</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num">10</div><b>平抛后垂直撞击斜面</b></div>
+<div class="stem">v₀ = 10 m/s 水平抛出，飞行一段时间后<b>垂直</b>撞在倾角 θ = 30° 的斜面上。判断 A t = √3 s；B 撞击速率 10√3 m/s；C 位移 15√3 m；D 竖直下落 10 m。</div>
+
+<div class="step"><span class="sn">步骤 1</span><span class="stitle">把"垂直撞击"翻译成速度关系</span>
+<div class="why">"垂直撞在斜面上" ⟺ 速度沿斜面的<b>法线</b>方向 ⟺ 速度沿斜面方向的分量为 0。</div>
+<p><b>方法一（矢量投影，最严格）：</b>设斜面上坡方向单位矢量为 (cos30°, sin30°)，速度为 (v₀, −v<sub>y</sub>)。垂直条件即点积为零：</p>
+<div class="eq">v₀·cos30° + (−v<sub>y</sub>)·sin30° = 0</div>
+<div class="eq">v<sub>y</sub> = v₀·cos30°/sin30° = v₀·cot30° = v₀·√3</div>
+<p><b>方法二（画角度，更直观）：</b>法线与竖直方向成 30°，故末速度与竖直方向成 30°、与水平成 60°：</p>
+<div class="eq">tan60° = v<sub>y</sub>/v₀　⟹　v<sub>y</sub> = 10·tan60° = 10√3 ≈ 17.32 m/s</div>
+<div class="eq res">两法一致：v<sub>y</sub> = 10√3 m/s</div>
+<div class="warn"><b>最容易错的一步：</b>这里是 tanθ = v₀/v<sub>y</sub>（<b>倒过来</b>的），不是 tanθ = v<sub>y</sub>/v₀。因为速度垂直斜面时，v₀ 是"对边"而 v<sub>y</sub> 是"邻边"。与第 9 题"落到斜面"的公式恰好互为倒数。</div>
+</div>
+
+<div class="step"><span class="sn">步骤 2</span><span class="stitle">A 项：飞行时间</span>
+<div class="eq">v<sub>y</sub> = gt　⟹　t = v<sub>y</sub>/g = 10√3/10 = √3 ≈ 1.73 s</div>
+<div class="eq res"><span class="ok">A 对</span></div>
+</div>
+
+<div class="step"><span class="sn">步骤 3</span><span class="stitle">B 项：撞击速率</span>
+<div class="eq">v = √<span class="rt">v₀² + v<sub>y</sub>²</span> = √<span class="rt">10² + (10√3)²</span> = √<span class="rt">100 + 300</span> = √<span class="rt">400</span> = 20 m/s</div>
+<div class="eq res">20 m/s ≠ 10√3 ≈ 17.3 m/s ⟹ <span class="no">B 错</span></div>
+<div class="chk"><b>换算法：</b>末速度与水平成 60°，v = v₀/cos60° = 10/0.5 = 20 m/s ✓</div>
+</div>
+
+<div class="step"><span class="sn">步骤 4</span><span class="stitle">D 项：竖直下落距离</span>
+<div class="eq">y = ½gt² = ½ × 10 × (√3)² = 5 × 3 = 15 m</div>
+<div class="eq res">15 m ≠ 10 m ⟹ <span class="no">D 错</span></div>
+<div class="chk"><b>换算法：</b>v<sub>y</sub>² = 2gy ⟹ y = v<sub>y</sub>²/(2g) = 300/20 = 15 m ✓</div>
+</div>
+
+<div class="step"><span class="sn">步骤 5</span><span class="stitle">C 项：位移大小</span>
+<div class="eq">x = v₀t = 10 × √3 = 10√3 ≈ 17.32 m</div>
+<div class="eq">s = √<span class="rt">x² + y²</span> = √<span class="rt">(10√3)² + 15²</span> = √<span class="rt">300 + 225</span> = √<span class="rt">525</span></div>
+<p>化简：525 = 25 × 21，故</p>
+<div class="eq">s = 5√<span class="rt">21</span> ≈ 5 × 4.583 ≈ 22.9 m</div>
+<div class="eq res">22.9 m ≠ 15√3 ≈ 25.98 m ⟹ <span class="no">C 错</span></div>
+</div>
+<div class="ans">答案：A</div>
+<div class="tip"><b>两个斜面模型对照记忆：</b><br>
+落到斜面（位移沿斜面）：tanθ = y/x = gt/(2v₀) ⟹ t = 2v₀tanθ/g<br>
+垂直打斜面（速度垂直斜面）：tanθ = v₀/v<sub>y</sub> = v₀/(gt) ⟹ t = v₀/(g tanθ)<br>
+两者的 t 相差 <b>2tan²θ</b> 倍，绝不能混。</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num">11</div><b>排球：既要过网又要不出界</b></div>
+<div class="stem">场地长 l = 18 m，网高 h = 2 m，在右侧场地距网 3 m 处、离地 h₁ = 2.45 m 高度水平击球。求初速度范围。</div>
+
+<div class="given"><b>整理数据：</b>击球高度 2.45 m；击球点到网水平距离 3 m；对方半场长 18/2 = <b>9 m</b>；故击球点到对方底线的水平距离 = 3 + 9 = <b>12 m</b>。</div>
+
+<div class="step"><span class="sn">步骤 1</span><span class="stitle">临界一：恰好过网 → 给出速度<b>下限</b></span>
+<div class="why">球必须在到达网的正上方时还没降到网高以下。比较的是"<b>到网处的高度</b>"，不是落点位置。</div>
+<p>设初速度为 v。到达网正上方所需时间：</p>
+<div class="eq">t₁ = 3/v</div>
+<p>这段时间内的下落高度：</p>
+<div class="eq">y₁ = ½g t₁² = ½ × 10 × (3/v)² = 5 × 9/v² = 45/v²</div>
+<p>过网条件：下落高度必须小于"击球高度 − 网高"：</p>
+<div class="eq">y₁ &lt; h₁ − h = 2.45 − 2 = 0.45 m</div>
+<div class="eq">45/v² &lt; 0.45　⟹　v² &gt; 45/0.45 = 100　⟹　v &gt; 10 m/s</div>
+<div class="eq res">下限：v &gt; 10 m/s</div>
+</div>
+
+<div class="step"><span class="sn">步骤 2</span><span class="stitle">临界二：恰好落在底线 → 给出速度<b>上限</b></span>
+<p>球落地时竖直下落 2.45 m（击球高度）。总飞行时间：</p>
+<div class="eq">2.45 = ½ × 10 × t²  = 5t²　⟹　t² = 2.45/5 = 0.49　⟹　t = 0.7 s</div>
+<p>不出界条件：水平射程不超过 12 m：</p>
+<div class="eq">v·t &lt; 12　⟹　v × 0.7 &lt; 12　⟹　v &lt; 12/0.7 = 120/7 ≈ 17.14 m/s</div>
+<div class="eq res">上限：v &lt; 120/7 m/s</div>
+</div>
+
+<div class="step"><span class="sn">步骤 3</span><span class="stitle">合并区间</span>
+<div class="eq res">10 m/s &lt; v &lt; 120/7 m/s　（约 10 ~ 17.1 m/s）</div>
+<div class="chk"><b>合理性检验：</b>区间非空（10 &lt; 17.14），说明确实存在可行的击球速度。<br>
+取中间值 v = 14 m/s 试算：到网时间 3/14 ≈ 0.214 s，下落 5×0.0459 ≈ 0.23 m &lt; 0.45 m ✓ 过网；<br>
+射程 14 × 0.7 = 9.8 m &lt; 12 m ✓ 不出界。</div>
+</div>
+<div class="ans">答案：A（10 m/s &lt; v &lt; 120/7 m/s）</div>
+<div class="warn"><b>三个易错：</b>① 对方半场是 9 m 不是 18 m；② 过网判据用"到网处的下落高度"，不能用落点；③ C、D 选项各只答对一半（一个只给下限，一个只给上限）。</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num m">12</div><b>（多选）斜面内圆周运动 + 类平抛</b></div>
+<div class="stem">两个倾角 30° 的<b>光滑</b>斜面。正方形 ABCD 边长 2L，O 是中心，a 是 CD 中点，细线长 L 系于 O；abcd 边长未知，a、C、b 共线。在 a 点给小球沿 ab 方向、大小 v<sub>a</sub> = 2√(gL) 的初速度，绕 O 做圆周运动；再次到 a 点时剪断细线，小球沿斜面 abcd 运动并从 c 点离开。判断 A 剪断前 a 点张力 4mg；B c 点速度 2√(5gL)；C abcd 边长 14L；D a 到 c 时间 8√(L/g)。</div>
+
+<div class="step"><span class="sn">步骤 1</span><span class="stitle">建立"等效重力场"</span>
+<p>小球在光滑斜面上，垂直斜面方向受力平衡：</p>
+<div class="eq">N = mg·cos30°（不参与沿面的运动）</div>
+<p>沿斜面方向只剩重力分量：</p>
+<div class="eq">F<sub>沿面</sub> = mg·sin30° = mg × 0.5 = 0.5mg（方向：沿斜面向下坡）</div>
+<div class="eq res">等效重力加速度 g′ = g·sin30° = <b>g/2</b></div>
+<div class="why">从此以后，这个斜面上的一切运动都可以套用"竖直平面内"的公式，只要把 g 换成 g/2。</div>
+</div>
+
+<div class="step"><span class="sn">步骤 2</span><span class="stitle">抠清三条几何关系</span>
+<ul>
+<li><b>圆的半径与正方形的关系：</b>边长 2L，O 是中心，a 是 CD 中点 ⟹ Oa ⊥ CD 且 Oa = 2L/2 = L，正好等于绳长 ⟹ <b>圆内切于正方形</b>，与四边相切于各边中点。</li>
+<li><b>初速度确实是切线方向：</b>a 是 CD 中点、a、C、b 共线 ⟹ 直线 ab 就是 <b>CD 边所在直线</b>；又 Oa ⊥ CD ⟹ v<sub>a</sub> ⊥ Oa ⟹ 是切线 ✓</li>
+<li><b>a 是圆周的"最低点"：</b>由图，AD、BC 沿最大坡度线（与水平成 30°），故 AB、CD 是<b>水平边</b>；O 在 a 的正上坡方向、相距 L ⟹ 沿斜面看，a 比圆周上任何点都低。</li>
+</ul>
+<div class="note">竖直高度差核算：O 比 a 高 L·sin30° = L/2。</div>
+</div>
+
+<div class="step"><span class="sn">步骤 3</span><span class="stitle">A 项：a 点的绳张力</span>
+<p><b>① 先确认此刻速率。</b>斜面光滑；绳张力始终垂直于速度，<b>不做功</b>；小球绕一圈回到<b>同一点</b> a，高度不变。由动能定理：</p>
+<div class="eq">W<sub>合</sub> = 0　⟹　½mv² − ½mv<sub>a</sub>² = 0　⟹　v = v<sub>a</sub> = 2√<span class="rt">gL</span></div>
+<p><b>② 在 a 点沿"指向圆心"方向列牛顿第二定律。</b>a 是最低点，圆心 O 在其上坡方向，故指向圆心 = 沿斜面向上坡。该方向受力：绳张力 T（向上坡，指向 O）、重力分量 mg sin30°（向下坡，背离 O）：</p>
+<div class="eq">T − mg·sin30° = m·v<sub>a</sub>²/L</div>
+<p><b>③ 逐项代入。</b>先算向心力项：</p>
+<div class="eq">m·v<sub>a</sub>²/L = m·(2√<span class="rt">gL</span>)²/L = m·(4gL)/L = 4mg</div>
+<p>再算重力分量项：mg sin30° = 0.5mg。于是</p>
+<div class="eq">T = 4mg + 0.5mg = 4.5mg</div>
+<div class="eq res">4.5mg ≠ 4mg ⟹ <span class="no">A 错</span></div>
+<div class="warn"><b>陷阱复盘：</b>4mg 恰好是"只算向心力、漏掉重力分量"的结果，出题人就是把这个半成品放进选项。</div>
+<div class="chk"><b>顺带验证小球能转完整圈。</b>最高点在 O 的上坡方向 L 处，与 a 的"等效高度差"为 2L：<br>
+v<sub>顶</sub>² = v<sub>a</sub>² − 2g′(2L) = 4gL − 2×(g/2)×2L = 4gL − 2gL = 2gL；<br>
+过顶临界条件 v<sub>顶</sub>² ≥ g′L = 0.5gL。因 2gL &gt; 0.5gL ✓ 能通过最高点、回到 a。</div>
+</div>
+
+<div class="step"><span class="sn">步骤 4</span><span class="stitle">剪断细线后：建立类平抛模型</span>
+<p>剪断瞬间速度不变，仍为 v<sub>a</sub> = 2√(gL)，方向沿 ab。进入第二个斜面后（设边长为 s）：</p>
+<table>
+<tr><th style="width:26%">方向</th><th style="width:24%">受力</th><th>运动性质 / 方程</th></tr>
+<tr><td class="c">沿 ab（水平边）</td><td class="c">0</td><td>匀速：<b>s = v<sub>a</sub>·t</b></td></tr>
+<tr><td class="c">沿 ad（最大坡度线）</td><td class="c">mg sin30°</td><td>初速为零匀加速：<b>s = ½·g′·t² = ¼g t²</b></td></tr>
+</table>
+<div class="why"><b>为什么两个方向的位移都等于 s？</b>小球从顶点 a 出发、"从 c 点离开"，而 c 是 a 的<b>对角顶点</b>，所以沿 ab 走了一个边长、沿 ad 也走了一个边长。</div>
+</div>
+
+<div class="step"><span class="sn">步骤 5</span><span class="stitle">D 项：a 到 c 的时间</span>
+<p>两式的左边都是 s，令右边相等：</p>
+<div class="eq">v<sub>a</sub>·t = ¼g t²</div>
+<p>两边同除 t（t ≠ 0）：</p>
+<div class="eq">v<sub>a</sub> = ¼g t　⟹　t = 4v<sub>a</sub>/g</div>
+<p>代入 v<sub>a</sub> = 2√(gL)：</p>
+<div class="eq">t = 4 × 2√<span class="rt">gL</span> / g = 8√<span class="rt">gL</span>/g</div>
+<p>化简（把 g 挪进根号）：√(gL)/g = √(gL/g²) = √(L/g)，所以</p>
+<div class="eq res">t = 8√<span class="rt">L/g</span> ⟹ <span class="ok">D 对</span></div>
+</div>
+
+<div class="step"><span class="sn">步骤 6</span><span class="stitle">C 项：正方形 abcd 的边长</span>
+<div class="eq">s = v<sub>a</sub>·t = 2√<span class="rt">gL</span> × 8√<span class="rt">L/g</span> = 16 × √<span class="rt">gL × L/g</span> = 16√<span class="rt">L²</span> = 16L</div>
+<div class="eq res">16L ≠ 14L ⟹ <span class="no">C 错</span></div>
+<div class="chk"><b>用另一个方程复核：</b>s = ¼g t² = ¼ × g × 64(L/g) = 16L ✓</div>
+</div>
+
+<div class="step"><span class="sn">步骤 7</span><span class="stitle">B 项：c 点速度——三种算法</span>
+<p><b>算法一：直接算两个分量。</b></p>
+<div class="eq">v<sub>∥</sub> = v<sub>a</sub> = 2√<span class="rt">gL</span>　（沿 ab，全程不变）</div>
+<div class="eq">v<sub>⊥</sub> = g′·t = (g/2) × 8√<span class="rt">L/g</span> = 4g√<span class="rt">L/g</span> = 4√<span class="rt">g²L/g</span> = 4√<span class="rt">gL</span></div>
+<div class="eq">v<sub>c</sub> = √<span class="rt">v<sub>∥</sub>² + v<sub>⊥</sub>²</span> = √<span class="rt">4gL + 16gL</span> = √<span class="rt">20gL</span> = 2√<span class="rt">5gL</span></div>
+
+<p><b>算法二：用平抛"黄金比例"秒杀。</b>位移沿正方形对角线，位移偏角的正切 = s/s = 1；由 tanθ<sub>速度</sub> = 2·tanα<sub>位移</sub> 得 tanθ = 2，即</p>
+<div class="eq">v<sub>⊥</sub> = 2v<sub>∥</sub> = 4√<span class="rt">gL</span>　⟹　v<sub>c</sub> = √<span class="rt">1²+2²</span>·v<sub>∥</sub> = √5 × 2√<span class="rt">gL</span> = 2√<span class="rt">5gL</span></div>
+
+<p><b>算法三：动能定理（最适合查错）。</b>光滑，只有重力沿斜面分量做功，位移沿坡向的分量为 s：</p>
+<div class="eq">W = mg·sin30°·s = mg × 0.5 × 16L = 8mgL</div>
+<div class="eq">½mv<sub>c</sub>² − ½mv<sub>a</sub>² = ½m(20gL − 4gL) = ½m × 16gL = 8mgL ✓ 完全吻合</div>
+<div class="eq res"><span class="ok">B 对</span></div>
+</div>
+<div class="ans">答案：BD</div>
+</div>
+
+<h2>题型 4 ｜ 斜抛运动</h2>
+
+<div class="q">
+<div class="qhead"><div class="num">13</div><b>三条最高点等高的高尔夫球轨迹</b></div>
+<div class="stem">甲、乙、丙从同一点 O 斜向上击出，分别落在地面 A、B、C（OA &gt; OB &gt; OC），<b>三条路径的最高点在同一水平面内</b>。判断 A 乙落地速率最大；B 丙空中时间最短；C 三球初速度竖直分量相等；D 水平分量相等。</div>
+
+<div class="step"><span class="sn">步骤 1</span><span class="stitle">把"最高点等高"翻译成公式</span>
+<p>斜抛的竖直方向是竖直上抛，最高点 v<sub>y</sub> = 0，由 v<sub>y</sub>² = v<sub>0y</sub>² − 2gH：</p>
+<div class="eq">0 = v<sub>0y</sub>² − 2gH　⟹　H = v<sub>0y</sub>²/(2g)　⟹　v<sub>0y</sub> = √<span class="rt">2gH</span></div>
+<p>三条轨迹 H 相同、g 相同：</p>
+<div class="eq res">v<sub>0y甲</sub> = v<sub>0y乙</sub> = v<sub>0y丙</sub> ⟹ <span class="ok">C 对</span></div>
+</div>
+
+<div class="step"><span class="sn">步骤 2</span><span class="stitle">B 项：飞行时间</span>
+<p>落回同一水平地面，由对称性（上升时间 = 下降时间）：</p>
+<div class="eq">t = 2v<sub>0y</sub>/g</div>
+<p>v<sub>0y</sub> 三者相同 ⟹ t 三者相同。</p>
+<div class="eq res">不存在"时间最短" ⟹ <span class="no">B 错</span></div>
+</div>
+
+<div class="step"><span class="sn">步骤 3</span><span class="stitle">D 项：水平分量</span>
+<p>水平方向匀速，射程 x = v<sub>0x</sub>·t，而 t 相同：</p>
+<div class="eq">v<sub>0x</sub> = x/t　⟹　x 越大，v<sub>0x</sub> 越大</div>
+<p>由题图 OA &gt; OB &gt; OC，故</p>
+<div class="eq res">v<sub>0x甲</sub> &gt; v<sub>0x乙</sub> &gt; v<sub>0x丙</sub>，<b>不</b>相等 ⟹ <span class="no">D 错</span></div>
+</div>
+
+<div class="step"><span class="sn">步骤 4</span><span class="stitle">A 项：落地速率</span>
+<p>落回抛出高度，由对称性落地速率 = 初速率：</p>
+<div class="eq">v = √<span class="rt">v<sub>0x</sub>² + v<sub>0y</sub>²</span></div>
+<p>v<sub>0y</sub> 三者相同，比较归结为比较 v<sub>0x</sub>：甲最大 ⟹ 甲落地速率最大。</p>
+<div class="eq res">是甲不是乙 ⟹ <span class="no">A 错</span></div>
+<div class="chk"><b>用能量再验一次：</b>½mv<sub>落</sub>² = ½mv₀²（回到同一高度，重力做功为零）⟹ 落地速率 = 初速率，与上面一致。</div>
+</div>
+<div class="ans">答案：C</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num c">14</div><b>桃子：自由落体 → 碰撞 → 屋顶滑行 → 斜抛落地</b></div>
+<div class="stem">m = 0.1 kg 的桃子自由下落 h = 1.25 m 落到屋顶 c 点，碰后瞬间速度是碰前的 3/5、方向沿屋顶向下；沿屋顶滑到末端 d 后做斜抛。cd 长 L₀ = 6.75 m，与水平面成 θ = 37°，d 离地 H = 3.05 m，动摩擦因数 μ = 0.5。求 (1) v<sub>c</sub>；(2) c→d 时间 t₀；(3) 落地点与 d 的水平距离 L。</div>
+
+<div class="given"><b>过程分解：</b>① 自由落体（树梢→c）② 碰撞（速度突变）③ 屋顶匀加速下滑（c→d）④ 斜向下抛（d→地面）。<br>
+<b>衔接原则：</b>上一段的末速度就是下一段的初速度（碰撞处按题给比例突变）。</div>
+
+<div class="step"><span class="sn">(1)-①</span><span class="stitle">自由落体求碰前速度</span>
+<p>初速为零的自由落体，用 v² = 2gh：</p>
+<div class="eq">v² = 2 × 10 × 1.25 = 25　⟹　v = 5 m/s（方向竖直向下）</div>
+</div>
+
+<div class="step"><span class="sn">(1)-②</span><span class="stitle">碰撞后的速度</span>
+<p>题给"碰后瞬间速度大小是碰前的 3/5"：</p>
+<div class="eq res">v<sub>c</sub> = (3/5) × 5 = 3 m/s（方向沿屋顶向下）</div>
+<div class="note">碰撞使速度的大小和方向同时突变，这是题目直接给定的条件，不需要（也无法）用动量定理去算。</div>
+</div>
+
+<div class="step"><span class="sn">(2)-①</span><span class="stitle">c→d 段受力分析与加速度</span>
+<p>桃子沿屋顶下滑，取<b>沿屋顶向下为正方向</b>。垂直屋顶方向平衡：</p>
+<div class="eq">N = mg·cos37° = 0.1 × 10 × 0.8 = 0.8 N</div>
+<p>沿屋顶方向：重力分量（正）与滑动摩擦力（负，因为向下滑，摩擦向上）：</p>
+<div class="eq">mg·sin37° = 0.1 × 10 × 0.6 = 0.6 N</div>
+<div class="eq">f = μN = 0.5 × 0.8 = 0.4 N</div>
+<p>牛顿第二定律：</p>
+<div class="eq">ma = mg sin37° − μmg cos37° = 0.6 − 0.4 = 0.2 N</div>
+<div class="eq">a = 0.2 / 0.1 = 2 m/s²</div>
+<div class="eq res">a = 2 m/s²（沿屋顶向下，匀加速）</div>
+<div class="note">也可直接用公式 a = g(sinθ − μcosθ) = 10(0.6 − 0.5×0.8) = 10 × 0.2 = 2 m/s²，与质量无关。</div>
+</div>
+
+<div class="step"><span class="sn">(2)-②</span><span class="stitle">解位移方程求时间</span>
+<div class="eq">L₀ = v<sub>c</sub>t₀ + ½at₀²</div>
+<p>代入 L₀ = 6.75、v<sub>c</sub> = 3、a = 2：</p>
+<div class="eq">6.75 = 3t₀ + ½ × 2 × t₀² = 3t₀ + t₀²</div>
+<p>整理成标准二次方程：</p>
+<div class="eq">t₀² + 3t₀ − 6.75 = 0</div>
+<p>判别式与求根：</p>
+<div class="eq">Δ = 3² − 4×1×(−6.75) = 9 + 27 = 36，√Δ = 6</div>
+<div class="eq">t₀ = (−3 ± 6)/2　⟹　t₀ = 1.5 s 或 t₀ = −4.5 s</div>
+<div class="eq res">时间不能为负 ⟹ <b>t₀ = 1.5 s</b></div>
+</div>
+
+<div class="step"><span class="sn">(3)-①</span><span class="stitle">求 d 点速度并分解</span>
+<div class="eq">v<sub>d</sub> = v<sub>c</sub> + a t₀ = 3 + 2 × 1.5 = 6 m/s（方向沿屋顶向下，与水平成 37°）</div>
+<div class="chk"><b>用速度—位移公式验算：</b>v<sub>d</sub>² = v<sub>c</sub>² + 2aL₀ = 9 + 2×2×6.75 = 9 + 27 = 36 ⟹ v<sub>d</sub> = 6 m/s ✓</div>
+<p>离开 d 后只受重力，做<b>斜向下抛</b>。把 v<sub>d</sub> 分解：</p>
+<div class="eq">v<sub>dx</sub> = v<sub>d</sub>cos37° = 6 × 0.8 = 4.8 m/s（水平，匀速）</div>
+<div class="eq">v<sub>dy</sub> = v<sub>d</sub>sin37° = 6 × 0.6 = 3.6 m/s（竖直<b>向下</b>，作为竖直方向的初速度）</div>
+</div>
+
+<div class="step"><span class="sn">(3)-②</span><span class="stitle">竖直方向求落地时间</span>
+<div class="why">竖直方向是"初速度向下 3.6 m/s 的匀加速直线运动"，不是自由落体，公式必须带初速度项。</div>
+<div class="eq">H = v<sub>dy</sub>t + ½g t²</div>
+<div class="eq">3.05 = 3.6t + 5t²　⟹　5t² + 3.6t − 3.05 = 0</div>
+<div class="eq">Δ = 3.6² − 4×5×(−3.05) = 12.96 + 61 = 73.96，√Δ = 8.6</div>
+<div class="eq">t = (−3.6 ± 8.6)/(2×5) = (−3.6 ± 8.6)/10</div>
+<div class="eq res">t = 0.5 s（另一根 −1.22 s 舍去）</div>
+</div>
+
+<div class="step"><span class="sn">(3)-③</span><span class="stitle">水平方向求距离</span>
+<div class="eq">L = v<sub>dx</sub>·t = 4.8 × 0.5 = 2.4 m</div>
+<div class="chk"><b>落地速度校验（可选）：</b>落地时 v<sub>y</sub> = 3.6 + 10×0.5 = 8.6 m/s，v = √(4.8²+8.6²) = √(23.04+73.96) = √97 ≈ 9.85 m/s；<br>
+用动能定理复核：½v² = ½v<sub>d</sub>² + gH ⟹ v² = 36 + 2×10×3.05 = 36+61 = 97 ✓</div>
+</div>
+<div class="ans">答案：(1) v<sub>c</sub> = 3 m/s　(2) t₀ = 1.5 s　(3) L = 2.4 m</div>
+</div>
+
+<div class="q">
+<div class="qhead"><div class="num c">15</div><b>高处斜向上抛出</b></div>
+<div class="stem">离地 3.2 m 高处，将 1 kg 小球以 v₀ = 10 m/s、与水平成 37° 斜向上抛出。求 (1) 从抛出点上升的最大高度；(2) 空中运动时间；(3) 落地点与抛出点的水平距离。</div>
+
+<div class="step"><span class="sn">步骤 0</span><span class="stitle">分解初速度（一切的起点）</span>
+<div class="eq">v<sub>0x</sub> = v₀cos37° = 10 × 0.8 = 8 m/s（水平，全程不变）</div>
+<div class="eq">v<sub>0y</sub> = v₀sin37° = 10 × 0.6 = 6 m/s（竖直向上）</div>
+<div class="note">质量 1 kg 是干扰信息——抛体运动的轨迹与质量无关。</div>
+</div>
+
+<div class="step"><span class="sn">(1)</span><span class="stitle">上升的最大高度</span>
+<div class="why">竖直方向是竖直上抛。最高点的标志是 v<sub>y</sub> = 0（此时速度只剩水平分量 8 m/s，并非速度为零）。</div>
+<div class="eq">v<sub>y</sub>² = v<sub>0y</sub>² − 2gh，令 v<sub>y</sub> = 0：</div>
+<div class="eq">0 = 6² − 2 × 10 × h　⟹　20h = 36　⟹　h = 1.8 m</div>
+<div class="eq res">h = 1.8 m（距地面则为 3.2 + 1.8 = 5.0 m）</div>
+<div class="note">上升所用时间 t₁ = v<sub>0y</sub>/g = 6/10 = 0.6 s，后面要用。</div>
+</div>
+
+<div class="step"><span class="sn">(2)</span><span class="stitle">空中运动时间——两种算法</span>
+<p><b>算法一：统一方程法（推荐）。</b>取<b>竖直向上为正</b>，落地时小球比抛出点低 3.2 m，即位移 y = −3.2 m：</p>
+<div class="eq">y = v<sub>0y</sub>t − ½g t²</div>
+<div class="eq">−3.2 = 6t − 5t²　⟹　5t² − 6t − 3.2 = 0</div>
+<div class="eq">Δ = (−6)² − 4×5×(−3.2) = 36 + 64 = 100，√Δ = 10</div>
+<div class="eq">t = (6 ± 10)/(2×5) = (6 ± 10)/10　⟹　t = 1.6 s 或 t = −0.4 s</div>
+<div class="eq res">t = 1.6 s（负根舍去）</div>
+
+<p><b>算法二：分段法（用来验算）。</b></p>
+<div class="eq">上升段：t₁ = 0.6 s，升到离地 5.0 m</div>
+<div class="eq">下降段（从最高点自由下落 5.0 m）：5.0 = ½ × 10 × t₂² ⟹ t₂² = 1 ⟹ t₂ = 1.0 s</div>
+<div class="eq res">t = t₁ + t₂ = 0.6 + 1.0 = 1.6 s ✓ 两法一致</div>
+<div class="warn"><b>常见错误：</b>直接用对称公式 t = 2v<sub>0y</sub>/g = 1.2 s。那只是"回到抛出点<b>同一高度</b>"的时间，本题落点比抛出点低 3.2 m，还要再飞一段。</div>
+</div>
+
+<div class="step"><span class="sn">(3)</span><span class="stitle">水平距离</span>
+<p>水平方向自始至终匀速：</p>
+<div class="eq">x = v<sub>0x</sub>·t = 8 × 1.6 = 12.8 m</div>
+<div class="chk"><b>落地速度校验：</b>v<sub>y</sub> = v<sub>0y</sub> − gt = 6 − 16 = −10 m/s（向下 10 m/s）；<br>
+v = √(8² + 10²) = √164 ≈ 12.8 m/s；<br>
+动能定理复核：½v² = ½v₀² + g×3.2 ⟹ v² = 100 + 64 = 164 ✓</div>
+</div>
+<div class="ans">答案：(1) 1.8 m　(2) 1.6 s　(3) 12.8 m</div>
+</div>
+
+<h2>题型 5 ｜ 多过程综合（压轴）</h2>
+
+<div class="q">
+<div class="qhead"><div class="num c">16</div><b>传送带 → 平抛 → 圆弧 → 双木板</b></div>
+<div class="stem">光滑圆弧 BC 固定在地面，圆心角 θ = 53°，R = 3 m，C 端切线水平。木板 D、E 质量均 M = 1 kg、长均 L = 4.5 m，静止在粗糙地面，上表面与 C 等高平滑衔接。m = 2 kg 的物块 A 轻放于顺时针转动的传送带左端，离开传送带后从 B 点<b>沿切线方向</b>进入 BC，最终滑上 E。μ₁ = 0.5（A—带）、μ₂ = 0.4（A—木板）、μ₃ = 0.2（D—地面，E 下表面光滑），A、B 高度差 h = 0.8 m。求 (1) A 到与带共速时相对地面的位移；(2) A 滑到 C 时轨道支持力；(3) A 在 D 上运动过程中 D 克服地面摩擦力做的功。</div>
+
+<div class="step"><span class="sn">步骤 0</span><span class="stitle">反推传送带速度（本题的钥匙）</span>
+<div class="why">题目没直接给带速。但"<b>沿切线方向</b>进入 B 点"是一个强条件：平抛末速度的方向必须等于 B 点的切线方向。而 C 端切线水平、圆心角 53° ⟹ <b>B 点切线与水平成 53°</b>。</div>
+<p>平抛段竖直方向（下落 h = 0.8 m）：</p>
+<div class="eq">v<sub>y</sub> = √<span class="rt">2gh</span> = √<span class="rt">2 × 10 × 0.8</span> = √<span class="rt">16</span> = 4 m/s</div>
+<p>由速度方向条件：</p>
+<div class="eq">tan53° = v<sub>y</sub>/v<sub>x</sub>　⟹　v<sub>x</sub> = v<sub>y</sub>/tan53° = 4 ÷ (0.8/0.6) = 4 × 0.6/0.8 = 3 m/s</div>
+<div class="eq res">A 离开传送带时的速度 = 传送带速度 = <b>3 m/s</b></div>
+</div>
+
+<div class="step"><span class="sn">(1)-①</span><span class="stitle">传送带上的受力与加速度</span>
+<p>A 轻放（v = 0），带面向右运动 ⟹ A 相对带向左滑 ⟹ 滑动摩擦力方向<b>向右</b>（带动 A 加速）：</p>
+<div class="eq">f₁ = μ₁·mg = 0.5 × 2 × 10 = 10 N</div>
+<div class="eq">a₁ = f₁/m = 10/2 = 5 m/s²</div>
+<div class="note">也可直接写 a₁ = μ₁g = 0.5 × 10 = 5 m/s²。</div>
+</div>
+
+<div class="step"><span class="sn">(1)-②</span><span class="stitle">求共速前的位移</span>
+<p>A 从 0 加速到 3 m/s：</p>
+<div class="eq">v² = 2a₁s₁　⟹　s₁ = v²/(2a₁) = 3²/(2×5) = 9/10 = 0.9 m</div>
+<div class="eq res">s₁ = 0.9 m</div>
+<div class="chk"><b>另算一遍：</b>t = v/a₁ = 3/5 = 0.6 s；s₁ = ½a₁t² = ½×5×0.36 = 0.9 m ✓<br>
+（顺带：这段时间带子走了 3×0.6 = 1.8 m，A 相对带后退 0.9 m。）</div>
+</div>
+
+<div class="step"><span class="sn">(2)-①</span><span class="stitle">B 点速度</span>
+<div class="eq">v<sub>B</sub> = √<span class="rt">v<sub>x</sub>² + v<sub>y</sub>²</span> = √<span class="rt">3² + 4²</span> = √<span class="rt">9+16</span> = 5 m/s</div>
+</div>
+
+<div class="step"><span class="sn">(2)-②</span><span class="stitle">B 到 C 的高度差</span>
+<p>C 是圆弧最低点（切线水平 ⟹ 圆心 O′ 在 C 正上方，O′C = R 竖直）。B 与 C 的圆心角为 53°，B 相对圆心的竖直位置为 −R cos53°：</p>
+<div class="eq">Δh = R − R·cos53° = R(1 − cos53°) = 3 × (1 − 0.6) = 3 × 0.4 = 1.2 m</div>
+</div>
+
+<div class="step"><span class="sn">(2)-③</span><span class="stitle">机械能守恒求 v<sub>C</sub></span>
+<div class="why">圆弧<b>光滑</b>，只有重力做功 ⟹ 机械能守恒（或用动能定理：W<sub>G</sub> = mgΔh）。</div>
+<div class="eq">½mv<sub>C</sub>² = ½mv<sub>B</sub>² + mg·Δh</div>
+<p>两边同除 ½m：</p>
+<div class="eq">v<sub>C</sub>² = v<sub>B</sub>² + 2gΔh = 25 + 2 × 10 × 1.2 = 25 + 24 = 49</div>
+<div class="eq res">v<sub>C</sub> = 7 m/s</div>
+</div>
+
+<div class="step"><span class="sn">(2)-④</span><span class="stitle">C 点的向心力方程</span>
+<p>C 是最低点，圆心在正上方 ⟹ 向心加速度<b>竖直向上</b>。受力：支持力 N（向上）、重力 mg（向下）：</p>
+<div class="eq">N − mg = m·v<sub>C</sub>²/R</div>
+<div class="eq">N = mg + m v<sub>C</sub>²/R = 2×10 + 2×49/3 = 20 + 98/3</div>
+<p>通分：20 = 60/3，故</p>
+<div class="eq res">N = 60/3 + 98/3 = 158/3 ≈ 52.7 N</div>
+<div class="note">由牛顿第三定律，A 对轨道的压力也是 158/3 N ≈ 52.7 N，方向竖直向下。</div>
+<div class="warn"><b>易错：</b>写成 N = mv<sub>C</sub>²/R（漏 mg）或 N = mg（漏向心力）都错。最低点必须两项都有，且 N &gt; mg。</div>
+</div>
+
+<div class="step"><span class="sn">(3)-①</span><span class="stitle">A 滑上木板 D 后的受力（A 的加速度）</span>
+<p>A 以 7 m/s 滑上 D，相对 D 向右滑 ⟹ 受向左的滑动摩擦：</p>
+<div class="eq">f₂ = μ₂·mg = 0.4 × 2 × 10 = 8 N</div>
+<div class="eq">a<sub>A</sub> = f₂/m = 8/2 = 4 m/s²（减速）</div>
+</div>
+
+<div class="step"><span class="sn">(3)-②</span><span class="stitle">判断木板动不动、几块一起动</span>
+<p><b>驱动力：</b>A 给 D 的摩擦力（反作用力）= 8 N，方向<b>向右</b>。</p>
+<p><b>地面阻力：</b>地面对 D 的正压力要算上压在上面的 A：</p>
+<div class="eq">N<sub>地</sub> = (m + M)g = (2 + 1) × 10 = 30 N</div>
+<div class="eq">f₃ = μ₃·N<sub>地</sub> = 0.2 × 30 = 6 N</div>
+<p>E 的下表面光滑 ⟹ 地面对 E 无摩擦力。D 被推动时会顶着前方的 E 一起走。</p>
+<p><b>对 D+E 整体列牛顿第二定律：</b></p>
+<div class="eq">8 N − 6 N = (M<sub>D</sub> + M<sub>E</sub>)·a<sub>DE</sub></div>
+<div class="eq">2 = 2 × a<sub>DE</sub>　⟹　a<sub>DE</sub> = 1 m/s²</div>
+<div class="chk"><b>两处必须校验：</b><br>
+① 8 N &gt; 6 N，所以木板确实被推动（若反之则木板静止不动）；<br>
+② 隔离 E：唯一水平力是 D 的推力 N<sub>DE</sub> = M<sub>E</sub>·a<sub>DE</sub> = 1 × 1 = 1 N &gt; 0，说明是<b>挤压</b>而非拉扯，"D、E 一起动"的假设成立 ✓</div>
+<div class="warn"><b>本题最大的坑：</b>若忘了 E 会被推着走，会算成 a<sub>D</sub> = 2/1 = 2 m/s²，后面全错。</div>
+</div>
+
+<div class="step"><span class="sn">(3)-③</span><span class="stitle">求 A 滑过 D 所需时间</span>
+<div class="why">A 从 D 的左端滑到右端，条件是<b>相对位移 = 板长 L</b>。</div>
+<p>A 的位移（初速 7，减速 4）：s<sub>A</sub> = 7t − ½×4×t² = 7t − 2t²</p>
+<p>D 的位移（初速 0，加速 1）：s<sub>D</sub> = ½×1×t² = 0.5t²</p>
+<div class="eq">Δs = s<sub>A</sub> − s<sub>D</sub> = 7t − 2t² − 0.5t² = 7t − 2.5t² = 4.5</div>
+<div class="eq">2.5t² − 7t + 4.5 = 0</div>
+<div class="eq">Δ = 49 − 4×2.5×4.5 = 49 − 45 = 4，√Δ = 2</div>
+<div class="eq">t = (7 ± 2)/(2×2.5) = (7 ± 2)/5　⟹　t = 1 s 或 t = 1.8 s</div>
+<p><b>取哪个根？</b>先求二者共速的时刻：</p>
+<div class="eq">7 − 4t = 0 + 1·t　⟹　5t = 7　⟹　t<sub>共速</sub> = 1.4 s</div>
+<div class="eq res">1 s &lt; 1.4 s，物理上有效；1.8 s &gt; 1.4 s 时早已共速、不再相对滑动，是增根 ⟹ <b>t = 1 s</b></div>
+<div class="chk"><b>核对：</b>t = 1 s 时 s<sub>A</sub> = 7 − 2 = 5 m，s<sub>D</sub> = 0.5 m，相对位移 = 5 − 0.5 = 4.5 m = L ✓<br>
+此时 v<sub>A</sub> = 7 − 4 = 3 m/s，v<sub>D</sub> = 1 m/s，A 仍比 D 快，确实滑到了 D 的右端并跨上 E ✓</div>
+</div>
+
+<div class="step"><span class="sn">(3)-④</span><span class="stitle">计算 D 克服地面摩擦力做的功</span>
+<p>D 在这 1 s 内的位移：</p>
+<div class="eq">s<sub>D</sub> = ½a<sub>DE</sub>t² = ½ × 1 × 1² = 0.5 m</div>
+<p>地面摩擦力大小恒为 6 N（A 一直压在 D 上，正压力不变），方向与 D 的运动方向相反：</p>
+<div class="eq">W<sub>克服</sub> = f₃ · s<sub>D</sub> = 6 × 0.5 = 3 J</div>
+<div class="eq res">W = 3 J</div>
+<div class="chk"><b>能量总账验算（可选）：</b><br>
+A 的动能损失 = ½×2×(7²−3²) = (49−9) = 40 J；<br>
+D、E 获得动能 = ½×2×1² = 1 J；<br>
+A 与 D 之间摩擦生热 Q = f₂·Δs = 8 × 4.5 = 36 J；<br>
+地面摩擦耗能 = 6 × 0.5 = 3 J。<br>
+核对：40 = 1 + 36 + 3 = 40 ✓ 能量完全守恒。</div>
+</div>
+<div class="ans">答案：(1) s₁ = 0.9 m　(2) N = 158/3 N ≈ 52.7 N　(3) W = 3 J</div>
+</div>
+
+<hr>
+<h2>附：本套题的通用解题流程</h2>
+<table>
+<tr><th style="width:14%">环节</th><th>要做的事</th><th>本套题中的实例</th></tr>
+<tr><td class="c"><b>① 分段</b></td><td>把复杂过程拆成"单一规律"的小段</td><td>第 16 题拆成 5 段；第 14 题拆成 4 段</td></tr>
+<tr><td class="c"><b>② 建系</b></td><td>选坐标/正方向，写下已知量并统一单位</td><td>第 5 题 cm→m；第 8 题以 O 为原点定四点坐标</td></tr>
+<tr><td class="c"><b>③ 受力</b></td><td>每段画受力图，求出该段加速度</td><td>第 14 题 a = g(sinθ−μcosθ)；第 16 题三个不同的 a</td></tr>
+<tr><td class="c"><b>④ 衔接</b></td><td>上段末速度 = 下段初速度；找隐含的方向条件</td><td>第 16 题"沿切线进入 B"反推带速</td></tr>
+<tr><td class="c"><b>⑤ 约束</b></td><td>几何约束（板长、河宽、正方形边长）转成方程</td><td>第 12 题两方向位移都 = s；第 16 题相对位移 = L</td></tr>
+<tr><td class="c"><b>⑥ 验根</b></td><td>二次方程两根要用物理条件筛选</td><td>第 16 题用"是否已共速"淘汰 1.8 s</td></tr>
+<tr><td class="c"><b>⑦ 校验</b></td><td>换公式 / 用能量 / 看极限，做交叉验证</td><td>第 12、14、15、16 题都做了能量核对</td></tr>
+</table>
+
+<p class="small" style="text-align:center;margin-top:24px">逐步推导详解 · 16 题完</p>
+</div>
+</body>
+</html>
