@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块质量检测(三) · 全卷详解</title>
+<style>
+:root{
+  --ink:#14293F;
+  --pen:#C0392B;
+  --paper:#FCFCFA;
+  --rule:#D9E2EB;
+  --soft:#F1F6FA;
+  --muted:#61738A;
+  --grid:#E4EDF5;
+  --gold:#B8860B;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Heiti SC",sans-serif;
+  font-size:16px; line-height:1.85;
+}
+.wrap{max-width:920px;margin:0 auto;padding:0 22px 90px}
+
+/* ---------- 页眉 ---------- */
+header{
+  border-bottom:3px double var(--ink);
+  padding:44px 0 20px; margin-bottom:34px;
+}
+header .eyebrow{
+  font-size:12px; letter-spacing:.42em; color:var(--muted);
+  text-transform:uppercase; margin-bottom:14px;
+}
+header h1{
+  font-family:"Songti SC","SimSun","STSong",serif;
+  font-size:40px; line-height:1.25; margin:0 0 10px; font-weight:700;
+  letter-spacing:.04em;
+}
+header .meta{font-size:13.5px;color:var(--muted);letter-spacing:.06em}
+header .meta span{margin-right:20px}
+
+/* ---------- 答案速查 ---------- */
+.quick{
+  border:1px solid var(--rule); background:var(--soft);
+  padding:18px 20px 8px; margin:0 0 42px; border-radius:3px;
+}
+.quick h2{
+  font-size:12.5px;letter-spacing:.3em;color:var(--muted);
+  margin:0 0 14px;font-weight:600;
+}
+.qgrid{display:flex;flex-wrap:wrap;gap:8px}
+.qcell{
+  border:1px solid var(--rule); background:#fff; border-radius:2px;
+  padding:5px 10px; font-size:13.5px; white-space:nowrap;
+}
+.qcell b{color:var(--muted);font-weight:600;margin-right:7px;font-size:12px}
+.qcell i{font-style:normal;color:var(--pen);font-weight:700}
+
+/* ---------- 分区标题 ---------- */
+.part{
+  font-family:"Songti SC","SimSun",serif;
+  font-size:23px;font-weight:700;margin:56px 0 26px;
+  padding-bottom:9px;border-bottom:1.5px solid var(--ink);
+  letter-spacing:.1em;
+}
+.part small{font-size:13px;color:var(--muted);font-weight:400;letter-spacing:.05em;margin-left:12px;font-family:inherit}
+
+/* ---------- 题目卡 ---------- */
+.q{margin:0 0 46px;padding-left:64px;position:relative}
+.qnum{
+  position:absolute;left:0;top:2px;width:44px;height:44px;
+  border:1.5px solid var(--ink);border-radius:2px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:"Songti SC","SimSun",serif;font-size:20px;font-weight:700;
+}
+.stem{
+  font-family:"Songti SC","SimSun","STSong",serif;
+  font-size:16.5px;line-height:1.95;margin:0 0 8px;
+}
+.opts{
+  font-family:"Songti SC","SimSun",serif;font-size:15.5px;
+  display:flex;flex-wrap:wrap;margin:6px 0 4px;
+}
+.opts span{width:50%;min-width:210px;padding:2px 12px 2px 0}
+.ans{
+  display:inline-block;border:1.5px solid var(--pen);color:var(--pen);
+  border-radius:2px;padding:2px 12px;font-weight:700;font-size:14.5px;
+  letter-spacing:.08em;margin:12px 0 6px;
+}
+.ans em{font-style:normal;font-size:11.5px;letter-spacing:.2em;margin-right:8px;opacity:.75}
+h4.sec{
+  font-size:13px;letter-spacing:.22em;color:var(--muted);
+  margin:20px 0 6px;font-weight:600;
+}
+.steps{margin:0;padding:0;list-style:none}
+.steps li{
+  margin:0 0 9px;padding-left:22px;position:relative;
+}
+.steps li::before{
+  content:"";position:absolute;left:4px;top:.78em;
+  width:5px;height:5px;background:var(--ink);border-radius:50%;
+}
+.note{
+  border-left:3px solid var(--gold);background:#FDFAF1;
+  padding:12px 16px;margin:16px 0;font-size:14.5px;line-height:1.8;
+}
+.note b{color:var(--gold)}
+.key{border-bottom:1.5px solid var(--pen);padding-bottom:1px}
+
+/* ---------- 图 ---------- */
+figure{
+  margin:20px 0;padding:16px;border:1px solid var(--rule);
+  border-radius:3px;
+  background-color:#fff;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),
+                   linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:22px 22px;
+  text-align:center;
+}
+figure svg{max-width:100%;height:auto}
+figcaption{
+  font-size:12.5px;color:var(--muted);margin-top:10px;letter-spacing:.06em;
+}
+.twofig{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;align-items:center}
+
+/* ---------- 数学排版 ---------- */
+.fr{display:inline-block;vertical-align:-0.55em;text-align:center;margin:0 .2em;line-height:1.25}
+.fr b{display:block;border-bottom:1.3px solid currentColor;padding:0 .32em;font-weight:inherit}
+.fr i{display:block;font-style:normal;padding:0 .32em}
+.rd{border-top:1.3px solid currentColor;padding:0 .12em;margin-left:-.06em}
+.mono{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.94em}
+table.tb{border-collapse:collapse;width:100%;margin:14px 0;font-size:14.5px}
+table.tb th,table.tb td{border:1px solid var(--rule);padding:7px 9px;text-align:center}
+table.tb th{background:var(--soft);font-weight:600}
+footer{
+  margin-top:70px;padding-top:20px;border-top:1px solid var(--rule);
+  font-size:12.5px;color:var(--muted);letter-spacing:.05em;
+}
+@media(max-width:640px){
+  .q{padding-left:0}
+  .qnum{position:static;margin-bottom:12px}
+  .opts span{width:100%}
+  header h1{font-size:30px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">数学 · 必修二综合</div>
+  <h1>模块质量检测(三)　全卷详解</h1>
+  <div class="meta"><span>时间 120 分钟</span><span>满分 150 分</span><span>共 19 题</span><span>附 2023 新课标Ⅱ卷第 19 题</span></div>
+</header>
+
+<section class="quick">
+  <h2>答案速查</h2>
+  <div class="qgrid">
+    <div class="qcell"><b>1</b><i>D</i></div>
+    <div class="qcell"><b>2</b><i>D</i></div>
+    <div class="qcell"><b>3</b><i>C</i></div>
+    <div class="qcell"><b>4</b><i>D</i></div>
+    <div class="qcell"><b>5</b><i>B</i></div>
+    <div class="qcell"><b>6</b><i>D</i></div>
+    <div class="qcell"><b>7</b><i>A</i></div>
+    <div class="qcell"><b>8</b><i>C</i></div>
+    <div class="qcell"><b>9</b><i>BD</i></div>
+    <div class="qcell"><b>10</b><i>ACD</i></div>
+    <div class="qcell"><b>11</b><i>BCD</i></div>
+    <div class="qcell"><b>12</b><i>174</i></div>
+    <div class="qcell"><b>13</b><i>3π/4</i></div>
+    <div class="qcell"><b>14</b><i>5/4</i></div>
+    <div class="qcell"><b>15</b><i>C=π/3；5+√7</i></div>
+    <div class="qcell"><b>16</b><i>n=100, m=25；95, 87.5；3/5</i></div>
+    <div class="qcell"><b>17</b><i>V=1</i></div>
+    <div class="qcell"><b>18</b><i>3/5；48/625</i></div>
+    <div class="qcell"><b>19</b><i>30°</i></div>
+  </div>
+</section>
+
+
+<!-- ================= 单选题 ================= -->
+<div class="part">一、单选题<small>每小题 5 分，共 40 分</small></div>
+
+<!-- Q1 -->
+<div class="q">
+  <div class="qnum">1</div>
+  <p class="stem">设复数 <em>z</em> = <span class="fr"><b>i</b><i>1+i</i></span>，则复数 <em>z</em> 的共轭复数 <em>z̄</em> 在复平面内对应的点位于</p>
+  <div class="opts"><span>A. 第一象限</span><span>B. 第二象限</span><span>C. 第三象限</span><span>D. 第四象限</span></div>
+  <div class="ans"><em>答案</em>D</div>
+  <h4 class="sec">推导</h4>
+  <ul class="steps">
+    <li>分母实数化，分子分母同乘 1−i：<br>
+      <em>z</em> = <span class="fr"><b>i(1−i)</b><i>(1+i)(1−i)</i></span> = <span class="fr"><b>i − i²</b><i>1 − i²</i></span> = <span class="fr"><b>1 + i</b><i>2</i></span> = <span class="fr"><b>1</b><i>2</i></span> + <span class="fr"><b>1</b><i>2</i></span>i</li>
+    <li>取共轭：<em>z̄</em> = <span class="fr"><b>1</b><i>2</i></span> − <span class="fr"><b>1</b><i>2</i></span>i，对应点 <span class="mono">(1/2, −1/2)</span></li>
+    <li>横坐标为正、纵坐标为负 ⟹ <span class="key">第四象限</span></li>
+  </ul>
+  <div class="note"><b>易错点</b>　问的是 <em>z̄</em> 不是 <em>z</em>。<em>z</em> 在第一象限，共轭后关于实轴翻折才落到第四象限。</div>
+</div>
+
+<!-- Q2 -->
+<div class="q">
+  <div class="qnum">2</div>
+  <p class="stem">某个年级有男生 180 人，女生 160 人，用分层随机抽样的方法从该年级全体学生中抽取 1 个容量为 68 的样本，则此样本中女生人数为</p>
+  <div class="opts"><span>A. 40</span><span>B. 36</span><span>C. 34</span><span>D. 32</span></div>
+  <div class="ans"><em>答案</em>D</div>
+  <h4 class="sec">推导</h4>
+  <ul class="steps">
+    <li>总体容量 <span class="mono">N = 180 + 160 = 340</span></li>
+    <li>抽样比 <em>k</em> = <span class="fr"><b>68</b><i>340</i></span> = <span class="fr"><b>1</b><i>5</i></span></li>
+    <li>分层抽样中<strong>各层按同一比例抽取</strong>：女生人数 = 160 × <span class="fr"><b>1</b><i>5</i></span> = <span class="key">32</span></li>
+  </ul>
+</div>
+
+<!-- Q3 -->
+<div class="q">
+  <div class="qnum">3</div>
+  <p class="stem">如图，正方体 <em>ABCD</em>-<em>A</em><sub>1</sub><em>B</em><sub>1</sub><em>C</em><sub>1</sub><em>D</em><sub>1</sub> 的棱 <em>AB</em>，<em>BC</em>，<em>CD</em>，<em>CC</em><sub>1</sub> 所在的直线中，与直线 <em>BC</em><sub>1</sub> 成异面直线的是</p>
+  <div class="opts"><span>A. 直线 AB</span><span>B. 直线 BC</span><span>C. 直线 CD</span><span>D. 直线 CC<sub>1</sub></span></div>
+
+  <figure>
+    <svg viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg" width="330">
+      <g fill="none" stroke="#14293F" stroke-width="1.6" stroke-linecap="round">
+        <!-- bottom face A B C D : A front-left -->
+        <path d="M60 175 L175 175 L230 135 L115 135 Z" stroke-dasharray="0"/>
+        <!-- top face -->
+        <path d="M60 80 L175 80 L230 40 L115 40 Z"/>
+        <!-- verticals -->
+        <path d="M60 175 L60 80"/><path d="M175 175 L175 80"/><path d="M230 135 L230 40"/>
+        <path d="M115 135 L115 40" stroke-dasharray="5 4"/>
+      </g>
+      <!-- hidden bottom edges -->
+      <g fill="none" stroke="#14293F" stroke-width="1.4" stroke-dasharray="5 4">
+        <path d="M60 175 L115 135"/><path d="M115 135 L230 135"/>
+      </g>
+      <!-- BC1 red -->
+      <line x1="175" y1="175" x2="230" y2="40" stroke="#C0392B" stroke-width="2.6"/>
+      <!-- CD blue -->
+      <line x1="230" y1="135" x2="115" y2="135" stroke="#1B6CA8" stroke-width="2.6"/>
+      <g font-size="12.5" font-family="serif" font-style="italic" fill="#14293F">
+        <text x="50" y="190">A</text><text x="178" y="190">B</text>
+        <text x="236" y="146">C</text><text x="100" y="132">D</text>
+        <text x="46" y="76">A₁</text><text x="178" y="74">B₁</text>
+        <text x="236" y="38">C₁</text><text x="100" y="36">D₁</text>
+      </g>
+      <g font-size="11.5" font-family="sans-serif">
+        <text x="212" y="100" fill="#C0392B">BC₁</text>
+        <text x="150" y="128" fill="#1B6CA8">CD</text>
+      </g>
+    </svg>
+    <figcaption>红色为 BC₁，蓝色为 CD —— 二者既不相交也不平行</figcaption>
+  </figure>
+
+  <div class="ans"><em>答案</em>C</div>
+  <h4 class="sec">逐项判断</h4>
+  <ul class="steps">
+    <li><strong>A. AB</strong>：<em>AB</em> 与 <em>BC</em><sub>1</sub> 都过点 <em>B</em> ⟹ <span class="key">相交</span>，不是异面。</li>
+    <li><strong>B. BC</strong>：同样都过点 <em>B</em> ⟹ 相交。</li>
+    <li><strong>D. CC<sub>1</sub></strong>：都过点 <em>C</em><sub>1</sub> ⟹ 相交。</li>
+    <li><strong>C. CD</strong>：<em>CD</em> 与 <em>BC</em><sub>1</sub> 无公共点；又 <em>CD</em>∥<em>AB</em>，而 <em>AB</em> 与 <em>BC</em><sub>1</sub> 相交且不平行，故 <em>CD</em> 与 <em>BC</em><sub>1</sub> 不平行 ⟹ <span class="key">异面</span>。</li>
+  </ul>
+  <div class="note"><b>方法</b>　判断异面最快的办法：先看有没有公共点（有则相交），再看方向向量是否成比例（成比例则平行）。两条都否定，就是异面。也可用"过平面外一点与平面内不过该点的直线异面"的判定定理：<em>BC</em><sub>1</sub> 上取点 <em>C</em><sub>1</sub>∉平面 <em>ABCD</em>，<em>CD</em>⊂平面 <em>ABCD</em> 且不过 <em>B</em>。</div>
+</div>
+
+<!-- Q4 -->
+<div class="q">
+  <div class="qnum">4</div>
+  <p class="stem">已知复数 <em>z</em><sub>1</sub> = 4 + i，<em>z</em><sub>2</sub> = 1 − 2i，则 <em>z</em><sub>1</sub><em>z</em><sub>2</sub> =</p>
+  <div class="opts"><span>A. 2 + 7i</span><span>B. 2 − 7i</span><span>C. 6 + 7i</span><span>D. 6 − 7i</span></div>
+  <div class="ans"><em>答案</em>D</div>
+  <h4 class="sec">推导</h4>
+  <ul class="steps">
+    <li>按多项式展开：(4 + i)(1 − 2i) = 4 − 8i + i − 2i²</li>
+    <li>代入 i² = −1：= 4 − 7i + 2 = <span class="key">6 − 7i</span></li>
+  </ul>
+  <div class="note"><b>易错点</b>　−2i² = −2·(−1) = <strong>+2</strong>，符号漏掉就会错选 B。</div>
+</div>
+
+<!-- Q5 -->
+<div class="q">
+  <div class="qnum">5</div>
+  <p class="stem">若单位向量 <strong>a</strong>，<strong>b</strong> 满足 (<strong>a</strong> − 2<strong>b</strong>) ⊥ <strong>a</strong>，则 <strong>a</strong> 与 <strong>b</strong> 的夹角为</p>
+  <div class="opts"><span>A. π/6</span><span>B. π/3</span><span>C. π/2</span><span>D. π</span></div>
+  <div class="ans"><em>答案</em>B</div>
+  <h4 class="sec">推导</h4>
+  <ul class="steps">
+    <li>垂直 ⟺ 数量积为零：(<strong>a</strong> − 2<strong>b</strong>)·<strong>a</strong> = 0</li>
+    <li>展开：<strong>a</strong>·<strong>a</strong> − 2<strong>b</strong>·<strong>a</strong> = |<strong>a</strong>|² − 2<strong>a</strong>·<strong>b</strong> = 0</li>
+    <li>单位向量 ⟹ |<strong>a</strong>| = |<strong>b</strong>| = 1，故 1 − 2cos<em>θ</em> = 0，cos<em>θ</em> = <span class="fr"><b>1</b><i>2</i></span></li>
+    <li><em>θ</em> ∈ [0, π] ⟹ <em>θ</em> = <span class="key">π/3</span></li>
+  </ul>
+</div>
+
+<!-- Q6 -->
+<div class="q">
+  <div class="qnum">6</div>
+  <p class="stem">已知 △<em>ABC</em> 的三个角 <em>A</em>，<em>B</em>，<em>C</em> 的对边分别为 <em>a</em>，<em>b</em>，<em>c</em>，且 <span class="fr"><b>cos C</b><i>c</i></span> = <span class="fr"><b>cos A</b><i>3b − a</i></span>，则 tan <em>C</em> =</p>
+  <div class="opts"><span>A. 1/3</span><span>B. 3</span><span>C. √2/4</span><span>D. 2√<span class="rd">2</span></span></div>
+  <div class="ans"><em>答案</em>D</div>
+  <h4 class="sec">推导</h4>
+  <ul class="steps">
+    <li>交叉相乘：(3<em>b</em> − <em>a</em>)·cos <em>C</em> = <em>c</em>·cos <em>A</em></li>
+    <li>整理：3<em>b</em>cos <em>C</em> = <em>a</em>cos <em>C</em> + <em>c</em>cos <em>A</em></li>
+    <li>关键一步 —— <strong>射影定理</strong>：<em>a</em>cos <em>C</em> + <em>c</em>cos <em>A</em> = <em>b</em><br>
+      <span style="color:var(--muted);font-size:14px">（由正弦定理：sin<em>A</em>cos<em>C</em> + sin<em>C</em>cos<em>A</em> = sin(<em>A</em>+<em>C</em>) = sin<em>B</em>）</span></li>
+    <li>于是 3<em>b</em>cos <em>C</em> = <em>b</em>，<em>b</em> ≠ 0 ⟹ cos <em>C</em> = <span class="fr"><b>1</b><i>3</i></span></li>
+    <li><em>C</em> ∈ (0, π) ⟹ sin <em>C</em> = √<span class="rd">1 − 1/9</span> = <span class="fr"><b>2√<span class="rd">2</span></b><i>3</i></span></li>
+    <li>tan <em>C</em> = <span class="fr"><b>sin C</b><i>cos C</i></span> = <span class="fr"><b>2√2/3</b><i>1/3</i></span> = <span class="key">2√<span class="rd">2</span></span></li>
+  </ul>
+</div>
+
+<!-- Q7 -->
+<div class="q">
+  <div class="qnum">7</div>
+  <p class="stem">下图是正方体的平面展开图，关于这个正方体，下列判断<strong>不正确</strong>的是</p>
+  <div class="opts">
+    <span>A. <em>BM</em> ∥ <em>DE</em></span>
+    <span>B. <em>CN</em> ∥ 平面 <em>AFB</em></span>
+    <span>C. <em>ED</em> 与 <em>NF</em> 所成的角为 60°</span>
+    <span>D. <em>EN</em> ∥ <em>BC</em></span>
+  </div>
+
+  <figure>
+    <div class="twofig">
+    <svg viewBox="0 0 270 230" xmlns="http://www.w3.org/2000/svg" width="260">
+      <g fill="#fff" stroke="#14293F" stroke-width="1.6">
+        <rect x="86" y="40" width="46" height="46"/>
+        <rect x="40" y="86" width="46" height="46"/>
+        <rect x="86" y="86" width="46" height="46"/>
+        <rect x="132" y="86" width="46" height="46"/>
+        <rect x="178" y="86" width="46" height="46"/>
+        <rect x="86" y="132" width="46" height="46"/>
+      </g>
+      <g fill="#C0392B">
+        <circle cx="86" cy="40" r="2.6"/><circle cx="86" cy="86" r="2.6"/>
+        <circle cx="132" cy="86" r="2.6"/><circle cx="178" cy="86" r="2.6"/>
+        <circle cx="40" cy="132" r="2.6"/><circle cx="86" cy="132" r="2.6"/>
+        <circle cx="132" cy="132" r="2.6"/><circle cx="132" cy="178" r="2.6"/>
+      </g>
+      <g font-size="13" font-family="serif" font-style="italic" fill="#14293F">
+        <text x="72" y="37">N</text>
+        <text x="72" y="82">D</text><text x="136" y="82">C</text><text x="182" y="82">M</text>
+        <text x="27" y="146">E</text><text x="76" y="148">A</text><text x="136" y="147">B</text>
+        <text x="137" y="192">F</text>
+      </g>
+      <text x="135" y="216" font-size="11" fill="#61738A" text-anchor="middle" font-family="sans-serif">平面展开图（1-4-1 型）</text>
+    </svg>
+
+    <svg viewBox="0 0 250 230" xmlns="http://www.w3.org/2000/svg" width="250">
+      <!-- cube ABCD-EFMN : E above A, F above B, M above C, N above D -->
+      <g fill="none" stroke="#14293F" stroke-width="1.6" stroke-linecap="round">
+        <path d="M55 175 L150 175 L200 140 L105 140 Z"/>
+        <path d="M55 85 L150 85 L200 50 L105 50 Z"/>
+        <path d="M55 175 L55 85"/><path d="M150 175 L150 85"/><path d="M200 140 L200 50"/>
+      </g>
+      <g fill="none" stroke="#14293F" stroke-width="1.3" stroke-dasharray="5 4">
+        <path d="M55 175 L105 140"/><path d="M105 140 L200 140"/><path d="M105 140 L105 50"/>
+      </g>
+      <!-- BM red, DE red dashed -->
+      <line x1="150" y1="175" x2="200" y2="50" stroke="#C0392B" stroke-width="2.4"/>
+      <line x1="105" y1="140" x2="55" y2="85" stroke="#C0392B" stroke-width="2.4" stroke-dasharray="6 4"/>
+      <!-- EN and BC green -->
+      <line x1="55" y1="85" x2="105" y2="50" stroke="#1E7A46" stroke-width="2.4"/>
+      <line x1="150" y1="175" x2="200" y2="140" stroke="#1E7A46" stroke-width="2.4"/>
+      <g font-size="13" font-family="serif" font-style="italic" fill="#14293F">
+        <text x="45" y="190">A</text><text x="152" y="190">B</text>
+        <text x="205" y="151">C</text><text x="92" y="137">D</text>
+        <text x="43" y="82">E</text><text x="153" y="82">F</text>
+        <text x="205" y="48">M</text><text x="93" y="47">N</text>
+      </g>
+      <text x="125" y="216" font-size="11" fill="#61738A" text-anchor="middle" font-family="sans-serif">折叠所得正方体 ABCD-EFMN</text>
+    </svg>
+    </div>
+    <figcaption>红色：BM 与 DE（异面）　绿色：EN 与 BC（平行）</figcaption>
+  </figure>
+
+  <div class="ans"><em>答案</em>A</div>
+
+  <h4 class="sec">第一步：把展开图折成正方体</h4>
+  <ul class="steps">
+    <li>取中间一行的<strong>第 2 个正方形</strong>（顶点 <em>A</em>、<em>B</em>、<em>C</em>、<em>D</em>）作<strong>底面</strong>，其余五个面向上折。</li>
+    <li>左侧正方形绕 <em>AD</em> 折起，<em>E</em> 落到 <em>A</em> 的正上方；下方正方形绕 <em>AB</em> 折起，<em>F</em> 落到 <em>B</em> 的正上方；上方正方形绕 <em>DC</em> 折起，<em>N</em> 落到 <em>D</em> 的正上方；右侧正方形绕 <em>BC</em> 折起，<em>M</em> 落到 <em>C</em> 的正上方；最右一个正方形恰好合成顶面。</li>
+    <li>结论：得到正方体 <strong><em>ABCD</em>-<em>EFMN</em></strong>，即 <em>E</em>↔<em>A</em>，<em>F</em>↔<em>B</em>，<em>M</em>↔<em>C</em>，<em>N</em>↔<em>D</em> 上下对应。</li>
+  </ul>
+
+  <h4 class="sec">第二步：建系验证（棱长取 1）</h4>
+  <p class="stem" style="font-family:inherit;font-size:15px">
+    <span class="mono">A(0,0,0)　B(1,0,0)　C(1,1,0)　D(0,1,0)</span><br>
+    <span class="mono">E(0,0,1)　F(1,0,1)　M(1,1,1)　N(0,1,1)</span>
+  </p>
+  <ul class="steps">
+    <li><strong>A. BM ∥ DE —— 不正确 ✗</strong><br>
+      <span class="mono">BM</span> = <em>M</em> − <em>B</em> = (0, 1, 1)，<span class="mono">DE</span> = <em>E</em> − <em>D</em> = (0, −1, 1)。<br>
+      两向量不成比例 ⟹ 不平行；又 <em>BM</em> ⊂ 平面 <em>BCMF</em>（<em>x</em>=1），<em>DE</em> ⊂ 平面 <em>ADNE</em>（<em>x</em>=0），两平面平行且不重合，故二者无公共点 ⟹ <span class="key"><em>BM</em> 与 <em>DE</em> 是异面直线</span>。</li>
+    <li><strong>B. CN ∥ 平面 AFB —— 正确 ✓</strong><br>
+      平面 <em>AFB</em> 即侧面 <em>ABFE</em>（<em>y</em>=0）。连 <em>BE</em>：<span class="mono">BE</span> = (−1, 0, 1) = <span class="mono">CN</span>，故 <em>CN</em> ∥ <em>BE</em>；<br>
+      而 <em>BE</em> ⊂ 平面 <em>AFB</em>，<em>CN</em> ⊄ 平面 <em>AFB</em>，由<strong>线面平行判定定理</strong>得 <em>CN</em> ∥ 平面 <em>AFB</em>。</li>
+    <li><strong>C. ED 与 NF 所成角为 60° —— 正确 ✓</strong><br>
+      <span class="mono">ED</span> = (0, 1, −1)，<span class="mono">NF</span> = (1, −1, 0)，均为面对角线，长度都是 √<span class="rd">2</span>。<br>
+      cos<em>θ</em> = <span class="fr"><b>|ED·NF|</b><i>|ED||NF|</i></span> = <span class="fr"><b>|0 − 1 + 0|</b><i>√2 · √2</i></span> = <span class="fr"><b>1</b><i>2</i></span> ⟹ <em>θ</em> = 60°。</li>
+    <li><strong>D. EN ∥ BC —— 正确 ✓</strong><br>
+      <span class="mono">EN</span> = (0, 1, 0) = <span class="mono">BC</span>，方向相同；且 <em>EN</em> 与 <em>BC</em> 不重合（一条在 <em>z</em>=1、<em>x</em>=0，另一条在 <em>z</em>=0、<em>x</em>=1）⟹ 平行。<br>
+      也可直接看出 <em>BCNE</em> 是正方体的对角面（矩形），<em>EN</em> 与 <em>BC</em> 是它的一组对边。</li>
+  </ul>
+  <div class="note"><b>命题陷阱</b>　本题 A 项是经典易错点：由 <span class="mono">BM</span> = <span class="mono">AN</span> 知 <em>BM</em> ∥ <em>AN</em>，而 <em>AN</em> ⊂ 平面 <em>ADNE</em>，所以 <strong><em>BM</em> ∥ 平面 <em>ADNE</em></strong> 成立 —— 但 <em>DE</em> 只是这个平面内的一条直线，<strong>线面平行推不出线线平行</strong>。把"平行于平面"误当成"平行于面内每条直线"，就会误判 A 为正确。</div>
+</div>
+
+<!-- Q8 -->
+<div class="q">
+  <div class="qnum">8</div>
+  <p class="stem">如图，在长方体 <em>ABCD</em>-<em>A</em><sub>1</sub><em>B</em><sub>1</sub><em>C</em><sub>1</sub><em>D</em><sub>1</sub> 中，<em>AB</em> = 2，<em>BC</em> = <em>CC</em><sub>1</sub> = 1，则直线 <em>AC</em><sub>1</sub> 与平面 <em>BB</em><sub>1</sub><em>C</em><sub>1</sub><em>C</em> 所成角的余弦值是</p>
+  <div class="opts"><span>A. √<span class="rd">3</span>/2</span><span>B. 1/2</span><span>C. √<span class="rd">3</span>/3</span><span>D. 1/3</span></div>
+
+  <figure>
+    <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg" width="330">
+      <g fill="none" stroke="#14293F" stroke-width="1.6" stroke-linecap="round">
+        <path d="M50 160 L190 160 L235 130 L95 130 Z"/>
+        <path d="M50 110 L190 110 L235 80 L95 80 Z"/>
+        <path d="M50 160 L50 110"/><path d="M190 160 L190 110"/><path d="M235 130 L235 80"/>
+      </g>
+      <g fill="none" stroke="#14293F" stroke-width="1.3" stroke-dasharray="5 4">
+        <path d="M50 160 L95 130"/><path d="M95 130 L235 130"/><path d="M95 130 L95 80"/>
+      </g>
+      <!-- AC1 -->
+      <line x1="50" y1="160" x2="235" y2="80" stroke="#C0392B" stroke-width="2.4"/>
+      <!-- AB perpendicular to plane BCC1B1 -->
+      <line x1="50" y1="160" x2="190" y2="160" stroke="#1B6CA8" stroke-width="2.4"/>
+      <!-- BC1 projection -->
+      <line x1="190" y1="160" x2="235" y2="80" stroke="#1E7A46" stroke-width="2.4"/>
+      <!-- right angle mark at B -->
+      <path d="M178 160 L178 152 L186 152" fill="none" stroke="#1B6CA8" stroke-width="1.2"/>
+      <g font-size="12.5" font-family="serif" font-style="italic" fill="#14293F">
+        <text x="40" y="175">A</text><text x="192" y="176">B</text>
+        <text x="240" y="142">C</text><text x="82" y="128">D</text>
+        <text x="36" y="106">A₁</text><text x="192" y="106">B₁</text>
+        <text x="240" y="78">C₁</text><text x="80" y="78">D₁</text>
+      </g>
+      <g font-size="11" font-family="sans-serif">
+        <text x="120" y="176" fill="#1B6CA8">2</text>
+        <text x="218" y="118" fill="#1E7A46">√2</text>
+        <text x="130" y="112" fill="#C0392B">√6</text>
+      </g>
+    </svg>
+    <figcaption>AB ⊥ 平面 BB₁C₁C，故 ∠AC₁B 即所求线面角</figcaption>
+  </figure>
+
+  <div class="ans"><em>答案</em>C</div>
+  <h4 class="sec">推导</h4>
+  <ul class="steps">
+    <li><strong>找垂足。</strong>长方体中 <em>AB</em> ⊥ <em>BC</em>，<em>AB</em> ⊥ <em>BB</em><sub>1</sub>，且 <em>BC</em> ∩ <em>BB</em><sub>1</sub> = <em>B</em>，<br>
+      由线面垂直判定定理得 <em>AB</em> ⊥ 平面 <em>BB</em><sub>1</sub><em>C</em><sub>1</sub><em>C</em>。</li>
+    <li>所以 <em>A</em> 在该平面内的<strong>射影就是 <em>B</em></strong>，<em>BC</em><sub>1</sub> 是 <em>AC</em><sub>1</sub> 的射影，<br>
+      ∠<em>AC</em><sub>1</sub><em>B</em> 即直线 <em>AC</em><sub>1</sub> 与平面 <em>BB</em><sub>1</sub><em>C</em><sub>1</sub><em>C</em> 所成的角。</li>
+    <li>算长度：<em>BC</em><sub>1</sub> = √<span class="rd">BC² + CC₁²</span> = √<span class="rd">1 + 1</span> = √<span class="rd">2</span></li>
+    <li>由 <em>AB</em> ⊥ 平面 ⟹ <em>AB</em> ⊥ <em>BC</em><sub>1</sub>，故 △<em>ABC</em><sub>1</sub> 为直角三角形，<br>
+      <em>AC</em><sub>1</sub> = √<span class="rd">AB² + BC₁²</span> = √<span class="rd">4 + 2</span> = √<span class="rd">6</span></li>
+    <li>cos∠<em>AC</em><sub>1</sub><em>B</em> = <span class="fr"><b>BC₁</b><i>AC₁</i></span> = <span class="fr"><b>√2</b><i>√6</i></span> = <span class="fr"><b>1</b><i>√3</i></span> = <span class="key">√<span class="rd">3</span>/3</span></li>
+  </ul>
+</div>
+
+
+<!-- ================= 多选题 ================= -->
+<div class="part">二、多选题<small>每小题 6 分，共 18 分；全部选对得 6 分，部分选对得部分分，有选错得 0 分</small></div>
+
+<!-- Q9 -->
+<div class="q">
+  <div class="qnum">9</div>
+  <p class="stem">已知复数 <em>z</em> = 2 − 3i，其中 i 是虚数单位，则下列结论正确的是</p>
+  <div class="opts">
+    <span>A. <em>z</em> 的模等于 13</span>
+    <span>B. <em>z</em> 在复平面内对应的点位于第四象限</span>
+    <span>C. <em>z</em> 的共轭复数为 −2 − 3i</span>
+    <span>D. 若 <em>z</em>(<em>m</em> + 4i) 是纯虚数，则 <em>m</em> = −6</span>
+  </div>
+  <div class="ans"><em>答案</em>BD</div>
+  <h4 class="sec">逐项判断</h4>
+  <ul class="steps">
+    <li><strong>A ✗</strong>　|<em>z</em>| = √<span class="rd">2² + (−3)²</span> = √<span class="rd">13</span>，不是 13。（模是<strong>带根号</strong>的）</li>
+    <li><strong>B ✓</strong>　对应点 (2, −3)，横正纵负 ⟹ 第四象限。</li>
+    <li><strong>C ✗</strong>　共轭只改虚部符号：<em>z̄</em> = 2 + 3i。（实部不变！）</li>
+    <li><strong>D ✓</strong>　<em>z</em>(<em>m</em> + 4i) = (2 − 3i)(<em>m</em> + 4i) = 2<em>m</em> + 8i − 3<em>m</em>i − 12i² = (2<em>m</em> + 12) + (8 − 3<em>m</em>)i<br>
+      纯虚数要求 <strong>实部为 0 且虚部不为 0</strong>：<br>
+      2<em>m</em> + 12 = 0 ⟹ <em>m</em> = −6；此时虚部 8 − 3(−6) = 26 ≠ 0 ✓</li>
+  </ul>
+  <div class="note"><b>易错点</b>　D 项若只解实部为零而忘记检验虚部非零，遇到"虚部恰好也为 0"的题就会出错。纯虚数两个条件缺一不可。</div>
+</div>
+
+<!-- Q10 -->
+<div class="q">
+  <div class="qnum">10</div>
+  <p class="stem">甲、乙两旅游景区某月初连续 7 天的日均气温数据如图所示，则关于这 7 天，下列判断正确的是</p>
+  <div class="opts">
+    <span>A. 甲旅游景区日均气温的中位数与平均数相等</span>
+    <span>B. 甲旅游景区的日均气温比乙旅游景区的日均气温稳定</span>
+    <span>C. 乙旅游景区日均气温的极差为 2 ℃</span>
+    <span>D. 乙旅游景区日均气温的众数为 5 ℃</span>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 440 270" xmlns="http://www.w3.org/2000/svg" width="440">
+      <!-- axes -->
+      <g stroke="#14293F" stroke-width="1.5" fill="none">
+        <path d="M55 230 L410 230"/><path d="M55 230 L55 25"/>
+      </g>
+      <!-- y ticks -->
+      <g font-size="11" fill="#61738A" font-family="sans-serif" text-anchor="end">
+        <text x="48" y="234">0</text>
+        <text x="48" y="209">1</text><text x="48" y="184">2</text><text x="48" y="159">3</text>
+        <text x="48" y="134">4</text><text x="48" y="109">5</text><text x="48" y="84">6</text>
+        <text x="48" y="59">7</text>
+      </g>
+      <g stroke="#E4EDF5" stroke-width="1">
+        <path d="M55 205 L410 205"/><path d="M55 180 L410 180"/><path d="M55 155 L410 155"/>
+        <path d="M55 130 L410 130"/><path d="M55 105 L410 105"/><path d="M55 80 L410 80"/>
+        <path d="M55 55 L410 55"/>
+      </g>
+      <!-- x ticks -->
+      <g font-size="11" fill="#61738A" font-family="sans-serif" text-anchor="middle">
+        <text x="90" y="247">1</text><text x="140" y="247">2</text><text x="190" y="247">3</text>
+        <text x="240" y="247">4</text><text x="290" y="247">5</text><text x="340" y="247">6</text>
+        <text x="390" y="247">7</text>
+        <text x="415" y="247" text-anchor="start">日期</text>
+      </g>
+      <text x="30" y="20" font-size="11" fill="#61738A" font-family="sans-serif">气温/℃</text>
+
+      <!-- 甲 : 5 3 6 3 7 5 6  solid -->
+      <polyline points="90,105 140,155 190,80 240,155 290,55 340,105 390,80"
+                fill="none" stroke="#C0392B" stroke-width="2.2"/>
+      <g fill="#C0392B">
+        <rect x="86" y="101" width="8" height="8"/><rect x="136" y="151" width="8" height="8"/>
+        <rect x="186" y="76" width="8" height="8"/><rect x="236" y="151" width="8" height="8"/>
+        <rect x="286" y="51" width="8" height="8"/><rect x="336" y="101" width="8" height="8"/>
+        <rect x="386" y="76" width="8" height="8"/>
+      </g>
+      <!-- 乙 : 5 4 6 5 5 4 6  dashed -->
+      <polyline points="90,105 140,130 190,80 240,105 290,105 340,130 390,80"
+                fill="none" stroke="#1B6CA8" stroke-width="2.2" stroke-dasharray="7 5"/>
+      <g fill="#1B6CA8">
+        <circle cx="90" cy="105" r="4.4"/><circle cx="140" cy="130" r="4.4"/>
+        <circle cx="190" cy="80" r="4.4"/><circle cx="240" cy="105" r="4.4"/>
+        <circle cx="290" cy="105" r="4.4"/><circle cx="340" cy="130" r="4.4"/>
+        <circle cx="390" cy="80" r="4.4"/>
+      </g>
+      <!-- legend -->
+      <g font-size="11.5" font-family="sans-serif">
+        <line x1="300" y1="22" x2="332" y2="22" stroke="#C0392B" stroke-width="2.2"/>
+        <rect x="312" y="18" width="8" height="8" fill="#C0392B"/>
+        <text x="338" y="26" fill="#14293F">甲</text>
+        <line x1="356" y1="22" x2="388" y2="22" stroke="#1B6CA8" stroke-width="2.2" stroke-dasharray="7 5"/>
+        <circle cx="372" cy="22" r="4.4" fill="#1B6CA8"/>
+        <text x="394" y="26" fill="#14293F">乙</text>
+      </g>
+    </svg>
+    <figcaption>甲：5, 3, 6, 3, 7, 5, 6　　乙：5, 4, 6, 5, 5, 4, 6（单位：℃）</figcaption>
+  </figure>
+
+  <div class="ans"><em>答案</em>ACD</div>
+
+  <h4 class="sec">先读数</h4>
+  <table class="tb">
+    <tr><th>日期</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>合计</th></tr>
+    <tr><th>甲</th><td>5</td><td>3</td><td>6</td><td>3</td><td>7</td><td>5</td><td>6</td><td>35</td></tr>
+    <tr><th>乙</th><td>5</td><td>4</td><td>6</td><td>5</td><td>5</td><td>4</td><td>6</td><td>35</td></tr>
+  </table>
+
+  <h4 class="sec">逐项判断</h4>
+  <ul class="steps">
+    <li><strong>A ✓</strong>　甲的平均数 <em>x̄</em><sub>甲</sub> = <span class="fr"><b>35</b><i>7</i></span> = 5；<br>
+      甲从小到大排列：3, 3, 5, <strong>5</strong>, 6, 6, 7，共 7 个数，第 4 个为中位数 = 5。<br>
+      二者<span class="key">都等于 5</span>，相等。</li>
+    <li><strong>B ✗</strong>　<em>x̄</em><sub>乙</sub> = <span class="fr"><b>35</b><i>7</i></span> = 5，两组平均数相同，可直接比方差：<br>
+      <em>s</em>²<sub>甲</sub> = <span class="fr"><b>0² + 2² + 1² + 2² + 2² + 0² + 1²</b><i>7</i></span> = <span class="fr"><b>14</b><i>7</i></span> = 2<br>
+      <em>s</em>²<sub>乙</sub> = <span class="fr"><b>0² + 1² + 1² + 0² + 0² + 1² + 1²</b><i>7</i></span> = <span class="fr"><b>4</b><i>7</i></span><br>
+      <em>s</em>²<sub>甲</sub> = 2 &gt; <span class="fr"><b>4</b><i>7</i></span> = <em>s</em>²<sub>乙</sub>，<strong>方差大者波动大</strong>，所以是<span class="key">乙更稳定</span>，B 错。</li>
+    <li><strong>C ✓</strong>　乙的最大值 6，最小值 4，极差 = 6 − 4 = <span class="key">2</span>。</li>
+    <li><strong>D ✓</strong>　乙的数据中 5 出现 3 次，4 出现 2 次，6 出现 2 次，出现最多的是 <span class="key">5</span>。</li>
+  </ul>
+  <div class="note"><b>方法</b>　两组平均数相同时比稳定性，直接算 Σ(<em>x</em><sub>i</sub> − <em>x̄</em>)² 即可，不必除以 <em>n</em> 再比较。从图上也能直观看出：甲的折线上下起伏大（3 到 7），乙始终在 4～6 之间，所以乙更稳定。</div>
+</div>
+
+<!-- Q11 -->
+<div class="q">
+  <div class="qnum">11</div>
+  <p class="stem">如图，在圆台 <em>O</em><sub>1</sub><em>O</em><sub>2</sub> 的轴截面 <em>ABCD</em> 中，<em>AB</em> = <em>BC</em> = <em>AD</em> = <span class="fr"><b>1</b><i>2</i></span><em>CD</em>，<em>CD</em> = 4，则</p>
+  <div class="opts">
+    <span>A. 该圆台的高为 1</span>
+    <span>B. 该圆台轴截面面积为 3√<span class="rd">3</span></span>
+    <span>C. 该圆台的体积为 7√<span class="rd">3</span>π/3</span>
+    <span>D. 一只小虫从点 <em>C</em> 沿着该圆台的侧面爬行到 <em>AD</em> 的中点，所经过的最短路程为 5</span>
+  </div>
+
+  <figure>
+    <div class="twofig">
+    <svg viewBox="0 0 250 210" xmlns="http://www.w3.org/2000/svg" width="240">
+      <!-- axial section: AB top =2 (x 90..150), CD bottom =4 (x 60..180), h=√3*30≈52 -->
+      <g fill="none" stroke="#14293F" stroke-width="1.7">
+        <path d="M90 60 L150 60 L180 164 L60 164 Z"/>
+      </g>
+      <!-- height -->
+      <line x1="120" y1="60" x2="120" y2="164" stroke="#1B6CA8" stroke-width="1.6" stroke-dasharray="5 4"/>
+      <path d="M120 156 L128 156 L128 164" fill="none" stroke="#1B6CA8" stroke-width="1.2"/>
+      <!-- offset -->
+      <line x1="60" y1="164" x2="90" y2="164" stroke="#1E7A46" stroke-width="1.8"/>
+      <line x1="90" y1="60" x2="90" y2="164" stroke="#1E7A46" stroke-width="1.2" stroke-dasharray="4 3"/>
+      <g font-size="12.5" font-family="serif" font-style="italic" fill="#14293F">
+        <text x="80" y="54">A</text><text x="150" y="54">B</text>
+        <text x="183" y="178">D</text><text x="50" y="178">C</text>
+      </g>
+      <g font-size="11" font-family="sans-serif">
+        <text x="112" y="52" fill="#61738A">2</text>
+        <text x="116" y="180" fill="#61738A">4</text>
+        <text x="126" y="115" fill="#1B6CA8">h=√3</text>
+        <text x="66" y="158" fill="#1E7A46">1</text>
+        <text x="60" y="110" fill="#61738A">2</text>
+      </g>
+      <text x="120" y="200" font-size="11" fill="#61738A" text-anchor="middle" font-family="sans-serif">轴截面（等腰梯形）</text>
+    </svg>
+
+    <svg viewBox="0 0 250 210" xmlns="http://www.w3.org/2000/svg" width="240">
+      <!-- unrolled: apex O at (40,30); sector radius 4 -> 4*30=120 ; angle 90° between C and D -->
+      <!-- C at angle 0 (to the right), D at angle 90° (down) -->
+      <g fill="none" stroke="#14293F" stroke-width="1.6">
+        <!-- outer arc radius 120 from C(160,30) to D(40,150) -->
+        <path d="M160 30 A120 120 0 0 1 40 150"/>
+        <!-- inner arc radius 60 -->
+        <path d="M100 30 A60 60 0 0 1 40 90"/>
+        <path d="M40 30 L160 30"/>
+        <path d="M40 30 L40 150"/>
+      </g>
+      <!-- shortest path C to midpoint of AD (radius 90 on the D-ray) -->
+      <line x1="160" y1="30" x2="40" y2="120" stroke="#C0392B" stroke-width="2.4"/>
+      <circle cx="40" cy="120" r="3.2" fill="#C0392B"/>
+      <circle cx="160" cy="30" r="3.2" fill="#C0392B"/>
+      <!-- right angle at O -->
+      <path d="M40 42 L52 42 L52 30" fill="none" stroke="#61738A" stroke-width="1.1"/>
+      <g font-size="12" font-family="serif" font-style="italic" fill="#14293F">
+        <text x="30" y="26">O</text><text x="164" y="26">C</text><text x="26" y="156">D</text>
+        <text x="102" y="26">B</text><text x="24" y="94">A</text>
+      </g>
+      <g font-size="11" font-family="sans-serif">
+        <text x="100" y="22" fill="#61738A">4</text>
+        <text x="24" y="118" fill="#C0392B">3</text>
+        <text x="112" y="88" fill="#C0392B">5</text>
+      </g>
+      <text x="120" y="196" font-size="11" fill="#61738A" text-anchor="middle" font-family="sans-serif">侧面展开图（补成圆锥后的扇形）</text>
+    </svg>
+    </div>
+    <figcaption>左：轴截面 　右：把圆台补成圆锥再展开，最短路径化为平面上的线段</figcaption>
+  </figure>
+
+  <div class="ans"><em>答案</em>BCD</div>
+
+  <h4 class="sec">基本量</h4>
+  <ul class="steps">
+    <li><em>CD</em> = 4 ⟹ <em>AB</em> = <em>BC</em> = <em>AD</em> = 2。轴截面 <em>ABCD</em> 是上底 2、下底 4、腰 2 的等腰梯形。</li>
+    <li>上下底半径：<em>r</em><sub>上</sub> = 1，<em>r</em><sub>下</sub> = 2；两底水平差 <span class="fr"><b>4 − 2</b><i>2</i></span> = 1</li>
+    <li>高 <em>h</em> = √<span class="rd">2² − 1²</span> = <span class="key">√<span class="rd">3</span></span>　⟹ <strong>A 错</strong>（高不是 1，1 是水平投影）</li>
+  </ul>
+
+  <h4 class="sec">逐项判断</h4>
+  <ul class="steps">
+    <li><strong>B ✓</strong>　梯形面积 = <span class="fr"><b>1</b><i>2</i></span>(2 + 4)·√<span class="rd">3</span> = <span class="key">3√<span class="rd">3</span></span></li>
+    <li><strong>C ✓</strong>　圆台体积 <em>V</em> = <span class="fr"><b>1</b><i>3</i></span>π<em>h</em>(<em>r</em><sub>上</sub>² + <em>r</em><sub>上</sub><em>r</em><sub>下</sub> + <em>r</em><sub>下</sub>²)<br>
+      = <span class="fr"><b>1</b><i>3</i></span>π·√<span class="rd">3</span>·(1 + 2 + 4) = <span class="key"><span class="fr"><b>7√<span class="rd">3</span>π</b><i>3</i></span></span></li>
+    <li><strong>D ✓</strong>　<strong>补形 + 展开</strong>：<br>
+      设圆台补成圆锥后顶点为 <em>O</em>，母线 <em>OA</em> = <em>l</em>₁，<em>OD</em> = <em>l</em>₂。由相似 <span class="fr"><b>l₁</b><i>l₂</i></span> = <span class="fr"><b>r上</b><i>r下</i></span> = <span class="fr"><b>1</b><i>2</i></span>，又 <em>l</em>₂ − <em>l</em>₁ = <em>AD</em> = 2 ⟹ <em>l</em>₁ = 2，<em>l</em>₂ = 4。<br>
+      下底圆周长 = 2π·2 = 4π，展开成以 <em>O</em> 为心、半径 4 的扇形，圆心角 <em>α</em> = <span class="fr"><b>4π</b><i>4</i></span> = π（即 180°）。<br>
+      <em>C</em>、<em>D</em> 是下底圆的一条<strong>直径</strong>的两端（相差半个圆周），故展开后 ∠<em>COD</em> = <span class="fr"><b>π</b><i>2</i></span> = 90°。<br>
+      <em>AD</em> 的中点到顶点 <em>O</em> 的距离 = <span class="fr"><b>2 + 4</b><i>2</i></span> = 3。<br>
+      最短路程 = √<span class="rd">4² + 3²</span> = <span class="key">5</span></li>
+  </ul>
+  <div class="note"><b>方法</b>　"沿侧面爬行的最短路径"必须先<strong>展开成平面图形</strong>，再用两点之间线段最短。圆台要先补成圆锥才能展成扇形；注意圆心角要由<strong>底面圆周长 = 扇形弧长</strong>算出，不能想当然。</div>
+</div>
+
+
+<!-- ================= 填空题 ================= -->
+<div class="part">三、填空题<small>每小题 5 分，共 15 分</small></div>
+
+<!-- Q12 -->
+<div class="q">
+  <div class="qnum">12</div>
+  <p class="stem">某校高二年级从甲、乙两个班各选出 10 名学生参加数学竞赛，他们取得的成绩从低到高排列如下：<br>
+  甲班：74　75　76　81　84　<em>m</em>　88　92　97　98<br>
+  乙班：79　79　80　82　83　<em>n</em>　91　91　96　98<br>
+  其中甲班学生成绩的平均分是 85，乙班学生成绩的中位数是 86，则 <em>m</em> + <em>n</em> 的值为 ______．</p>
+  <div class="ans"><em>答案</em>174</div>
+  <h4 class="sec">推导</h4>
+  <ul class="steps">
+    <li><strong>求 <em>m</em>（用平均数）：</strong>10 个数总和 = 85 × 10 = 850<br>
+      已知 9 个数之和 = 74+75+76+81+84+88+92+97+98 = 765<br>
+      <em>m</em> = 850 − 765 = <span class="key">85</span>　<span style="color:var(--muted);font-size:14px">（检验：84 ≤ 85 ≤ 88，符合"从低到高"✓）</span></li>
+    <li><strong>求 <em>n</em>（用中位数）：</strong>10 个数为偶数个，中位数是第 5、6 两个数的平均：<br>
+      <span class="fr"><b>83 + n</b><i>2</i></span> = 86 ⟹ <em>n</em> = <span class="key">89</span>　<span style="color:var(--muted);font-size:14px">（检验：83 ≤ 89 ≤ 91 ✓）</span></li>
+    <li><em>m</em> + <em>n</em> = 85 + 89 = <span class="key">174</span></li>
+  </ul>
+  <div class="note"><b>易错点</b>　偶数个数据的中位数是<strong>中间两个数的平均</strong>；数据已按从低到高排好，求出的 <em>m</em>、<em>n</em> 必须落在相邻两数之间，一定要回代检验。</div>
+</div>
+
+<!-- Q13 -->
+<div class="q">
+  <div class="qnum">13</div>
+  <p class="stem">圆柱的高为 1，它的两个底面在直径为 2 的同一球面上，则该圆柱的体积为 ______．</p>
+
+  <figure>
+    <svg viewBox="0 0 260 200" xmlns="http://www.w3.org/2000/svg" width="270">
+      <circle cx="130" cy="100" r="75" fill="none" stroke="#14293F" stroke-width="1.6"/>
+      <!-- cylinder cross-section rectangle: half-height 0.5*75=37.5 ; r = √3/2*75≈65 -->
+      <rect x="65" y="62" width="130" height="76" fill="none" stroke="#C0392B" stroke-width="1.8"/>
+      <ellipse cx="130" cy="62" rx="65" ry="13" fill="none" stroke="#C0392B" stroke-width="1.4" stroke-dasharray="4 3"/>
+      <ellipse cx="130" cy="138" rx="65" ry="13" fill="none" stroke="#C0392B" stroke-width="1.4"/>
+      <line x1="130" y1="100" x2="195" y2="100" stroke="#1E7A46" stroke-width="1.6" stroke-dasharray="4 3"/>
+      <line x1="130" y1="100" x2="195" y2="62" stroke="#1B6CA8" stroke-width="1.8"/>
+      <line x1="195" y1="62" x2="195" y2="100" stroke="#61738A" stroke-width="1.4"/>
+      <path d="M185 100 L185 90 L195 90" fill="none" stroke="#61738A" stroke-width="1.1"/>
+      <circle cx="130" cy="100" r="3" fill="#14293F"/>
+      <g font-size="11.5" font-family="sans-serif">
+        <text x="120" y="115" fill="#14293F">O</text>
+        <text x="155" y="114" fill="#1E7A46">r</text>
+        <text x="160" y="74" fill="#1B6CA8">R=1</text>
+        <text x="200" y="86" fill="#61738A">1/2</text>
+      </g>
+    </svg>
+    <figcaption>轴截面：球心到底面距离为高的一半</figcaption>
+  </figure>
+
+  <div class="ans"><em>答案</em>3π/4</div>
+  <h4 class="sec">推导</h4>
+  <ul class="steps">
+    <li>球的直径为 2 ⟹ 球半径 <em>R</em> = 1。</li>
+    <li>圆柱两底面圆都在球面上 ⟹ 圆柱与球<strong>同轴、球心在圆柱轴的中点</strong>，球心到每个底面的距离 = <span class="fr"><b>1</b><i>2</i></span>·1 = <span class="fr"><b>1</b><i>2</i></span>。</li>
+    <li>作轴截面，由勾股定理：<em>r</em>² + (<span class="fr"><b>1</b><i>2</i></span>)² = <em>R</em>² = 1 ⟹ <em>r</em>² = <span class="fr"><b>3</b><i>4</i></span></li>
+    <li><em>V</em> = π<em>r</em>²<em>h</em> = π · <span class="fr"><b>3</b><i>4</i></span> · 1 = <span class="key"><span class="fr"><b>3π</b><i>4</i></span></span></li>
+  </ul>
+  <div class="note"><b>易错点</b>　题给的是<strong>直径</strong> 2，不是半径；另外只需 <em>r</em>²，不必开方。</div>
+</div>
+
+<!-- Q14 -->
+<div class="q">
+  <div class="qnum">14</div>
+  <p class="stem">设 <strong>a</strong> = (cos <em>θ</em>, 1)，<strong>b</strong> = (cos <em>θ</em>, sin <em>θ</em>)，则 <strong>a</strong>·<strong>b</strong> 的最大值是 ______．</p>
+  <div class="ans"><em>答案</em>5/4</div>
+  <h4 class="sec">推导</h4>
+  <ul class="steps">
+    <li>坐标法算数量积：<strong>a</strong>·<strong>b</strong> = cos<em>θ</em>·cos<em>θ</em> + 1·sin<em>θ</em> = cos²<em>θ</em> + sin<em>θ</em></li>
+    <li><strong>统一为一个三角函数</strong>：cos²<em>θ</em> = 1 − sin²<em>θ</em><br>
+      ⟹ <strong>a</strong>·<strong>b</strong> = 1 − sin²<em>θ</em> + sin<em>θ</em></li>
+    <li>换元 <em>t</em> = sin<em>θ</em> ∈ [−1, 1]，得二次函数<br>
+      <em>f</em>(<em>t</em>) = −<em>t</em>² + <em>t</em> + 1 = −(<em>t</em> − <span class="fr"><b>1</b><i>2</i></span>)² + <span class="fr"><b>5</b><i>4</i></span></li>
+    <li>开口向下，对称轴 <em>t</em> = <span class="fr"><b>1</b><i>2</i></span> ∈ [−1, 1]，故 <em>t</em> = <span class="fr"><b>1</b><i>2</i></span> 时取最大值 <span class="key"><span class="fr"><b>5</b><i>4</i></span></span></li>
+  </ul>
+  <div class="note"><b>方法</b>　"三角 + 最值"的通用套路：先用平方关系把 sin、cos 统一成同一个量，再换元转化为闭区间上的二次函数问题。务必检查对称轴是否落在 <em>t</em> 的取值范围内。</div>
+</div>
+
+
+<!-- ================= 解答题 ================= -->
+<div class="part">四、解答题<small>共 5 小题，共 77 分。解答应写出文字说明、证明过程或演算步骤</small></div>
+
+<!-- Q15 -->
+<div class="q">
+  <div class="qnum">15</div>
+  <p class="stem">(13 分) 在锐角三角形 <em>ABC</em> 中，<em>A</em>，<em>B</em>，<em>C</em> 的对边分别为 <em>a</em>，<em>b</em>，<em>c</em>，且 √<span class="rd">3</span><em>a</em> = 2<em>c</em>·sin <em>A</em>．<br>
+  (1) 求角 <em>C</em> 的大小．<br>
+  (2) 若 <em>c</em> = √<span class="rd">7</span>，且 <em>ab</em> = 6，求 △<em>ABC</em> 的周长．</p>
+
+  <div class="ans"><em>答案</em>(1) C = π/3　(2) 5 + √<span class="rd">7</span></div>
+
+  <h4 class="sec">(1) 求角 C</h4>
+  <ul class="steps">
+    <li>已知条件中 <em>a</em>、<em>c</em> 是边，sin <em>A</em> 是角，考虑<strong>正弦定理边化角</strong>：<br>
+      由 <span class="fr"><b>a</b><i>sin A</i></span> = <span class="fr"><b>c</b><i>sin C</i></span> 得 <em>a</em> = 2<em>R</em>sin <em>A</em>，<em>c</em> = 2<em>R</em>sin <em>C</em></li>
+    <li>代入原式：√<span class="rd">3</span>·2<em>R</em>sin <em>A</em> = 2·2<em>R</em>sin <em>C</em>·sin <em>A</em></li>
+    <li><em>A</em> ∈ (0, π/2) ⟹ sin <em>A</em> ≠ 0，两边约去 2<em>R</em>sin <em>A</em>：<br>
+      √<span class="rd">3</span> = 2sin <em>C</em> ⟹ sin <em>C</em> = <span class="fr"><b>√<span class="rd">3</span></b><i>2</i></span></li>
+    <li>因为是<strong>锐角</strong>三角形，<em>C</em> ∈ (0, π/2)，舍去 <em>C</em> = <span class="fr"><b>2π</b><i>3</i></span>，得 <em>C</em> = <span class="key">π/3</span></li>
+  </ul>
+
+  <h4 class="sec">(2) 求周长</h4>
+  <ul class="steps">
+    <li>余弦定理：<em>c</em>² = <em>a</em>² + <em>b</em>² − 2<em>ab</em>·cos <em>C</em></li>
+    <li>代入 <em>c</em>² = 7，<em>ab</em> = 6，cos <span class="fr"><b>π</b><i>3</i></span> = <span class="fr"><b>1</b><i>2</i></span>：<br>
+      7 = <em>a</em>² + <em>b</em>² − 2 × 6 × <span class="fr"><b>1</b><i>2</i></span> = <em>a</em>² + <em>b</em>² − 6</li>
+    <li>⟹ <em>a</em>² + <em>b</em>² = 13</li>
+    <li>凑完全平方：(<em>a</em> + <em>b</em>)² = <em>a</em>² + <em>b</em>² + 2<em>ab</em> = 13 + 12 = 25<br>
+      <em>a</em>, <em>b</em> &gt; 0 ⟹ <em>a</em> + <em>b</em> = 5</li>
+    <li>周长 = <em>a</em> + <em>b</em> + <em>c</em> = <span class="key">5 + √<span class="rd">7</span></span></li>
+  </ul>
+  <div class="note"><b>方法</b>　已知 <em>ab</em> 与 <em>c</em> 求周长，不必分别解出 <em>a</em>、<em>b</em>。利用 (<em>a</em>+<em>b</em>)² = (<em>a</em>²+<em>b</em>²) + 2<em>ab</em> 整体代换，是解三角形中最常用的技巧。</div>
+</div>
+
+<!-- Q16 -->
+<div class="q">
+  <div class="qnum">16</div>
+  <p class="stem">(15 分) 某监测站点于 2025 年 3 月某日起连续 <em>n</em> 天监测空气质量指数(AQI)，数据统计如下表；频率分布直方图中只画出了 [0, 50) 一组．<br>
+  (1) 求出 <em>n</em>，<em>m</em> 的值，并完成频率分布直方图．<br>
+  (2) 由频率分布直方图，估计该组数据的平均数与中位数．<br>
+  (3) 在空气质量指数分别属于 [50, 100) 和 [150, 200) 的监测数据中，用分层随机抽样的方法抽取 5 天，再从中任意选取 2 天，求事件 <em>A</em> = "两天空气都为良"发生的概率．</p>
+
+  <table class="tb">
+    <tr><th>空气质量指数 /(μg/m³)</th><th>[0,50)</th><th>[50,100)</th><th>[100,150)</th><th>[150,200)</th><th>[200,250]</th></tr>
+    <tr><th>空气质量等级</th><td>优</td><td>良</td><td>轻度污染</td><td>中度污染</td><td>重度污染</td></tr>
+    <tr><th>天数</th><td>20</td><td>40</td><td><em>m</em></td><td>10</td><td>5</td></tr>
+  </table>
+
+  <figure>
+    <svg viewBox="0 0 420 260" xmlns="http://www.w3.org/2000/svg" width="420">
+      <g stroke="#14293F" stroke-width="1.5" fill="none">
+        <path d="M60 220 L390 220"/><path d="M60 220 L60 25"/>
+      </g>
+      <g stroke="#E4EDF5" stroke-width="1">
+        <path d="M60 198 L390 198"/><path d="M60 176 L390 176"/><path d="M60 154 L390 154"/>
+        <path d="M60 132 L390 132"/><path d="M60 110 L390 110"/><path d="M60 88 L390 88"/>
+        <path d="M60 66 L390 66"/><path d="M60 44 L390 44"/>
+      </g>
+      <g font-size="10.5" fill="#61738A" font-family="sans-serif" text-anchor="end">
+        <text x="54" y="202">0.001</text><text x="54" y="180">0.002</text><text x="54" y="158">0.003</text>
+        <text x="54" y="136">0.004</text><text x="54" y="114">0.005</text><text x="54" y="92">0.006</text>
+        <text x="54" y="70">0.007</text><text x="54" y="48">0.008</text>
+      </g>
+      <text x="60" y="18" font-size="10.5" fill="#61738A" font-family="sans-serif">频率/组距</text>
+      <!-- bars: width 60 each ; baseline 220 ; 0.001 -> 22px -->
+      <rect x="60"  y="132" width="60" height="88"  fill="#C0392B" fill-opacity="0.22" stroke="#C0392B" stroke-width="1.6"/>
+      <rect x="120" y="44"  width="60" height="176" fill="#1B6CA8" fill-opacity="0.18" stroke="#1B6CA8" stroke-width="1.6"/>
+      <rect x="180" y="110" width="60" height="110" fill="#1B6CA8" fill-opacity="0.18" stroke="#1B6CA8" stroke-width="1.6"/>
+      <rect x="240" y="176" width="60" height="44"  fill="#1B6CA8" fill-opacity="0.18" stroke="#1B6CA8" stroke-width="1.6"/>
+      <rect x="300" y="198" width="60" height="22"  fill="#1B6CA8" fill-opacity="0.18" stroke="#1B6CA8" stroke-width="1.6"/>
+      <g font-size="10.5" fill="#61738A" font-family="sans-serif" text-anchor="middle">
+        <text x="60" y="236">0</text><text x="120" y="236">50</text><text x="180" y="236">100</text>
+        <text x="240" y="236">150</text><text x="300" y="236">200</text><text x="360" y="236">250</text>
+        <text x="392" y="236" text-anchor="start">AQI</text>
+      </g>
+      <g font-size="10" fill="#14293F" font-family="sans-serif" text-anchor="middle">
+        <text x="90" y="126">0.004</text><text x="150" y="38">0.008</text><text x="210" y="104">0.005</text>
+        <text x="270" y="170">0.002</text><text x="330" y="192">0.001</text>
+      </g>
+      <!-- median line -->
+      <line x1="165" y1="220" x2="165" y2="44" stroke="#B8860B" stroke-width="1.6" stroke-dasharray="5 4"/>
+      <text x="168" y="60" font-size="10.5" fill="#B8860B" font-family="sans-serif">中位数 87.5</text>
+    </svg>
+    <figcaption>补全后的频率分布直方图（红色为原题已给出的一组）</figcaption>
+  </figure>
+
+  <div class="ans"><em>答案</em>(1) n = 100，m = 25　(2) 平均数 95，中位数 87.5　(3) 3/5</div>
+
+  <h4 class="sec">(1) 求 n 与 m</h4>
+  <ul class="steps">
+    <li>直方图中 [0, 50) 一组的纵坐标（频率/组距）为 0.004，组距为 50，<br>
+      故该组<strong>频率</strong> = 0.004 × 50 = 0.2</li>
+    <li>该组频数为 20，由"频率 = 频数 ÷ 总数"：<br>
+      <span class="fr"><b>20</b><i>n</i></span> = 0.2 ⟹ <em>n</em> = <span class="key">100</span></li>
+    <li>各组天数之和为 <em>n</em>：20 + 40 + <em>m</em> + 10 + 5 = 100 ⟹ <em>m</em> = <span class="key">25</span></li>
+    <li>补全直方图各组纵坐标（频率 ÷ 组距）：<br>
+      [50,100)：<span class="fr"><b>40/100</b><i>50</i></span> = 0.008　　[100,150)：<span class="fr"><b>25/100</b><i>50</i></span> = 0.005<br>
+      [150,200)：<span class="fr"><b>10/100</b><i>50</i></span> = 0.002　　[200,250]：<span class="fr"><b>5/100</b><i>50</i></span> = 0.001</li>
+  </ul>
+
+  <h4 class="sec">(2) 平均数与中位数</h4>
+  <ul class="steps">
+    <li><strong>平均数</strong>：用每组<strong>组中值</strong>乘以该组频率再求和<br>
+      <em>x̄</em> = 25×0.2 + 75×0.4 + 125×0.25 + 175×0.1 + 225×0.05<br>
+      　 = 5 + 30 + 31.25 + 17.5 + 11.25 = <span class="key">95</span></li>
+    <li><strong>中位数</strong>：先累计频率<br>
+      [0,50)：0.2　　[0,100)：0.2 + 0.4 = 0.6 &gt; 0.5<br>
+      ⟹ 中位数落在 [50, 100) 内。</li>
+    <li>设中位数为 <em>x</em>，需要在该组内再补足 0.5 − 0.2 = 0.3 的频率：<br>
+      0.2 + (<em>x</em> − 50) × 0.008 = 0.5 ⟹ <em>x</em> − 50 = <span class="fr"><b>0.3</b><i>0.008</i></span> = 37.5<br>
+      <em>x</em> = <span class="key">87.5</span></li>
+  </ul>
+
+  <h4 class="sec">(3) 求概率</h4>
+  <ul class="steps">
+    <li>[50, 100) 有 40 天（良），[150, 200) 有 10 天（中度污染），共 50 天，按 40 : 10 = 4 : 1 分层抽 5 天：<br>
+      良：5 × <span class="fr"><b>40</b><i>50</i></span> = 4 天（记为 <em>a</em><sub>1</sub>, <em>a</em><sub>2</sub>, <em>a</em><sub>3</sub>, <em>a</em><sub>4</sub>）；中度污染：1 天（记为 <em>b</em>）</li>
+    <li>从 5 天中任取 2 天，基本事件总数 <em>C</em><sub>5</sub><sup>2</sup> = <span class="fr"><b>5×4</b><i>2</i></span> = 10</li>
+    <li>事件 <em>A</em>："两天空气都为良"，即从 4 天良中取 2 天：<em>C</em><sub>4</sub><sup>2</sup> = <span class="fr"><b>4×3</b><i>2</i></span> = 6</li>
+    <li><em>P</em>(<em>A</em>) = <span class="fr"><b>6</b><i>10</i></span> = <span class="key"><span class="fr"><b>3</b><i>5</i></span></span></li>
+  </ul>
+  <div class="note"><b>另解</b>　也可用对立事件：取到 <em>b</em> 的概率 = <span class="fr"><b>C₄¹</b><i>C₅²</i></span> = <span class="fr"><b>4</b><i>10</i></span> = <span class="fr"><b>2</b><i>5</i></span>，故 <em>P</em>(<em>A</em>) = 1 − <span class="fr"><b>2</b><i>5</i></span> = <span class="fr"><b>3</b><i>5</i></span>。</div>
+</div>
+
+<!-- Q17 -->
+<div class="q">
+  <div class="qnum">17</div>
+  <p class="stem">(15 分) 如图，在边长为 2 的菱形 <em>ABCD</em> 中，∠<em>ADC</em> = 60°，现将 △<em>ADC</em> 沿 <em>AC</em> 边折叠到 △<em>APC</em> 的位置，使平面 <em>APC</em> ⊥ 平面 <em>ABC</em>．<br>
+  (1) 求证：<em>PB</em> ⊥ <em>AC</em>．　(2) 求三棱锥 <em>P</em>-<em>ABC</em> 的体积．</p>
+
+  <figure>
+    <div class="twofig">
+    <svg viewBox="0 0 230 190" xmlns="http://www.w3.org/2000/svg" width="220">
+      <!-- rhombus ABCD: D left, B right, A bottom, C top; ∠ADC=60 -->
+      <g fill="none" stroke="#14293F" stroke-width="1.7">
+        <path d="M30 100 L110 155 L190 100 L110 45 Z"/>
+      </g>
+      <line x1="30" y1="100" x2="190" y2="100" stroke="#1B6CA8" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <g font-size="12.5" font-family="serif" font-style="italic" fill="#14293F">
+        <text x="18" y="104">D</text><text x="104" y="170">A</text>
+        <text x="194" y="104">B</text><text x="106" y="40">C</text>
+      </g>
+      <g font-size="11" font-family="sans-serif" fill="#61738A">
+        <text x="62" y="124">2</text><text x="152" y="124">2</text>
+        <text x="62" y="70">2</text><text x="152" y="70">2</text>
+        <text x="106" y="114" fill="#1B6CA8">AC=2</text>
+        <text x="42" y="96">60°</text>
+      </g>
+      <text x="110" y="184" font-size="11" fill="#61738A" text-anchor="middle" font-family="sans-serif">折叠前：菱形 ABCD</text>
+    </svg>
+
+    <svg viewBox="0 0 230 190" xmlns="http://www.w3.org/2000/svg" width="220">
+      <!-- folded: base ABC, P above O -->
+      <g fill="none" stroke="#14293F" stroke-width="1.7">
+        <path d="M40 145 L180 145 L120 110 Z"/>
+        <path d="M40 145 L110 40 L180 145"/>
+      </g>
+      <path d="M120 110 L110 40" fill="none" stroke="#14293F" stroke-width="1.4" stroke-dasharray="5 4"/>
+      <!-- O midpoint of AC ; A(40,145) C(120,110) -> O(80,127.5) -->
+      <line x1="40" y1="145" x2="120" y2="110" stroke="#1B6CA8" stroke-width="1.5"/>
+      <line x1="110" y1="40" x2="80" y2="128" stroke="#C0392B" stroke-width="2" stroke-dasharray="5 4"/>
+      <line x1="180" y1="145" x2="80" y2="128" stroke="#1E7A46" stroke-width="1.6" stroke-dasharray="5 4"/>
+      <circle cx="80" cy="128" r="2.8" fill="#14293F"/>
+      <g font-size="12.5" font-family="serif" font-style="italic" fill="#14293F">
+        <text x="28" y="156">A</text><text x="184" y="156">B</text>
+        <text x="124" y="106">C</text><text x="104" y="34">P</text>
+        <text x="70" y="140">O</text>
+      </g>
+      <g font-size="10.5" font-family="sans-serif">
+        <text x="90" y="86" fill="#C0392B">PO=√3</text>
+        <text x="122" y="140" fill="#1E7A46">BO</text>
+      </g>
+      <text x="110" y="184" font-size="11" fill="#61738A" text-anchor="middle" font-family="sans-serif">折叠后：三棱锥 P-ABC</text>
+    </svg>
+    </div>
+    <figcaption>取 AC 中点 O，则 PO ⊥ AC 且 BO ⊥ AC</figcaption>
+  </figure>
+
+  <div class="ans"><em>答案</em>(2) V = 1</div>
+
+  <h4 class="sec">预备：算出各边长</h4>
+  <ul class="steps">
+    <li>菱形中 <em>AD</em> = <em>DC</em> = 2，∠<em>ADC</em> = 60° ⟹ △<em>ADC</em> 是<strong>等边三角形</strong>，<em>AC</em> = 2。</li>
+    <li>折叠只改变 △<em>ADC</em> 的位置、不改变其形状，故 △<em>APC</em> 也是边长为 2 的等边三角形，<em>PA</em> = <em>PC</em> = <em>AC</em> = 2。</li>
+    <li>又 <em>AB</em> = <em>BC</em> = 2，<em>AC</em> = 2 ⟹ △<em>ABC</em> 也是边长为 2 的等边三角形。</li>
+  </ul>
+
+  <h4 class="sec">(1) 证明 PB ⊥ AC</h4>
+  <ul class="steps">
+    <li>取 <em>AC</em> 的中点 <em>O</em>，连接 <em>PO</em>，<em>BO</em>，<em>PB</em>。</li>
+    <li>△<em>APC</em> 中 <em>PA</em> = <em>PC</em>，<em>O</em> 是 <em>AC</em> 中点 ⟹ <strong><em>PO</em> ⊥ <em>AC</em></strong>（等腰三角形三线合一）。</li>
+    <li>△<em>ABC</em> 中 <em>BA</em> = <em>BC</em>，同理 <strong><em>BO</em> ⊥ <em>AC</em></strong>。</li>
+    <li><em>PO</em> ∩ <em>BO</em> = <em>O</em>，且 <em>PO</em>、<em>BO</em> ⊂ 平面 <em>POB</em><br>
+      由<strong>线面垂直的判定定理</strong>：<em>AC</em> ⊥ 平面 <em>POB</em>。</li>
+    <li>又 <em>PB</em> ⊂ 平面 <em>POB</em>，由<strong>线面垂直的性质</strong>得 <span class="key"><em>PB</em> ⊥ <em>AC</em></span>．　∎</li>
+  </ul>
+
+  <h4 class="sec">(2) 求体积</h4>
+  <ul class="steps">
+    <li><strong>找高。</strong>已证 <em>PO</em> ⊥ <em>AC</em>，且 <em>PO</em> ⊂ 平面 <em>APC</em>；<br>
+      又平面 <em>APC</em> ⊥ 平面 <em>ABC</em>，两平面交线为 <em>AC</em>，<br>
+      由<strong>面面垂直的性质定理</strong>得 <em>PO</em> ⊥ 平面 <em>ABC</em>，即 <em>PO</em> 就是三棱锥的高。</li>
+    <li>等边 △<em>APC</em> 的中线：<em>PO</em> = <span class="fr"><b>√<span class="rd">3</span></b><i>2</i></span> × 2 = √<span class="rd">3</span></li>
+    <li>底面积：<em>S</em><sub>△<em>ABC</em></sub> = <span class="fr"><b>√<span class="rd">3</span></b><i>4</i></span> × 2² = √<span class="rd">3</span></li>
+    <li><em>V</em> = <span class="fr"><b>1</b><i>3</i></span> · <em>S</em> · <em>h</em> = <span class="fr"><b>1</b><i>3</i></span> × √<span class="rd">3</span> × √<span class="rd">3</span> = <span class="key">1</span></li>
+  </ul>
+  <div class="note"><b>折叠问题要点</b>　折叠时，<strong>折痕同侧的量（△APC 内部的边、角）全部不变</strong>，跨折痕的量（如 PB）会改变。本题中 PA = PC = 2 就是折叠前 DA = DC = 2 继承下来的。<br>另外"面面垂直 ⟹ 线面垂直"必须满足三个条件：直线在其中一个面内、垂直于交线、两面垂直，缺一不可。</div>
+</div>
+
+<!-- Q18 -->
+<div class="q">
+  <div class="qnum">18</div>
+  <p class="stem">(17 分) 某社区举行宪法宣传答题活动，共设置三关，选手从第一关开始依次闯关，若闯关失败或闯完三关，则闯关结束，规定每名选手只能参加一次活动．已知每名选手第一关闯关成功的概率为 <span class="fr"><b>4</b><i>5</i></span>，第二关为 <span class="fr"><b>1</b><i>2</i></span>，第三关为 <span class="fr"><b>2</b><i>5</i></span>．规定闯关结束时，恰好通过两关可获得奖金 300 元，三关全部通过可获得奖金 800 元．假设选手是否通过每一关相互独立．<br>
+  (1) 求参加活动的选手没有获得奖金的概率．<br>
+  (2) 现有甲、乙两名选手参加本次活动，求两人最后所得奖金总和为 1100 元的概率．</p>
+
+  <div class="ans"><em>答案</em>(1) 3/5　(2) 48/625</div>
+
+  <h4 class="sec">预备：四种结局及其概率</h4>
+  <p class="stem" style="font-family:inherit;font-size:15px">记 <em>A</em><sub>i</sub> = "第 <em>i</em> 关通过"，则 <em>P</em>(<em>A</em><sub>1</sub>) = <span class="fr"><b>4</b><i>5</i></span>，<em>P</em>(<em>A</em><sub>2</sub>) = <span class="fr"><b>1</b><i>2</i></span>，<em>P</em>(<em>A</em><sub>3</sub>) = <span class="fr"><b>2</b><i>5</i></span>，且相互独立。</p>
+  <table class="tb">
+    <tr><th>结局</th><th>概率计算</th><th>概率</th><th>奖金</th></tr>
+    <tr><td>第一关就失败</td><td>1 − 4/5</td><td>1/5 = 5/25</td><td>0</td></tr>
+    <tr><td>恰过 1 关</td><td>(4/5)(1 − 1/2)</td><td>2/5 = 10/25</td><td>0</td></tr>
+    <tr><td>恰过 2 关</td><td>(4/5)(1/2)(1 − 2/5)</td><td>6/25</td><td>300 元</td></tr>
+    <tr><td>三关全过</td><td>(4/5)(1/2)(2/5)</td><td>4/25</td><td>800 元</td></tr>
+  </table>
+  <p class="stem" style="font-family:inherit;font-size:14.5px;color:var(--muted)">检验：5/25 + 10/25 + 6/25 + 4/25 = 1 ✓</p>
+
+  <h4 class="sec">(1) 没有获得奖金的概率</h4>
+  <ul class="steps">
+    <li>"没有获得奖金"即<strong>通过的关数不超过 1</strong>，包含两个互斥事件：</li>
+    <li>第一关失败：<em>P</em> = 1 − <span class="fr"><b>4</b><i>5</i></span> = <span class="fr"><b>1</b><i>5</i></span></li>
+    <li>过第一关但第二关失败：<em>P</em> = <span class="fr"><b>4</b><i>5</i></span> × (1 − <span class="fr"><b>1</b><i>2</i></span>) = <span class="fr"><b>2</b><i>5</i></span></li>
+    <li>互斥事件概率相加：<em>P</em> = <span class="fr"><b>1</b><i>5</i></span> + <span class="fr"><b>2</b><i>5</i></span> = <span class="key"><span class="fr"><b>3</b><i>5</i></span></span></li>
+  </ul>
+
+  <h4 class="sec">(2) 两人奖金总和为 1100 元</h4>
+  <ul class="steps">
+    <li>单人奖金只可能是 0、300、800 三种。要凑出 1100，只有一种拆法：<br>
+      <strong>1100 = 300 + 800</strong>（因为 0 + 1100、800 + 300 之外无其他组合）</li>
+    <li>即"一人得 300，另一人得 800"，包含两个互斥情形：<br>
+      ① 甲 300、乙 800　② 甲 800、乙 300</li>
+    <li>由上表：<em>P</em>(得 300) = <span class="fr"><b>6</b><i>25</i></span>，<em>P</em>(得 800) = <span class="fr"><b>4</b><i>25</i></span></li>
+    <li>两人相互独立：<br>
+      <em>P</em> = 2 × <span class="fr"><b>6</b><i>25</i></span> × <span class="fr"><b>4</b><i>25</i></span> = <span class="fr"><b>48</b><i>625</i></span> = <span class="key"><span class="fr"><b>48</b><i>625</i></span></span></li>
+  </ul>
+  <div class="note"><b>易错点</b>　"恰好通过两关"必须包含<strong>第三关失败</strong>这一因子 (1 − 2/5)，不能只算 (4/5)(1/2)；<br>第 (2) 问容易漏掉<strong>系数 2</strong>（甲乙身份可互换）。</div>
+</div>
+
+<!-- Q19 -->
+<div class="q">
+  <div class="qnum">19</div>
+  <p class="stem">(17 分) 如图，在四棱锥 <em>P</em>-<em>ABCD</em> 中，四边形 <em>ABCD</em> 是边长为 2 的正方形，<em>AC</em> 与 <em>BD</em> 交于点 <em>O</em>，<em>PA</em> ⊥ 平面 <em>ABCD</em>，且 <em>PA</em> = 2．<br>
+  (1) 求证：<em>BD</em> ⊥ 平面 <em>PAC</em>．　(2) 求直线 <em>PD</em> 与平面 <em>PAC</em> 所成角的大小．</p>
+
+  <figure>
+    <svg viewBox="0 0 300 240" xmlns="http://www.w3.org/2000/svg" width="320">
+      <!-- base square ABCD in oblique: A(70,150) B(60,200) C(215,200) D(225,150)... use standard -->
+      <g fill="none" stroke="#14293F" stroke-width="1.7">
+        <path d="M85 155 L55 205 L215 205 L245 155 Z"/>
+      </g>
+      <!-- P above A -->
+      <line x1="85" y1="155" x2="85" y2="40" stroke="#14293F" stroke-width="1.7"/>
+      <g fill="none" stroke="#14293F" stroke-width="1.6">
+        <path d="M85 40 L55 205"/><path d="M85 40 L215 205"/><path d="M85 40 L245 155"/>
+      </g>
+      <!-- diagonals -->
+      <line x1="85" y1="155" x2="215" y2="205" stroke="#1B6CA8" stroke-width="1.8"/>
+      <line x1="55" y1="205" x2="245" y2="155" stroke="#C0392B" stroke-width="1.8"/>
+      <circle cx="150" cy="180" r="3" fill="#14293F"/>
+      <!-- right angle at O -->
+      <path d="M142 183 L146 172 L156 176" fill="none" stroke="#61738A" stroke-width="1.1"/>
+      <g font-size="12.5" font-family="serif" font-style="italic" fill="#14293F">
+        <text x="72" y="152">A</text><text x="44" y="216">B</text>
+        <text x="218" y="220">C</text><text x="250" y="152">D</text>
+        <text x="80" y="34">P</text><text x="152" y="194">O</text>
+      </g>
+      <g font-size="10.5" font-family="sans-serif">
+        <text x="92" y="100" fill="#61738A">PA=2</text>
+        <text x="180" y="168" fill="#C0392B">BD</text>
+        <text x="140" y="160" fill="#1B6CA8">AC</text>
+      </g>
+    </svg>
+    <figcaption>BD ⊥ AC 且 BD ⊥ PA ⟹ BD ⊥ 平面 PAC，O 即 D 在平面 PAC 内的射影</figcaption>
+  </figure>
+
+  <div class="ans"><em>答案</em>(2) 30°（即 π/6）</div>
+
+  <h4 class="sec">(1) 证明 BD ⊥ 平面 PAC</h4>
+  <ul class="steps">
+    <li><em>PA</em> ⊥ 平面 <em>ABCD</em>，而 <em>BD</em> ⊂ 平面 <em>ABCD</em><br>
+      ⟹ <strong><em>PA</em> ⊥ <em>BD</em></strong>（线面垂直的性质）</li>
+    <li><em>ABCD</em> 是正方形，对角线互相垂直<br>
+      ⟹ <strong><em>AC</em> ⊥ <em>BD</em></strong></li>
+    <li><em>PA</em> ∩ <em>AC</em> = <em>A</em>，且 <em>PA</em>、<em>AC</em> ⊂ 平面 <em>PAC</em><br>
+      由<strong>线面垂直的判定定理</strong>：<span class="key"><em>BD</em> ⊥ 平面 <em>PAC</em></span>．　∎</li>
+  </ul>
+
+  <h4 class="sec">(2) 求线面角</h4>
+  <ul class="steps">
+    <li><strong>找射影。</strong>由 (1) 知 <em>DO</em> ⊥ 平面 <em>PAC</em>（<em>O</em> 是垂足），<br>
+      所以 <em>D</em> 在平面 <em>PAC</em> 内的射影就是 <em>O</em>，<em>PO</em> 是 <em>PD</em> 的射影，<br>
+      ∠<em>DPO</em> 即为直线 <em>PD</em> 与平面 <em>PAC</em> 所成的角。</li>
+    <li><strong>算长度。</strong>正方形边长 2 ⟹ 对角线 <em>BD</em> = 2√<span class="rd">2</span>，<br>
+      <em>DO</em> = <span class="fr"><b>1</b><i>2</i></span><em>BD</em> = √<span class="rd">2</span></li>
+    <li><em>PA</em> ⊥ 平面 <em>ABCD</em> ⟹ <em>PA</em> ⊥ <em>AD</em>，在 Rt△<em>PAD</em> 中：<br>
+      <em>PD</em> = √<span class="rd">PA² + AD²</span> = √<span class="rd">4 + 4</span> = 2√<span class="rd">2</span></li>
+    <li>由 <em>DO</em> ⊥ 平面 <em>PAC</em> ⟹ <em>DO</em> ⊥ <em>PO</em>，△<em>DPO</em> 是直角三角形：<br>
+      sin∠<em>DPO</em> = <span class="fr"><b>DO</b><i>PD</i></span> = <span class="fr"><b>√<span class="rd">2</span></b><i>2√<span class="rd">2</span></i></span> = <span class="fr"><b>1</b><i>2</i></span></li>
+    <li>线面角范围为 [0°, 90°] ⟹ ∠<em>DPO</em> = <span class="key">30°</span></li>
+  </ul>
+  <div class="note"><b>方法</b>　求线面角的关键是<strong>找射影</strong>。本题第 (1) 问已经证出 BD ⊥ 平面 PAC，这就直接告诉我们 D 的射影是 O —— <strong>前一问往往是后一问的钥匙</strong>，做题时要有意识地利用。</div>
+</div>
+
+
+<!-- ================= 附加题 ================= -->
+<div class="part">附：2023 新课标Ⅱ卷 第 19 题<small>教辅第 303–304 页</small></div>
+
+<div class="q">
+  <div class="qnum">附</div>
+  <p class="stem">(17 分) 记 △<em>ABC</em> 的内角 <em>A</em>，<em>B</em>，<em>C</em> 的对边分别为 <em>a</em>，<em>b</em>，<em>c</em>，已知 △<em>ABC</em> 的面积为 √<span class="rd">3</span>，<em>D</em> 为 <em>BC</em> 的中点，且 <em>AD</em> = 1．<br>
+  (1) 若 ∠<em>ADC</em> = <span class="fr"><b>π</b><i>3</i></span>，求 tan <em>B</em>．　(2) 若 <em>b</em>² + <em>c</em>² = 8，求 <em>b</em>，<em>c</em>．</p>
+
+  <figure>
+    <svg viewBox="0 0 300 190" xmlns="http://www.w3.org/2000/svg" width="300">
+      <g fill="none" stroke="#14293F" stroke-width="1.7">
+        <path d="M40 150 L250 150 L110 40 Z"/>
+      </g>
+      <line x1="110" y1="40" x2="145" y2="150" stroke="#C0392B" stroke-width="2"/>
+      <circle cx="145" cy="150" r="3" fill="#C0392B"/>
+      <!-- tick marks for midpoint -->
+      <g stroke="#1E7A46" stroke-width="1.6">
+        <path d="M90 145 L96 155"/><path d="M195 145 L201 155"/>
+      </g>
+      <g font-size="12.5" font-family="serif" font-style="italic" fill="#14293F">
+        <text x="30" y="164">B</text><text x="252" y="164">C</text>
+        <text x="104" y="34">A</text><text x="140" y="168">D</text>
+      </g>
+      <g font-size="11" font-family="sans-serif">
+        <text x="118" y="100" fill="#C0392B">AD=1</text>
+        <text x="60" y="90" fill="#61738A">c</text>
+        <text x="195" y="90" fill="#61738A">b</text>
+        <text x="152" y="140" fill="#61738A">120°</text>
+        <text x="160" y="164" fill="#1E7A46">BD = DC = a/2</text>
+      </g>
+    </svg>
+    <figcaption>中线 AD 把 △ABC 分成面积相等的两个三角形</figcaption>
+  </figure>
+
+  <div class="ans"><em>答案</em>(1) tan B = √<span class="rd">3</span>/5　(2) b = c = 2</div>
+
+  <h4 class="sec">(1) 求 tan B</h4>
+  <ul class="steps">
+    <li><strong>中线等分面积：</strong><em>D</em> 是 <em>BC</em> 中点 ⟹ <em>S</em><sub>△<em>ABD</em></sub> = <em>S</em><sub>△<em>ADC</em></sub> = <span class="fr"><b>1</b><i>2</i></span><em>S</em><sub>△<em>ABC</em></sub> = <span class="fr"><b>√<span class="rd">3</span></b><i>2</i></span></li>
+    <li>在 △<em>ADC</em> 中用面积公式求 <em>DC</em>：<br>
+      <span class="fr"><b>1</b><i>2</i></span>·<em>AD</em>·<em>DC</em>·sin∠<em>ADC</em> = <span class="fr"><b>1</b><i>2</i></span> × 1 × <em>DC</em> × <span class="fr"><b>√<span class="rd">3</span></b><i>2</i></span> = <span class="fr"><b>√<span class="rd">3</span></b><i>2</i></span><br>
+      ⟹ <em>DC</em> = 2，从而 <em>BD</em> = 2，<em>a</em> = <em>BC</em> = 4</li>
+    <li>∠<em>ADC</em> = <span class="fr"><b>π</b><i>3</i></span> ⟹ ∠<em>ADB</em> = π − <span class="fr"><b>π</b><i>3</i></span> = <span class="fr"><b>2π</b><i>3</i></span>（补角）</li>
+    <li>在 △<em>ABD</em> 中用余弦定理求 <em>AB</em>：<br>
+      <em>AB</em>² = <em>AD</em>² + <em>BD</em>² − 2·<em>AD</em>·<em>BD</em>·cos<span class="fr"><b>2π</b><i>3</i></span><br>
+      = 1 + 4 − 2 × 1 × 2 × (−<span class="fr"><b>1</b><i>2</i></span>) = 7 ⟹ <em>AB</em> = √<span class="rd">7</span></li>
+    <li>再在 △<em>ABD</em> 中求 <em>B</em>：<br>
+      sin<em>B</em>（正弦定理）：<span class="fr"><b>AD</b><i>sin B</i></span> = <span class="fr"><b>AB</b><i>sin∠ADB</i></span> ⟹ sin<em>B</em> = <span class="fr"><b>1 × √3/2</b><i>√<span class="rd">7</span></i></span> = <span class="fr"><b>√<span class="rd">3</span></b><i>2√<span class="rd">7</span></i></span><br>
+      cos<em>B</em>（余弦定理）：cos<em>B</em> = <span class="fr"><b>AB² + BD² − AD²</b><i>2·AB·BD</i></span> = <span class="fr"><b>7 + 4 − 1</b><i>2 × √<span class="rd">7</span> × 2</i></span> = <span class="fr"><b>10</b><i>4√<span class="rd">7</span></i></span> = <span class="fr"><b>5</b><i>2√<span class="rd">7</span></i></span></li>
+    <li>tan <em>B</em> = <span class="fr"><b>sin B</b><i>cos B</i></span> = <span class="fr"><b>√<span class="rd">3</span>/(2√<span class="rd">7</span>)</b><i>5/(2√<span class="rd">7</span>)</i></span> = <span class="key"><span class="fr"><b>√<span class="rd">3</span></b><i>5</i></span></span></li>
+  </ul>
+
+  <h4 class="sec">(2) 求 b，c</h4>
+  <ul class="steps">
+    <li><strong>用中线长公式求 a：</strong>在 △<em>ABD</em> 与 △<em>ADC</em> 中对补角 ∠<em>ADB</em>、∠<em>ADC</em> 分别用余弦定理并相加，得<br>
+      <em>AD</em>² = <span class="fr"><b>2b² + 2c² − a²</b><i>4</i></span></li>
+    <li>代入 <em>AD</em> = 1，<em>b</em>² + <em>c</em>² = 8：<br>
+      1 = <span class="fr"><b>2 × 8 − a²</b><i>4</i></span> ⟹ 4 = 16 − <em>a</em>² ⟹ <em>a</em>² = 12</li>
+    <li><strong>联立面积与余弦定理。</strong>由面积公式：<br>
+      <span class="fr"><b>1</b><i>2</i></span><em>bc</em>·sin <em>A</em> = √<span class="rd">3</span> ⟹ sin <em>A</em> = <span class="fr"><b>2√<span class="rd">3</span></b><i>bc</i></span></li>
+    <li>由余弦定理：cos <em>A</em> = <span class="fr"><b>b² + c² − a²</b><i>2bc</i></span> = <span class="fr"><b>8 − 12</b><i>2bc</i></span> = −<span class="fr"><b>2</b><i>bc</i></span></li>
+    <li>由 sin²<em>A</em> + cos²<em>A</em> = 1：<br>
+      <span class="fr"><b>12</b><i>(bc)²</i></span> + <span class="fr"><b>4</b><i>(bc)²</i></span> = 1 ⟹ (<em>bc</em>)² = 16 ⟹ <em>bc</em> = 4（<em>bc</em> &gt; 0）</li>
+    <li>联立 <em>b</em>² + <em>c</em>² = 8 与 <em>bc</em> = 4：<br>
+      (<em>b</em> − <em>c</em>)² = <em>b</em>² + <em>c</em>² − 2<em>bc</em> = 8 − 8 = 0 ⟹ <em>b</em> = <em>c</em></li>
+    <li>代回 <em>bc</em> = 4 ⟹ <em>b</em>² = 4 ⟹ <span class="key"><em>b</em> = <em>c</em> = 2</span></li>
+  </ul>
+  <div class="note"><b>中线三大工具</b>　遇到"中线 + 面积"的题，通常从三条路选：<br>
+  ① <strong>面积等分</strong>：中线把三角形分成面积相等的两半（本题 (1)）；<br>
+  ② <strong>补角关系</strong>：∠<em>ADB</em> + ∠<em>ADC</em> = π，故 cos∠<em>ADB</em> = −cos∠<em>ADC</em>；<br>
+  ③ <strong>向量法</strong>：2<span class="mono">AD</span> = <span class="mono">AB</span> + <span class="mono">AC</span>，两边平方得 4<em>AD</em>² = <em>b</em>² + <em>c</em>² + 2<em>bc</em>cos<em>A</em>，与中线长公式等价（本题 (2)）。</div>
+</div>
+
+<footer>
+  模块质量检测(三) 全卷详解 · 共 19 题 + 附加题 1 题　|　图形均按题目条件重新绘制，仅供对照参考
+</footer>
+
+</div>
+</body>
+</html>
