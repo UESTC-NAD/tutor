@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>功和能量专题 · 详解（例题1—16）</title>
+<style>
+  :root{
+    --ink:#16202b;
+    --ink-soft:#43535f;
+    --paper:#ffffff;
+    --bg:#e9eef2;
+    --rule:#ccd6de;
+    --steel:#1f5f8b;
+    --steel-l:#e3edf4;
+    --amber:#b5761a;
+    --amber-l:#fbf3e3;
+    --moss:#2c6b4d;
+    --moss-l:#e7f2eb;
+    --red:#a83b2c;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    background-image:linear-gradient(var(--rule) 1px,transparent 1px),linear-gradient(90deg,var(--rule) 1px,transparent 1px);
+    background-size:28px 28px;
+    background-blend-mode:soft-light;
+    color:var(--ink);
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC",system-ui,sans-serif;
+    font-size:16px;line-height:1.85;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:0 18px 90px}
+
+  /* ---------- 页眉 ---------- */
+  header.masthead{
+    margin:0 -18px 34px;padding:52px 34px 40px;
+    background:var(--ink);color:#f2f6f8;
+    border-bottom:6px solid var(--amber);
+  }
+  .masthead .eyebrow{
+    font-size:13px;letter-spacing:.34em;color:#8fb6cf;margin:0 0 14px;
+  }
+  .masthead h1{
+    margin:0;font-family:"Songti SC","SimSun",Georgia,serif;
+    font-size:clamp(28px,5vw,46px);font-weight:700;letter-spacing:.02em;line-height:1.25;
+  }
+  .masthead p{margin:14px 0 0;color:#b9cbd7;font-size:15px;max-width:52em}
+  .masthead .meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:10px}
+  .masthead .meta span{
+    border:1px solid #3d5265;border-radius:2px;padding:3px 11px;font-size:13px;color:#cfe0ea;
+  }
+
+  /* ---------- 目录 ---------- */
+  .toc{background:var(--paper);border:1px solid var(--rule);border-left:5px solid var(--steel);
+       padding:20px 24px 22px;margin-bottom:34px}
+  .toc h2{margin:0 0 12px;font-size:15px;letter-spacing:.22em;color:var(--steel);font-weight:700}
+  .toc ol{margin:0;padding:0;list-style:none;
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:2px 18px}
+  .toc a{color:var(--ink);text-decoration:none;font-size:14.5px;display:block;padding:3px 0;
+         border-bottom:1px dotted var(--rule)}
+  .toc a:hover{color:var(--steel)}
+  .toc .n{display:inline-block;min-width:2.6em;color:var(--amber);font-weight:700;
+          font-family:Georgia,serif}
+
+  /* ---------- 分区标题 ---------- */
+  .band{margin:52px 0 22px;border-top:3px solid var(--ink);padding-top:12px}
+  .band .k{font-size:12px;letter-spacing:.3em;color:var(--steel);font-weight:700}
+  .band h2{margin:4px 0 0;font-family:"Songti SC","SimSun",Georgia,serif;font-size:25px}
+  .band .sub{color:var(--ink-soft);font-size:14.5px;margin-top:6px}
+
+  /* ---------- 题卡 ---------- */
+  .card{background:var(--paper);border:1px solid var(--rule);margin:0 0 30px;
+        box-shadow:0 1px 0 rgba(22,32,43,.06)}
+  .card > .head{display:flex;align-items:stretch;border-bottom:1px solid var(--rule)}
+  .card > .head .num{
+    flex:0 0 auto;background:var(--ink);color:#fff;font-family:Georgia,serif;font-weight:700;
+    font-size:19px;padding:14px 16px;min-width:64px;text-align:center;line-height:1.3;
+  }
+  .card > .head .num small{display:block;font-size:10px;letter-spacing:.18em;color:#8fb6cf;font-weight:400}
+  .card > .head .t{padding:12px 18px;font-weight:700;font-size:17px;align-self:center}
+  .tag{display:inline-block;font-size:12px;letter-spacing:.08em;padding:1px 8px;margin-left:8px;
+       border:1px solid var(--steel);color:var(--steel);vertical-align:2px;font-weight:500}
+  .body{padding:20px 24px 24px}
+
+  .stem{background:#f6f8fa;border-left:3px solid var(--steel);padding:12px 16px;margin:0 0 18px;
+        font-size:15.2px;color:#26333d}
+  .stem b{color:var(--ink)}
+  .opts{margin:8px 0 0;padding:0;list-style:none;display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:2px 20px}
+  .opts li{font-size:15px}
+
+  h3.step{margin:22px 0 8px;font-size:16px;color:var(--steel);
+     border-bottom:1px solid var(--rule);padding-bottom:5px}
+  h3.step::before{content:"▎";color:var(--amber);margin-right:2px}
+
+  .eq{font-family:"Cambria Math",Cambria,Georgia,"Times New Roman",serif;
+      font-size:17px;text-align:center;margin:12px 0;padding:9px 12px;background:#f7f9fb;
+      border:1px dashed var(--rule);overflow-x:auto}
+  .eq.plain{background:none;border:none;padding:2px 0;margin:8px 0}
+  var,i.v{font-family:"Cambria Math",Cambria,Georgia,serif;font-style:italic}
+  .u{font-style:normal}
+
+  .ans{background:var(--moss-l);border:1px solid #b9d6c5;border-left:5px solid var(--moss);
+       padding:12px 16px;margin:18px 0 0;font-size:15.6px}
+  .ans b{color:var(--moss)}
+  .tip{background:var(--amber-l);border:1px solid #ecd9b0;border-left:5px solid var(--amber);
+       padding:11px 16px;margin:16px 0 0;font-size:14.6px;color:#5c4517}
+  .tip b{color:var(--amber)}
+  .note{background:var(--steel-l);border-left:5px solid var(--steel);padding:11px 16px;
+        margin:16px 0;font-size:14.8px}
+
+  figure{margin:18px 0;text-align:center}
+  figure svg{max-width:100%;height:auto;background:var(--paper)}
+  figcaption{font-size:13px;color:var(--ink-soft);margin-top:6px;letter-spacing:.03em}
+  .svg-line{stroke:var(--ink);fill:none;stroke-width:1.6}
+  .svg-thin{stroke:var(--ink-soft);fill:none;stroke-width:1}
+  .svg-dash{stroke:var(--ink-soft);fill:none;stroke-width:1.2;stroke-dasharray:5 4}
+  .svg-red{stroke:var(--red);fill:none;stroke-width:2}
+  .svg-blue{stroke:var(--steel);fill:none;stroke-width:2}
+  .svg-fill{fill:#dbe6ee;stroke:var(--steel);stroke-width:1.2}
+  text{font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:13px;fill:var(--ink)}
+  text.it{font-family:Georgia,serif;font-style:italic;font-size:14px}
+  text.sm{font-size:11.5px;fill:var(--ink-soft)}
+  text.rd{fill:var(--red)}
+  text.bl{fill:var(--steel)}
+
+  table.data{border-collapse:collapse;width:100%;margin:14px 0;font-size:14.6px}
+  table.data th,table.data td{border:1px solid var(--rule);padding:7px 10px;text-align:center}
+  table.data th{background:#f0f4f7;font-weight:600}
+  table.data td.l{text-align:left}
+
+  ul.pt{margin:8px 0;padding-left:1.35em}
+  ul.pt li{margin:4px 0}
+  .kbd{font-family:Georgia,serif;font-style:italic}
+  footer{margin-top:60px;border-top:3px solid var(--ink);padding-top:16px;
+         font-size:13.5px;color:var(--ink-soft)}
+  @media (max-width:600px){
+    .body{padding:16px 14px 20px}
+    .eq{font-size:15.5px}
+    header.masthead{padding:36px 20px 30px}
+  }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <marker id="ah" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 z" fill="#a83b2c"/></marker>
+    <marker id="ab" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 z" fill="#1f5f8b"/></marker>
+    <marker id="ak" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 z" fill="#16202b"/></marker>
+  </defs>
+</svg>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">机 械 能 · 专 题 详 解</p>
+  <h1>功、功率、动能定理与机械能守恒<br>全套例题精解（第19—24页）</h1>
+  <p>覆盖题型 1—7 共 16 道题：功的计算与变力功、功率分析与机车启动、动能定理、机械能守恒判断、含弹簧的系统、摩擦生热、多过程综合。每题含受力/过程图解、完整推导、答案与易错提示。全部取 <i class="v">g</i> 按题给值。</p>
+  <div class="meta"><span>16 题全解</span><span>11 幅图解</span><span>逐步推导</span><span>易错点标注</span></div>
+</header>
+
+<nav class="toc">
+  <h2>目 录</h2>
+  <ol>
+    <li><a href="#q1"><span class="n">例1</span>各力做功判断（多选）</a></li>
+    <li><a href="#q2"><span class="n">2</span>F–t 图像与功（多选）</a></li>
+    <li><a href="#q3"><span class="n">3</span>竖直上抛含空气阻力</a></li>
+    <li><a href="#q4"><span class="n">例4</span>F–x 图像求瞬时功率</a></li>
+    <li><a href="#q5"><span class="n">5</span>复兴号恒定功率启动（多选）</a></li>
+    <li><a href="#q6"><span class="n">6</span>额定功率与位移</a></li>
+    <li><a href="#q7"><span class="n">例7</span>绳末端速度分解求功</a></li>
+    <li><a href="#q8"><span class="n">8</span>滑雪赛道综合</a></li>
+    <li><a href="#q9"><span class="n">例9</span>机械能守恒的判断</a></li>
+    <li><a href="#q10"><span class="n">10</span>投篮的机械能</a></li>
+    <li><a href="#q11"><span class="n">例11</span>弹簧 F–x 图像（多选）</a></li>
+    <li><a href="#q12"><span class="n">12</span>圆弧滑块 + 弹簧</a></li>
+    <li><a href="#q13"><span class="n">例13</span>滑块—木板模型</a></li>
+    <li><a href="#q14"><span class="n">14</span>倾斜传送带卸货</a></li>
+    <li><a href="#q15"><span class="n">例15</span>半圆轨道 + 锁定弹簧</a></li>
+    <li><a href="#q16"><span class="n">16</span>碰撞—弹簧—圆弧滑块</a></li>
+  </ol>
+</nav>
+
+<!-- ======================= 题型1 ======================= -->
+<section class="band">
+  <div class="k">题 型 1</div>
+  <h2>功的计算与变力做功</h2>
+  <div class="sub">恒力功 <i class="v">W</i> = <i class="v">Fs</i>cos<i class="v">α</i>；变力功用动能定理或 <i class="v">F–s</i> 图像面积；摩擦力做功与路径有关。</div>
+</section>
+
+<!-- ---------- 例题1 ---------- -->
+<article class="card" id="q1">
+  <div class="head"><div class="num">例1<small>多选</small></div>
+    <div class="t">恒力作用下匀速前进，各力做功<span class="tag">恒力功</span></div></div>
+  <div class="body">
+    <div class="stem">
+      大小 <i class="v">F</i> = 50 N、与水平方向成 60° 角的力作用在质量 <i class="v">m</i> = 6 kg 的物体上，物体沿水平地面<b>匀速</b>前进 <i class="v">l</i> = 8 m，<i class="v">g</i> = 10 m/s²。下列说法正确的是（　　）
+      <ul class="opts">
+        <li>A．力 <i class="v">F</i> 对物体做功为 400 J</li>
+        <li>B．摩擦力对物体做功为 −200 J</li>
+        <li>C．重力做功为 480 J</li>
+        <li>D．合力做功为 0</li>
+      </ul>
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 460 200" role="img" aria-label="物体受力示意图">
+        <line x1="30" y1="150" x2="440" y2="150" class="svg-line"/>
+        <g class="svg-thin">
+          <line x1="34" y1="150" x2="26" y2="160"/><line x1="54" y1="150" x2="46" y2="160"/>
+          <line x1="74" y1="150" x2="66" y2="160"/><line x1="94" y1="150" x2="86" y2="160"/>
+          <line x1="114" y1="150" x2="106" y2="160"/><line x1="134" y1="150" x2="126" y2="160"/>
+          <line x1="154" y1="150" x2="146" y2="160"/><line x1="174" y1="150" x2="166" y2="160"/>
+          <line x1="194" y1="150" x2="186" y2="160"/><line x1="214" y1="150" x2="206" y2="160"/>
+          <line x1="234" y1="150" x2="226" y2="160"/><line x1="254" y1="150" x2="246" y2="160"/>
+          <line x1="274" y1="150" x2="266" y2="160"/><line x1="294" y1="150" x2="286" y2="160"/>
+          <line x1="314" y1="150" x2="306" y2="160"/><line x1="334" y1="150" x2="326" y2="160"/>
+          <line x1="354" y1="150" x2="346" y2="160"/><line x1="374" y1="150" x2="366" y2="160"/>
+          <line x1="394" y1="150" x2="386" y2="160"/><line x1="414" y1="150" x2="406" y2="160"/>
+          <line x1="434" y1="150" x2="426" y2="160"/>
+        </g>
+        <rect x="80" y="122" width="56" height="28" class="svg-fill"/>
+        <rect x="330" y="122" width="56" height="28" fill="none" stroke="#aab8c2" stroke-dasharray="4 3"/>
+        <line x1="108" y1="136" x2="168" y2="32" class="svg-red" marker-end="url(#ah)"/>
+        <text class="it rd" x="172" y="30">F = 50 N</text>
+        <path d="M148 136 A 40 40 0 0 0 128 101" class="svg-thin"/>
+        <text class="sm" x="150" y="115">60°</text>
+        <line x1="108" y1="136" x2="108" y2="196" class="svg-blue" marker-end="url(#ab)"/>
+        <text class="it bl" x="112" y="192">mg</text>
+        <line x1="60" y1="136" x2="12" y2="136" class="svg-blue" marker-end="url(#ab)"/>
+        <text class="it bl" x="14" y="128">f</text>
+        <line x1="80" y1="122" x2="80" y2="72" class="svg-blue" marker-end="url(#ab)"/>
+        <text class="it bl" x="56" y="68">N</text>
+        <line x1="108" y1="176" x2="358" y2="176" class="svg-thin" marker-end="url(#ak)"/>
+        <text class="it" x="220" y="192">l = 8 m</text>
+      </svg>
+      <figcaption>图1　物体受 <i class="v">F</i>、重力 <i class="v">mg</i>、支持力 <i class="v">N</i>、滑动摩擦力 <i class="v">f</i> 四个力，沿水平方向匀速位移 8 m</figcaption>
+    </figure>
+
+    <h3 class="step">第一步　力 F 做的功（分解到位移方向）</h3>
+    <div class="eq"><i class="v">W<sub>F</sub></i> = <i class="v">Fl</i> cos60° = 50 × 8 × 0.5 = <b>200 J</b></div>
+    <p>A 项把 cos60° 误当成了 cos0°（或用了 <i class="v">F</i>·<i class="v">l</i> = 400 J），<b>A 错</b>。</p>
+
+    <h3 class="step">第二步　匀速 ⇒ 合力为零，摩擦力大小已定</h3>
+    <p>物体匀速，加速度为零，水平方向：</p>
+    <div class="eq"><i class="v">f</i> = <i class="v">F</i>cos60° = 50 × 0.5 = 25 N（方向与运动方向相反）</div>
+    <div class="eq"><i class="v">W<sub>f</sub></i> = −<i class="v">f l</i> = −25 × 8 = <b>−200 J</b>　⇒　<b>B 对</b></div>
+    <p class="note">顺带看竖直方向：<i class="v">N</i> = <i class="v">mg</i> − <i class="v">F</i>sin60° = 60 − 25√3 ≈ 16.7 N，支持力被 <i class="v">F</i> 的竖直分量"提"小了，但 <i class="v">N</i> 与 <i class="v">mg</i> 都与位移垂直，不做功。</p>
+
+    <h3 class="step">第三步　重力与合力做的功</h3>
+    <p>位移水平、重力竖直，夹角 90°：<i class="v">W<sub>G</sub></i> = <i class="v">mgl</i>cos90° = 0，<b>C 错</b>（480 J 是把 <i class="v">mg</i>×<i class="v">l</i> 直接相乘）。</p>
+    <p>合力做功有两种算法，结果一致：</p>
+    <div class="eq">① <i class="v">W</i><sub>合</sub> = <i class="v">W<sub>F</sub></i> + <i class="v">W<sub>f</sub></i> + <i class="v">W<sub>G</sub></i> + <i class="v">W<sub>N</sub></i> = 200 − 200 + 0 + 0 = 0</div>
+    <div class="eq">② 动能定理：<i class="v">W</i><sub>合</sub> = Δ<i class="v">E</i><sub>k</sub> = 0（匀速，动能不变）　⇒　<b>D 对</b></div>
+
+    <div class="ans"><b>答案：BD</b></div>
+    <div class="tip"><b>易错点</b>　计算功一定先问三件事：力多大、位移多大、二者夹角多少。垂直于位移的力（支持力、向心力、匀速圆周运动的绳拉力）永远不做功。</div>
+  </div>
+</article>
+
+<!-- ---------- 第2题 ---------- -->
+<article class="card" id="q2">
+  <div class="head"><div class="num">2<small>多选</small></div>
+    <div class="t">F–t 图像下的往复运动<span class="tag">分段分析</span></div></div>
+  <div class="body">
+    <div class="stem">
+      质量 <i class="v">m</i> = 1 kg 的物块在水平力 <i class="v">F</i> 作用下由静止开始在水平地面上做直线运动，<i class="v">F</i>–<i class="v">t</i> 关系如图（0～3 s 为 +4 N，3～6 s 为 −4 N）。已知动摩擦因数 <i class="v">μ</i> = 0.2，<i class="v">g</i> = 10 m/s²。则（　　）
+      <ul class="opts">
+        <li>A．4 s 时物块的动能为零</li>
+        <li>B．6 s 时物块回到初始位置</li>
+        <li>C．3 s 时物块的动量为 12 kg·m/s</li>
+        <li>D．0～6 s 内 <i class="v">F</i> 对物块所做的功为 40 J</li>
+      </ul>
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 700 220" role="img" aria-label="F-t 图与 v-t 图">
+        <!-- F-t -->
+        <line x1="40" y1="110" x2="300" y2="110" class="svg-line" marker-end="url(#ak)"/>
+        <line x1="60" y1="30" x2="60" y2="190" class="svg-line"/>
+        <text class="it" x="300" y="128">t/s</text><text class="it" x="34" y="28">F/N</text>
+        <line x1="60" y1="70" x2="180" y2="70" class="svg-red"/>
+        <line x1="180" y1="70" x2="180" y2="150" class="svg-dash"/>
+        <line x1="180" y1="150" x2="300" y2="150" class="svg-red"/>
+        <text class="sm" x="40" y="74">4</text><text class="sm" x="36" y="154">−4</text>
+        <text class="sm" x="176" y="126">3</text><text class="sm" x="236" y="126">4</text>
+        <text class="sm" x="296" y="126">6</text>
+        <line x1="240" y1="106" x2="240" y2="114" class="svg-thin"/>
+        <text class="sm" x="120" y="60">F = 4 N</text><text class="sm" x="212" y="170">F = −4 N</text>
+        <!-- v-t -->
+        <line x1="380" y1="120" x2="660" y2="120" class="svg-line" marker-end="url(#ak)"/>
+        <line x1="400" y1="30" x2="400" y2="195" class="svg-line"/>
+        <text class="it" x="660" y="138">t/s</text><text class="it" x="374" y="28">v/(m·s⁻¹)</text>
+        <polyline points="400,120 550,48 600,120 650,168" class="svg-blue"/>
+        <text class="sm" x="378" y="52">6</text><text class="sm" x="372" y="172">−4</text>
+        <text class="sm" x="544" y="136">3</text><text class="sm" x="594" y="136">4</text><text class="sm" x="644" y="136">6</text>
+        <text class="sm bl" x="440" y="80">a₁ = 2</text>
+        <text class="sm bl" x="556" y="96">a₂ = −6</text>
+        <text class="sm bl" x="602" y="185">a₃ = −2</text>
+        <text class="sm" x="452" y="112">+9 m</text><text class="sm" x="556" y="112">+3 m</text>
+        <text class="sm" x="600" y="150">−4 m</text>
+      </svg>
+      <figcaption>图2　左：题给 <i class="v">F–t</i> 图像；右：据此画出的 <i class="v">v–t</i> 图像，面积即位移（向右为正）</figcaption>
+    </figure>
+
+    <h3 class="step">第一步　摩擦力大小</h3>
+    <div class="eq"><i class="v">f</i> = <i class="v">μmg</i> = 0.2 × 1 × 10 = 2 N（方向总与<b>运动方向</b>相反）</div>
+
+    <h3 class="step">第二步　逐段求加速度、速度、位移</h3>
+    <table class="data">
+      <tr><th>阶段</th><th>受力（取向右为正）</th><th>加速度</th><th>速度变化</th><th>位移</th></tr>
+      <tr><td>0～3 s</td><td class="l">+4 N，摩擦 −2 N</td><td><i class="v">a</i>₁ = (4−2)/1 = +2 m/s²</td><td>0 → +6 m/s</td><td>+9 m</td></tr>
+      <tr><td>3～4 s</td><td class="l">−4 N，仍向右运动故摩擦 −2 N</td><td><i class="v">a</i>₂ = (−4−2)/1 = −6 m/s²</td><td>+6 → 0</td><td>+3 m</td></tr>
+      <tr><td>4～6 s</td><td class="l">−4 N &gt; 最大静摩擦 2 N，向左加速，摩擦 +2 N</td><td><i class="v">a</i>₃ = (−4+2)/1 = −2 m/s²</td><td>0 → −4 m/s</td><td>−4 m</td></tr>
+    </table>
+
+    <h3 class="step">第三步　逐项判断</h3>
+    <ul class="pt">
+      <li><b>A 对：</b>3 s 末速度 6 m/s，此后以 6 m/s² 减速，恰好经 1 s 到 4 s 速度为零，<i class="v">E</i><sub>k</sub> = 0。</li>
+      <li><b>B 错：</b>6 s 末总位移 = 9 + 3 − 4 = <b>+8 m</b>，仍在出发点右侧 8 m 处。</li>
+      <li><b>C 错：</b><i class="v">p</i> = <i class="v">mv</i> = 1 × 6 = 6 kg·m/s（也可用动量定理 <i class="v">p</i> = (4−2)×3 = 6 kg·m/s）。</li>
+      <li><b>D 对：</b>分段求 <i class="v">W</i> = <i class="v">F</i>·<i class="v">x</i>（注意符号）：</li>
+    </ul>
+    <div class="eq"><i class="v">W<sub>F</sub></i> = (+4)(+9) + (−4)(+3) + (−4)(−4) = 36 − 12 + 16 = <b>40 J</b></div>
+    <p>校验（动能定理）：6 s 末 <i class="v">E</i><sub>k</sub> = ½×1×4² = 8 J；全程<b>路程</b> <i class="v">s</i> = 9+3+4 = 16 m，摩擦做功 −2×16 = −32 J，故 <i class="v">W<sub>F</sub></i> = 8 + 32 = 40 J ✓。</p>
+
+    <div class="ans"><b>答案：AD</b></div>
+    <div class="tip"><b>易错点</b>　① 摩擦力方向随速度方向翻转，不随外力方向翻转；② 4 s 后能否运动要比较 |<i class="v">F</i>| 与最大静摩擦；③ 求外力功用<b>位移</b>（带符号），求摩擦力功（生热）用<b>路程</b>。</div>
+  </div>
+</article>
+
+<!-- ---------- 第3题 ---------- -->
+<article class="card" id="q3">
+  <div class="head"><div class="num">3<small>单选</small></div>
+    <div class="t">竖直上抛往返，重力功与阻力功<span class="tag">路径相关</span></div></div>
+  <div class="body">
+    <div class="stem">
+      以一定初速度竖直上抛质量为 <i class="v">m</i> 的小球，上升最大高度为 <i class="v">h</i>，空气阻力大小恒为 <i class="v">f</i>。从抛出点到返回原出发点的过程中（　　）<br>
+      A．重力做功为零，空气阻力做功为 −2<i class="v">fh</i>　　B．重力做功 <i class="v">mgh</i>，阻力做功 <i class="v">fh</i><br>
+      C．重力做功为零，阻力做功为零　　D．重力做功 2<i class="v">mgh</i>，阻力做功 −2<i class="v">fh</i>
+    </div>
+
+    <h3 class="step">第一步　重力做功只看初末位置高度差</h3>
+    <p>重力是<b>保守力</b>，做功与路径无关：上升 <i class="v">W</i>₁ = −<i class="v">mgh</i>，下落 <i class="v">W</i>₂ = +<i class="v">mgh</i>。</p>
+    <div class="eq"><i class="v">W<sub>G</sub></i> = −<i class="v">mgh</i> + <i class="v">mgh</i> = <b>0</b>（末位置与初位置等高）</div>
+
+    <h3 class="step">第二步　空气阻力做功要看路程</h3>
+    <p>阻力方向<b>始终与速度反向</b>，无论上升还是下落都做负功，总路程为 2<i class="v">h</i>：</p>
+    <div class="eq"><i class="v">W<sub>f</sub></i> = −<i class="v">f</i>·(<i class="v">h</i> + <i class="v">h</i>) = <b>−2<i class="v">fh</i></b></div>
+
+    <div class="ans"><b>答案：A</b></div>
+    <div class="tip"><b>拓展</b>　由动能定理可得落回时动能 <i class="v">E</i>ₖ′ = <i class="v">E</i>ₖ₀ − 2<i class="v">fh</i> &lt; <i class="v">E</i>ₖ₀，所以<b>落回速度小于抛出速度</b>，且下落时间大于上升时间。</div>
+  </div>
+</article>
+
+<!-- ---------- 例题4 ---------- -->
+<article class="card" id="q4">
+  <div class="head"><div class="num">例4<small>单选</small></div>
+    <div class="t">F–x 图像面积求变力功，再求瞬时功率<span class="tag">图像面积</span></div></div>
+  <div class="body">
+    <div class="stem">
+      质量 <i class="v">m</i> = 1 kg 的物块静置于<b>光滑</b>水平面，静止位置为 <i class="v">x</i> 轴零点。沿 <i class="v">x</i> 正方向施加水平力 <i class="v">F</i>，其大小随位置变化如图（0～2 m 内 <i class="v">F</i> = 3 N，2～3 m 内 <i class="v">F</i> = 2 N）。物块运动到 <i class="v">x</i> = 3 m 处时 <i class="v">F</i> 做功的瞬时功率为（　　）　A．8 W　B．16 W　C．24 W　D．36 W
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 420 220" role="img" aria-label="F-x 图像及面积">
+        <line x1="60" y1="180" x2="380" y2="180" class="svg-line" marker-end="url(#ak)"/>
+        <line x1="60" y1="30" x2="60" y2="180" class="svg-line" marker-end="url(#ak)"/>
+        <text class="it" x="378" y="200">x/m</text><text class="it" x="34" y="28">F/N</text>
+        <rect x="60" y="60" width="180" height="120" fill="#dbe6ee" stroke="none"/>
+        <rect x="240" y="100" width="90" height="80" fill="#f4e3c4" stroke="none"/>
+        <line x1="60" y1="60" x2="240" y2="60" class="svg-red"/>
+        <line x1="240" y1="60" x2="240" y2="100" class="svg-dash"/>
+        <line x1="240" y1="100" x2="330" y2="100" class="svg-red"/>
+        <line x1="330" y1="100" x2="330" y2="180" class="svg-dash"/>
+        <g class="svg-thin">
+          <line x1="56" y1="60" x2="64" y2="60"/><line x1="56" y1="100" x2="64" y2="100"/>
+          <line x1="56" y1="140" x2="64" y2="140"/>
+          <line x1="150" y1="176" x2="150" y2="184"/><line x1="240" y1="176" x2="240" y2="184"/>
+          <line x1="330" y1="176" x2="330" y2="184"/>
+        </g>
+        <text class="sm" x="46" y="64">3</text><text class="sm" x="46" y="104">2</text><text class="sm" x="46" y="144">1</text>
+        <text class="sm" x="146" y="196">1</text><text class="sm" x="236" y="196">2</text><text class="sm" x="326" y="196">3</text>
+        <text class="sm" x="112" y="128">W₁ = 6 J</text>
+        <text class="sm" x="250" y="146">W₂ = 2 J</text>
+      </svg>
+      <figcaption>图3　<i class="v">F–x</i> 图线与 <i class="v">x</i> 轴围成的面积即为力做的功</figcaption>
+    </figure>
+
+    <h3 class="step">第一步　用图像面积求 0→3 m 内 F 做的总功</h3>
+    <div class="eq"><i class="v">W</i> = <i class="v">W</i>₁ + <i class="v">W</i>₂ = 3 N × 2 m + 2 N × 1 m = 6 + 2 = <b>8 J</b></div>
+
+    <h3 class="step">第二步　动能定理求 x = 3 m 处的速度</h3>
+    <p>水平面光滑，只有 <i class="v">F</i> 做功，初速度为零：</p>
+    <div class="eq"><i class="v">W</i> = ½<i class="v">mv</i>² − 0　⇒　8 = ½ × 1 × <i class="v">v</i>²　⇒　<i class="v">v</i> = 4 m/s</div>
+
+    <h3 class="step">第三步　瞬时功率 P = Fv（用该时刻的 F）</h3>
+    <div class="eq"><i class="v">P</i> = <i class="v">F</i>′<i class="v">v</i> = 2 N × 4 m/s = <b>8 W</b></div>
+
+    <div class="ans"><b>答案：A</b></div>
+    <div class="tip"><b>易错点</b>　<i class="v">x</i> = 3 m 处的力是 <b>2 N</b> 而不是 3 N；若误用 3 N 会得 12 W，若把总功 8 J 当成 <i class="v">Fv</i> 中的 <i class="v">F</i>×… 更会出错。<b>瞬时功率必须用该位置（该时刻）的力</b>。</div>
+  </div>
+</article>
+
+<!-- ======================= 题型2 ======================= -->
+<section class="band">
+  <div class="k">题 型 2</div>
+  <h2>功率分析与机车启动</h2>
+  <div class="sub">瞬时功率 <i class="v">P</i> = <i class="v">Fv</i>；恒定功率启动 <i class="v">a</i> = (<i class="v">P</i>/<i class="v">v</i> − <i class="v">f</i>)/<i class="v">m</i> 逐渐减小到 0；恒定加速度启动时功率增大至额定值。</div>
+</section>
+
+<!-- ---------- 第5题 ---------- -->
+<article class="card" id="q5">
+  <div class="head"><div class="num">5<small>多选</small></div>
+    <div class="t">复兴号以恒定功率行驶<span class="tag">恒定功率</span></div></div>
+  <div class="body">
+    <div class="stem">
+      质量为 <i class="v">m</i> 的动车初速度为 <i class="v">v</i>₀，以<b>恒定功率</b> <i class="v">P</i> 在平直轨道上运动，经时间 <i class="v">t</i> 达到该功率下的最大速度 <i class="v">v</i><sub>m</sub>，行驶中所受阻力 <i class="v">F</i> 不变。则在时间 <i class="v">t</i> 内（　　）
+      <ul class="opts">
+        <li>A．加速度逐渐减小到 0</li>
+        <li>B．做匀加速直线运动</li>
+        <li>C．牵引力做功为 <i class="v">Pt</i> − ½<i class="v">mv</i>₀²</li>
+        <li>D．牵引力的功率 <i class="v">P</i> = <i class="v">Fv</i><sub>m</sub></li>
+      </ul>
+    </div>
+
+    <h3 class="step">第一步　恒定功率下的动力学分析</h3>
+    <p>牵引力 <i class="v">F</i><sub>牵</sub> = <i class="v">P</i>/<i class="v">v</i>。速度 <i class="v">v</i> ↑ ⇒ <i class="v">F</i><sub>牵</sub> ↓ ⇒</p>
+    <div class="eq"><i class="v">a</i> = (<i class="v">P</i>/<i class="v">v</i> − <i class="v">F</i>) / <i class="v">m</i>　（随 <i class="v">v</i> 增大而减小）</div>
+    <p>当 <i class="v">a</i> = 0 时速度不再增大，达到最大速度 <i class="v">v</i><sub>m</sub>。故运动是<b>加速度不断减小的变加速直线运动</b>：<b>A 对，B 错</b>。</p>
+
+    <h3 class="step">第二步　牵引力做的功</h3>
+    <p>功率恒定，由 <i class="v">W</i> = <i class="v">Pt</i> 直接得</p>
+    <div class="eq"><i class="v">W</i><sub>牵</sub> = <b><i class="v">Pt</i></b></div>
+    <p>C 项的表达式来源于对动能定理的误用。正确的动能定理应为</p>
+    <div class="eq"><i class="v">Pt</i> − <i class="v">Fs</i> = ½<i class="v">mv</i><sub>m</sub>² − ½<i class="v">mv</i>₀²</div>
+    <p>可见 <i class="v">Pt</i> − ½<i class="v">mv</i>₀² = ½<i class="v">mv</i><sub>m</sub>² + <i class="v">Fs</i> ≠ <i class="v">W</i><sub>牵</sub>，<b>C 错</b>。</p>
+
+    <h3 class="step">第三步　最大速度处的关系</h3>
+    <p>达到 <i class="v">v</i><sub>m</sub> 时 <i class="v">a</i> = 0，牵引力与阻力平衡：<i class="v">F</i><sub>牵</sub> = <i class="v">F</i>，于是</p>
+    <div class="eq"><i class="v">P</i> = <i class="v">F</i><sub>牵</sub><i class="v">v</i><sub>m</sub> = <i class="v">Fv</i><sub>m</sub>　⇒　<b>D 对</b></div>
+
+    <div class="ans"><b>答案：AD</b></div>
+    <div class="tip"><b>记牢</b>　恒定功率启动：<i class="v">v</i>↑ → <i class="v">F</i>↓ → <i class="v">a</i>↓ → 最终匀速，<i class="v">v</i><sub>max</sub> = <i class="v">P</i>/<i class="v">f</i>；求功首选 <i class="v">W</i> = <i class="v">Pt</i>，求位移首选动能定理（因为 <i class="v">a</i> 变，运动学公式不能用）。</div>
+  </div>
+</article>
+
+<!-- ---------- 第6题 ---------- -->
+<article class="card" id="q6">
+  <div class="head"><div class="num">6<small>计算</small></div>
+    <div class="t">先匀加速后恒定功率，求额定功率与总位移<span class="tag">两段模型</span></div></div>
+  <div class="body">
+    <div class="stem">
+      汽车由静止开始做<b>匀加速</b>直线运动，经 <i class="v">t</i>₁ = 4 s 速度增至 <i class="v">v</i>₁ = 10 m/s 时<b>恰达到额定功率</b>，此后以额定功率行驶。<i class="v">m</i> = 2000 kg，阻力恒为 <i class="v">f</i> = 2000 N。求：(1) 额定功率 <i class="v">P</i>；(2) 达到额定功率后速度如何变化；(3) 若此后再经 <i class="v">t</i>₂ = 8 s 速度增至 <i class="v">v</i>₂ = 20 m/s，求从静止到 <i class="v">v</i>₂ 的总位移 <i class="v">x</i>。
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 620 200" role="img" aria-label="两段运动的 v-t 示意">
+        <line x1="50" y1="160" x2="580" y2="160" class="svg-line" marker-end="url(#ak)"/>
+        <line x1="50" y1="30" x2="50" y2="160" class="svg-line" marker-end="url(#ak)"/>
+        <text class="it" x="576" y="180">t/s</text><text class="it" x="24" y="28">v</text>
+        <line x1="50" y1="160" x2="200" y2="105" class="svg-blue"/>
+        <path d="M200 105 C 300 78, 400 62, 520 55" class="svg-red"/>
+        <line x1="50" y1="42" x2="560" y2="42" class="svg-dash"/>
+        <text class="sm" x="470" y="36">v<tspan baseline-shift="sub">max</tspan> = P/f = 35 m/s（渐近）</text>
+        <line x1="200" y1="105" x2="200" y2="160" class="svg-dash"/>
+        <line x1="380" y1="70" x2="380" y2="160" class="svg-dash"/>
+        <text class="sm" x="186" y="176">4 s</text><text class="sm" x="366" y="176">12 s</text>
+        <text class="sm" x="24" y="110">10</text><text class="sm" x="24" y="74">20</text>
+        <text class="sm bl" x="70" y="128">① 匀加速：a = 2.5 m/s²</text>
+        <text class="sm rd" x="240" y="112">② 恒定功率：a 逐渐减小</text>
+        <text class="sm" x="96" y="152">x₁ = 20 m</text>
+        <text class="sm" x="250" y="152">x₂ = 130 m</text>
+      </svg>
+      <figcaption>图4　第①段匀加速（<i class="v">P</i> 由小增大到额定），第②段恒定功率（<i class="v">a</i> 减小）</figcaption>
+    </figure>
+
+    <h3 class="step">(1) 额定功率</h3>
+    <p>匀加速段的加速度</p>
+    <div class="eq"><i class="v">a</i> = <i class="v">v</i>₁/<i class="v">t</i>₁ = 10/4 = 2.5 m/s²</div>
+    <p>该段牵引力恒定：</p>
+    <div class="eq"><i class="v">F</i><sub>牵</sub> = <i class="v">ma</i> + <i class="v">f</i> = 2000 × 2.5 + 2000 = 7000 N</div>
+    <p>匀加速末恰好达到额定功率，此时速度为 <i class="v">v</i>₁：</p>
+    <div class="eq"><i class="v">P</i> = <i class="v">F</i><sub>牵</sub><i class="v">v</i>₁ = 7000 × 10 = 7 × 10⁴ W = <b>70 kW</b></div>
+
+    <h3 class="step">(2) 达到额定功率后的速度变化（推理）</h3>
+    <ul class="pt">
+      <li>此后 <i class="v">P</i> 保持 7×10⁴ W 不变，牵引力 <i class="v">F</i><sub>牵</sub> = <i class="v">P</i>/<i class="v">v</i>；</li>
+      <li>速度 <i class="v">v</i> 增大 ⇒ <i class="v">F</i><sub>牵</sub> 减小 ⇒ 合力 (<i class="v">F</i><sub>牵</sub> − <i class="v">f</i>) 减小 ⇒ 加速度减小；</li>
+      <li>只要 <i class="v">F</i><sub>牵</sub> &gt; <i class="v">f</i>，速度仍在增大，所以车做<b>加速度逐渐减小的加速运动</b>；</li>
+      <li>当 <i class="v">F</i><sub>牵</sub> = <i class="v">f</i> 时 <i class="v">a</i> = 0，此后匀速，最大速度</li>
+    </ul>
+    <div class="eq"><i class="v">v</i><sub>max</sub> = <i class="v">P</i>/<i class="v">f</i> = 7 × 10⁴ / 2000 = <b>35 m/s</b></div>
+
+    <h3 class="step">(3) 总位移</h3>
+    <p>第①段（匀加速，可用运动学公式）：</p>
+    <div class="eq"><i class="v">x</i>₁ = <i class="v">v</i>₁²/(2<i class="v">a</i>) = 100/(2×2.5) = 20 m　（或 ½·2.5·4² = 20 m）</div>
+    <p>第②段加速度变化，<b>只能用动能定理</b>，牵引力做功为 <i class="v">Pt</i>₂：</p>
+    <div class="eq"><i class="v">Pt</i>₂ − <i class="v">fx</i>₂ = ½<i class="v">mv</i>₂² − ½<i class="v">mv</i>₁²</div>
+    <div class="eq">7×10⁴ × 8 − 2000<i class="v">x</i>₂ = ½×2000×(20² − 10²)</div>
+    <div class="eq">5.6×10⁵ − 2000<i class="v">x</i>₂ = 3×10⁵　⇒　<i class="v">x</i>₂ = 130 m</div>
+    <div class="eq"><i class="v">x</i> = <i class="v">x</i>₁ + <i class="v">x</i>₂ = 20 + 130 = <b>150 m</b></div>
+
+    <div class="ans"><b>答案：</b>(1) <b>70 kW</b>；(2) 速度继续增大但加速度不断减小，最终以 <b>35 m/s</b> 匀速；(3) <b><i class="v">x</i> = 150 m</b></div>
+    <div class="tip"><b>易错点</b>　第②段绝不能用 <i class="v">x</i> = (<i class="v">v</i>₁+<i class="v">v</i>₂)<i class="v">t</i>₂/2（那是匀变速公式）。变加速求位移的通用武器是动能定理。</div>
+  </div>
+</article>
+
+<!-- ======================= 题型3 ======================= -->
+<section class="band">
+  <div class="k">题 型 3</div>
+  <h2>动能定理的应用</h2>
+  <div class="sub">三步走：定初末动能 → 列出所有力的功（代数和） → <i class="v">W</i><sub>合</sub> = ½<i class="v">mv</i>² − ½<i class="v">mv</i>₀²。优势：可处理曲线运动、变力做功。</div>
+</section>
+
+<!-- ---------- 例题7 ---------- -->
+<article class="card" id="q7">
+  <div class="head"><div class="num">例7<small>单选</small></div>
+    <div class="t">绳末端速度分解 + 动能定理求变力功<span class="tag">速度分解</span></div></div>
+  <div class="body">
+    <div class="stem">
+      质量为 <i class="v">m</i> 的物体置于<b>光滑</b>水平面上，一根绳跨过定滑轮，一端固定在物体上，另一端在力 <i class="v">F</i> 作用下。物体由静止开始运动到绳与水平方向夹角 <i class="v">α</i> = 30° 时，绳（自由端）以速度 <i class="v">v</i>₀ 竖直向下运动。此过程中绳的拉力对物体做的功为（　　）<br>
+      A．3<i class="v">mv</i>₀²　B．½<i class="v">mv</i>₀²　C．(3/2)<i class="v">mv</i>₀²　D．(2/3)<i class="v">mv</i>₀²
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 520 230" role="img" aria-label="定滑轮与速度分解">
+        <line x1="300" y1="30" x2="470" y2="30" class="svg-line"/>
+        <g class="svg-thin">
+          <line x1="304" y1="30" x2="296" y2="20"/><line x1="324" y1="30" x2="316" y2="20"/>
+          <line x1="344" y1="30" x2="336" y2="20"/><line x1="364" y1="30" x2="356" y2="20"/>
+          <line x1="384" y1="30" x2="376" y2="20"/><line x1="404" y1="30" x2="396" y2="20"/>
+          <line x1="424" y1="30" x2="416" y2="20"/><line x1="444" y1="30" x2="436" y2="20"/>
+          <line x1="464" y1="30" x2="456" y2="20"/>
+        </g>
+        <circle cx="360" cy="48" r="16" class="svg-line"/>
+        <line x1="50" y1="170" x2="470" y2="170" class="svg-line"/>
+        <g class="svg-thin">
+          <line x1="54" y1="170" x2="46" y2="180"/><line x1="84" y1="170" x2="76" y2="180"/>
+          <line x1="114" y1="170" x2="106" y2="180"/><line x1="144" y1="170" x2="136" y2="180"/>
+          <line x1="174" y1="170" x2="166" y2="180"/><line x1="204" y1="170" x2="196" y2="180"/>
+          <line x1="234" y1="170" x2="226" y2="180"/><line x1="264" y1="170" x2="256" y2="180"/>
+          <line x1="294" y1="170" x2="286" y2="180"/><line x1="324" y1="170" x2="316" y2="180"/>
+          <line x1="354" y1="170" x2="346" y2="180"/><line x1="384" y1="170" x2="376" y2="180"/>
+          <line x1="414" y1="170" x2="406" y2="180"/><line x1="444" y1="170" x2="436" y2="180"/>
+        </g>
+        <rect x="118" y="146" width="54" height="24" class="svg-fill"/>
+        <line x1="172" y1="150" x2="345" y2="52" class="svg-line"/>
+        <line x1="376" y1="48" x2="376" y2="140" class="svg-line"/>
+        <line x1="376" y1="120" x2="376" y2="165" class="svg-red" marker-end="url(#ah)"/>
+        <text class="it rd" x="382" y="150">v₀ , F</text>
+        <path d="M232 150 A 62 62 0 0 0 226 130" class="svg-thin"/>
+        <text class="sm" x="200" y="142">α = 30°</text>
+        <line x1="145" y1="146" x2="245" y2="146" class="svg-blue" marker-end="url(#ab)"/>
+        <text class="it bl" x="212" y="140">v</text>
+        <line x1="245" y1="146" x2="245" y2="100" class="svg-dash"/>
+        <line x1="145" y1="146" x2="232" y2="97" class="svg-dash"/>
+        <text class="sm" x="180" y="106">v cosα = v₀（沿绳分量）</text>
+      </svg>
+      <figcaption>图5　物体速度 <i class="v">v</i> 沿绳方向的分量等于绳自由端下降的速率 <i class="v">v</i>₀</figcaption>
+    </figure>
+
+    <h3 class="step">第一步　关键：绳不可伸长 ⇒ 沿绳方向的速度分量相等</h3>
+    <p>物体速度 <i class="v">v</i> 水平，把它分解为<b>沿绳</b>与<b>垂直绳</b>两个分量；沿绳分量就是绳被"抽走"的速率，即自由端下降速率 <i class="v">v</i>₀：</p>
+    <div class="eq"><i class="v">v</i> cos<i class="v">α</i> = <i class="v">v</i>₀　⇒　<i class="v">v</i> = <i class="v">v</i>₀ / cos30° = 2√3<i class="v">v</i>₀/3</div>
+    <div class="eq"><i class="v">v</i>² = <i class="v">v</i>₀²/cos²30° = <i class="v">v</i>₀²/(3/4) = 4<i class="v">v</i>₀²/3</div>
+
+    <h3 class="step">第二步　对物体用动能定理</h3>
+    <p>水平面光滑，重力与支持力均垂直于位移不做功，<b>只有绳拉力做功</b>（拉力大小、方向都在变，是变力，只能用动能定理）：</p>
+    <div class="eq"><i class="v">W<sub>T</sub></i> = ½<i class="v">mv</i>² − 0 = ½<i class="v">m</i> · (4<i class="v">v</i>₀²/3) = <b>(2/3)<i class="v">mv</i>₀²</b></div>
+
+    <div class="ans"><b>答案：D</b></div>
+    <div class="tip"><b>易错点</b>　① 不能认为物体速度等于 <i class="v">v</i>₀（那是把绳当刚性杆平移）；② 不能用 <i class="v">W</i> = <i class="v">F</i>·<i class="v">s</i>，因为拉力是变力且题中 <i class="v">F</i> 未知；③ 分解的对象是<b>物体的速度</b>，分解方向是"沿绳"与"垂直绳"。</div>
+  </div>
+</article>
+
+<!-- ---------- 第8题 ---------- -->
+<article class="card" id="q8">
+  <div class="head"><div class="num">8<small>计算</small></div>
+    <div class="t">滑雪赛道：平抛衔接 + 圆周运动 + 动能定理<span class="tag">多过程</span></div></div>
+  <div class="body">
+    <div class="stem">
+      赛道由平直轨道 <i class="v">AB</i>、倾斜轨道 <i class="v">BC</i> 和圆弧轨道 <i class="v">CDE</i> 构成。圆弧半径 <i class="v">R</i> = 20 m，<i class="v">O</i> 为圆心，<i class="v">D</i> 为最低点，<i class="v">OD</i> 竖直，<i class="v">OC</i> 与竖直方向夹角 <i class="v">α</i> = 37°。总质量 60 kg 的运动员从 <i class="v">B</i> 点以 <i class="v">v</i>₀ = 8 m/s <b>水平飞出</b>，恰好<b>无碰撞</b>地从 <i class="v">C</i> 点进入圆弧，在 <i class="v">D</i> 点对轨道压力为 1080 N。不计空气阻力，<i class="v">g</i> = 10 m/s²，cos37° = 0.8。求：(1) <i class="v">v<sub>C</sub></i>；(2) <i class="v">B</i> 到 <i class="v">C</i> 下降高度 <i class="v">h</i>；(3) <i class="v">C</i> 到 <i class="v">D</i> 克服摩擦力做的功 <i class="v">W</i>。
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 620 300" role="img" aria-label="滑雪赛道几何关系">
+        <circle cx="400" cy="90" r="4" fill="#16202b"/>
+        <text class="it" x="408" y="84">O</text>
+        <path d="M280 170 A 130 130 0 0 0 520 170" fill="none" stroke="#16202b" stroke-width="2"/>
+        <line x1="400" y1="90" x2="280" y2="170" class="svg-dash"/>
+        <line x1="400" y1="90" x2="400" y2="220" class="svg-dash"/>
+        <path d="M400 150 A 60 60 0 0 0 372 138" class="svg-thin"/>
+        <text class="sm" x="358" y="140">α</text>
+        <text class="it" x="330" y="126">R</text>
+        <text class="it" x="266" y="166">C</text><text class="it" x="392" y="238">D</text><text class="it" x="524" y="168">E</text>
+        <line x1="60" y1="60" x2="150" y2="60" class="svg-line"/>
+        <text class="it" x="56" y="52">A</text><text class="it" x="148" y="52">B</text>
+        <line x1="150" y1="60" x2="196" y2="60" class="svg-red" marker-end="url(#ah)"/>
+        <text class="it rd" x="160" y="50">v₀ = 8 m/s</text>
+        <path d="M150 60 Q 220 84, 280 170" class="svg-dash"/>
+        <text class="sm" x="176" y="112">平抛（B→C）</text>
+        <line x1="280" y1="170" x2="330" y2="207" class="svg-blue" marker-end="url(#ab)"/>
+        <text class="it bl" x="300" y="200">v<tspan baseline-shift="sub">C</tspan></text>
+        <line x1="150" y1="70" x2="150" y2="170" class="svg-thin"/>
+        <line x1="150" y1="170" x2="272" y2="170" class="svg-thin" stroke-dasharray="4 3"/>
+        <text class="it" x="126" y="126">h</text>
+        <line x1="560" y1="170" x2="560" y2="220" class="svg-thin"/>
+        <text class="sm" x="500" y="196">R − Rcosα = 4 m</text>
+      </svg>
+      <figcaption>图6　"无碰撞进入" ⇒ <i class="v">C</i> 点速度沿圆弧切线，与水平成 37°</figcaption>
+    </figure>
+
+    <h3 class="step">(1) C 点速度：平抛速度方向 = 圆弧切线方向</h3>
+    <p><i class="v">OC</i> 与竖直方向成 37°，而切线 ⊥ 半径，所以 <i class="v">C</i> 点切线与<b>水平方向</b>也成 37°。平抛的水平分速度始终为 <i class="v">v</i>₀：</p>
+    <div class="eq"><i class="v">v</i>₀ = <i class="v">v<sub>C</sub></i> cos37°　⇒　<i class="v">v<sub>C</sub></i> = 8 / 0.8 = <b>10 m/s</b></div>
+
+    <h3 class="step">(2) B 到 C 的下降高度</h3>
+    <div class="eq"><i class="v">v<sub>y</sub></i> = <i class="v">v<sub>C</sub></i> sin37° = 10 × 0.6 = 6 m/s</div>
+    <div class="eq"><i class="v">h</i> = <i class="v">v<sub>y</sub></i>²/(2<i class="v">g</i>) = 36/20 = <b>1.8 m</b></div>
+
+    <h3 class="step">(3) C→D 克服摩擦做的功</h3>
+    <p><b>先由 D 点的圆周运动求 <i class="v">v<sub>D</sub></i>：</b>由牛顿第三定律，轨道对人的支持力 <i class="v">N</i> = 1080 N，方向竖直向上，指向圆心。</p>
+    <div class="eq"><i class="v">N</i> − <i class="v">mg</i> = <i class="v">mv<sub>D</sub></i>²/<i class="v">R</i></div>
+    <div class="eq">1080 − 600 = 60<i class="v">v<sub>D</sub></i>²/20　⇒　<i class="v">v<sub>D</sub></i>² = 160 m²/s²</div>
+    <p><b>再求 C 到 D 的高度差：</b></p>
+    <div class="eq"><i class="v">h</i>′ = <i class="v">R</i> − <i class="v">R</i>cos37° = 20 − 16 = 4 m</div>
+    <p><b>对 C→D 用动能定理</b>（重力做正功，摩擦力做负功 −<i class="v">W</i>）：</p>
+    <div class="eq"><i class="v">mgh</i>′ − <i class="v">W</i> = ½<i class="v">mv<sub>D</sub></i>² − ½<i class="v">mv<sub>C</sub></i>²</div>
+    <div class="eq">60×10×4 − <i class="v">W</i> = ½×60×160 − ½×60×100</div>
+    <div class="eq">2400 − <i class="v">W</i> = 4800 − 3000　⇒　<i class="v">W</i> = <b>600 J</b></div>
+
+    <div class="ans"><b>答案：</b>(1) <i class="v">v<sub>C</sub></i> = <b>10 m/s</b>；(2) <i class="v">h</i> = <b>1.8 m</b>；(3) 克服摩擦力做功 <i class="v">W</i> = <b>600 J</b></div>
+    <div class="tip"><b>易错点</b>　① "恰好无碰撞进入" = 速度方向沿切线，这是连接平抛与圆周的桥梁；② <i class="v">C</i> 到 <i class="v">D</i> 的高度差是 <i class="v">R</i>(1 − cos<i class="v">α</i>)，不是 <i class="v">R</i>cos<i class="v">α</i>；③ 圆弧上摩擦力是变力，只能用动能定理，不能用 <i class="v">μmg</i>·<i class="v">s</i>。</div>
+  </div>
+</article>
+
+<!-- ======================= 题型4 ======================= -->
+<section class="band">
+  <div class="k">题 型 4</div>
+  <h2>机械能守恒的判断与应用</h2>
+  <div class="sub">判据：对<b>所选系统</b>而言，是否只有重力/系统内弹力做功？其他力（含系统内部物体间的弹力、绳/轨道的作用力）是否做功？</div>
+</section>
+
+<!-- ---------- 例题9 ---------- -->
+<article class="card" id="q9">
+  <div class="head"><div class="num">例9<small>单选</small></div>
+    <div class="t">四种情景下机械能是否守恒<span class="tag">研究对象</span></div></div>
+  <div class="body">
+    <div class="stem">
+      下列关于机械能是否守恒的判断正确的是（　　）
+      <ul class="opts">
+        <li>A．图甲，物体 A 将弹簧压缩的过程中，A 的机械能守恒</li>
+        <li>B．图乙，A 不固定且置于光滑水平面上，B 沿光滑斜面下滑，B 的机械能守恒</li>
+        <li>C．图丙，不计任何阻力和滑轮质量时，A 加速下落、B 加速上升过程中，A、B 组成的系统机械能不守恒</li>
+        <li>D．图丁，系在橡皮条一端的小球向下摆动时，小球和橡皮条构成的系统机械能守恒</li>
+      </ul>
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 700 220" role="img" aria-label="四个情景示意图">
+        <!-- 甲 -->
+        <rect x="42" y="30" width="46" height="24" class="svg-fill"/>
+        <text class="it" x="58" y="47">A</text>
+        <line x1="65" y1="56" x2="65" y2="80" class="svg-red" marker-end="url(#ah)"/>
+        <text class="it rd" x="70" y="74">v</text>
+        <path d="M65 88 l-14 8 l28 8 l-28 8 l28 8 l-28 8 l28 8 l-14 8" class="svg-line"/>
+        <line x1="30" y1="156" x2="102" y2="156" class="svg-line"/>
+        <text x="56" y="196">甲</text>
+        <!-- 乙 -->
+        <polygon points="180,156 280,156 280,96" class="svg-fill"/>
+        <text class="it" x="264" y="146">A</text>
+        <rect x="216" y="112" width="24" height="18" transform="rotate(31 228 121)" class="svg-fill"/>
+        <text class="it" x="222" y="110">B</text>
+        <line x1="240" y1="126" x2="264" y2="142" class="svg-red" marker-end="url(#ah)"/>
+        <line x1="170" y1="156" x2="292" y2="156" class="svg-line"/>
+        <g class="svg-thin"><line x1="174" y1="156" x2="166" y2="166"/><line x1="204" y1="156" x2="196" y2="166"/>
+        <line x1="234" y1="156" x2="226" y2="166"/><line x1="264" y1="156" x2="256" y2="166"/><line x1="290" y1="156" x2="282" y2="166"/></g>
+        <text x="226" y="196">乙</text>
+        <!-- 丙 -->
+        <line x1="360" y1="26" x2="440" y2="26" class="svg-line"/>
+        <circle cx="400" cy="42" r="14" class="svg-line"/>
+        <line x1="386" y1="42" x2="386" y2="100" class="svg-line"/>
+        <line x1="414" y1="42" x2="414" y2="100" class="svg-line"/>
+        <rect x="366" y="100" width="40" height="24" class="svg-fill"/>
+        <text class="it" x="380" y="117">A</text>
+        <rect x="398" y="100" width="40" height="24" class="svg-fill"/>
+        <text class="it" x="412" y="117">B</text>
+        <line x1="376" y1="130" x2="376" y2="158" class="svg-red" marker-end="url(#ah)"/>
+        <line x1="440" y1="130" x2="440" y2="102" class="svg-red" marker-end="url(#ah)"/>
+        <text class="it rd" x="444" y="120">v</text>
+        <text x="396" y="196">丙</text>
+        <!-- 丁 -->
+        <line x1="520" y1="26" x2="620" y2="26" class="svg-line"/>
+        <g class="svg-thin"><line x1="524" y1="26" x2="516" y2="16"/><line x1="546" y1="26" x2="538" y2="16"/>
+        <line x1="568" y1="26" x2="560" y2="16"/><line x1="590" y1="26" x2="582" y2="16"/><line x1="614" y1="26" x2="606" y2="16"/></g>
+        <circle cx="580" cy="26" r="3" fill="#16202b"/>
+        <text class="it" x="586" y="22">O</text>
+        <path d="M580 26 q -34 30 -46 74" class="svg-line" stroke-dasharray="3 3"/>
+        <circle cx="534" cy="102" r="10" class="svg-fill"/>
+        <path d="M580 26 A 84 84 0 0 0 536 100" class="svg-dash"/>
+        <text x="566" y="196">丁</text>
+      </svg>
+      <figcaption>图7　甲：压缩弹簧；乙：楔块自由的光滑斜面；丙：滑轮连接的 A、B；丁：橡皮条上的小球摆动</figcaption>
+    </figure>
+
+    <h3 class="step">A 项（甲）：研究对象只有 A</h3>
+    <p>压缩过程中<b>弹簧对 A 的弹力做负功</b>，A 的动能与重力势能之和不断减少（转化为弹簧的弹性势能）。若把"A + 弹簧"当系统才守恒。<b>A 错。</b></p>
+
+    <h3 class="step">B 项（乙）：研究对象只有 B</h3>
+    <p>斜面 A 不固定且地面光滑，B 下滑时 A 被推着向左运动、获得动能。这份动能来自 <b>A 对 B 的支持力（弹力）对 B 做的负功</b>——支持力垂直于斜面，而 B 的实际位移（对地）不再沿斜面，二者不垂直，故该力做功不为零。<b>B 的机械能减少，B 错。</b>（"A + B"系统机械能才守恒。）</p>
+
+    <h3 class="step">C 项（丙）：研究对象是 A、B 系统</h3>
+    <p>不计阻力和滑轮质量，绳对 A、B 的拉力做功之和为零（绳不可伸长，一端做正功一端做等量负功），系统只有重力做功 ⇒ <b>机械能守恒</b>。题述"不守恒"，<b>C 错。</b></p>
+
+    <h3 class="step">D 项（丁）：研究对象是"小球 + 橡皮条"</h3>
+    <p>系统内只有重力和橡皮条的弹力做功，弹力做功对应弹性势能的变化，且不计发热等损耗，则</p>
+    <div class="eq"><i class="v">E</i><sub>k</sub> + <i class="v">E</i><sub>p重</sub> + <i class="v">E</i><sub>p弹</sub> = 常量</div>
+    <p>系统机械能守恒（注意：若只研究小球，则不守恒）。<b>D 对。</b></p>
+
+    <div class="ans"><b>答案：D</b></div>
+    <div class="tip"><b>核心方法</b>　判断守恒必须先说清"<b>谁</b>的机械能"。弹力/内力做功时，把相互作用的物体（含弹簧）一起纳入系统，通常就守恒了。</div>
+  </div>
+</article>
+
+<!-- ---------- 第10题 ---------- -->
+<article class="card" id="q10">
+  <div class="head"><div class="num">10<small>单选</small></div>
+    <div class="t">投篮：机械能守恒的直接应用<span class="tag">选参考面</span></div></div>
+  <div class="body">
+    <div class="stem">
+      篮球从离地高 <i class="v">h</i> 处以大小为 <i class="v">v</i> 的速度抛出，直接进入离地高 <i class="v">H</i> 的篮筐。篮球质量 <i class="v">m</i>，不计空气阻力和篮球大小，以地面为参考平面，篮球进入篮筐时的机械能为（　　）<br>
+      A．½<i class="v">mv</i>²　B．½<i class="v">mv</i>² + <i class="v">mgH</i>　C．½<i class="v">mv</i>² + <i class="v">mg</i>(<i class="v">H</i> − <i class="v">h</i>)　D．½<i class="v">mv</i>² + <i class="v">mgh</i>
+    </div>
+
+    <h3 class="step">第一步　判断守恒</h3>
+    <p>球在空中<b>只受重力</b>（不计空气阻力），做斜抛运动 ⇒ 机械能守恒，<b>全程机械能等于抛出瞬间的机械能</b>。</p>
+
+    <h3 class="step">第二步　算抛出时刻的机械能（地面为零势能面）</h3>
+    <div class="eq"><i class="v">E</i> = <i class="v">E</i><sub>k</sub> + <i class="v">E</i><sub>p</sub> = ½<i class="v">mv</i>² + <i class="v">mgh</i></div>
+    <p>因此进筐时的机械能仍是 ½<i class="v">mv</i>² + <i class="v">mgh</i>。（B 项 ½<i class="v">mv</i>² + <i class="v">mgH</i> 错在：到篮筐时速度已不是 <i class="v">v</i>，两项不能混用不同时刻的量。）</p>
+
+    <div class="ans"><b>答案：D</b></div>
+    <div class="tip"><b>小结</b>　"机械能守恒"意味着可以在<b>任意一个便于计算的时刻</b>求出这一常量——本题抛出时刻的信息最全，直接算它。</div>
+  </div>
+</article>
+
+<!-- ======================= 题型5 ======================= -->
+<section class="band">
+  <div class="k">题 型 5</div>
+  <h2>含弹簧的系统机械能守恒</h2>
+  <div class="sub">两个临界点：<b>弹簧最长/最短时 ⇒ 两物体共速</b>（弹性势能最大）；<b>弹簧恢复原长时 ⇒ 分离点</b>（弹性势能为零）。水平光滑面上常配合动量守恒联立。</div>
+</section>
+
+<!-- ---------- 例题11 ---------- -->
+<article class="card" id="q11">
+  <div class="head"><div class="num">例11<small>多选</small></div>
+    <div class="t">小球压缩竖直弹簧的 F–x 图像<span class="tag">图像面积</span></div></div>
+  <div class="body">
+    <div class="stem">
+      将竖直轻弹簧固定在水平面上，质量为 <i class="v">m</i> 的小球从弹簧正上方 <i class="v">h</i> 处由静止自由落下。以小球开始下落的位置为坐标原点，沿竖直向下建立 <i class="v">x</i> 轴，小球所受弹力大小随 <i class="v">x</i> 变化如图乙（<i class="v">x</i> = <i class="v">h</i> 时开始接触，<i class="v">x</i> = <i class="v">h</i> + <i class="v">x</i>₀ 时弹力等于 <i class="v">mg</i>）。下列说法正确的是（　　）
+      <ul class="opts">
+        <li>A．<i class="v">x</i> = <i class="v">h</i> + <i class="v">x</i>₀ 处，小球的速度为零</li>
+        <li>B．<i class="v">x</i> = <i class="v">h</i> 处与 <i class="v">x</i> = <i class="v">h</i> + 2<i class="v">x</i>₀ 处，小球的加速度大小相同</li>
+        <li>C．从 <i class="v">x</i> = <i class="v">h</i> 到 <i class="v">x</i> = <i class="v">h</i> + 2<i class="v">x</i>₀，小球动能一直增大</li>
+        <li>D．从 <i class="v">x</i> = <i class="v">h</i> 到 <i class="v">x</i> = <i class="v">h</i> + 2<i class="v">x</i>₀，弹力做功为 −2<i class="v">mgx</i>₀</li>
+      </ul>
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 460 250" role="img" aria-label="弹力随位置变化图像">
+        <line x1="60" y1="200" x2="420" y2="200" class="svg-line" marker-end="url(#ak)"/>
+        <line x1="60" y1="30" x2="60" y2="200" class="svg-line" marker-end="url(#ak)"/>
+        <text class="it" x="416" y="220">x</text><text class="it" x="34" y="28">F</text>
+        <polygon points="150,200 330,200 330,60" fill="#f4e3c4" stroke="none"/>
+        <polygon points="150,200 240,200 240,130" fill="#dbe6ee" stroke="none"/>
+        <line x1="150" y1="200" x2="330" y2="60" class="svg-red" stroke-width="2.2"/>
+        <line x1="60" y1="200" x2="150" y2="200" class="svg-red" stroke-width="2.2"/>
+        <line x1="240" y1="130" x2="60" y2="130" class="svg-dash"/>
+        <line x1="240" y1="130" x2="240" y2="200" class="svg-dash"/>
+        <line x1="330" y1="60" x2="60" y2="60" class="svg-dash"/>
+        <line x1="330" y1="60" x2="330" y2="200" class="svg-dash"/>
+        <text class="it" x="26" y="134">mg</text><text class="it" x="18" y="64">2mg</text>
+        <text class="it" x="142" y="220">h</text>
+        <text class="it" x="212" y="220">h+x₀</text>
+        <text class="it" x="300" y="220">h+2x₀</text>
+        <text class="sm" x="160" y="186">面积 = ½mgx₀</text>
+        <text class="sm" x="250" y="110">总面积 = 2mgx₀</text>
+        <text class="sm bl" x="150" y="46">斜率 k = mg/x₀</text>
+      </svg>
+      <figcaption>图8　弹力大小与 <i class="v">x</i> 成线性关系；图线下的面积即弹力做功的大小（做负功）</figcaption>
+    </figure>
+
+    <h3 class="step">读图：先把弹簧的劲度系数与关键点标出来</h3>
+    <p>接触点 <i class="v">x</i> = <i class="v">h</i> 时 <i class="v">F</i> = 0；<i class="v">x</i> = <i class="v">h</i> + <i class="v">x</i>₀ 时 <i class="v">F</i> = <i class="v">mg</i>，故斜率（劲度系数）<i class="v">k</i> = <i class="v">mg</i>/<i class="v">x</i>₀，从而 <i class="v">x</i> = <i class="v">h</i> + 2<i class="v">x</i>₀ 时 <i class="v">F</i> = 2<i class="v">mg</i>。</p>
+
+    <h3 class="step">A 项：h + x₀ 处速度是否为零？</h3>
+    <p>该处 <i class="v">F</i> = <i class="v">mg</i>，合力为零，加速度为零——这是<b>速度最大</b>（动能最大）的位置，绝非速度为零。<b>A 错。</b></p>
+
+    <h3 class="step">B 项：两处加速度大小</h3>
+    <div class="eq"><i class="v">x</i> = <i class="v">h</i>：<i class="v">F</i> = 0，<i class="v">a</i> = <i class="v">g</i>（方向向下）</div>
+    <div class="eq"><i class="v">x</i> = <i class="v">h</i>+2<i class="v">x</i>₀：<i class="v">F</i> = 2<i class="v">mg</i>，<i class="v">ma</i> = 2<i class="v">mg</i> − <i class="v">mg</i> = <i class="v">mg</i>，<i class="v">a</i> = <i class="v">g</i>（方向向上）</div>
+    <p>大小相同（方向相反）。<b>B 对。</b></p>
+
+    <h3 class="step">C 项：动能变化趋势</h3>
+    <p><i class="v">h</i> → <i class="v">h</i>+<i class="v">x</i>₀：<i class="v">F</i> &lt; <i class="v">mg</i>，合力向下，加速，动能增大；<br>
+       <i class="v">h</i>+<i class="v">x</i>₀ → <i class="v">h</i>+2<i class="v">x</i>₀：<i class="v">F</i> &gt; <i class="v">mg</i>，合力向上，减速，动能减小。<b>C 错。</b></p>
+
+    <h3 class="step">D 项：用图线面积算变力（弹力）做功</h3>
+    <p><i class="v">h</i> → <i class="v">h</i>+2<i class="v">x</i>₀ 的图线下面积为三角形：</p>
+    <div class="eq">面积 = ½ × (2<i class="v">x</i>₀) × (2<i class="v">mg</i>) = 2<i class="v">mgx</i>₀</div>
+    <p>弹力方向<b>向上</b>，位移<b>向下</b>，做负功：</p>
+    <div class="eq"><i class="v">W</i><sub>弹</sub> = <b>−2<i class="v">mgx</i>₀</b>　⇒　<b>D 对</b></div>
+
+    <div class="ans"><b>答案：BD</b></div>
+    <div class="tip"><b>结论迁移</b>　该结果也说明：小球在 <i class="v">h</i>+2<i class="v">x</i>₀ 处的动能 = 在 <i class="v">h</i> 处的动能 + <i class="v">mg</i>(2<i class="v">x</i>₀) − 2<i class="v">mgx</i>₀ = <i class="v">mgh</i>，即恰好与刚接触弹簧时相等（速度大小相同）。</div>
+  </div>
+</article>
+
+<!-- ---------- 第12题 ---------- -->
+<article class="card" id="q12">
+  <div class="head"><div class="num">12<small>计算</small></div>
+    <div class="t">圆弧滑块 + 弹簧：动量守恒 + 能量守恒<span class="tag">双守恒</span></div></div>
+  <div class="body">
+    <div class="stem">
+      质量 2<i class="v">m</i> 的物块 P 静止在<b>光滑</b>水平地面上，其右侧表面是半径 <i class="v">R</i> 的 ¼ 光滑圆弧轨道，下端与地面相切。P 右侧静止着质量 <i class="v">m</i> 的球 b，b 左侧固定有轻弹簧。质量 <i class="v">m</i> 的球 a 从圆弧最上端由静止释放，a 离开 P 后与弹簧左侧接触<b>并粘连</b>。求：(1) 若 P <b>固定</b>，整个过程中弹簧的最大弹性势能 <i class="v">E</i><sub>p</sub>；(2) 若 P <b>不固定</b>，a 离开 P 瞬间速度 <i class="v">v</i><sub>a</sub> 的大小，及 b 能达到的最大速度 <i class="v">v</i><sub>b</sub>。
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 700 210" role="img" aria-label="圆弧滑块与弹簧三阶段">
+        <line x1="20" y1="150" x2="680" y2="150" class="svg-line"/>
+        <g class="svg-thin">
+          <line x1="30" y1="150" x2="22" y2="160"/><line x1="90" y1="150" x2="82" y2="160"/>
+          <line x1="150" y1="150" x2="142" y2="160"/><line x1="210" y1="150" x2="202" y2="160"/>
+          <line x1="270" y1="150" x2="262" y2="160"/><line x1="330" y1="150" x2="322" y2="160"/>
+          <line x1="390" y1="150" x2="382" y2="160"/><line x1="450" y1="150" x2="442" y2="160"/>
+          <line x1="510" y1="150" x2="502" y2="160"/><line x1="570" y1="150" x2="562" y2="160"/>
+          <line x1="630" y1="150" x2="622" y2="160"/><line x1="676" y1="150" x2="668" y2="160"/>
+        </g>
+        <path d="M60 40 L60 150 L170 150 Q 80 150 60 40 Z" class="svg-fill"/>
+        <text class="it" x="82" y="140">P (2m)</text>
+        <circle cx="66" cy="32" r="9" fill="#fff" stroke="#a83b2c" stroke-width="2"/>
+        <text class="it rd" x="40" y="30">a</text>
+        <text class="sm" x="110" y="66">R</text>
+        <line x1="176" y1="150" x2="176" y2="42" class="svg-dash"/>
+        <path d="M230 132 l-12 -8 l24 -8 l-24 -8 l24 -8 l-24 -8 l24 -8 l-12 -6" class="svg-line" transform="translate(200,0)"/>
+        <circle cx="500" cy="122" r="14" class="svg-fill"/>
+        <text class="it" x="494" y="127">b</text>
+        <path d="M300 122 l14 -7 l-28 -7 l28 -7 l-28 -7 l28 -7 l-14 -7" class="svg-line" transform="translate(140,0) rotate(0)"/>
+        <path d="M330 122 h 60" class="svg-thin"/>
+        <circle cx="300" cy="122" r="12" fill="#fff" stroke="#a83b2c" stroke-width="2"/>
+        <text class="it rd" x="294" y="127">a</text>
+        <line x1="316" y1="104" x2="360" y2="104" class="svg-red" marker-end="url(#ah)"/>
+        <text class="it rd" x="326" y="98">v<tspan baseline-shift="sub">a</tspan></text>
+        <path d="M340 116 q 10 -6 20 0 q 10 6 20 0 q 10 -6 20 0 q 10 6 20 0 q 10 -6 20 0 q 10 6 20 0" class="svg-line" fill="none"/>
+        <line x1="60" y1="176" x2="16" y2="176" class="svg-blue" marker-end="url(#ab)"/>
+        <text class="sm bl" x="20" y="194">P 后退（P 不固定时）</text>
+        <text class="sm" x="470" y="176">b 静止 → 被弹簧推动</text>
+      </svg>
+      <figcaption>图9　a 沿光滑圆弧下滑 → 离开 P 后压缩弹簧（与 b 作用）；P 不固定时 P 会向左反冲</figcaption>
+    </figure>
+
+    <h3 class="step">(1) P 固定：先求 a 到底端的速度</h3>
+    <p>圆弧光滑、P 固定，对 a 用机械能守恒：</p>
+    <div class="eq"><i class="v">mgR</i> = ½<i class="v">mv</i>²　⇒　<i class="v">v</i> = √(2<i class="v">gR</i>)</div>
+    <p><b>再找"弹性势能最大"的临界条件：a 与 b 共速。</b>地面光滑，a、b 组成的系统水平方向动量守恒：</p>
+    <div class="eq"><i class="v">mv</i> = 2<i class="v">mv</i><sub>共</sub>　⇒　<i class="v">v</i><sub>共</sub> = <i class="v">v</i>/2</div>
+    <p>能量守恒（损失的动能全部转化为弹性势能）：</p>
+    <div class="eq"><i class="v">E</i><sub>p</sub> = ½<i class="v">mv</i>² − ½(2<i class="v">m</i>)<i class="v">v</i><sub>共</sub>² = <i class="v">mgR</i> − ½(2<i class="v">m</i>)(2<i class="v">gR</i>/4)</div>
+    <div class="eq"><i class="v">E</i><sub>p</sub> = <i class="v">mgR</i> − ½<i class="v">mgR</i> = <b>½<i class="v">mgR</i></b></div>
+
+    <h3 class="step">(2-①) P 不固定：a 离开 P 时的速度</h3>
+    <p>地面光滑，"a + P"系统水平动量守恒（初动量为零），设 a 向右 <i class="v">v</i><sub>a</sub>、P 向左 <i class="v">V</i>：</p>
+    <div class="eq">0 = <i class="v">mv</i><sub>a</sub> − 2<i class="v">mV</i>　⇒　<i class="v">V</i> = <i class="v">v</i><sub>a</sub>/2</div>
+    <p>全程光滑，机械能守恒：</p>
+    <div class="eq"><i class="v">mgR</i> = ½<i class="v">mv</i><sub>a</sub>² + ½(2<i class="v">m</i>)<i class="v">V</i>² = ½<i class="v">mv</i><sub>a</sub>² + ¼<i class="v">mv</i><sub>a</sub>² = ¾<i class="v">mv</i><sub>a</sub>²</div>
+    <div class="eq"><i class="v">v</i><sub>a</sub>² = 4<i class="v">gR</i>/3　⇒　<i class="v">v</i><sub>a</sub> = <b>(2/3)√(3<i class="v">gR</i>)</b> ≈ 1.15√(<i class="v">gR</i>)</div>
+
+    <h3 class="step">(2-②) b 能达到的最大速度</h3>
+    <p>a 离开 P 后与 b 通过弹簧相互作用（a 与弹簧粘连，但只要弹簧未被拉伸，作用与"弹性碰撞"完全一致）。<b>b 速度最大的时刻恰是弹簧恢复原长的时刻</b>——此后弹簧被拉长，反过来拉住 b 使其减速。</p>
+    <p>此过程动量守恒、机械能守恒（弹性势能回到零）：</p>
+    <div class="eq"><i class="v">mv</i><sub>a</sub> = <i class="v">mv</i><sub>a</sub>′ + <i class="v">mv</i><sub>b</sub>　　½<i class="v">mv</i><sub>a</sub>² = ½<i class="v">mv</i><sub>a</sub>′² + ½<i class="v">mv</i><sub>b</sub>²</div>
+    <p>两式联立，舍去"未发生作用"的解，得<b>质量相等 ⇒ 速度交换</b>：</p>
+    <div class="eq"><i class="v">v</i><sub>a</sub>′ = 0，　<i class="v">v</i><sub>b</sub> = <i class="v">v</i><sub>a</sub> = <b>(2/3)√(3<i class="v">gR</i>)</b></div>
+
+    <div class="ans"><b>答案：</b>(1) <i class="v">E</i><sub>p</sub> = <b><i class="v">mgR</i>/2</b>；(2) <i class="v">v</i><sub>a</sub> = <b>(2√3/3)√(<i class="v">gR</i>)</b>，<i class="v">v</i><sub>b</sub> = <b>(2√3/3)√(<i class="v">gR</i>)</b></div>
+    <div class="tip"><b>两个模型化结论</b>　① 弹簧被压缩到最短（<i class="v">E</i><sub>p</sub> 最大）⟺ 两物体共速；② 等质量弹性作用 ⟺ 交换速度。牢记可省大量计算。</div>
+  </div>
+</article>
+
+<!-- ======================= 题型6 ======================= -->
+<section class="band">
+  <div class="k">题 型 6</div>
+  <h2>摩擦力做功与能量转化</h2>
+  <div class="sub">静摩擦做功可以为零、可正可负；滑动摩擦生热 <i class="v">Q</i> = <i class="v">f</i><sub>滑</sub>·Δ<i class="v">s</i><sub>相对</sub>；系统机械能减少量 = 摩擦生热。</div>
+</section>
+
+<!-- ---------- 例题13 ---------- -->
+<article class="card" id="q13">
+  <div class="head"><div class="num">例13<small>计算</small></div>
+    <div class="t">滑块—木板模型：相对位移与摩擦做功<span class="tag">相对位移</span></div></div>
+  <div class="body">
+    <div class="stem">
+      <i class="v">M</i> = 8 kg 的长木板停放在<b>光滑</b>水平面上，木板<b>左端</b>放置 <i class="v">m</i> = 2 kg 的小物块，二者间动摩擦因数 <i class="v">μ</i> = 0.2。对小物块施加水平向右的恒力 <i class="v">F</i> = 8 N，物块由静止开始向右运动，2 s 后物块从木板上滑落。<i class="v">g</i> = 10 m/s²。求：(1) 二者加速度；(2) 木板长度；(3) 摩擦力对物块及木板做的功。
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 660 250" role="img" aria-label="滑块木板的位移关系">
+        <!-- t=0 -->
+        <text class="sm bl" x="20" y="34">t = 0</text>
+        <rect x="90" y="66" width="300" height="18" class="svg-fill"/>
+        <rect x="90" y="42" width="52" height="24" fill="#f4e3c4" stroke="#b5761a" stroke-width="1.4"/>
+        <text class="it" x="108" y="60">m</text>
+        <text class="it" x="330" y="80">M</text>
+        <line x1="146" y1="54" x2="196" y2="54" class="svg-red" marker-end="url(#ah)"/>
+        <text class="it rd" x="200" y="58">F = 8 N</text>
+        <line x1="60" y1="84" x2="620" y2="84" class="svg-line"/>
+        <text class="sm" x="470" y="78">（地面光滑）</text>
+        <!-- t=2 -->
+        <text class="sm bl" x="20" y="164">t = 2 s</text>
+        <rect x="165" y="196" width="300" height="18" class="svg-fill"/>
+        <rect x="413" y="172" width="52" height="24" fill="#f4e3c4" stroke="#b5761a" stroke-width="1.4"/>
+        <text class="it" x="431" y="190">m</text>
+        <line x1="60" y1="214" x2="620" y2="214" class="svg-line"/>
+        <line x1="116" y1="146" x2="439" y2="146" class="svg-thin" marker-end="url(#ak)"/>
+        <text class="sm" x="240" y="140">物块位移 x₁ = 4 m</text>
+        <line x1="90" y1="234" x2="165" y2="234" class="svg-thin" marker-end="url(#ak)"/>
+        <text class="sm" x="86" y="248">木板 x₂ = 1 m</text>
+        <line x1="165" y1="234" x2="465" y2="234" class="svg-blue" marker-end="url(#ab)"/>
+        <text class="sm bl" x="250" y="248">相对位移 Δs = x₁ − x₂ = 3 m = 板长 L</text>
+        <line x1="116" y1="140" x2="116" y2="200" class="svg-dash"/>
+        <line x1="439" y1="140" x2="439" y2="176" class="svg-dash"/>
+        <line x1="90" y1="86" x2="90" y2="238" class="svg-dash"/>
+        <line x1="165" y1="200" x2="165" y2="238" class="svg-dash"/>
+      </svg>
+      <figcaption>图10　物块从板的左端滑到右端，二者位移之差恰等于木板长度</figcaption>
+    </figure>
+
+    <h3 class="step">(1) 分别对物块和木板用牛顿第二定律</h3>
+    <p>二者发生相对滑动，摩擦力为滑动摩擦力：</p>
+    <div class="eq"><i class="v">f</i> = <i class="v">μmg</i> = 0.2 × 2 × 10 = 4 N</div>
+    <p>物块（受 <i class="v">F</i> 向右、<i class="v">f</i> 向左）：</p>
+    <div class="eq"><i class="v">a</i>₁ = (<i class="v">F</i> − <i class="v">f</i>)/<i class="v">m</i> = (8 − 4)/2 = <b>2 m/s²</b>（向右）</div>
+    <p>木板（地面光滑，只受物块给的摩擦力 <i class="v">f</i> 向右）：</p>
+    <div class="eq"><i class="v">a</i>₂ = <i class="v">f</i>/<i class="v">M</i> = 4/8 = <b>0.5 m/s²</b>（向右）</div>
+    <p>因 <i class="v">a</i>₁ &gt; <i class="v">a</i>₂，物块相对木板向右滑动，与"从左端滑向右端"一致 ✓</p>
+
+    <h3 class="step">(2) 木板长度 = 2 s 内的相对位移</h3>
+    <div class="eq"><i class="v">x</i>₁ = ½<i class="v">a</i>₁<i class="v">t</i>² = ½ × 2 × 2² = 4 m　　<i class="v">x</i>₂ = ½<i class="v">a</i>₂<i class="v">t</i>² = ½ × 0.5 × 4 = 1 m</div>
+    <div class="eq"><i class="v">L</i> = <i class="v">x</i>₁ − <i class="v">x</i>₂ = 4 − 1 = <b>3 m</b></div>
+
+    <h3 class="step">(3) 摩擦力做的功（各自用各自对地的位移）</h3>
+    <div class="eq">对物块：<i class="v">W</i>₁ = −<i class="v">f</i>·<i class="v">x</i>₁ = −4 × 4 = <b>−16 J</b></div>
+    <div class="eq">对木板：<i class="v">W</i>₂ = +<i class="v">f</i>·<i class="v">x</i>₂ = 4 × 1 = <b>+4 J</b></div>
+    <p><b>校验：</b>一对滑动摩擦力做功的代数和 = −<i class="v">Q</i>（生热）：</p>
+    <div class="eq"><i class="v">W</i>₁ + <i class="v">W</i>₂ = −12 J，而 <i class="v">Q</i> = <i class="v">f</i>·Δ<i class="v">s</i> = 4 × 3 = 12 J ✓</div>
+
+    <div class="ans"><b>答案：</b>(1) 物块 2 m/s²、木板 0.5 m/s²；(2) <i class="v">L</i> = <b>3 m</b>；(3) 对物块 <b>−16 J</b>，对木板 <b>+4 J</b></div>
+    <div class="tip"><b>易错点</b>　① 摩擦力对<b>物块</b>做功用物块位移，对<b>木板</b>做功用木板位移，切勿都用相对位移；② 只有求<b>生热</b>时才用相对位移（也叫"划痕长度""相对滑行距离"）。</div>
+  </div>
+</article>
+
+<!-- ---------- 第14题 ---------- -->
+<article class="card" id="q14">
+  <div class="head"><div class="num">14<small>单选</small></div>
+    <div class="t">倾斜传送带卸货：两段加速 + 划痕 + 摩擦功<span class="tag">传送带</span></div></div>
+  <div class="body">
+    <div class="stem">
+      皮带输送机可简化为倾角 <i class="v">θ</i>、以恒定速率 <i class="v">v</i>₀ <b>逆时针</b>匀速转动的传送带（上表面向下运动）。<i class="v">t</i> = 0 时把质量 <i class="v">m</i> 的货物<b>轻放</b>在传送带顶端，其 <i class="v">v–t</i> 图像如图丙（0～<i class="v">t</i>₀ 由 0 增至 <i class="v">v</i>₀；<i class="v">t</i>₀～2<i class="v">t</i>₀ 由 <i class="v">v</i>₀ 增至 1.5<i class="v">v</i>₀），2<i class="v">t</i>₀ 时到达底端。取沿斜面向下为正，最大静摩擦等于滑动摩擦。则（　　）
+      <ul class="opts">
+        <li>A．货物下滑过程中，传送带一直对货物做正功</li>
+        <li>B．货物与传送带间的动摩擦因数 <i class="v">μ</i> &gt; tan<i class="v">θ</i></li>
+        <li>C．货物在传送带上留下的划痕长度为 ¾<i class="v">v</i>₀<i class="v">t</i>₀</li>
+        <li>D．货物从顶端到底端，摩擦力对货物做功等于 −(3/16)<i class="v">mv</i>₀²</li>
+      </ul>
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 700 260" role="img" aria-label="传送带受力与 v-t 图">
+        <!-- 斜面 -->
+        <line x1="40" y1="40" x2="270" y2="180" class="svg-line"/>
+        <line x1="40" y1="180" x2="270" y2="180" class="svg-thin" stroke-dasharray="4 3"/>
+        <path d="M110 180 A 70 70 0 0 0 96 152" class="svg-thin"/>
+        <text class="sm" x="88" y="174">θ</text>
+        <rect x="86" y="52" width="30" height="16" transform="rotate(31 101 60)" fill="#f4e3c4" stroke="#b5761a" stroke-width="1.4"/>
+        <line x1="120" y1="74" x2="152" y2="94" class="svg-blue" marker-end="url(#ab)"/>
+        <text class="sm bl" x="128" y="70">v₀（带）</text>
+        <line x1="150" y1="66" x2="182" y2="86" class="svg-red" marker-end="url(#ah)"/>
+        <text class="sm rd" x="180" y="72">阶段①：f 沿斜面向下</text>
+        <line x1="196" y1="152" x2="164" y2="132" class="svg-red" marker-end="url(#ah)"/>
+        <text class="sm rd" x="150" y="166">阶段②：f 沿斜面向上</text>
+        <!-- v-t -->
+        <line x1="380" y1="200" x2="670" y2="200" class="svg-line" marker-end="url(#ak)"/>
+        <line x1="400" y1="40" x2="400" y2="200" class="svg-line" marker-end="url(#ak)"/>
+        <text class="it" x="666" y="220">t</text><text class="it" x="374" y="38">v</text>
+        <polygon points="400,200 520,120 520,200" fill="#dbe6ee" stroke="none"/>
+        <polygon points="520,200 520,120 640,60 640,200" fill="#f4e3c4" stroke="none"/>
+        <line x1="400" y1="200" x2="520" y2="120" class="svg-red" stroke-width="2.2"/>
+        <line x1="520" y1="120" x2="640" y2="60" class="svg-red" stroke-width="2.2"/>
+        <line x1="400" y1="120" x2="520" y2="120" class="svg-dash"/>
+        <line x1="400" y1="60" x2="640" y2="60" class="svg-dash"/>
+        <line x1="520" y1="120" x2="520" y2="200" class="svg-dash"/>
+        <line x1="640" y1="60" x2="640" y2="200" class="svg-dash"/>
+        <text class="sm" x="372" y="124">v₀</text><text class="sm" x="358" y="64">1.5v₀</text>
+        <text class="sm" x="514" y="218">t₀</text><text class="sm" x="632" y="218">2t₀</text>
+        <text class="sm" x="424" y="188">½v₀t₀</text>
+        <text class="sm" x="548" y="180">1.25 v₀t₀</text>
+      </svg>
+      <figcaption>图11　两个阶段摩擦力方向相反；<i class="v">v–t</i> 图下的面积为货物位移</figcaption>
+    </figure>
+
+    <h3 class="step">第一步　判断两个阶段的摩擦力方向与加速度</h3>
+    <p>阶段①（0～<i class="v">t</i>₀）：货物初速为 0，传送带以 <i class="v">v</i>₀ 向下运动，<b>带比货物快</b> ⇒ 货物相对带向上滑 ⇒ 摩擦力沿斜面<b>向下</b>：</p>
+    <div class="eq"><i class="v">a</i>₁ = <i class="v">g</i>sin<i class="v">θ</i> + <i class="v">μg</i>cos<i class="v">θ</i> = <i class="v">v</i>₀/<i class="v">t</i>₀</div>
+    <p>阶段②（<i class="v">t</i>₀～2<i class="v">t</i>₀）：由图像货物<b>继续加速</b>（<i class="v">a</i>₂ = 0.5<i class="v">v</i>₀/<i class="v">t</i>₀ &gt; 0），说明共速后货物比带更快，摩擦力沿斜面<b>向上</b>：</p>
+    <div class="eq"><i class="v">a</i>₂ = <i class="v">g</i>sin<i class="v">θ</i> − <i class="v">μg</i>cos<i class="v">θ</i> = 0.5<i class="v">v</i>₀/<i class="v">t</i>₀</div>
+    <p>两式相加、相减得</p>
+    <div class="eq"><i class="v">g</i>sin<i class="v">θ</i> = 0.75<i class="v">v</i>₀/<i class="v">t</i>₀，　<i class="v">μg</i>cos<i class="v">θ</i> = 0.25<i class="v">v</i>₀/<i class="v">t</i>₀　⇒　<i class="v">μ</i> = tan<i class="v">θ</i>/3</div>
+
+    <h3 class="step">逐项分析</h3>
+    <ul class="pt">
+      <li><b>A 错：</b>阶段①摩擦力向下、位移向下 ⇒ 正功；阶段②摩擦力向上、位移向下 ⇒ <b>负功</b>。并非"一直做正功"（支持力始终不做功）。</li>
+      <li><b>B 错：</b>由 <i class="v">a</i>₂ &gt; 0 即 <i class="v">g</i>sin<i class="v">θ</i> &gt; <i class="v">μg</i>cos<i class="v">θ</i> 得 <b><i class="v">μ</i> &lt; tan<i class="v">θ</i></b>（本题恰为 tan<i class="v">θ</i>/3）。若 <i class="v">μ</i> &gt; tan<i class="v">θ</i>，共速后二者将一起匀速下行。</li>
+      <li><b>C 错：</b>算相对位移——<br>
+        阶段①：带走 <i class="v">v</i>₀<i class="v">t</i>₀，货走 ½<i class="v">v</i>₀<i class="v">t</i>₀ ⇒ 货物相对带<b>后退</b> ½<i class="v">v</i>₀<i class="v">t</i>₀；<br>
+        阶段②：货走 (<i class="v">v</i>₀+1.5<i class="v">v</i>₀)<i class="v">t</i>₀/2 = 1.25<i class="v">v</i>₀<i class="v">t</i>₀，带走 <i class="v">v</i>₀<i class="v">t</i>₀ ⇒ 货物相对带<b>前进</b> ¼<i class="v">v</i>₀<i class="v">t</i>₀，是沿原划痕<b>返回</b>；<br>
+        故划痕总长取相对位移的最大值 <b>½<i class="v">v</i>₀<i class="v">t</i>₀</b>，不是 ¾<i class="v">v</i>₀<i class="v">t</i>₀（¾ 是把两段相对位移大小直接相加的错误做法）。</li>
+      <li><b>D 对：</b>摩擦力大小 <i class="v">f</i> = <i class="v">μmg</i>cos<i class="v">θ</i> = 0.25<i class="v">mv</i>₀/<i class="v">t</i>₀，分段求功：</li>
+    </ul>
+    <div class="eq"><i class="v">W</i>₁ = +<i class="v">f</i> × ½<i class="v">v</i>₀<i class="v">t</i>₀ = +(1/8)<i class="v">mv</i>₀²</div>
+    <div class="eq"><i class="v">W</i>₂ = −<i class="v">f</i> × 1.25<i class="v">v</i>₀<i class="v">t</i>₀ = −(5/16)<i class="v">mv</i>₀²</div>
+    <div class="eq"><i class="v">W</i><sub>f</sub> = 2/16 − 5/16 = <b>−(3/16)<i class="v">mv</i>₀²</b></div>
+
+    <div class="ans"><b>答案：D</b></div>
+    <div class="tip"><b>易错点</b>　划痕长度 ≠ 两段相对位移之和；当相对滑动<b>反向</b>时，后一段是在已有划痕上"回擦"，取最大值即可。</div>
+  </div>
+</article>
+
+<!-- ======================= 题型7 ======================= -->
+<section class="band">
+  <div class="k">题 型 7</div>
+  <h2>多过程综合问题</h2>
+  <div class="sub">分段分析 → 抓住衔接点速度 → 直线用牛顿定律、曲线/变力用动能定理、条件满足用守恒。</div>
+</section>
+
+<!-- ---------- 例题15 ---------- -->
+<article class="card" id="q15">
+  <div class="head"><div class="num">例15<small>计算</small></div>
+    <div class="t">半圆轨道 + 摩擦水平面 + 锁定弹簧 + 平抛<span class="tag">全链条</span></div></div>
+  <div class="body">
+    <div class="stem">
+      半径 <i class="v">R</i> 的<b>光滑</b>半圆轨道 <i class="v">ABC</i> 在竖直面内，与水平轨道 <i class="v">CD</i> 相切于 <i class="v">C</i>。<i class="v">D</i> 端有一被锁定的轻质压缩弹簧，左端连于固定挡板，右端 <i class="v">Q</i> 到 <i class="v">C</i> 的距离为 4<i class="v">R</i>。质量 <i class="v">m</i> 的滑块从轨道上 <i class="v">P</i> 点由静止滑下，<b>恰好能运动到 <i class="v">Q</i> 点</b>并触发弹簧解除锁定，随后滑块被弹回，且从 <i class="v">A</i> 点平抛后<b>恰好落到 <i class="v">Q</i> 点</b>。已知 ∠<i class="v">POC</i> = 60°。求：(1) 滑块第一次滑至最低点 <i class="v">C</i> 时对轨道的压力；(2) 滑块与水平轨道间的动摩擦因数 <i class="v">μ</i>；(3) 弹簧被锁定时具有的弹性势能。
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 620 300" role="img" aria-label="半圆轨道与弹簧装置">
+        <line x1="60" y1="230" x2="560" y2="230" class="svg-line"/>
+        <g class="svg-thin">
+          <line x1="70" y1="230" x2="62" y2="240"/><line x1="120" y1="230" x2="112" y2="240"/>
+          <line x1="170" y1="230" x2="162" y2="240"/><line x1="220" y1="230" x2="212" y2="240"/>
+          <line x1="270" y1="230" x2="262" y2="240"/><line x1="320" y1="230" x2="312" y2="240"/>
+          <line x1="370" y1="230" x2="362" y2="240"/><line x1="420" y1="230" x2="412" y2="240"/>
+          <line x1="470" y1="230" x2="462" y2="240"/><line x1="520" y1="230" x2="512" y2="240"/>
+        </g>
+        <line x1="70" y1="180" x2="70" y2="230" class="svg-line" stroke-width="3"/>
+        <text class="it" x="52" y="248">D</text>
+        <path d="M70 214 l12 -8 l-24 -8 l24 -8 l-24 -8 l24 -8 l-12 -6" class="svg-line"/>
+        <line x1="118" y1="230" x2="118" y2="212" class="svg-thin"/>
+        <text class="it" x="112" y="248">Q</text>
+        <path d="M400 230 A 90 90 0 1 1 400 50" fill="none" stroke="#16202b" stroke-width="2.4"/>
+        <circle cx="400" cy="140" r="3.5" fill="#16202b"/>
+        <text class="it" x="380" y="136">O</text>
+        <text class="it" x="392" y="42">A</text><text class="it" x="496" y="146">B</text><text class="it" x="392" y="252">C</text>
+        <line x1="400" y1="140" x2="400" y2="230" class="svg-dash"/>
+        <line x1="400" y1="140" x2="478" y2="185" class="svg-dash"/>
+        <path d="M400 185 A 45 45 0 0 0 424 178" class="svg-thin"/>
+        <text class="sm" x="404" y="200">60°</text>
+        <rect x="466" y="174" width="22" height="18" transform="rotate(-30 477 183)" fill="#f4e3c4" stroke="#b5761a" stroke-width="1.4"/>
+        <text class="it" x="488" y="204">P</text>
+        <path d="M400 50 Q 250 60, 118 212" class="svg-dash" stroke="#a83b2c"/>
+        <text class="sm rd" x="230" y="66">平抛，水平射程 4R</text>
+        <line x1="118" y1="258" x2="400" y2="258" class="svg-thin" marker-end="url(#ak)"/>
+        <line x1="400" y1="258" x2="118" y2="258" class="svg-thin" marker-end="url(#ak)"/>
+        <text class="it" x="240" y="276">4R</text>
+        <line x1="424" y1="50" x2="424" y2="230" class="svg-dash"/>
+        <text class="it" x="430" y="146">2R</text>
+        <line x1="400" y1="50" x2="352" y2="50" class="svg-blue" marker-end="url(#ab)"/>
+        <text class="it bl" x="326" y="44">v<tspan baseline-shift="sub">A</tspan></text>
+      </svg>
+      <figcaption>图12　<i class="v">P</i>（∠<i class="v">POC</i> = 60°）→ <i class="v">C</i> → <i class="v">Q</i>（速度为零）→ 弹簧弹回 → <i class="v">C</i> → <i class="v">A</i> → 平抛落回 <i class="v">Q</i></figcaption>
+    </figure>
+
+    <h3 class="step">(1) 第一次到达 C 点的压力</h3>
+    <p><b>先算 P 相对 C 的高度</b>（<i class="v">P</i> 与圆心 <i class="v">O</i> 的连线与 <i class="v">OC</i> 成 60°）：</p>
+    <div class="eq"><i class="v">h<sub>P</sub></i> = <i class="v">R</i> − <i class="v">R</i>cos60° = <i class="v">R</i>/2</div>
+    <p><b>P→C 圆轨道光滑</b>，机械能守恒：</p>
+    <div class="eq"><i class="v">mg</i>(<i class="v">R</i>/2) = ½<i class="v">mv<sub>C</sub></i>²　⇒　<i class="v">v<sub>C</sub></i>² = <i class="v">gR</i></div>
+    <p><b>在 C 点（最低点）</b>，合力提供向心力，方向向上：</p>
+    <div class="eq"><i class="v">N</i> − <i class="v">mg</i> = <i class="v">mv<sub>C</sub></i>²/<i class="v">R</i> = <i class="v">mg</i>　⇒　<i class="v">N</i> = 2<i class="v">mg</i></div>
+    <p>由牛顿第三定律，滑块对轨道的压力大小为 <b>2<i class="v">mg</i></b>，方向竖直向下。</p>
+
+    <h3 class="step">(2) 动摩擦因数</h3>
+    <p><b>"恰好能运动到 Q 点" ⇒ 到 Q 时速度为零</b>。对 C→Q（长 4<i class="v">R</i>）用动能定理：</p>
+    <div class="eq">−<i class="v">μmg</i>·4<i class="v">R</i> = 0 − ½<i class="v">mv<sub>C</sub></i>²</div>
+    <div class="eq"><i class="v">μ</i> = <i class="v">v<sub>C</sub></i>²/(8<i class="v">gR</i>) = <i class="v">gR</i>/(8<i class="v">gR</i>) = <b>0.125</b></div>
+
+    <h3 class="step">(3) 弹簧的弹性势能——倒着推</h3>
+    <p><b>第①步：由平抛反求 <i class="v">A</i> 点速度。</b><i class="v">A</i> 是最高点，速度水平（向左），<i class="v">A</i> 在 <i class="v">C</i> 正上方 2<i class="v">R</i> 处，落点 <i class="v">Q</i> 距 <i class="v">C</i> 为 4<i class="v">R</i>：</p>
+    <div class="eq">竖直：2<i class="v">R</i> = ½<i class="v">gt</i>²　⇒　<i class="v">t</i> = 2√(<i class="v">R</i>/<i class="v">g</i>)</div>
+    <div class="eq">水平：4<i class="v">R</i> = <i class="v">v<sub>A</sub>t</i>　⇒　<i class="v">v<sub>A</sub></i> = 2√(<i class="v">gR</i>)，<i class="v">v<sub>A</sub></i>² = 4<i class="v">gR</i></div>
+    <p class="note">校验能否通过最高点：需 <i class="v">v<sub>A</sub></i>² ≥ <i class="v">gR</i>，而 4<i class="v">gR</i> &gt; <i class="v">gR</i> ✓</p>
+    <p><b>第②步：A→C 逆推（圆轨道光滑，机械能守恒）</b>，设弹回后经过 <i class="v">C</i> 的速度为 <i class="v">v<sub>C</sub></i>′：</p>
+    <div class="eq">½<i class="v">mv<sub>C</sub></i>′² = ½<i class="v">mv<sub>A</sub></i>² + <i class="v">mg</i>·2<i class="v">R</i> = 2<i class="v">mgR</i> + 2<i class="v">mgR</i> = 4<i class="v">mgR</i></div>
+    <p><b>第③步：Q→C 逆推（克服摩擦）</b>，设离开弹簧（弹簧恢复原长、滑块在 <i class="v">Q</i>）时动能为 <i class="v">E</i><sub>k</sub>：</p>
+    <div class="eq"><i class="v">E</i><sub>k</sub> − <i class="v">μmg</i>·4<i class="v">R</i> = ½<i class="v">mv<sub>C</sub></i>′²</div>
+    <div class="eq"><i class="v">E</i><sub>k</sub> = 4<i class="v">mgR</i> + 0.125<i class="v">mg</i>·4<i class="v">R</i> = 4<i class="v">mgR</i> + 0.5<i class="v">mgR</i> = 4.5<i class="v">mgR</i></div>
+    <p><b>第④步：弹簧释放时弹性势能全部转化为滑块动能</b>（轻弹簧、<i class="v">Q</i> 为原长位置）：</p>
+    <div class="eq"><i class="v">E</i><sub>p</sub> = <i class="v">E</i><sub>k</sub> = <b>4.5<i class="v">mgR</i></b>　（即 9<i class="v">mgR</i>/2）</div>
+
+    <div class="ans"><b>答案：</b>(1) <b>2<i class="v">mg</i></b>，方向竖直向下；(2) <i class="v">μ</i> = <b>0.125</b>；(3) <i class="v">E</i><sub>p</sub> = <b>4.5<i class="v">mgR</i></b></div>
+    <div class="tip"><b>解题主线</b>　"末态已知、初态未知"的多过程题<b>倒着推</b>最省事：平抛 → 定 <i class="v">v<sub>A</sub></i> → 定 <i class="v">v<sub>C</sub></i>′ → 定 <i class="v">E</i><sub>k</sub> → 定 <i class="v">E</i><sub>p</sub>。另注意滑块两次经过 <i class="v">CQ</i> 段，摩擦各损耗 <i class="v">μmg</i>·4<i class="v">R</i> = 0.5<i class="v">mgR</i>。</div>
+  </div>
+</article>
+
+<!-- ---------- 第16题 ---------- -->
+<article class="card" id="q16">
+  <div class="head"><div class="num">16<small>计算</small></div>
+    <div class="t">碰撞 → 弹簧 → 冲上光滑圆弧滑块<span class="tag">三次守恒</span></div></div>
+  <div class="body">
+    <div class="stem">
+      <b>光滑</b>水平地面上，质量均为 1 kg 的滑块 B 和 C 中间夹一<b>原长</b>轻弹簧，左端固定在 B 上，右端与 C 接触<b>但不固定</b>；质量 <i class="v">M</i> = 2 kg、半径 <i class="v">R</i> 的四分之一<b>光滑</b>圆弧滑块 D 放在 C 右边（C、D 间距足够远）。质量 <i class="v">m</i>₀ = 0.5 kg 的滑块 A 以 <i class="v">v</i>₀ = 10 m/s 向右与 B 碰撞，碰撞时间极短，碰后 A 被反弹，速度大小 <i class="v">v</i><sub>A</sub> = 2 m/s，<i class="v">g</i> = 10 m/s²。求：(1) 碰后 B 的速度；(2) 弹簧的最大弹性势能；(3) 若滑块 C <b>恰能到达</b> D 的最高点，求 <i class="v">R</i>。
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 700 320" role="img" aria-label="四个阶段示意">
+        <!-- 阶段1 -->
+        <text class="sm bl" x="16" y="30">① 碰撞（极短）</text>
+        <line x1="150" y1="60" x2="680" y2="60" class="svg-line"/>
+        <rect x="160" y="36" width="26" height="24" fill="#f4e3c4" stroke="#b5761a" stroke-width="1.4"/>
+        <text class="it" x="167" y="53">A</text>
+        <line x1="190" y1="30" x2="222" y2="30" class="svg-red" marker-end="url(#ah)"/>
+        <text class="sm rd" x="192" y="24">10 m/s</text>
+        <rect x="250" y="36" width="26" height="24" class="svg-fill"/><text class="it" x="256" y="53">B</text>
+        <path d="M276 48 q 8 -6 16 0 q 8 6 16 0 q 8 -6 16 0 q 8 6 16 0" class="svg-line" fill="none"/>
+        <rect x="340" y="36" width="26" height="24" class="svg-fill"/><text class="it" x="346" y="53">C</text>
+        <path d="M560 60 L560 6 Q 560 60 500 60 Z" class="svg-fill"/>
+        <text class="it" x="536" y="54">D</text>
+        <!-- 阶段2 -->
+        <text class="sm bl" x="16" y="120">② 弹簧最短（B、C 共速）</text>
+        <line x1="150" y1="150" x2="680" y2="150" class="svg-line"/>
+        <rect x="200" y="126" width="26" height="24" fill="#f4e3c4" stroke="#b5761a" stroke-width="1.4"/>
+        <line x1="196" y1="120" x2="168" y2="120" class="svg-blue" marker-end="url(#ab)"/>
+        <text class="sm bl" x="150" y="114">2 m/s</text>
+        <rect x="270" y="126" width="26" height="24" class="svg-fill"/>
+        <path d="M296 138 q 5 -6 10 0 q 5 6 10 0 q 5 -6 10 0 q 5 6 10 0" class="svg-line" fill="none"/>
+        <rect x="336" y="126" width="26" height="24" class="svg-fill"/>
+        <line x1="300" y1="118" x2="336" y2="118" class="svg-red" marker-end="url(#ah)"/>
+        <text class="sm rd" x="300" y="112">共速 3 m/s</text>
+        <text class="sm" x="392" y="142">E<tspan baseline-shift="sub">p</tspan> 最大 = 9 J</text>
+        <!-- 阶段3 -->
+        <text class="sm bl" x="16" y="210">③ 弹簧恢复原长（C 分离）</text>
+        <line x1="150" y1="240" x2="680" y2="240" class="svg-line"/>
+        <rect x="250" y="216" width="26" height="24" class="svg-fill"/><text class="it" x="256" y="233">B</text>
+        <text class="sm" x="246" y="210">v = 0</text>
+        <path d="M276 228 q 8 -6 16 0 q 8 6 16 0 q 8 -6 16 0 q 8 6 16 0" class="svg-line" fill="none"/>
+        <rect x="360" y="216" width="26" height="24" class="svg-fill"/><text class="it" x="366" y="233">C</text>
+        <line x1="390" y1="210" x2="430" y2="210" class="svg-red" marker-end="url(#ah)"/>
+        <text class="sm rd" x="392" y="204">6 m/s</text>
+        <!-- 阶段4 -->
+        <text class="sm bl" x="16" y="290">④ C 恰达 D 最高点（共速）</text>
+        <line x1="150" y1="312" x2="680" y2="312" class="svg-line"/>
+        <path d="M560 312 L560 258 Q 560 312 500 312 Z" class="svg-fill"/>
+        <rect x="548" y="248" width="24" height="14" class="svg-fill"/>
+        <text class="sm" x="576" y="262">C 与 D 共速 2 m/s</text>
+        <line x1="562" y1="300" x2="562" y2="264" class="svg-dash"/>
+        <text class="it" x="566" y="292">R</text>
+      </svg>
+      <figcaption>图13　四个关键节点：碰撞 → 共速（<i class="v">E</i><sub>p</sub> 最大）→ 分离 → C 与 D 共速（恰达最高点）</figcaption>
+    </figure>
+
+    <h3 class="step">(1) 碰后 B 的速度（动量守恒）</h3>
+    <p>碰撞时间极短，弹簧尚未压缩、地面光滑，A、B 系统动量守恒。取向右为正，A 被反弹故其末速取负：</p>
+    <div class="eq"><i class="v">m</i>₀<i class="v">v</i>₀ = −<i class="v">m</i>₀<i class="v">v</i><sub>A</sub> + <i class="v">m</i><sub>B</sub><i class="v">v</i><sub>B</sub></div>
+    <div class="eq">0.5 × 10 = −0.5 × 2 + 1 × <i class="v">v</i><sub>B</sub>　⇒　<i class="v">v</i><sub>B</sub> = <b>6 m/s</b>（向右）</div>
+
+    <h3 class="step">(2) 弹簧的最大弹性势能（临界：B、C 共速）</h3>
+    <p>此后 B 通过弹簧推 C，B、C 系统动量守恒；弹簧最短时二者共速：</p>
+    <div class="eq"><i class="v">m</i><sub>B</sub><i class="v">v</i><sub>B</sub> = (<i class="v">m</i><sub>B</sub> + <i class="v">m</i><sub>C</sub>)<i class="v">v</i><sub>共</sub>　⇒　1 × 6 = 2<i class="v">v</i><sub>共</sub>　⇒　<i class="v">v</i><sub>共</sub> = 3 m/s</div>
+    <div class="eq"><i class="v">E</i><sub>p</sub> = ½<i class="v">m</i><sub>B</sub><i class="v">v</i><sub>B</sub>² − ½(<i class="v">m</i><sub>B</sub>+<i class="v">m</i><sub>C</sub>)<i class="v">v</i><sub>共</sub>² = ½×1×36 − ½×2×9 = 18 − 9 = <b>9 J</b></div>
+
+    <h3 class="step">(3-①) C 离开弹簧时的速度</h3>
+    <p>弹簧右端与 C <b>不固定</b>，故弹簧恢复原长时 C 与弹簧分离。该过程动量与机械能均守恒，且 <i class="v">m</i><sub>B</sub> = <i class="v">m</i><sub>C</sub> ⇒ <b>交换速度</b>：</p>
+    <div class="eq"><i class="v">v</i><sub>B</sub>′ = 0，　<i class="v">v</i><sub>C</sub> = 6 m/s（向右）</div>
+
+    <h3 class="step">(3-②) C 冲上 D："恰能到达最高点" = 二者共速</h3>
+    <p>D 可自由滑动，C 在 D 上升的过程中推着 D 一起向右加速。"恰好到达最高点"指 C 到达顶端时<b>相对 D 的速度为零</b>（否则会飞出或中途返回），此时二者速度相同。水平方向动量守恒：</p>
+    <div class="eq"><i class="v">m</i><sub>C</sub><i class="v">v</i><sub>C</sub> = (<i class="v">m</i><sub>C</sub> + <i class="v">M</i>)<i class="v">v</i>′　⇒　1 × 6 = 3<i class="v">v</i>′　⇒　<i class="v">v</i>′ = 2 m/s</div>
+    <p>圆弧光滑、地面光滑，系统机械能守恒（减少的动能转化为 C 的重力势能）：</p>
+    <div class="eq">½<i class="v">m</i><sub>C</sub><i class="v">v</i><sub>C</sub>² = ½(<i class="v">m</i><sub>C</sub>+<i class="v">M</i>)<i class="v">v</i>′² + <i class="v">m</i><sub>C</sub><i class="v">gR</i></div>
+    <div class="eq">½×1×36 = ½×3×4 + 1×10×<i class="v">R</i>　⇒　18 = 6 + 10<i class="v">R</i></div>
+    <div class="eq"><i class="v">R</i> = <b>1.2 m</b></div>
+
+    <div class="ans"><b>答案：</b>(1) <i class="v">v</i><sub>B</sub> = <b>6 m/s</b>，方向向右；(2) <i class="v">E</i><sub>p max</sub> = <b>9 J</b>；(3) <i class="v">R</i> = <b>1.2 m</b></div>
+    <div class="tip"><b>三处临界的识别</b>　① 碰撞极短 ⇒ 只用动量守恒（弹簧来不及形变）；② 弹簧最短 ⇒ 共速，弹性势能最大；③ "恰能到达最高点"（滑块可动） ⇒ 相对速度为零、水平共速，<b>不是</b> <i class="v">v</i> = 0，也<b>不是</b> <i class="v">mg</i> = <i class="v">mv</i>²/<i class="v">R</i>（那是竖直圆轨道内侧的最高点条件）。</div>
+  </div>
+</article>
+
+<!-- ======================= 总结 ======================= -->
+<section class="band">
+  <div class="k">收 束</div>
+  <h2>方法总纲：遇到题目先问三句话</h2>
+</section>
+<article class="card">
+  <div class="body">
+    <table class="data">
+      <tr><th style="width:22%">问自己</th><th>判断</th><th>选用工具</th></tr>
+      <tr><td>力是恒力还是变力？</td><td class="l">恒力、直线</td><td class="l"><i class="v">W</i> = <i class="v">Fs</i>cos<i class="v">α</i>；牛顿定律 + 运动学</td></tr>
+      <tr><td></td><td class="l">变力（弹簧力、绳拉力、圆弧上的摩擦力、恒定功率的牵引力）</td><td class="l"><b>动能定理</b>；或 <i class="v">F–x</i> 图像面积</td></tr>
+      <tr><td>系统有无摩擦/形变？</td><td class="l">只有重力和系统内弹力做功</td><td class="l"><b>机械能守恒</b>（含弹簧时把弹簧计入系统）</td></tr>
+      <tr><td></td><td class="l">有滑动摩擦</td><td class="l">能量守恒：Δ<i class="v">E</i><sub>机</sub> = −<i class="v">Q</i> = −<i class="v">f</i>Δ<i class="v">s</i><sub>相对</sub></td></tr>
+      <tr><td>水平方向有无外力？</td><td class="l">地面光滑、碰撞极短</td><td class="l"><b>动量守恒</b>，常与能量方程联立</td></tr>
+    </table>
+    <h3 class="step">三个最常考的"临界条件"</h3>
+    <ul class="pt">
+      <li><b>弹簧最短 / 最长</b> ⟺ 两物体共速（此时弹性势能取极值）。</li>
+      <li><b>弹簧恢复原长</b> ⟺ 不粘连的两物体分离点；等质量时表现为"交换速度"。</li>
+      <li><b>"恰好到达最高点"</b>：轨道固定的竖直圆内侧 ⟹ <i class="v">mg</i> = <i class="v">mv</i>²/<i class="v">R</i>；轨道可自由移动（如第 16 题的 D）⟹ 二者<b>共速</b>；有杆/有轨道外侧支撑 ⟹ <i class="v">v</i> 可为 0。</li>
+    </ul>
+    <div class="tip"><b>最后提醒</b>　摩擦力做功与路径有关（往返运动、传送带划痕都是典型）；求各物体的功用<b>各自对地位移</b>，求生热才用<b>相对位移</b>。</div>
+  </div>
+</article>
+
+<footer>
+  <p>本文覆盖第 19—24 页题型 1—7 全部 16 题：例1 BD ｜ 2 AD ｜ 3 A ｜ 例4 A ｜ 5 AD ｜ 6（70 kW / 变加速至 35 m/s / 150 m）｜ 例7 D ｜ 8（10 m/s、1.8 m、600 J）｜ 例9 D ｜ 10 D ｜ 例11 BD ｜ 12（<i class="v">mgR</i>/2；2√3√(<i class="v">gR</i>)/3）｜ 例13（2、0.5 m/s²；3 m；−16 J、+4 J）｜ 14 D ｜ 例15（2<i class="v">mg</i>；0.125；4.5<i class="v">mgR</i>）｜ 16（6 m/s；9 J；1.2 m）。</p>
+</footer>
+
+</div>
+</body>
+</html>
