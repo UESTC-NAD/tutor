@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark">
+<title>网络安全五章速览</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0}
+
+:root{
+  --bg:#f5f4f1; --surface:#fff; --surface-2:#f0efea; --surface-3:#e9e7e0;
+  --text:#1b1a17; --text-2:#565349; --text-3:#8a867c;
+  --line:#e1ded6; --line-2:#cdc9be;
+  --accent:#4338ca; --accent-bg:#eceafb; --accent-line:#c3bdf3;
+  --trap:#b91c1c; --trap-bg:#fdeceb; --trap-line:#f2b8b5;
+  --eg:#046c4e;   --eg-bg:#e4f5ee;   --eg-line:#a4dcc5;
+  --c5:#0d7d74; --c5-bg:#e0f2f0; --c5-line:#9ad4cd;
+  --c6:#4338ca; --c6-bg:#eceafb; --c6-line:#c3bdf3;
+  --c7:#0369a1; --c7-bg:#e6f3fb; --c7-line:#a8d6ee;
+  --c8:#a15c00; --c8-bg:#fdf2dd; --c8-line:#eccf95;
+  --c9:#be123c; --c9-bg:#fdeaee; --c9-line:#f5b5c3;
+  --shadow:0 1px 2px rgba(24,22,18,.05),0 4px 14px rgba(24,22,18,.05);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#111216; --surface:#191b21; --surface-2:#20232b; --surface-3:#272b34;
+    --text:#e8e7e4; --text-2:#a5a39c; --text-3:#78766f;
+    --line:#2a2d36; --line-2:#3b3f4b;
+    --accent:#a5b4fc; --accent-bg:#1c1f2e; --accent-line:#3a3f63;
+    --trap:#fca5a5; --trap-bg:#2a1719; --trap-line:#5d2f31;
+    --eg:#6ee7b7;   --eg-bg:#12241d;   --eg-line:#2a5344;
+    --c5:#5eead4; --c5-bg:#0e2724; --c5-line:#2a5a54;
+    --c6:#a5b4fc; --c6-bg:#1c1f2e; --c6-line:#3a3f63;
+    --c7:#7dd3fc; --c7-bg:#12212c; --c7-line:#2b4a5e;
+    --c8:#fcd34d; --c8-bg:#2a2313; --c8-line:#5c4a1f;
+    --c9:#fda4af; --c9-bg:#2a1219; --c9-line:#5e2833;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111216; --surface:#191b21; --surface-2:#20232b; --surface-3:#272b34;
+  --text:#e8e7e4; --text-2:#a5a39c; --text-3:#78766f;
+  --line:#2a2d36; --line-2:#3b3f4b;
+  --accent:#a5b4fc; --accent-bg:#1c1f2e; --accent-line:#3a3f63;
+  --trap:#fca5a5; --trap-bg:#2a1719; --trap-line:#5d2f31;
+  --eg:#6ee7b7;   --eg-bg:#12241d;   --eg-line:#2a5344;
+  --c5:#5eead4; --c5-bg:#0e2724; --c5-line:#2a5a54;
+  --c6:#a5b4fc; --c6-bg:#1c1f2e; --c6-line:#3a3f63;
+  --c7:#7dd3fc; --c7-bg:#12212c; --c7-line:#2b4a5e;
+  --c8:#fcd34d; --c8-bg:#2a2313; --c8-line:#5c4a1f;
+  --c9:#fda4af; --c9-bg:#2a1219; --c9-line:#5e2833;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);
+}
+
+body{background:var(--bg); color:var(--text); font-family:var(--font);
+  font-size:16.5px; line-height:1.85; -webkit-font-smoothing:antialiased}
+a{color:var(--accent); text-underline-offset:2px}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none !important; scroll-behavior:auto !important}}
+html{scroll-behavior:smooth}
+
+.topbar{position:sticky; top:0; z-index:50;
+  background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:saturate(180%) blur(12px); -webkit-backdrop-filter:saturate(180%) blur(12px);
+  border-bottom:1px solid var(--line)}
+.topbar-in{max-width:880px; margin:0 auto; padding:9px 20px; display:flex; align-items:center; gap:10px}
+.tb-brand{font-size:13px; font-weight:750; white-space:nowrap}
+.pills{display:flex; gap:5px; flex:1 1 auto; flex-wrap:wrap}
+.pill{font-family:var(--mono); font-size:12px; font-weight:600; text-decoration:none;
+  padding:3.5px 9px; border-radius:999px; border:1px solid var(--line-2);
+  color:var(--text-2); background:var(--surface); white-space:nowrap;
+  transition:background .12s,color .12s,border-color .12s}
+.pill:hover{border-color:currentColor}
+.pill.c5{color:var(--c5)} .pill.c6{color:var(--c6)} .pill.c7{color:var(--c7)}
+.pill.c8{color:var(--c8)} .pill.c9{color:var(--c9)}
+.pill.c5.on{background:var(--c5); border-color:var(--c5); color:var(--surface)}
+.pill.c6.on{background:var(--c6); border-color:var(--c6); color:var(--surface)}
+.pill.c7.on{background:var(--c7); border-color:var(--c7); color:var(--surface)}
+.pill.c8.on{background:var(--c8); border-color:var(--c8); color:var(--surface)}
+.pill.c9.on{background:var(--c9); border-color:var(--c9); color:var(--surface)}
+.tb-btn{font-size:12px; font-family:var(--font); padding:4px 10px; border-radius:8px; cursor:pointer;
+  border:1px solid var(--line-2); background:var(--surface); color:var(--text-2); white-space:nowrap}
+.tb-btn:hover{color:var(--text); border-color:var(--text-3)}
+
+.wrap{max-width:880px; margin:0 auto; padding:0 20px}
+.hero{padding:48px 0 32px; border-bottom:1px solid var(--line)}
+.hero h1{font-size:clamp(28px,4.8vw,42px); line-height:1.24; margin:0 0 14px;
+  letter-spacing:-.022em; font-weight:780; text-wrap:balance}
+.hero .lede{font-size:17px; color:var(--text-2); margin:0; max-width:60ch}
+.eyebrow{font-family:var(--mono); font-size:11.5px; letter-spacing:.13em; text-transform:uppercase;
+  color:var(--text-3); font-weight:600; margin-bottom:10px}
+
+.sec{padding:44px 0 4px; scroll-margin-top:64px}
+h2.h{font-size:23px; margin:0 0 8px; letter-spacing:-.016em; font-weight:770; text-wrap:balance}
+h3.h{font-size:15px; margin:26px 0 9px; letter-spacing:-.008em; font-weight:720}
+h3.h .n{font-family:var(--mono); font-size:11.5px; color:var(--text-3); margin-right:7px; font-weight:600}
+p{margin:0 0 13px}
+.dim{color:var(--text-2)}
+.small{font-size:14px}
+code{font-family:var(--mono); font-size:.875em; background:var(--surface-3); padding:1px 4.5px; border-radius:4px}
+b,strong{font-weight:680}
+mark{background:var(--eg-bg); color:inherit; padding:0 3px; border-radius:3px}
+
+/* ---------- 协议栈图 ---------- */
+.stack{display:grid; gap:7px; margin:20px 0 6px}
+.layer{display:grid; grid-template-columns:96px 1fr; gap:12px; align-items:stretch}
+.layer .ln{font-family:var(--mono); font-size:12px; color:var(--text-3); font-weight:650;
+  display:flex; align-items:center; justify-content:flex-end; text-align:right; line-height:1.35}
+.layer .slots{display:flex; gap:7px; flex-wrap:wrap}
+.slot{flex:1 1 auto; padding:9px 13px; border-radius:9px; font-size:14px; line-height:1.5;
+  border:1px solid var(--line-2); background:var(--surface-2); color:var(--text-2)}
+.slot b{display:block; font-size:12px; font-family:var(--mono); letter-spacing:.04em; margin-bottom:1px}
+.slot.s5{background:var(--c5-bg); border-color:var(--c5-line)} .slot.s5 b{color:var(--c5)}
+.slot.s6{background:var(--c6-bg); border-color:var(--c6-line)} .slot.s6 b{color:var(--c6)}
+.slot.s7{background:var(--c7-bg); border-color:var(--c7-line)} .slot.s7 b{color:var(--c7)}
+.slot.s8{background:var(--c8-bg); border-color:var(--c8-line)} .slot.s8 b{color:var(--c8)}
+.slot.s9{background:var(--c9-bg); border-color:var(--c9-line)} .slot.s9 b{color:var(--c9)}
+.slot.void{background:transparent; border-style:dashed; color:var(--text-3); font-size:13px}
+
+/* ---------- 章节卡 ---------- */
+.ch{background:var(--surface); border:1px solid var(--line); border-radius:14px;
+  box-shadow:var(--shadow); margin:0 0 24px; overflow:hidden; scroll-margin-top:64px}
+.ch-head{padding:19px 22px 15px; border-bottom:1px solid var(--line); display:flex; gap:15px; align-items:center}
+.ch-num{flex:0 0 auto; font-family:var(--mono); font-weight:700; font-size:12px; letter-spacing:.06em;
+  padding:5px 10px; border-radius:8px; line-height:1.4}
+.ch-t h2{font-size:20px; margin:0; letter-spacing:-.018em; font-weight:760}
+.ch-t .src{font-family:var(--mono); font-size:11.5px; color:var(--text-3); margin-top:2px}
+.ch-body{padding:8px 22px 22px}
+.ch5 .ch-num{background:var(--c5-bg); color:var(--c5); border:1px solid var(--c5-line)}
+.ch6 .ch-num{background:var(--c6-bg); color:var(--c6); border:1px solid var(--c6-line)}
+.ch7 .ch-num{background:var(--c7-bg); color:var(--c7); border:1px solid var(--c7-line)}
+.ch8 .ch-num{background:var(--c8-bg); color:var(--c8); border:1px solid var(--c8-line)}
+.ch9 .ch-num{background:var(--c9-bg); color:var(--c9); border:1px solid var(--c9-line)}
+.ch5{border-top:3px solid var(--c5)} .ch6{border-top:3px solid var(--c6)}
+.ch7{border-top:3px solid var(--c7)} .ch8{border-top:3px solid var(--c8)}
+.ch9{border-top:3px solid var(--c9)}
+
+.root{margin:14px 0 4px; padding:15px 17px; border-radius:11px;
+  background:var(--surface-2); border:1px solid var(--line)}
+.root .lbl{font-family:var(--mono); font-size:10.5px; letter-spacing:.11em; font-weight:700;
+  color:var(--text-3); display:block; margin-bottom:5px}
+.root p{font-size:16px; line-height:1.78; margin:0}
+
+.chain{display:flex; flex-wrap:wrap; align-items:center; gap:6px 4px; margin:12px 0 4px;
+  font-size:13.8px; line-height:1.6}
+.chain .node{padding:4px 10px; border-radius:8px; background:var(--surface-2); border:1px solid var(--line-2)}
+.chain .arr{color:var(--text-3); font-family:var(--mono); font-size:12px}
+.ch5 .chain .hot{background:var(--c5-bg); border-color:var(--c5-line); color:var(--c5)}
+.ch6 .chain .hot{background:var(--c6-bg); border-color:var(--c6-line); color:var(--c6)}
+.ch7 .chain .hot{background:var(--c7-bg); border-color:var(--c7-line); color:var(--c7)}
+.ch8 .chain .hot{background:var(--c8-bg); border-color:var(--c8-line); color:var(--c8)}
+.ch9 .chain .hot{background:var(--c9-bg); border-color:var(--c9-line); color:var(--c9)}
+
+/* 名词表：只说「它是干什么的」 */
+.terms{display:grid; grid-template-columns:auto 1fr; gap:7px 16px; margin:10px 0 4px;
+  font-size:14.6px; align-items:baseline}
+.terms dt{font-weight:680; white-space:nowrap; color:var(--text)}
+.terms dd{margin:0; color:var(--text-2); line-height:1.68}
+
+.box{border:1px solid var(--line-2); border-left-width:3px; border-radius:9px;
+  padding:13px 16px; margin:14px 0; font-size:14.8px; line-height:1.75}
+.box .bt{font-weight:700; font-size:13px; margin-bottom:5px; display:block}
+.box ul{margin:5px 0 0; padding-left:20px}
+.box li{margin:4px 0}
+.box li::marker{color:var(--text-3)}
+.box.key{background:var(--eg-bg); border-color:var(--eg-line); border-left-color:var(--eg)}
+.box.key .bt{color:var(--eg)}
+.box.trap{background:var(--trap-bg); border-color:var(--trap-line); border-left-color:var(--trap)}
+.box.trap .bt{color:var(--trap)}
+.box.plain{background:var(--surface-2); border-color:var(--line-2); border-left-color:var(--text-3)}
+
+.tw{overflow-x:auto; margin:12px 0 14px; border:1px solid var(--line); border-radius:10px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-size:14px; line-height:1.65; min-width:min(600px,100%)}
+th,td{padding:9px 12px; text-align:left; border-bottom:1px solid var(--line); vertical-align:top}
+thead th{background:var(--surface-2); font-weight:680; font-size:12.5px; white-space:nowrap; color:var(--text-2)}
+tbody tr:last-child td{border-bottom:none}
+.tag{font-family:var(--mono); font-size:11px; font-weight:700; padding:1.5px 6px; border-radius:5px; white-space:nowrap}
+.tag.t5{background:var(--c5-bg); color:var(--c5)} .tag.t6{background:var(--c6-bg); color:var(--c6)}
+.tag.t7{background:var(--c7-bg); color:var(--c7)} .tag.t8{background:var(--c8-bg); color:var(--c8)}
+.tag.t9{background:var(--c9-bg); color:var(--c9)}
+
+.foot{border-top:1px solid var(--line); margin-top:46px; padding:24px 0 70px;
+  font-size:13.6px; color:var(--text-3); line-height:1.8}
+
+@media (max-width:640px){
+  body{font-size:16px}
+  .wrap{padding:0 15px}
+  .topbar-in{padding:8px 15px; gap:9px; flex-wrap:nowrap}
+  .tb-brand{display:none}
+  .pills{flex-wrap:nowrap; overflow-x:auto; overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch; scrollbar-width:none; padding:2px 0}
+  .pills::-webkit-scrollbar{display:none}
+  .ch,.sec{scroll-margin-top:54px}
+  .hero{padding:34px 0 26px}
+  .ch-head{padding:15px 15px 12px; gap:11px}
+  .ch-body{padding:6px 15px 18px}
+  .ch-t h2{font-size:18px}
+  .layer{grid-template-columns:1fr; gap:4px}
+  .layer .ln{justify-content:flex-start; text-align:left}
+  .terms{grid-template-columns:1fr; gap:1px 0}
+  .terms dd{margin-bottom:9px}
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="tb-brand">五章框架</div>
+    <nav class="pills" aria-label="章节导航">
+      <a class="pill" href="#stack" style="color:var(--text-2)">全局</a>
+      <a class="pill c5" href="#ch5">5 无线</a>
+      <a class="pill c6" href="#ch6">6 链路·IP</a>
+      <a class="pill c7" href="#ch7">7 传输层</a>
+      <a class="pill c8" href="#ch8">8 DNS</a>
+      <a class="pill c9" href="#ch9">9 Web</a>
+      <a class="pill" href="#thread" style="color:var(--text-2)">主线</a>
+    </nav>
+    <button class="tb-btn" id="themeBtn" type="button">主题</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">框架版 · 只讲脉络</div>
+  <h1>第五到第九章，只留脉络</h1>
+  <p class="lede">这一页不装细节。每章只有三样：<b>这一章在解决什么问题</b>、<b>逼出后面所有内容的那条因果链</b>、<b>你必须知道「存在」的那几个名词</b>——名词只给一句「它是干什么的」，不给字段、不给数字、不给流程。<br><br>看完你应该能做到：<mark>听见任何一个术语，能立刻说出它属于哪一章、是用来补哪个洞的</mark>。剩下的考场上现查。</p>
+</header>
+
+<!-- ==================== 全局：协议栈 ==================== -->
+<section class="sec" id="stack">
+  <h2 class="h">先把五章挂到协议栈上</h2>
+  <p class="dim">这五章不是并列的五个话题，是<b>从下往上走了一遍协议栈</b>。知道每章站在哪一层，比记住章名有用得多。</p>
+
+  <div class="stack">
+    <div class="layer">
+      <div class="ln">应用层</div>
+      <div class="slots">
+        <div class="slot s8"><b>CH 8</b>DNS —— 名字换地址</div>
+        <div class="slot s9"><b>CH 9</b>Web / HTTP —— 应用程序自己</div>
+      </div>
+    </div>
+    <div class="layer">
+      <div class="ln">传输层</div>
+      <div class="slots">
+        <div class="slot s7"><b>CH 7</b>TCP，以及垫在它上面的 SSL / TLS</div>
+      </div>
+    </div>
+    <div class="layer">
+      <div class="ln">网络层</div>
+      <div class="slots">
+        <div class="slot s6"><b>CH 6 下半</b>IP，以及做进 IP 层的 IPSec</div>
+      </div>
+    </div>
+    <div class="layer">
+      <div class="ln">数据链路层</div>
+      <div class="slots">
+        <div class="slot s6"><b>CH 6 上半</b>MAC / ARP / 混杂模式</div>
+        <div class="slot s5"><b>CH 5</b>802.11 无线 —— WEP / WPA / WPA2</div>
+      </div>
+    </div>
+    <div class="layer">
+      <div class="ln">物理层</div>
+      <div class="slots">
+        <div class="slot void">有线：要偷听得先接触那根线　｜　无线：<b>这道门槛没了</b>（第 5 章的起点）</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="box key">
+    <span class="bt">🔑 挂上去之后，最该记住的一句话</span>
+    <b>每一层都各自重新发明了一次「认证 + 完整性 + 加密」。</b><br>
+    因为<mark>下层保不了上层</mark>：链路层加密只保一段链路，出了这个局域网就没了；IP 层保的是两个 IP 之间的管子，管不了「哪个用户在用」；传输层的 SSL 只保护调用了它的那个应用；到了应用层，管子再安全，<b>管子那头的程序照样会把用户输入当命令执行</b>。<br>
+    所以 WEP/WPA、IPSec、SSL/TLS、DNSSEC、HTTPS 这五套东西，做的是<b>同一件事的五个副本</b>——这就是为什么它们长得那么像。
+  </div>
+</section>
+
+<!-- ==================== 全局：同一个故事 ==================== -->
+<section class="sec" id="story">
+  <h2 class="h">再看一遍：五章其实是同一个故事</h2>
+  <p class="dim">每一章的病根都能压成同一句话：<b>某个协议在设计时假定「对面是好人」，于是把「你是谁」交给一个不需要密钥就能造出来的凭据去担保。</b></p>
+  <div class="tw">
+  <table>
+    <thead><tr><th style="min-width:64px">章</th><th style="min-width:118px">出问题的协议</th><th style="min-width:150px">它拿什么当「真实性凭据」</th><th>为什么靠不住</th><th style="min-width:96px">补丁</th></tr></thead>
+    <tbody>
+      <tr><td><span class="tag t5">5</span></td><td>802.11 / WEP</td><td><b>CRC-32 校验值</b></td><td>不要密钥，人人可算 → 改内容顺手改校验值</td><td>WPA → WPA2</td></tr>
+      <tr><td><span class="tag t6">6</span></td><td>IPv4</td><td><b>首部里的源地址</b></td><td>发送方自己填的，没人查；检验和也明文可重算</td><td>IPSec</td></tr>
+      <tr><td><span class="tag t7">7</span></td><td>TCP</td><td><b>序列号</b></td><td>明文可见 → 抄；有规律 → 猜</td><td>SSL / TLS</td></tr>
+      <tr><td><span class="tag t8">8</span></td><td>DNS</td><td><b>事务 ID</b></td><td>太短，且报文明文 → 谁先送到就信谁</td><td>DNSSEC</td></tr>
+      <tr><td><span class="tag t9">9</span></td><td>HTTP / Web 应用</td><td><b>Cookie</b>（以及：根本不区分代码和数据）</td><td>Cookie 在用户手里可改；输入拼进解释器时分不清哪段是代码</td><td>HTTPS + 参数化 / 转义</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section class="sec" id="chapters">
+  <h2 class="h">五章逐个过</h2>
+  <p class="dim small">每章三块：<b>病根 → 因果链 → 必须知道存在的名词</b>。三块看完就走，不要停在名词上。</p>
+</section>
+<!-- ========== 第五章 ========== -->
+<article class="ch ch5" id="ch5">
+  <div class="ch-head">
+    <div class="ch-num">CH 5</div>
+    <div class="ch-t"><h2>无线网络安全</h2><div class="src">WEP → WPA → WPA2 → WPA3　+　移动通信 2G → 5G</div></div>
+  </div>
+  <div class="ch-body">
+    <div class="root"><span class="lbl">病根</span>
+      <p>有线网络里，偷听要先<b>物理接触那根线</b>——门槛不高，但真实存在。无线把这道门槛整个拆了：频段公开、信号穿墙、<b>被动收听不留痕迹</b>。既然物理隔离没有了，就只能用密码学补回来——补三样：<b>认证、完整性、加密</b>。后面四个协议做的全是这一件事。</p>
+    </div>
+
+    <h3 class="h"><span class="n">因果链</span>每个协议都在补上一个的漏</h3>
+    <div class="chain">
+      <span class="node hot"><b>WEP</b></span><span class="arr">→</span>
+      <span class="node">三个漏：密钥太短会用完、校验值不要密钥、认证是单向的</span><span class="arr">→</span>
+      <span class="node hot"><b>WPA</b> 换密钥、换校验值</span><span class="arr">→</span>
+      <span class="node">但为了能用旧硬件，<b>加密算法没换</b></span><span class="arr">→</span>
+      <span class="node hot"><b>WPA2</b> 换成 AES</span><span class="arr">→</span>
+      <span class="node">加密解决了，那<b>密钥是怎么协商出来的</b>？</span><span class="arr">→</span>
+      <span class="node hot"><b>四次握手</b>（顺便补上双向认证）</span><span class="arr">→</span>
+      <span class="node">握手可以被逼着重来一遍，<b>同一段密钥流就用了两次</b></span><span class="arr">→</span>
+      <span class="node hot"><b>KRACK</b></span><span class="arr">→</span>
+      <span class="node hot"><b>WPA3</b></span>
+    </div>
+    <div class="box key"><span class="bt">🔑 一句话</span>
+      <b>这一章从头到尾只在讲：流密码的密钥流绝对不能重用。</b>WEP 是因为密钥太短用完了，KRACK 是因为计数器被重置了——相隔十几年、两个不同的协议，栽在同一个坑里。
+    </div>
+
+    <h3 class="h"><span class="n">名词</span>必须知道存在的东西</h3>
+    <dl class="terms">
+      <dt>WEP / WPA / WPA2 / WPA3</dt><dd>四代无线加密协议，一代补一代的漏</dd>
+      <dt>TKIP / CCMP</dt><dd>WPA 和 WPA2 各自的加密协议（CCMP 是基于 AES 的那个）</dd>
+      <dt>ICV / MIC</dt><dd>WEP 和 WPA 各自的完整性校验值——<b>区别只在要不要密钥</b></dd>
+      <dt>四次握手</dt><dd>连上 Wi-Fi 时协商会话密钥的过程，顺带互相认证</dd>
+      <dt>KRACK</dt><dd>逼客户端重装密钥的攻击。注意：它<b>破坏机密性，但破解不了你的 Wi-Fi 密码</b></dd>
+      <dt>802.1x / WPA-PSK</dt><dd>企业模式 / 个人模式。<b>区别只在主密钥从哪来</b>，之后完全一样</dd>
+      <dt>AKA</dt><dd>移动网络（3G 起）的双向认证机制。2G 只有单向 → 所以有伪基站</dd>
+    </dl>
+  </div>
+</article>
+
+<!-- ========== 第六章 ========== -->
+<article class="ch ch6" id="ch6">
+  <div class="ch-head">
+    <div class="ch-num">CH 6</div>
+    <div class="ch-t"><h2>数据链路层和网络层安全</h2><div class="src">链路层风险 → 网络层风险 → IPSec（全章重心）→ 路由安全</div></div>
+  </div>
+  <div class="ch-body">
+    <div class="root"><span class="lbl">病根</span>
+      <p>IPv4 首部里那个「源地址」，是<b>发送方自己填进去的一串数字</b>，没有任何东西证明它是真的——信封上写谁的地址都行，邮局不查。而「首部检验和」是明文可重算的，它防的是<b>线路噪声，不是防人</b>。这一章就是给一个从设计上就不设防的协议，补上认证、加密和密钥管理。</p>
+    </div>
+
+    <h3 class="h"><span class="n">因果链</span>责任一层层往上推，推到 IPSec 才收口</h3>
+    <div class="chain">
+      <span class="node">链路层：谁都能看见谁（<b>混杂模式是硬件的默认能力，不是漏洞</b>）</span><span class="arr">→</span>
+      <span class="node">补丁：MAC 白名单、CHAP</span><span class="arr">→</span>
+      <span class="node">补不住，而且<b>只保一段链路</b></span><span class="arr">→</span>
+      <span class="node hot">推给<b>网络层</b></span><span class="arr">→</span>
+      <span class="node">网络层自己也不设防（路由表能被毒、地址能冒充）</span><span class="arr">→</span>
+      <span class="node">工程手段：NAT、过滤、私网地址——都是「<b>让攻击者够不着</b>」，不是密码学</span><span class="arr">→</span>
+      <span class="node hot">只能上密码学：<b>IPSec</b></span><span class="arr">→</span>
+      <span class="node">但 IPSec 只保护「<b>包</b>」，保护不了「<b>路怎么走</b>」</span><span class="arr">→</span>
+      <span class="node hot">路由协议安全（RIP / OSPF / BGP）</span>
+    </div>
+    <div class="box key"><span class="bt">🔑 一句话</span>
+      <b>IPSec 为什么做在 IP 层？</b>因为下面的链路层只能保一段，上面的应用层要一个个改。做在 IP 层<b>对上层协议和用户完全透明</b>——不用改一行应用代码。这是它全部优点的来源。
+    </div>
+
+    <h3 class="h"><span class="n">名词</span>必须知道存在的东西</h3>
+    <dl class="terms">
+      <dt>AH / ESP</dt><dd>IPSec 的两个协议：<b>AH 只认证，ESP 还能加密</b></dd>
+      <dt>传输模式 / 隧道模式</dt><dd>保护载荷 / <b>把整个原包包起来再套个新头</b>。一方是路由器或网关就必须用隧道</dd>
+      <dt>SA / SPD</dt><dd>SA =「这条连接用哪把密钥、哪个算法」；SPD =「哪些流量需要保护」</dd>
+      <dt>IKE</dt><dd>密钥是怎么协商出来的。它补的是 Diffie-Hellman 的两个毛病：<b>不认身份、算得太慢</b></dd>
+      <dt>NAT</dt><dd>地址转换，顺带有防火墙效果。<b>它和 AH 天生冲突</b>（AH 认证了 IP 地址，NAT 恰恰改它）</dd>
+      <dt>ARP 投毒</dt><dd>局域网里改别人的地址对照表 → 做 DoS 或中间人</dd>
+      <dt>BGP 路由劫持</dt><dd>路由协议无条件相信邻居的通告 → 把流量整片引走</dd>
+    </dl>
+  </div>
+</article>
+
+<!-- ========== 第七章 ========== -->
+<article class="ch ch7" id="ch7">
+  <div class="ch-head">
+    <div class="ch-num">CH 7</div>
+    <div class="ch-t"><h2>传输层安全</h2><div class="src">上半章：裸 TCP 为什么必然被打　下半章：SSL / TLS 怎么逐个堵死</div></div>
+  </div>
+  <div class="ch-body">
+    <div class="root"><span class="lbl">病根</span>
+      <p>TCP 把「<b>谁在说话</b>」这件事，交给了一个<b>明文的序列号</b>来担保。于是：看得见的人能改、猜得中的人能冒充、发得快的人能拖垮它。改端口、装防火墙、上 IDS 全是外围补丁，根子一个没解决——<b>TCP 报文本身既不加密也不认证</b>。既然改不动 TCP，就在它上面加一层。</p>
+    </div>
+
+    <h3 class="h"><span class="n">因果链</span>四个子协议不是并列的，是被逼出来的</h3>
+    <div class="chain">
+      <span class="node">要机密性 + 完整性 + 认证</span><span class="arr">→</span>
+      <span class="node">就要密钥</span><span class="arr">→</span>
+      <span class="node">密钥要协商 <span class="arr">⇒</span> <b>握手协议</b></span><span class="arr">→</span>
+      <span class="node">协商出来要派生 <span class="arr">⇒</span> <b>密钥生成</b></span><span class="arr">→</span>
+      <span class="node">派生出来要用 <span class="arr">⇒</span> <b>记录协议</b></span><span class="arr">→</span>
+      <span class="node">新旧密钥切换要同步 <span class="arr">⇒</span> <b>变更规格协议</b></span><span class="arr">→</span>
+      <span class="node">出错和关闭要可认证 <span class="arr">⇒</span> <b>告警协议</b></span>
+    </div>
+    <div class="box key"><span class="bt">🔑 两句话</span>
+      <b>① 为什么加在传输层？</b>网络层太低（点对点，管不到「哪个用户」），应用层太散（每个应用都要重写一遍），传输层刚好。<br>
+      <b>② 记这个顺序就够了：</b>协商（握手）→ 派生（密钥生成）→ 使用（记录）→ 切换（变更规格）→ 收场（告警）。
+    </div>
+
+    <h3 class="h"><span class="n">名词</span>必须知道存在的东西</h3>
+    <dl class="terms">
+      <dt>握手 / 记录 / 变更规格 / 告警</dt><dd>SSL 的四个子协议。<b>握手只产出参数，记录协议才真的加密</b></dd>
+      <dt>连接 vs 会话</dt><dd><b>会话存参数，连接干活</b>。一次握手的成果可以被多条连接共用</dd>
+      <dt>SYN Flood</dt><dd>把半开的连接队列塞满。<b>SSL 挡不住它</b>——可用性不在 SSL 的服务范围内</dd>
+      <dt>会话拦截（全会话 / 盲）</dt><dd>看得见序列号的<b>抢答</b>，看不见的<b>猜号</b></dd>
+      <dt>IDS / IPS</dt><dd>分界就在七个字：<b>部署在数据转发路径上</b>。IDS 只告警，IPS 能拦</dd>
+      <dt>TLS</dt><dd>SSL 的标准化版本。PPT 没讲但课本习题考，主要改的是<b>把自创的构造换成有安全性证明的标准构造</b></dd>
+      <dt>SSL VPN</dt><dd>SSL 只护「调用了它的那个应用」，VPN 让它能护任意应用</dd>
+    </dl>
+  </div>
+</article>
+
+<!-- ========== 第八章 ========== -->
+<article class="ch ch8" id="ch8">
+  <div class="ch-head">
+    <div class="ch-num">CH 8</div>
+    <div class="ch-t"><h2>DNS 安全</h2><div class="src">上半章：DNS 为什么必然被骗　下半章：DNSSEC 怎么让骗被当场识破</div></div>
+  </div>
+  <div class="ch-body">
+    <div class="root"><span class="lbl">病根</span>
+      <p>DNS 诞生在一个「上网的人彼此都认识」的年代，设计基础是<b>互相信任</b>。协议里根本没有「验明正身」这一步——<b>谁先把一个长得像回答的包送到你面前，你就信谁</b>。后面所有攻击都是这同一句话的不同玩法。</p>
+    </div>
+
+    <h3 class="h"><span class="n">因果链</span>从「互相信任」到「自带签名」</h3>
+    <div class="chain">
+      <span class="node">层次 + 分布式解决了<b>规模</b>，但没解决<b>真假</b></span><span class="arr">→</span>
+      <span class="node hot">只好用一个<b>短短的事务 ID</b> 当凭据</span><span class="arr">→</span>
+      <span class="node">能监听就抄，抄不到就猜；<b>谁抢先送到谁赢</b></span><span class="arr">→</span>
+      <span class="node">而 DNS 会<b>缓存</b>，缓存多久由攻击者在假回答里自己填</span><span class="arr">→</span>
+      <span class="node hot">骗一次 → <b>骗很久，还传染给所有人</b>（缓存投毒）</span><span class="arr">→</span>
+      <span class="node">补丁只是「<b>让猜变难</b>」，而<b>路径上的人根本不用猜</b></span><span class="arr">→</span>
+      <span class="node hot">唯一出路：<b>让数据自带证据</b> = DNSSEC</span><span class="arr">→</span>
+      <span class="node">那公钥本身谁来证明？<b>交给父区签名</b> → 信任链</span><span class="arr">→</span>
+      <span class="node">还剩一件事没解决：<b>不加密</b> → DoH / DoT</span>
+    </div>
+    <div class="box key"><span class="bt">🔑 一句话</span>
+      DNS 的所有安全问题，都源自「<b>它没办法证明一个回答是谁说的</b>」；DNSSEC 的所有设计，都是在补这一件事——<mark>而它补完之后，「谁看见了你在问什么」这个问题还原封不动地留在那里。</mark>
+    </div>
+
+    <h3 class="h"><span class="n">名词</span>必须知道存在的东西</h3>
+    <dl class="terms">
+      <dt>递归 / 迭代查询</dt><dd>「你帮我查到底」/「我不知道但我知道该问谁」。<b>一次查询里两者同时存在</b></dd>
+      <dt>缓存投毒</dt><dd>骗的不是一个人一次，是<b>一台解析器的持久记忆</b>——种下之后攻击者可以下线</dd>
+      <dt>DNSSEC</dt><dd>给 DNS 记录加数字签名。三项功能：来源验证、完整性验证、<b>否定存在验证</b></dd>
+      <dt>DNSKEY / RRSIG / NSEC / DS</dt><dd>公钥 / 签名 / <b>证明「不存在」</b> / 把子区公钥的散列交给父区保管</dd>
+      <dt>信任链 / 信任锚</dt><dd>一层层往上验到根。<b>停在根不是因为验过了，是因为根的公钥被预装在你机器里</b></dd>
+      <dt>ZSK / KSK</dt><dd>两对密钥：一把常换（不惊动父区），一把长期用（换它要通知父区）</dd>
+      <dt>DoH / DoT</dt><dd>补 DNSSEC 剩下的那件事：<b>隐私</b>。签名不等于加密</dd>
+    </dl>
+    <div class="box trap"><span class="bt">⚠ 最反直觉的一条</span>
+      <b>部署了 DNSSEC，反射式 DDoS 不但没变好，反而更糟</b>——它验的是「回答」不是「提问」，而签名让报文更大，放大倍数更高。
+    </div>
+  </div>
+</article>
+
+<!-- ========== 第九章 ========== -->
+<article class="ch ch9" id="ch9">
+  <div class="ch-head">
+    <div class="ch-num">CH 9</div>
+    <div class="ch-t"><h2>Web 应用安全</h2><div class="src">体系结构脆弱性 → 七种攻击（全章重头）→ HTTPS → QUIC → WAF</div></div>
+  </div>
+  <div class="ch-body">
+    <div class="root"><span class="lbl">病根</span>
+      <p>前面四章的防护都在保护「<b>传输</b>」。但 SQL 注入的那条请求<b>既没被偷看也没被篡改</b>——它就是用户自己敲进去的，规规矩矩从 443 端口<b>加密</b>传到服务器，然后<b>服务器自己把它拼进了一条 SQL 语句</b>。<br><mark>Web 应用会把外部输入拼进某种「解释器」能读懂的语句里，而拼接时分不清哪段是代码、哪段是数据。换一个解释器，就换一个漏洞名字。</mark></p>
+    </div>
+
+    <h3 class="h"><span class="n">因果链</span>一个病根，十种病灶</h3>
+    <div class="chain">
+      <span class="node">HTTP <b>无状态</b></span><span class="arr">→</span>
+      <span class="node">用 <b>Cookie</b> 补</span><span class="arr">→</span>
+      <span class="node">Cookie 在用户手里，<b>能改也能被听走</b></span><span class="arr">·</span>
+      <span class="node hot">另一条线：输入被拼进<b>解释器</b></span><span class="arr">→</span>
+      <span class="node">拼进 SQL、HTML、Shell、文件路径、响应头 = <b>五种注入</b></span><span class="arr">→</span>
+      <span class="node">共同解法：<b>让解释器自己区分代码与数据</b></span><span class="arr">→</span>
+      <span class="node">但如果请求<b>字字合法</b>，只是不是用户本意呢 <span class="arr">⇒</span> <b>CSRF</b></span><span class="arr">→</span>
+      <span class="node hot">应用补完了，<b>链路还是明文</b> <span class="arr">⇒</span> <b>HTTPS</b></span><span class="arr">→</span>
+      <span class="node">80 端口还开着 <span class="arr">⇒</span> <b>SSL 剥离</b> <span class="arr">⇒</span> <b>HSTS</b></span><span class="arr">→</span>
+      <span class="node">握手太慢、还有队头阻塞 <span class="arr">⇒</span> <b>QUIC / HTTP3</b></span><span class="arr">→</span>
+      <span class="node hot">代码改不完、0day 补不上 <span class="arr">⇒</span> <b>WAF</b></span>
+    </div>
+    <div class="box key"><span class="bt">🧭 一句话记住整章</span>
+      <b>前半章是「服务器分不清代码和数据」，后半章是「浏览器分不清对面是谁」。</b><br>
+      七种攻击属前者；HTTPS / HSTS 属后者；QUIC 是后者的<b>效率</b>改良（不是更安全）；WAF 是给前者打的补丁（不修漏洞，只买时间）。
+    </div>
+
+    <h3 class="h"><span class="n">名词</span>必须知道存在的东西</h3>
+    <dl class="terms">
+      <dt>SQL 注入</dt><dd>拼进数据库 → 拖走网站的数据。根治：<b>参数化查询</b></dd>
+      <dt>XSS</dt><dd>拼进 HTML → 打的是<b>其他用户</b>。根治：输出时做实体编码</dd>
+      <dt>OS 命令注入 / 目录遍历 / 头注入</dt><dd>分别拼进 Shell、文件路径、HTTP 响应头——<b>同一个病根的另外三个名字</b></dd>
+      <dt>CSRF</dt><dd>请求合法、Cookie 也是真的，<b>只是不是用户本意</b>。所以输入校验一个字都挑不出毛病</dd>
+      <dt>Cookie 欺骗 / 会话劫持</dt><dd><b>编一个 vs 偷一个</b></dd>
+      <dt>HTTPS / HSTS / SSL 剥离</dt><dd>加密链路 / 强制走加密 / 把用户悄悄退回明文的攻击</dd>
+      <dt>QUIC / HTTP3</dt><dd>把加密内建进传输协议。<b>价值在效率，不在「更安全」</b></dd>
+      <dt>WAF</dt><dd>看得懂 HTTP 内容的墙。网络防火墙管「谁能进门」，WAF 管「<b>进门的人手里拿的是什么</b>」</dd>
+    </dl>
+  </div>
+</article>
+<!-- ==================== 跨章主线 ==================== -->
+<section class="sec" id="thread">
+  <h2 class="h">跨章主线：五个「其实是同一道题」</h2>
+  <p class="dim">这一节是框架里最值钱的部分。简答题最爱问「比较 / 分析 / 为什么」，而下面每一条都<b>横跨好几章</b>——记住一条，等于同时准备了三四道题；更重要的是，它能让你在考场上<b>认出一道没见过的题属于哪一类</b>。</p>
+
+  <h3 class="h"><span class="n">01</span>单向认证 → 必然出现「假冒服务方」</h3>
+  <div class="box plain">
+    <b>WEP</b> 只有 AP 验设备　→　<b>假冒 AP</b>　<span class="tag t5">5</span><br>
+    <b>2G</b> 只有网络认证用户　→　<b>伪基站</b>　<span class="tag t5">5</span><br>
+    <b>DNS</b> 客户端无法认证应答方　→　<b>假应答 / 缓存投毒</b>　<span class="tag t8">8</span><br>
+    <b>HTTP</b> 浏览器无法认证服务器　→　<b>中间人 / SSL 剥离</b>　<span class="tag t9">9</span><br>
+    <span class="small dim">补法也永远一样：<b>做成双向</b>——WPA 的四次握手、3G 的 AKA、DNSSEC 的签名、HTTPS 的证书。</span>
+  </div>
+
+  <h3 class="h"><span class="n">02</span>没有密钥的校验值，只防噪声不防人</h3>
+  <div class="box plain">
+    <b>WEP 的 CRC-32</b>：不要密钥 → 改内容顺手改校验值　<span class="tag t5">5</span><br>
+    <b>IP 首部检验和</b>：明文可重算 → 同上　<span class="tag t6">6</span><br>
+    <span class="small dim">换成<b>带密钥的 MAC / 签名</b>就解决了：WPA 的 MIC、IPSec 的 ICV、SSL 记录协议的 HMAC、DNSSEC 的签名。<b>这四个东西是同一个思路的四个名字。</b></span>
+  </div>
+
+  <h3 class="h"><span class="n">03</span>「谁先送到我就信谁」</h3>
+  <div class="box plain">
+    <b>TCP</b> 认序列号对得上的那个包　<span class="tag t7">7</span>　｜　<b>DNS</b> 认第一个到达的应答、扔掉后面的　<span class="tag t8">8</span><br>
+    <span class="small dim">所以两边的攻击套路完全一样：<b>先把真的那一方 DoS 掉</b>，把「比谁快」的赌局变成「对手跑不动」的稳赢局。看到题目里出现「先对某某发起拒绝服务」，多半就是这一类。</span>
+  </div>
+
+  <h3 class="h"><span class="n">04</span>加密解决不了「资源被耗尽」</h3>
+  <div class="box plain">
+    <b>SSL 挡不住 SYN Flood</b>——可用性根本不在 SSL 的服务范围内　<span class="tag t7">7</span><br>
+    <b>DNSSEC 挡不住反射放大，反而更糟</b>　<span class="tag t8">8</span><br>
+    <b>HTTPS 挡不住应用层的洞</b>——注入请求本来就是加密送达的　<span class="tag t9">9</span><br>
+    <span class="small dim">凡是问「加了 X 之后还能防住 Y 吗」，<b>先分清 Y 打的是「真实性 / 机密性」还是「可用性」</b>——是后者，答案基本都是「不能」。</span>
+  </div>
+
+  <h3 class="h"><span class="n">05</span>把「数据」当成「指令」执行</h3>
+  <div class="box plain">
+    <b>路由协议</b>无条件相信邻居的通告 → 路由劫持　<span class="tag t6">6</span><br>
+    <b>解析器</b>无条件相信收到的应答 → 缓存投毒　<span class="tag t8">8</span><br>
+    <b>应用</b>把外部输入拼进解释器 → 五种注入　<span class="tag t9">9</span><br>
+    <span class="small dim">越往上层，「数据」被当成「指令」执行的后果越直接。</span>
+  </div>
+</section>
+
+<!-- ==================== 怎么用 ==================== -->
+<section class="sec" id="how">
+  <h2 class="h">这几天怎么用这一页</h2>
+  <div class="box key">
+    <span class="bt">✅ 目标只有一个</span>
+    听见任何一个术语，能立刻说出：<b>它属于哪一章 · 是用来补哪个洞的 · 它自己又留下了什么洞</b>。<br>
+    做到这一步，考场上翻书就是<b>定向查证</b>，而不是从头找起——这中间的时间差通常比多背十个字段大得多。
+  </div>
+  <div class="box plain">
+    <span class="bt">建议的顺序</span>
+    <ul>
+      <li><b>先看两遍「协议栈」那一节</b>（最上面）。五章的相对位置一旦立住，后面全是往上挂东西。</li>
+      <li><b>每章只读「病根 + 因果链」</b>，名词表扫一眼就走，<b>不要停下来试图记住</b>。</li>
+      <li><b>「跨章主线」值得单独读一遍</b>，它是简答题的通用答题框架。</li>
+      <li>考前如果还有时间，再回原来的五个完整复习站看各章的<b>考前速查卡</b>——那才是细节。</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="foot">
+  <p><b>这一页是什么</b>：第五~九章的框架版，只讲脉络，刻意不装细节——字段、数字、流程、对照表都在原来的五个完整复习站里，考场上现查。</p>
+  <p>内容全部来自那五个站的正文，未新增未经核对的说法。</p>
+</footer>
+
+</div><!-- /wrap -->
+
+<script>
+(function(){
+  var root=document.documentElement, btn=document.getElementById('themeBtn');
+  var order=['','light','dark'], label={'':'主题·跟随系统','light':'主题·亮','dark':'主题·暗'};
+  function apply(v){
+    if(v){root.setAttribute('data-theme',v);}else{root.removeAttribute('data-theme');}
+    btn.textContent=label[v];
+    try{v?localStorage.setItem('ck59fw',v):localStorage.removeItem('ck59fw');}catch(e){}
+  }
+  var saved=''; try{saved=localStorage.getItem('ck59fw')||'';}catch(e){}
+  apply(saved);
+  btn.addEventListener('click',function(){
+    var cur=root.getAttribute('data-theme')||'';
+    apply(order[(order.indexOf(cur)+1)%order.length]);
+  });
+
+  var pills=[].slice.call(document.querySelectorAll('.pills a[href^="#ch"]'));
+  var targets=pills.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));});
+  function spy(){
+    var best=-1, bestTop=1e9;
+    for(var i=0;i<targets.length;i++){
+      if(!targets[i]) continue;
+      var t=targets[i].getBoundingClientRect().top-90;
+      if(t<=0 && Math.abs(t)<bestTop){bestTop=Math.abs(t); best=i;}
+    }
+    pills.forEach(function(p,i){p.classList.toggle('on', i===best);});
+  }
+  var tick=false;
+  addEventListener('scroll',function(){
+    if(tick) return; tick=true;
+    requestAnimationFrame(function(){spy(); tick=false;});
+  },{passive:true});
+  spy();
+})();
+</script>
+</body>
+</html>
