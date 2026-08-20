@@ -1,0 +1,2187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>第13章 入侵检测与网络欺骗 · 开卷打印资料</title>
+<style>
+/* ==========================================================================
+   第 13 章 · 入侵检测与网络欺骗 —— A4 打印资料
+   设计原则：所见即所打。
+   · 屏幕栏宽 == 打印栏宽：A4 210mm − 左右页边距 2×10mm = 190mm（≈718px）
+   · 从屏幕到纸只有「字号」在变（15px → 9pt），排版结构完全不动
+   · 单一浅色外观，不做暗色；零 JS；零折叠
+   ========================================================================== */
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+
+:root{
+  --ink:#141414; --ink2:#3f3f3f; --ink3:#6e6b64;
+  --line:#c6c2b9; --line2:#e0ddd5; --line3:#efece5;
+  --paper:#fff; --gray:#f4f3f0; --gray2:#eae8e2;
+
+  --accent:#1b3a8f;                                   /* 深蓝，黑白打印下也够深 */
+  --def:#14548c;  --def-bg:#eef4fa;  --def-line:#b9d3e8;
+  --key:#2b3f8f;  --key-bg:#eef0fa;  --key-line:#c0c6e8;
+  --trap:#a81f1f; --trap-bg:#fdeeed; --trap-line:#f0bfbc;
+  --exam:#8a5a00; --exam-bg:#fdf5e2; --exam-line:#e8d29a;
+  --eg:#126b4a;   --eg-bg:#eaf5ef;   --eg-line:#b3ddc8;
+  --ok:#126b4a;
+
+  --font:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --mono:"SF Mono",SFMono-Regular,ui-monospace,Menlo,Consolas,monospace;
+}
+
+body{
+  margin:0; background:var(--gray2); color:var(--ink);
+  font-family:var(--font); font-size:15px; line-height:1.72;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- 版心：屏幕上模拟一张 A4 ---------- */
+.page{
+  max-width:210mm; margin:0 auto; padding:14mm 10mm 20mm;
+  background:var(--paper); box-shadow:0 0 0 1px rgba(0,0,0,.06),0 8px 40px rgba(0,0,0,.10);
+}
+
+/* ---------- 排版 ---------- */
+p{margin:0 0 .72em}
+ul,ol{margin:0 0 .8em; padding-left:1.45em}
+li{margin:0 0 .3em}
+li>ul,li>ol{margin-top:.3em}
+b,strong{font-weight:700}
+a{color:inherit; text-decoration:none}
+hr{border:0; border-top:1px solid var(--line2); margin:1.6em 0}
+
+.hdr{border-bottom:2.5px solid var(--ink); padding-bottom:12px; margin-bottom:18px}
+.hdr .eyebrow{font-size:12px; letter-spacing:.14em; color:var(--accent); font-weight:750}
+.hdr h1{font-size:29px; line-height:1.25; margin:7px 0 9px; letter-spacing:-.02em; font-weight:800}
+.hdr p{font-size:14px; color:var(--ink2); margin:0 0 5px}
+
+.sec{margin-top:30px}
+.sec-head{border-top:2px solid var(--ink); padding-top:11px; margin-bottom:12px}
+.sec-num{display:block; font-size:11.5px; font-weight:800; letter-spacing:.14em; color:var(--accent); margin-bottom:4px}
+h2.sec-t{font-size:23px; font-weight:800; letter-spacing:-.018em; line-height:1.3; margin:0 0 4px}
+.sec-lede{font-size:13.5px; color:var(--ink2); margin:5px 0 0}
+
+h3{font-size:18px; font-weight:760; margin:26px 0 9px; line-height:1.4; letter-spacing:-.01em;
+   border-left:4px solid var(--accent); padding-left:9px}
+h4{font-size:15.5px; font-weight:740; margin:19px 0 7px; line-height:1.5}
+h5{font-size:14.4px; font-weight:720; margin:15px 0 5px; color:var(--ink2)}
+
+.lead{font-size:15.4px; color:var(--ink2); border-left:3px solid var(--accent); padding-left:13px; margin:0 0 18px}
+
+/* ---------- 行内标记 ---------- */
+.hl{background:#fdf0c4; padding:0 2px; font-weight:650; print-color-adjust:exact; -webkit-print-color-adjust:exact}
+mark{background:#fdf0c4; padding:0 3px; border-radius:2px}
+code{font-family:var(--mono); font-size:.87em; background:var(--gray); border:1px solid var(--line2);
+     padding:1px 4px; border-radius:4px; overflow-wrap:anywhere;
+     print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.pill{display:inline-block; font-family:var(--mono); font-size:.85em; background:var(--gray);
+      border:1px solid var(--line2); border-radius:4px; padding:0 5px; overflow-wrap:anywhere}
+.en{font-family:var(--mono); font-size:.9em; color:var(--ink2)}
+.small{font-size:13px}
+.muted{color:var(--ink3)}
+.center{text-align:center}
+.mt0{margin-top:0}
+
+/* ---------- 来源徽标（双轨）----------
+   .pref = PPT 页码（考纲范围），.bref = 课本页码（详解出处）。
+   两者都必须显式 text-transform:none —— 否则塞进任何 uppercase 容器里
+   「p.108」会被渲染成「P.108」。本表整套 CSS 都不使用 uppercase。 */
+.pref,.bref{
+  display:inline-block; font-family:var(--mono); font-size:10.5px; font-weight:700;
+  border-radius:3px; padding:0 4px; margin-left:5px; vertical-align:1px;
+  white-space:nowrap; line-height:1.6; text-transform:none;
+  print-color-adjust:exact; -webkit-print-color-adjust:exact;
+}
+.pref{color:var(--accent); background:#eaeefa; border:1px solid #c2cbea}
+.bref{color:var(--ink3); background:var(--gray); border:1px solid var(--line2)}
+
+.chip{
+  display:inline-block; font-size:11.5px; font-weight:700; padding:.5px 7px;
+  border-radius:10px; border:1px solid var(--line); background:var(--gray); color:var(--ink2);
+  white-space:nowrap; line-height:1.6; text-transform:none;
+  print-color-adjust:exact; -webkit-print-color-adjust:exact;
+}
+.chip.warn{background:var(--exam-bg); border-color:var(--exam-line); color:var(--exam)}
+.chip.bad{background:var(--trap-bg); border-color:var(--trap-line); color:var(--trap)}
+.chips{display:flex; flex-wrap:wrap; gap:6px; margin:10px 0}
+
+/* ---------- 提示框 ---------- */
+.box{
+  border:1px solid var(--line2); border-left:3.5px solid var(--ink3);
+  background:var(--gray); border-radius:0 6px 6px 0; padding:11px 14px; margin:15px 0;
+  font-size:14.4px; break-inside:avoid;
+  print-color-adjust:exact; -webkit-print-color-adjust:exact;
+}
+.box>:last-child{margin-bottom:0}
+.box-t{font-size:12px; font-weight:800; letter-spacing:.06em; margin-bottom:5px; text-transform:none}
+.box.def {border-left-color:var(--def);  background:var(--def-bg);  border-color:var(--def-line)}
+.box.def  .box-t{color:var(--def)}
+.box.key {border-left-color:var(--key);  background:var(--key-bg);  border-color:var(--key-line)}
+.box.key  .box-t{color:var(--key)}
+.box.trap{border-left-color:var(--trap); background:var(--trap-bg); border-color:var(--trap-line)}
+.box.trap .box-t{color:var(--trap)}
+.box.exam{border-left-color:var(--exam); background:var(--exam-bg); border-color:var(--exam-line)}
+.box.exam .box-t{color:var(--exam)}
+.box.eg  {border-left-color:var(--eg);   background:var(--eg-bg);   border-color:var(--eg-line)}
+.box.eg   .box-t{color:var(--eg)}
+/* 课本有、PPT 未讲：灰底 + 虚线框，视觉降级到权重为零（不折叠） */
+.box.beyond{border:1px dashed var(--line); border-left:3.5px dashed var(--line);
+            background:var(--gray); color:var(--ink2)}
+.box.beyond .box-t{color:var(--ink3)}
+
+/* ---------- 表格 ---------- */
+.tbl-wrap{margin:15px 0; border:1px solid var(--line2); border-radius:6px; overflow:hidden; break-inside:avoid}
+table{border-collapse:collapse; width:100%; font-size:13.6px; line-height:1.6}
+th,td{padding:6px 9px; text-align:left; border-bottom:1px solid var(--line3); vertical-align:top}
+thead th{background:var(--gray2); font-weight:750; font-size:13px; color:var(--ink2);
+         border-bottom:1px solid var(--line);
+         print-color-adjust:exact; -webkit-print-color-adjust:exact}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{font-family:var(--mono); font-variant-numeric:tabular-nums; white-space:nowrap}
+.tbl-cap{font-size:12.5px; color:var(--ink3); margin:-9px 0 15px; text-align:center}
+
+/* ---------- 卡片网格 ---------- */
+.grid{display:grid; gap:10px; margin:15px 0}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.mini{border:1px solid var(--line2); border-radius:6px; padding:9px 11px; font-size:13.6px;
+      line-height:1.65; background:var(--paper); break-inside:avoid; min-width:0}
+.mini>:last-child{margin-bottom:0}
+.mini .t{font-weight:750; font-size:13.8px; margin-bottom:4px; display:flex; align-items:center; gap:6px}
+.mini .t .ic{flex:0 0 18px; width:18px; height:18px; border-radius:4px; background:var(--accent); color:#fff;
+             display:grid; place-items:center; font-size:11px; font-weight:800;
+             print-color-adjust:exact; -webkit-print-color-adjust:exact}
+
+/* ---------- 武器一：场景卡 ---------- */
+.scene{border:1px solid var(--line); border-radius:8px; margin:18px 0; padding:13px 15px;
+       background:var(--gray); break-inside:avoid;
+       print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.scene-k{font-size:11.5px; font-weight:800; letter-spacing:.1em; color:var(--trap); margin-bottom:5px; text-transform:none}
+.scene-q{font-size:17px; font-weight:780; line-height:1.45; margin:0 0 8px; letter-spacing:-.012em}
+.scene-b{font-size:14.2px; color:var(--ink2); line-height:1.72}
+.scene-b>:last-child{margin-bottom:0}
+.scene-real{margin:10px 0 0; padding:9px 12px; border-radius:6px; background:var(--paper);
+            border:1px dashed var(--line); font-size:13.4px; line-height:1.7}
+.scene-real .t{font-size:11.5px; font-weight:800; letter-spacing:.08em; color:var(--ink3); margin-bottom:4px}
+.scene-real>:last-child{margin-bottom:0}
+
+/* ---------- 武器二：因果链 ---------- */
+.chain{border:1px solid var(--line); border-radius:7px; overflow:hidden; margin:16px 0; break-inside:avoid}
+.chain-i{display:grid; grid-template-columns:minmax(0,64px) minmax(0,1fr); gap:11px;
+         padding:9px 13px; border-bottom:1px solid var(--line2);
+         print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.chain-i:last-child{border-bottom:0}
+.chain-k{font-size:11.5px; font-weight:800; letter-spacing:.05em; padding-top:2px; line-height:1.5; text-transform:none}
+.chain-b{font-size:14px; line-height:1.68; min-width:0}
+.chain-b>:last-child{margin-bottom:0}
+.chain-i.prev{background:var(--trap-bg)} .chain-i.prev .chain-k{color:var(--trap)}
+.chain-i.now {background:var(--eg-bg)}   .chain-i.now  .chain-k{color:var(--eg)}
+.chain-i.next{background:var(--exam-bg)} .chain-i.next .chain-k{color:var(--exam)}
+
+/* ---------- 武器三：步骤表 ---------- */
+.steps{list-style:none; padding:0; margin:14px 0; counter-reset:st}
+.steps>li{position:relative; padding-left:29px; margin-bottom:8px; counter-increment:st; break-inside:avoid}
+.steps>li::before{
+  content:counter(st); position:absolute; left:0; top:2px; width:20px; height:20px;
+  border-radius:50%; background:var(--accent); color:#fff;
+  display:grid; place-items:center; font-size:11.5px; font-weight:800; font-variant-numeric:tabular-nums;
+  print-color-adjust:exact; -webkit-print-color-adjust:exact;
+}
+.steps.tight>li{margin-bottom:4px}
+
+/* ---------- 定义列表 ---------- */
+.kv{display:grid; grid-template-columns:minmax(0,max-content) minmax(0,1fr); gap:5px 14px;
+    font-size:14px; margin:12px 0}
+.kv dt{font-weight:750; color:var(--ink2)}
+.kv dd{margin:0}
+
+/* ---------- 公式 / 算式 ---------- */
+.fx{font-family:var(--mono); font-size:14px; text-align:center; padding:10px 12px; line-height:1.75;
+    background:var(--gray); border:1px solid var(--line2); border-radius:6px; margin:14px 0;
+    break-inside:avoid; overflow-wrap:anywhere;
+    print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.fx.fx-l{text-align:left}
+.fx small{display:block; font-family:var(--font); font-size:12.8px; color:var(--ink3); margin-top:6px; line-height:1.65}
+sub{font-size:.72em; vertical-align:-.25em}
+sup{font-size:.72em; vertical-align:.45em}
+
+/* ---------- PPT 页数权重条 ----------
+   .wfill 是 <span>，且不是 grid 的直接子元素（它在 .wtrack 里），
+   不会被自动 blockify —— 必须显式 display:block，否则五根条整根不显示。 */
+.wt{display:grid; gap:6px; margin:14px 0; break-inside:avoid}
+.wt-r{display:grid; grid-template-columns:minmax(0,110px) minmax(0,1fr) auto; gap:9px;
+      align-items:center; font-size:13.4px}
+.wt-n{font-weight:700; min-width:0; overflow-wrap:anywhere}
+.wtrack{display:block; height:13px; border-radius:7px; background:var(--gray2); overflow:hidden; min-width:0;
+        print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.wfill{display:block; height:100%; border-radius:7px; background:var(--accent);
+       print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.wfill.hot{background:var(--trap)}
+.wfill.cold{background:#9c988f}
+.wt-v{font-family:var(--mono); font-size:12px; color:var(--ink3); white-space:nowrap}
+
+/* ---------- 放大倍数条 ---------- */
+.amp{display:grid; gap:5px; margin:12px 0; break-inside:avoid}
+.amp-r{display:grid; grid-template-columns:minmax(0,86px) minmax(0,1fr) auto; gap:8px;
+       align-items:center; font-size:13px}
+.amp-n{font-weight:700; min-width:0; overflow-wrap:anywhere}
+.amptrack{display:block; height:11px; border-radius:6px; background:var(--gray2); overflow:hidden; min-width:0;
+          print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.ampfill{display:block; height:100%; border-radius:6px; background:var(--trap);
+         print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.ampfill.mid{background:var(--exam)} .ampfill.low{background:#9c988f}
+.amp-v{font-family:var(--mono); font-size:12px; color:var(--ink3); white-space:nowrap}
+
+/* ---------- 必背数字卡 ---------- */
+.mustnum{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin:14px 0}
+.mustnum .n{border:1px solid var(--exam-line); background:var(--exam-bg); border-radius:6px;
+            padding:7px 10px; font-size:13px; line-height:1.5; min-width:0; break-inside:avoid;
+            print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.mustnum .n b{display:block; font-family:var(--mono); font-size:14.5px; color:var(--exam);
+              font-weight:800; overflow-wrap:anywhere; line-height:1.35}
+.mustnum .n span{display:block; font-size:12px; color:var(--ink2); margin-top:2px}
+
+/* ---------- 关键词索引 ---------- */
+.idx table{font-size:12.8px}
+.idx th,.idx td{padding:4px 8px}
+.idx td:last-child{font-family:var(--mono); font-weight:700; color:var(--accent); white-space:nowrap}
+
+/* ---------- 选择题 ---------- */
+.mc{border:1px solid var(--line2); border-radius:6px; padding:9px 12px; margin:9px 0;
+    background:var(--paper); font-size:13.8px; break-inside:avoid}
+.mc-h{font-weight:640; line-height:1.7; margin-bottom:6px; display:flex; gap:7px; align-items:baseline}
+.qn{flex:0 0 auto; font-family:var(--mono); font-size:11.5px; font-weight:800; color:#fff;
+    background:var(--accent); border-radius:3px; padding:1px 5px; text-transform:none;
+    print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.mc-o{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:2px 14px;
+      font-size:13.4px; line-height:1.65; margin-bottom:6px}
+.mc-o span{min-width:0; overflow-wrap:anywhere}
+.mc-o span.ok{font-weight:750; color:var(--ok)}
+.mc-a{font-size:13.2px; line-height:1.7; background:var(--gray); border:1px solid var(--line2);
+      border-radius:5px; padding:7px 10px;
+      print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.mc-a b{color:var(--ok)}
+
+/* ---------- 简答题（静态，不折叠） ---------- */
+.qa{border:1px solid var(--line2); border-radius:6px; margin:11px 0; overflow:hidden;
+    background:var(--paper); break-inside:avoid}
+.qa-h{padding:8px 12px; font-weight:700; font-size:14.2px; line-height:1.65;
+      background:var(--gray); border-bottom:1px solid var(--line2);
+      display:flex; gap:8px; align-items:baseline;
+      print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.qa-b{padding:10px 12px; font-size:13.8px; line-height:1.72}
+.qa-b>:last-child{margin-bottom:0}
+.qa-src{font-size:12.2px; color:var(--ink3); margin-top:8px; padding-top:6px; border-top:1px dashed var(--line2)}
+
+/* ---------- SVG 图 ---------- */
+.svg-wrap{margin:14px 0; padding:8px; border:1px solid var(--line2); border-radius:6px;
+          background:var(--paper); break-inside:avoid}
+svg.flow{display:block; width:100%; height:auto}
+svg.flow text{font-family:var(--font); fill:var(--ink); font-size:11px}
+svg.flow .mono{font-family:var(--mono)}
+svg.flow .ttl{font-size:12.5px; font-weight:750}
+svg.flow .t-md{font-size:12px; font-weight:700}
+svg.flow .t-sm{font-size:11px}
+svg.flow .lbl{font-size:10.5px; fill:var(--ink3)}
+svg.flow .t-mut{font-size:10px; fill:var(--ink3)}
+svg.flow .bx  {fill:#fff;            stroke:var(--line);  stroke-width:1.3}
+svg.flow .bx-a{fill:var(--key-bg);   stroke:var(--accent);stroke-width:1.5}
+svg.flow .bx-c{fill:var(--gray);     stroke:var(--line);  stroke-width:1.3}
+svg.flow .bx-t{fill:var(--trap-bg);  stroke:var(--trap);  stroke-width:1.4}
+svg.flow .bx-e{fill:var(--eg-bg);    stroke:var(--eg);    stroke-width:1.4}
+svg.flow .ln  {stroke:var(--line);   stroke-width:1.4; fill:none}
+svg.flow .ln-a{stroke:var(--accent); stroke-width:1.8; fill:none}
+svg.flow .ln-t{stroke:var(--trap);   stroke-width:1.8; fill:none}
+
+/* ---------- 强制分页（节制使用：只给最大的几节） ---------- */
+.pagebreak{break-before:page; page-break-before:always}
+
+/* ==========================================================================
+   打印
+   ========================================================================== */
+@page{ size:A4; margin:11mm 10mm; }
+
+@media print{
+  body{background:#fff; font-size:9pt; line-height:1.40}
+  .page{max-width:none; width:auto; margin:0; padding:0; box-shadow:none}
+
+  .hdr{padding-bottom:6pt; margin-bottom:7pt; border-bottom-width:1.6pt}
+  .hdr h1{font-size:19pt; margin:4pt 0 5pt}
+  .hdr p{font-size:9pt; margin:0 0 3pt}
+  .hdr .eyebrow{font-size:8pt}
+
+  .sec{margin-top:12pt}
+  .sec-head{border-top-width:1.4pt; padding-top:6pt; margin-bottom:7pt; break-after:avoid}
+  .sec-num{font-size:8pt; margin-bottom:2pt}
+  h2.sec-t{font-size:14.5pt; break-after:avoid}
+  .sec-lede{font-size:8.6pt; margin-top:3pt}
+  h3{font-size:11.6pt; margin:9pt 0 4pt; border-left-width:3pt; padding-left:6pt; break-after:avoid; break-inside:avoid}
+  h4{font-size:10pt; margin:7pt 0 3pt; break-after:avoid; break-inside:avoid}
+  h5{font-size:9.2pt; margin:5pt 0 2pt; break-after:avoid}
+  .lead{font-size:9.2pt; margin:0 0 6pt; padding-left:7pt}
+
+  p{margin:0 0 3.5pt}
+  ul,ol{margin:0 0 3.5pt; padding-left:1.25em}
+  li{margin:0 0 1.2pt}
+  p,li,dd,dt{orphans:2; widows:2}
+
+  .box{padding:4pt 6pt; margin:5pt 0; font-size:8.5pt; border-left-width:2.2pt}
+  .box-t{font-size:7.7pt; margin-bottom:2pt}
+  .tbl-wrap{margin:5pt 0}
+  table{font-size:7.7pt; line-height:1.36}
+  th,td{padding:2pt 3.2pt}
+  thead th{font-size:7.7pt}
+  .tbl-cap{font-size:7.5pt; margin:-3pt 0 5pt}
+
+  .grid{gap:4pt; margin:5pt 0}
+  .mini{padding:4pt 5.5pt; font-size:8.3pt; line-height:1.42}
+  .mini .t{font-size:8.5pt; margin-bottom:1.5pt}
+  .mini .t .ic{flex-basis:11pt; width:11pt; height:11pt; font-size:6.6pt}
+
+  .scene{padding:5pt 7pt; margin:6pt 0}
+  .scene-k{font-size:7.6pt; margin-bottom:3pt}
+  .scene-q{font-size:10.2pt; margin:0 0 3.5pt}
+  .scene-b{font-size:8.5pt; line-height:1.44}
+  .scene-real{padding:4pt 5.5pt; margin-top:4pt; font-size:8.2pt; line-height:1.42}
+  .scene-real .t{font-size:7.4pt; margin-bottom:2pt}
+
+  .chain{margin:6pt 0}
+  .chain-i{padding:3.5pt 6pt; grid-template-columns:minmax(0,36pt) minmax(0,1fr); gap:5pt}
+  .chain-k{font-size:7.6pt}
+  .chain-b{font-size:8.5pt; line-height:1.42}
+
+  .steps{margin:5pt 0}
+  .steps>li{padding-left:15pt; margin-bottom:2.5pt}
+  .steps>li::before{width:11.5pt; height:11.5pt; font-size:7.2pt; top:1pt}
+  .steps.tight>li{margin-bottom:2pt}
+
+  .kv{font-size:8.4pt; gap:3pt 9pt; margin:6pt 0}
+  .fx{font-size:8.5pt; padding:4pt 6pt; margin:5pt 0; line-height:1.46}
+  .fx small{font-size:7.6pt; margin-top:3pt}
+
+  .chips{gap:3pt; margin:5pt 0}
+  .chip{font-size:7.4pt; padding:0 4pt}
+  .pref,.bref{font-size:6.9pt; padding:0 3pt; margin-left:3pt}
+  code,.pill{font-size:7.9pt; padding:0 2.5pt}
+  .small{font-size:8pt}
+
+  .wt{gap:2.5pt; margin:5pt 0}
+  .wt-r{font-size:8pt; grid-template-columns:minmax(0,74pt) minmax(0,1fr) auto; gap:5pt}
+  .wtrack{height:8pt}
+  .wt-v{font-size:7.2pt}
+
+  .amp{gap:2.5pt; margin:6pt 0}
+  .amp-r{font-size:7.8pt; grid-template-columns:minmax(0,56pt) minmax(0,1fr) auto; gap:5pt}
+  .amptrack{height:7pt}
+  .amp-v{font-size:7.2pt}
+
+  .mustnum{gap:3pt; margin:5pt 0; grid-template-columns:repeat(3,minmax(0,1fr))}
+  .mustnum .n{padding:4pt 6pt; font-size:7.8pt; line-height:1.42}
+  .mustnum .n b{font-size:9pt}
+  .mustnum .n span{font-size:7.1pt}
+
+  .idx table{font-size:7.5pt}
+  .idx th,.idx td{padding:1.6pt 3.2pt}
+
+  .mc{padding:3.5pt 5.5pt; margin:3.5pt 0; font-size:8.3pt}
+  .mc-h{font-size:8.5pt; margin-bottom:2pt; line-height:1.44}
+  .mc-o{font-size:8.2pt; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0.5pt 8pt; margin-bottom:2pt}
+  .mc-a{font-size:8pt; padding:3pt 5pt; line-height:1.44}
+  .qn{font-size:7.2pt; padding:0 3pt}
+
+  .qa{margin:4.5pt 0}
+  .qa-h{padding:3.5pt 5.5pt; font-size:8.6pt; line-height:1.44}
+  .qa-b{padding:4.5pt 5.5pt; font-size:8.3pt; line-height:1.46}
+  .qa-src{font-size:7.4pt; margin-top:3.5pt; padding-top:3pt}
+
+  .svg-wrap{margin:5pt 0; padding:3pt}
+  svg.flow text{font-size:9px}
+  svg.flow .ttl{font-size:10px} svg.flow .t-md{font-size:9.6px}
+  svg.flow .t-sm{font-size:9px} svg.flow .lbl{font-size:8.6px} svg.flow .t-mut{font-size:8.2px}
+
+  hr{margin:7pt 0}
+}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="hdr">
+  <div class="eyebrow">计算机网络安全原理 · 开卷考试打印资料</div>
+  <h1>第 13 章　入侵检测与网络欺骗</h1>
+  <p>老师 PPT <b>58 页</b>（正文 53 页）＋ 课本 <b>pp.384–414</b> 整合　·　脉络与权重一律以 PPT 为准，课本只用来把每一页讲透</p>
+  <p>课本习题 <b>28 道</b>全部带完整解析（10 单选 ＋ 8 多选 ＋ 9 简答 ＋ 综合题第(4)问）　·　零脚本、零折叠，<b>Cmd+P 直接打 A4</b></p>
+</div>
+
+<p class="lead">这一章表面上是「一堆安全设备的名词」，其实是<b>一条被逼出来的链</b>：防火墙挡不住 → 那就检测（IDS）→ 光告警不够那就阻断（IPS）→ 可是怎么判断是不是攻击（特征检测 vs 异常检测）→ 判断永远会错，那干脆<b>造一个「只要有人碰就一定是攻击」的东西</b>（蜜罐 / 网络欺骗）。读懂这条链，本章所有名词的位置就都定了。</p>
+
+<div class="box trap">
+  <div class="box-t">⚠ 先说两处编号笔误，免得你以为拿错了资料</div>
+  <p><b>①</b> 老师 PPT 的封面写的是「第 <b>十二</b> 章　入侵检测与网络欺骗」，但文件名是「第13章」，内容也确实是课本第 13 章。<b>PPT 封面那个「十二」是笔误</b>，第 12 章是网络防火墙。</p>
+  <p><b>②</b> 课本 PDF 的文件名写的是「入侵检测与网络<b>欺诈</b>」，而课本正文标题、PPT、本章所有正文用的都是「网络<b>欺骗</b>」（Cyber Deception）。<b>「欺诈」是文件名的笔误</b>——考试写「网络欺骗」。</p>
+</div>
+
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-num">§ 0 ── 总览</span>
+    <h2 class="sec-t">老师把整章组织成了五个问句</h2>
+    <p class="sec-lede">PPT 的「内容提纲」页在全篇出现了 <b>4 次</b>（p.2 / p.5 / p.27 / p.45），每次都是同一张五问表。它就是本资料的一级目录。</p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:13%">提纲项</th><th style="width:29%">老师的原问句</th><th style="width:34%">这个问句在问什么</th><th style="width:24%">本资料对应节</th></tr></thead>
+      <tbody>
+        <tr><td><b>1 Why</b></td><td>为什么需要入侵检测？</td><td>已经有防火墙了，为什么还要再花一份钱？</td><td>§1（PPT p.3–4）</td></tr>
+        <tr><td><b>2 What</b></td><td>什么是入侵检测？</td><td>定义、通用模型、IDS／IPS／IMS 的分工、按数据源怎么分类</td><td>§2（PPT p.6–26）</td></tr>
+        <tr><td><b>3 How</b></td><td>如何进行入侵检测？</td><td>两大分析方法、用什么数据、检测器摆在网络的哪个位置</td><td>§3（PPT p.28–44）</td></tr>
+        <tr><td><b>4 State</b></td><td>研究现状？</td><td><b>PPT 正文一页都没有</b>——见下方说明，本资料按课本补齐</td><td>§4（课本 p.406）</td></tr>
+        <tr><td><b>5 Trend</b></td><td>网络欺骗？</td><td>蜜罐、蜜网、网络欺骗防御——检测走不通之后的新思路</td><td>§5（PPT p.46–58）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>0.1　PPT 各节的页数权重（决定了本资料的篇幅分配）</h3>
+  <p>去掉封面和 4 张重复的内容提纲页，PPT 正文共 <b>53 页</b>。按提纲项统计：</p>
+
+  <div class="wt">
+    <div class="wt-r"><span class="wt-n">§2 什么是入侵检测</span>
+      <span class="wtrack"><span class="wfill" style="width:100%"></span></span>
+      <span class="wt-v">21 页 · 39.6%</span></div>
+    <div class="wt-r"><span class="wt-n">§3 如何检测</span>
+      <span class="wtrack"><span class="wfill" style="width:81%"></span></span>
+      <span class="wt-v">17 页 · 32.1%</span></div>
+    <div class="wt-r"><span class="wt-n">§5 网络欺骗</span>
+      <span class="wtrack"><span class="wfill" style="width:62%"></span></span>
+      <span class="wt-v">13 页 · 24.5%</span></div>
+    <div class="wt-r"><span class="wt-n">§1 为什么需要</span>
+      <span class="wtrack"><span class="wfill cold" style="width:10%"></span></span>
+      <span class="wt-v">2 页 · 3.8%</span></div>
+    <div class="wt-r"><span class="wt-n">§4 研究现状</span>
+      <span class="wtrack"><span class="wfill hot" style="width:1%"></span></span>
+      <span class="wt-v">0 页 · 0%</span></div>
+  </div>
+
+  <div class="box exam">
+    <div class="box-t">★ 从这张图能直接读出三条考试信息</div>
+    <p><b>① §2 和 §3 合起来占 72%</b>——「IDS 是什么、怎么分类、用哪两种方法检测」是绝对主干，本资料也给它们最多的篇幅。</p>
+    <p><b>② §5 网络欺骗占 24.5%，比「为什么需要」多 6 倍。</b>蜜罐/蜜网不是「了解即可」的尾巴，是<b>四分之一的考纲</b>。课本习题里也有 <b>5 道</b>直接考它（单选 7、8，多选 5、6、7，还有多选 8 的数据层欺骗）。</p>
+    <p><b>③ §4「研究现状」列在提纲里却 0 页</b>——这是老师<b>打算课上口头带过、或者交给课本</b>的部分，不是「删掉了」。而课本恰好在 13.4 开头讲了它，且<b>课本习题在这里考了 3 道</b>（多选 4、简答 7、简答 8）。所以本资料<b>破例补齐</b>，理由写在 §4 开头。</p>
+  </div>
+
+  <h3>0.2　一张图看完整章：每一格都是上一格「留下的坑」逼出来的</h3>
+
+  <div class="svg-wrap">
+    <svg class="flow" viewBox="0 0 760 208" role="img" aria-label="第13章因果链：防火墙挡不住→IDS→IPS→检测方法之争→网络欺骗">
+      <defs>
+        <marker id="ov-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,1 L9,5 L0,9 z" fill="#1b3a8f"/>
+        </marker>
+        <marker id="ov-ar-t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,1 L9,5 L0,9 z" fill="#a81f1f"/>
+        </marker>
+      </defs>
+
+      <rect class="bx-t" x="10" y="6" width="742" height="38" rx="5"/>
+      <text class="ttl" x="381" y="22" text-anchor="middle" fill="#a81f1f">病根：防火墙不是万能的</text>
+      <text class="t-sm" x="381" y="37" text-anchor="middle" fill="#3f3f3f">自身可能有漏洞　·　配置不当就起不到作用　·　边界有缺口（Modem／无线）　·　内部攻击与误用根本不经过防火墙</text>
+
+      <line class="ln-t" x1="381" y1="44" x2="381" y2="55" marker-end="url(#ov-ar-t)"/>
+
+      <rect class="bx-a" x="10" y="58" width="172" height="50" rx="5"/>
+      <text class="t-md" x="96" y="79" text-anchor="middle">① 入侵检测 IDS</text>
+      <text class="t-sm" x="96" y="97" text-anchor="middle" fill="#3f3f3f">发现了就告警</text>
+
+      <rect class="bx-a" x="200" y="58" width="172" height="50" rx="5"/>
+      <text class="t-md" x="286" y="79" text-anchor="middle">② 入侵防御 IPS</text>
+      <text class="t-sm" x="286" y="97" text-anchor="middle" fill="#3f3f3f">发现了直接丢包</text>
+
+      <rect class="bx-a" x="390" y="58" width="172" height="50" rx="5"/>
+      <text class="t-md" x="476" y="79" text-anchor="middle">③ 怎么判断是攻击</text>
+      <text class="t-sm" x="476" y="97" text-anchor="middle" fill="#3f3f3f">特征检测 ／ 异常检测</text>
+
+      <rect class="bx-e" x="580" y="58" width="172" height="50" rx="5"/>
+      <text class="t-md" x="666" y="79" text-anchor="middle">④ 网络欺骗</text>
+      <text class="t-sm" x="666" y="97" text-anchor="middle" fill="#3f3f3f">干脆不再「判断」</text>
+
+      <line class="ln-a" x1="182" y1="83" x2="199" y2="83" marker-end="url(#ov-ar)"/>
+      <line class="ln-a" x1="372" y1="83" x2="389" y2="83" marker-end="url(#ov-ar)"/>
+      <line class="ln-a" x1="562" y1="83" x2="579" y2="83" marker-end="url(#ov-ar)"/>
+
+      <line class="ln-t" x1="96"  y1="108" x2="96"  y2="119" marker-end="url(#ov-ar-t)"/>
+      <line class="ln-t" x1="286" y1="108" x2="286" y2="119" marker-end="url(#ov-ar-t)"/>
+      <line class="ln-t" x1="476" y1="108" x2="476" y2="119" marker-end="url(#ov-ar-t)"/>
+      <line class="ln-t" x1="666" y1="108" x2="666" y2="119" marker-end="url(#ov-ar-t)"/>
+
+      <rect class="bx-t" x="10"  y="122" width="172" height="44" rx="5"/>
+      <text class="t-mut" x="96" y="138" text-anchor="middle" fill="#a81f1f">只告警、不阻断</text>
+      <text class="t-mut" x="96" y="155" text-anchor="middle" fill="#3f3f3f">看到时损失已经造成</text>
+
+      <rect class="bx-t" x="200" y="122" width="172" height="44" rx="5"/>
+      <text class="t-mut" x="286" y="138" text-anchor="middle" fill="#a81f1f">一误报就阻断正常业务</text>
+      <text class="t-mut" x="286" y="155" text-anchor="middle" fill="#3f3f3f">高速网扛不住、加密看不了</text>
+
+      <rect class="bx-t" x="390" y="122" width="172" height="44" rx="5"/>
+      <text class="t-mut" x="476" y="138" text-anchor="middle" fill="#a81f1f">误报率与漏报率此消彼长</text>
+      <text class="t-mut" x="476" y="155" text-anchor="middle" fill="#3f3f3f">APT 与零日漏洞两头不讨好</text>
+
+      <rect class="bx-c" x="580" y="122" width="172" height="44" rx="5"/>
+      <text class="t-mut" x="666" y="138" text-anchor="middle" fill="#3f3f3f">部署实现复杂、成本高</text>
+      <text class="t-mut" x="666" y="155" text-anchor="middle" fill="#3f3f3f">可能被识破、甚至成跳板</text>
+
+      <rect class="bx-c" x="10" y="174" width="742" height="28" rx="5"/>
+      <text class="t-sm" x="381" y="192" text-anchor="middle" fill="#3f3f3f">读法：上排是「补了什么」，下排红框是「它自己又留下什么」——每一格的红框，就是下一格存在的理由。第 ④ 格的框是灰的，因为它是本章的终点。</text>
+    </svg>
+  </div>
+
+  <div class="box key">
+    <div class="box-t">这条链最关键的一步是③→④，务必想明白</div>
+    <p>①②③都在做同一件事：<b>看一段流量／一次操作，判断它「是不是攻击」</b>。而判断必然有两类错——<b>把好人当坏人（误报）</b>和<b>把坏人当好人（漏报）</b>，且这两者<b>此消彼长，永远调不平</b>（§4 会给出极端例子的证明）。</p>
+    <p>网络欺骗换了个思路：<b>不去判断，而是先造一个「正常业务根本不会去碰」的假资源</b>。这样一来，<b>凡是访问它的，几乎一定是攻击</b>——误报率天然趋近于 0。<span class="hl">蜜罐的价值不在于它有多安全，恰恰在于它「被探测、被攻击、被突破」。</span></p>
+  </div>
+
+  <h3>0.3　PPT 与课本的双向对照（本资料的取舍就是按这张表定的）</h3>
+  <p class="small muted">课程 PPT 的切分与课本章节并不一一对应。下表逐项对齐后，才能看出哪些是老师加的、哪些是老师留给课本的。</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">主题</th><th style="width:14%">PPT</th><th style="width:16%">课本</th><th style="width:44%">怎么处理</th></tr></thead>
+      <tbody>
+        <tr><td>入侵检测的必要性（防火墙的局限）</td><td>p.3–4（2 页）</td><td>p.384–385</td><td>两边都有。PPT 只给了骨架，课本给了<b>「安全弥补作用」6 条</b>——<b>简答题第 1 题原题</b>，照写</td></tr>
+        <tr><td>入侵检测定义 · 通用模型 CIDF</td><td>p.6–7（2 页）</td><td>p.385–386</td><td>两边都有。PPT 只贴了 CIDF 图，课本给了四组件＋GIDO＋CISL 的解释，重绘成 SVG</td></tr>
+        <tr><td><b>入侵防御 IPS · IDS/IPS/IMS</b></td><td><b>p.8–14（7 页）</b></td><td><b>一个字都没有</b></td><td><b>PPT 有课本无 → 必须补，占 13% 的篇幅，几乎一定考</b></td></tr>
+        <tr><td>IDS 分类（HIDS／NIDS／混合分布式）</td><td>p.15–26（12 页）</td><td>p.386–389</td><td>主干。PPT 的<b>「网络连接检测 vs 主机文件检测」细分课本没有</b>，一并收入</td></tr>
+        <tr><td>特征检测（＝误用检测）</td><td>p.32–35（4 页）</td><td>p.390–392</td><td>两边都有。PPT 列了 6 个方法名，课本详解了前 3 个</td></tr>
+        <tr><td>异常检测（＝基于行为）</td><td>p.28–31（4 页）</td><td>p.392–399</td><td>两边都有。<b>课本详解 8 页远超 PPT 的 4 页</b>——按 PPT 权重给篇幅，只收 PPT 点到的名词＋考点</td></tr>
+        <tr><td>数据源（什么数据能判断入侵）</td><td>p.37（1 页）</td><td>p.387–389</td><td>PPT 一页问句，课本给了<b>审计记录的 3 条缺陷、应用日志的 3 优 4 缺</b>——<b>简答 2、3 原题</b></td></tr>
+        <tr><td><b>入侵检测系统的部署 · 报警策略</b></td><td><b>p.38–44（7 页）</b></td><td><b>一个字都没有</b></td><td><b>PPT 有课本无 → 必须补，同样占 13%，重绘部署图</b></td></tr>
+        <tr><td><b>研究现状（误报漏报 · APT）</b></td><td><b>提纲里有，正文 0 页</b></td><td>p.406</td><td><b>提纲列为一级标题＝老师认账的范围。课本习题考了 3 道 → 破例补齐（§4）</b></td></tr>
+        <tr><td>网络欺骗 · 蜜罐 · 蜜网 · 欺骗防御</td><td>p.46–58（13 页）</td><td>p.406–414</td><td>两边都有，权重高。课本的分类维度更全，PPT 的功能拆分更清楚，合并讲</td></tr>
+        <tr><td><b>Snort 入侵检测系统</b></td><td><b>一个字都没有</b>（连提纲都没列）</td><td>p.400–405（6 页）</td><td><b>课本有 PPT 无 → 按你的要求正文不写</b>，只在 §3 留一个灰框说明边界；单选第 6 题的答案在习题区直接给</td></tr>
+        <tr><td>异常检测的机器学习细节（孤立森林／LOF／深度学习／熵公式）</td><td>只有名词</td><td>p.393–399</td><td><b>课本详解 7 页，PPT 只列了三个词</b>。降级成灰框，不铺开</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>0.4　同一件事的四个名字：本章最大的困惑源</h3>
+  <p>PPT 和课本<b>对同一类检测方法用了不同的主名</b>，而且其中一个名字<b>既是这一整类的名字、又是这一类下面某个具体方法的名字</b>。不摆出来一定会被绕晕。</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:22%">出现在哪</th><th style="width:26%">这一类被叫做什么</th><th style="width:52%">说的其实是</th></tr></thead>
+      <tbody>
+        <tr><td>PPT p.32 标题</td><td><b>误用检测技术</b>——基于知识的检测</td><td rowspan="4">同一件事：<b>先把已知攻击的特征收集成库，再拿当前行为去和库里比对，匹配上就报警。</b><br>英文标准名 <span class="pill">Signature Detection, SD</span>（也写作 Misuse Detection）。</td></tr>
+        <tr><td>PPT p.32 副标题</td><td>也称<b>模式匹配检测技术</b></td></tr>
+        <tr><td>PPT p.15 分类维度</td><td>基于<b>特征</b>的入侵检测</td></tr>
+        <tr><td>课本 13.2.1 标题</td><td><b>特征检测</b>（也常被称为误用检测）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box trap">
+    <div class="box-t">⚠ 「模式匹配」这个词的硬伤：它同时是「类名」和「组员名」</div>
+    <p>PPT p.32 说这一整类「也称为<b>模式匹配</b>检测技术」；可是课本 13.2.1 里，<b>模式匹配法只是这一类下面的三个具体方法之一</b>（另外两个是<b>专家系统法</b>和<b>状态迁移法</b>）。</p>
+    <p>也就是说，「模式匹配」在同一本教材里<b>既指整个大类，又指大类里的一个小方法</b>。<br>
+    <b>一句话拆掉这个矛盾：</b>课本 p.392 明写「模式匹配技术非常成熟……<b>也是目前入侵检测系统最常用的检测方法</b>」——正因为它在这类方法里用得最多，它的名字才被拿去当了整类的绰号。<b>做题时看语境：和「异常检测」并列出现＝大类；和「专家系统法／状态迁移法」并列出现＝小方法。</b></p>
+    <p class="mt0"><b>速判口诀：只看它「拿什么去比」——比的是『已知攻击长什么样』就是特征／误用检测；比的是『正常行为长什么样』就是异常检测。不要纠结那个名词叫什么。</b></p>
+  </div>
+
+  <div class="box def">
+    <div class="box-t">另一侧的三个名字（这组没有冲突，但也要认得）</div>
+    <p><b>异常检测 ＝ 基于异常的入侵检测 ＝ 基于行为的检测</b>，英文 <span class="pill">Anomaly Detection, AD</span>。PPT p.28 用「异常检测技术——基于行为的检测」，课本 13.2.2 用「异常检测」，图 13-3 用「基于异常的入侵检测」。<b>三名一物，怎么写都对。</b></p>
+  </div>
+
+  <h3>0.5　PPT 提了问但没给答案的地方</h3>
+  <p>老师抛出问句却没在下一页作答的，通常是留着课堂讲或者留着考，而且<b>全是「为什么这样设计」而不是「是什么」</b>——正是开卷考最爱出的那类，翻书翻不到。本章有 2 处：</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:14%">PPT 位置</th><th style="width:26%">原问句</th><th style="width:38%">一句话答案</th><th style="width:22%">课本习题也在考</th></tr></thead>
+      <tbody>
+        <tr><td>p.2 / 5 / 27 / 45<br>（提纲页出现 4 次）</td><td><b>State：研究现状？</b></td><td>现有入侵检测有两大死结：<b>误报率与漏报率此消彼长调不平</b>；<b>对 APT ＋ 零日漏洞基本无能为力</b>。这正是网络欺骗被端出来的原因。<span class="pref">完整作答见 §4</span></td><td><b>多选 4、简答 7、简答 8</b><br>（共 3 道）</td></tr>
+        <tr><td>p.37 末尾</td><td>数据源列了应用／主机／网络三类后，单独抛一句：<b>用户行为？</b></td><td>能用，而且<b>用户行为正是异常检测的立身之本</b>（Anderson 1980 就是用它抓伪装者）。但代价是<b>行为模型极难建立、误报率高</b>——用户换个作息、升级个软件，模型就误判。<span class="pref">完整作答见 §3.1</span></td><td><b>简答 6</b>（为什么异常检测发现的异常未必是攻击）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box exam">
+    <div class="box-t">★ 这条交叉印证很有说服力</div>
+    <p>两处「老师提了不答」的地方，<b>课本习题都在考</b>，加起来 4 道题。<b>老师提了不答，基本等于点题。</b></p>
+  </div>
+</div>
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-num">§ 1 ── Why　<span class="pref">PPT p.3–4（2 页 · 3.8%）</span><span class="bref">课本 p.384–385</span></span>
+    <h2 class="sec-t">为什么已经有防火墙了，还要再装一套入侵检测？</h2>
+    <p class="sec-lede">这一节 PPT 只有 2 页，但它是全章的地基：<b>不承认防火墙有洞，后面所有技术都没有存在理由。</b></p>
+  </div>
+
+  <div class="scene">
+    <div class="scene-k">PPT p.3 · 老师的开场（整章的出发点）</div>
+    <p class="scene-q">防火墙：根据规则对进出网络的信息进行过滤。——那它挡不住什么？</p>
+    <div class="scene-b">
+      <p>老师在这一页把防火墙的失效方式列成了<b>五条</b>，注意这五条<b>不是「防火墙做得不够好」，而是「防火墙原理上就管不着」</b>：</p>
+      <div class="grid g2" style="margin:9px 0 0">
+        <div class="mini"><div class="t"><span class="ic">1</span>本身问题</div><p class="mt0">防火墙自己<b>可能存在安全漏洞</b>，从防护设备变成<b>被攻击的对象</b>。</p></div>
+        <div class="mini"><div class="t"><span class="ic">2</span>配置不当</div><p class="mt0">规则写错、次序写反、默认策略设成允许——<b>装了等于没装</b>。</p></div>
+        <div class="mini"><div class="t"><span class="ic">3</span>网络边界有缺口</div><p class="mt0">Modem 拨号、私接<b>无线 AP</b>——流量<b>根本不经过防火墙</b>，规则再严也拦不到。</p></div>
+        <div class="mini"><div class="t"><span class="ic">4</span>不是万能</div><p class="mt0">入侵教程、攻击工具随处可见，<b>攻击模式是多样的</b>，一套规则不可能覆盖所有攻击。</p></div>
+      </div>
+      <div class="mini" style="margin-top:9px"><div class="t"><span class="ic">5</span>内部攻击（Abuse）与误用（Misuse）</div>
+        <p class="mt0"><b>并不是所有攻击都来自外部。</b>防火墙站在<b>网络边界</b>上，而内部员工访问内部服务器<b>压根不穿过边界</b>；合法用户拿着合法账号做越权的事（误用），流量在防火墙看来<b>完全合规</b>。<span class="hl">这是防火墙最根本的盲区，也是整章第一个考点。</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="box key">
+    <div class="box-t">再往上追一层：为什么不能干脆造一个「绝对安全」的系统？<span class="bref">课本 p.384</span></div>
+    <p>课本在开篇给了 6 条原因，说明<b>「把洞全堵上」这条路走不通</b>，所以才必须有「发现攻击」这条路：<br>
+    ① 设计并实现一个<b>整体</b>安全的系统异常困难；② 把已有系统的缺陷<b>全部</b>消除需要很长时间；③ 加解密技术和访问控制模型<b>本身就有缺陷</b>，并非无懈可击；④ 安全系统<b>难以防范合法用户滥用特权</b>；⑤ 访问控制越严格，<b>用户的使用效率就越低</b>；⑥ 从软件工程看，测试不充分、生命周期缩短、大型软件复杂度高等问题都难以解决。</p>
+    <p><b>结论（这句话最值得抄进卷子）：</b><span class="hl">既然「不让攻击发生」做不到，退而求其次——<b>及时发现攻击活动并采取阻断措施，降低破坏</b>。这就是入侵检测技术的目的。</span></p>
+  </div>
+
+  <h3>1.1　突破边界不可避免，而且难以发现<span class="pref">PPT p.4</span></h3>
+  <p class="small muted">PPT 这一页贴的是 FireEye《M-Trends 2020》的两张截图（一张标题「GLOBAL MEDIAN DWELL TIME BY YEAR」，一张逐年数据表）。下面是<b>对截图内容的文字复述</b>，不是图片复现。</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:34%">攻陷通报（驻留时间中位数 / 天）</th><th class="num" style="width:11%">2015</th><th class="num" style="width:11%">2016</th><th class="num" style="width:11%">2017</th><th class="num" style="width:11%">2018</th><th class="num" style="width:11%">2019</th></tr></thead>
+      <tbody>
+        <tr><td><b>全部（All）</b></td><td class="num">146</td><td class="num">99</td><td class="num">101</td><td class="num">78</td><td class="num"><b>56</b></td></tr>
+        <tr><td>内部自己发现（Internal Detection）</td><td class="num">56</td><td class="num">80</td><td class="num">57.5</td><td class="num">50.5</td><td class="num"><b>30</b></td></tr>
+        <tr><td>由外部通知才知道（External Notification）</td><td class="num">320</td><td class="num">107</td><td class="num">186</td><td class="num">184</td><td class="num"><b>141</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="tbl-cap">2011–2014 年的「全部」值分别为 416 / 243 / 229 / 205 天，当年未拆分内外部来源。</p>
+
+  <div class="box exam">
+    <div class="box-t">★ 这张表的破绽在哪——老师贴它就是为了这一句</div>
+    <p><b>表面读法：</b>2019 年攻击者驻留时间中位数 <b>56 天</b>，从 2011 年的 416 天缩短了 86%，形势一片大好。</p>
+    <p><b>正确读法：</b><span class="hl">这个 56 天是被「内部自己发现」的 30 天拉下来的；靠别人通知才知道的那一批，中位数仍然是 <b>141 天，近 5 个月</b>。</span></p>
+    <p><b>教训：</b>整体数字的改善<b>几乎全部来自「组织自己具备了检测能力」</b>。<b>没有自己的检测能力，你平均要在被攻陷 5 个月之后，才由外面的人来告诉你——那时数据早没了。</b>这就是本章第一句话「入侵检测是防火墙的必要补充」的现实证据。</p>
+  </div>
+
+  <h3>1.2　入侵检测对防火墙的「安全弥补作用」六条<span class="bref">课本 p.385</span></h3>
+  <div class="box exam">
+    <div class="box-t">★★ 简答题第 1 题的原题原答案，考到就照抄</div>
+    <p>题面：<b>「入侵检测系统对防火墙的安全弥补作用主要体现在哪些方面？」</b>课本给了整整六条，逐条对应防火墙的一个盲区：</p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:5%">#</th><th style="width:47%">课本原文（可直接誊抄）</th><th style="width:48%">它补的是防火墙的哪个洞</th></tr></thead>
+      <tbody>
+        <tr><td class="num">1</td><td>入侵检测可以发现<b>内部的攻击事件</b>以及<b>合法用户的越权访问行为</b>，而位于网络边界的防火墙对于这些类型的攻击活动无能为力。</td><td>对应开场第 5 条：<b>内部攻击 / 误用不经过边界</b>。这一条最重要</td></tr>
+        <tr><td class="num">2</td><td>如果防火墙<b>开放的网络服务存在安全漏洞</b>，那么入侵检测系统可以在网络攻击发生时及时发现并进行告警。</td><td>防火墙<b>只管「放不放行」，不管「放进去的东西干了什么」</b>——80 端口开着，SQL 注入照样进</td></tr>
+        <tr><td class="num">3</td><td>在<b>防火墙配置不完善</b>的条件下，攻击者可能利用配置漏洞穿越防火墙，入侵检测系统能够发现此类攻击行为。</td><td>对应开场第 2 条：配置不当</td></tr>
+        <tr><td class="num">4</td><td>对于<b>加密的网络通信</b>，防火墙无法检测，但是<b>监视主机活动的</b>入侵检测系统能够发现入侵。</td><td><b>注意「监视主机活动的」五个字</b>——加密流量在网线上看不懂，但到了主机上必然要解密。<span class="hl">这就是单选第 9 题的依据</span></td></tr>
+        <tr><td class="num">5</td><td>入侵检测系统能够有效发现<b>入侵企图</b>。如果防火墙允许外网访问某台主机，当攻击者利用<b>扫描工具</b>对主机实施扫描时，防火墙会直接放行，但是入侵检测系统能够识别此类网络异常并进行告警。</td><td>扫描的每一个包<b>单独看都合规</b>，防火墙逐包判断必然放行；只有把<b>一连串包放在一起看</b>才看得出是扫描</td></tr>
+        <tr><td class="num">6</td><td>入侵检测系统可以提供丰富的<b>审计信息</b>，详细记录网络攻击过程，帮助管理员发现网络中的<b>脆弱点</b>。</td><td>防火墙的日志只有「放行/拒绝」，IDS 记的是<b>攻击过程</b>，可用于事后取证与加固</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box def">
+    <div class="box-t">这一节的定位（课本原话，一句话结论）</div>
+    <p><span class="hl"><b>入侵检测系统被视为防火墙之后的第二道安全防线，是防火墙的必要补充。</b></span>——注意措辞是<b>「补充」不是「替代」</b>：防火墙负责<b>挡</b>，IDS 负责<b>看</b>。多选第 1 题（为什么边界有防火墙还要在内网装 IDS）的四个选项 ABCD 全对，依据就是开场那五条。</p>
+  </div>
+
+  <div class="chain">
+    <div class="chain-i prev"><div class="chain-k">上一章留下</div><div class="chain-b">第 12 章的<b>防火墙</b>守住了<b>网络边界</b>，但它<b>只在边界上、只看单个包是否合规</b>。</div></div>
+    <div class="chain-i now"><div class="chain-k">§1 本节</div><div class="chain-b">承认这个事实：<b>突破边界不可避免</b>，而且平均 141 天都发现不了。于是需要一套<b>「进来之后还在看」</b>的机制。</div></div>
+    <div class="chain-i next"><div class="chain-k">留下的坑</div><div class="chain-b">「在看」的东西到底叫什么、由哪些部件组成、看主机还是看网络？<b>→ §2</b></div></div>
+  </div>
+</div>
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-num">§ 2 ── What　<span class="pref">PPT p.6–26（21 页 · 39.6%，全章最大）</span><span class="bref">课本 p.385–389</span></span>
+    <h2 class="sec-t">什么是入侵检测：定义、通用模型、IDS／IPS／IMS、四种分类</h2>
+    <p class="sec-lede">这一节占了 PPT 近四成篇幅，而且其中 <b>7 页（IPS 与 IMS）课本里一个字都没有</b>——那是老师专门加进来的，几乎一定考。</p>
+  </div>
+
+  <h3>2.1　入侵与入侵检测的定义<span class="pref">PPT p.7</span><span class="bref">课本 p.384</span></h3>
+
+  <div class="box def">
+    <div class="box-t">三个层层递进的定义（问不同的问法，答不同的一条）</div>
+    <dl class="kv">
+      <dt>入侵（Anderson, 1980）</dt><dd>技术报告《计算机安全威胁的监控》首次提出「入侵检测」概念，把<b>入侵</b>定义为：<b>未经授权蓄意尝试访问信息、篡改信息、使系统不可靠或不能使用的各种行为。</b></dd>
+      <dt>入侵（美国国家安全通信委员会下属入侵检测小组）</dt><dd>入侵是对信息系统的<b>非授权访问</b>以及<b>未经许可在信息系统中进行的操作</b>。</dd>
+      <dt>入侵（从安全属性角度）</dt><dd>试图破坏信息系统<b>保密性、完整性、可用性、可控性</b>的各类活动。</dd>
+      <dt><b>入侵检测</b>（本章主定义）</dt><dd><span class="hl">从计算机系统或网络的<b>若干关键点收集信息并进行分析</b>，从中发现系统或网络中<b>是否有违反安全策略的行为和被攻击的迹象</b>的安全技术。</span></dd>
+      <dt>IDS</dt><dd>实施入侵检测的是<b>入侵检测系统</b>（Intrusion Detection System）。除了检测入侵，一些 IDS 还具备<b>自动响应</b>功能：与防火墙等安全产品联动，把攻击者 IP 列入黑名单、过滤特定类型或内容的数据包，阻止攻击进一步实施。</dd>
+    </dl>
+  </div>
+
+  <div class="box key">
+    <div class="box-t">为什么定义里非要有「关键点」和「违反安全策略」这两个词？</div>
+    <p><b>「若干关键点」</b>——不可能什么都看。看哪里就决定了你是哪一类 IDS：看主机上的日志和文件＝ HIDS，看网线上的数据包＝ NIDS。<b>2.5 节的整个分类，就是从这三个字里长出来的。</b></p>
+    <p><b>「违反安全策略」</b>——注意不是「违法」也不是「异常」，而是<b>违反你自己定的策略</b>。所以同一个行为（比如凌晨三点改网页）在 A 单位是入侵、在 B 单位是正常加班。<span class="hl">入侵的判据是相对的、由策略定义的——这正是后面误报率降不下来的根源。</span></p>
+  </div>
+
+  <h3>2.2　通用入侵检测模型：IDES 与 CIDF<span class="pref">PPT p.6</span><span class="bref">课本 p.385–386</span></h3>
+  <p>PPT 这一页只贴了一张 CIDF 结构图，标题写「通用入侵检测系统模型（CIDF）」。课本给了<b>两个</b>模型，需要分清：</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:16%">模型</th><th style="width:20%">谁 / 何时</th><th style="width:64%">由什么组成</th></tr></thead>
+      <tbody>
+        <tr><td><b>IDES</b><br><span class="small muted">入侵检测专家系统</span></td><td><b>Denning，1987</b><br>经典论文《An Intrusion-Detection Model》</td><td><b>6 部分：</b>主体（Subjects）、客体（Objects）、审计记录（Audit Records）、活动概图（Activity Profile）、异常记录（Anomaly Records）、规则集（Rules Set）。<br>· <b>主体</b>＝活动的发起者（用户、进程）；<b>客体</b>＝被管理的资源（文件、设备、命令）<br>· <b>审计记录</b>＝主体对客体的访问信息（登录、执行命令、访问文件）<br>· <b>活动概图</b>＝主体访问客体时的行为特点，可作活动的<b>签名（Signature）</b>或正常行为的描述<br>· <b>规则集</b>含三类规则：审计记录规则、异常记录规则、定期异常分析规则<br>· <b>规则集处理引擎</b>相当于<b>入侵检测引擎</b></td></tr>
+        <tr><td><b>CIDF</b><br><span class="small muted">通用入侵检测框架</span></td><td>美国<b>加州大学戴维斯分校</b>安全实验室，<b>1998</b></td><td><b>4 个组件：</b>事件产生器、事件分析器、事件数据库、响应单元。<br>组件之间通过 <b>GIDO</b>（通用入侵检测对象）交换数据，GIDO 由 <b>CISL</b>（公共入侵规范语言）描述。<br>CIDF 定义了三样东西：<b>IDS 的逻辑组成、表达检测信息的标准语言、组件之间的通信协议</b>。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="svg-wrap">
+    <svg class="flow" viewBox="0 0 760 252" role="img" aria-label="CIDF 通用入侵检测框架：事件产生器、事件分析器、事件数据库、响应单元四组件通过 GIDO 交换数据">
+      <defs>
+        <marker id="ci-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,1 L9,5 L0,9 z" fill="#1b3a8f"/>
+        </marker>
+        <marker id="ci-ar-s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M9,1 L0,5 L9,9 z" fill="#1b3a8f"/>
+        </marker>
+        <marker id="ci-ar-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,1 L9,5 L0,9 z" fill="#6e6b64"/>
+        </marker>
+      </defs>
+
+      <text class="lbl" x="78" y="14" text-anchor="middle">原始网络事件</text>
+      <ellipse class="bx-c" cx="78" cy="60" rx="70" ry="41"/>
+      <text class="t-sm" x="78" y="48" text-anchor="middle">网络数据包</text>
+      <text class="t-sm" x="78" y="64" text-anchor="middle">系统日志</text>
+      <text class="t-sm" x="78" y="80" text-anchor="middle">数据库访问……</text>
+
+      <rect class="bx-a" x="180" y="33" width="140" height="54" rx="5"/>
+      <text class="t-md" x="250" y="55" text-anchor="middle">事件产生器</text>
+      <text class="mono t-mut" x="250" y="72" text-anchor="middle">Event Generators</text>
+
+      <rect class="bx-a" x="420" y="33" width="140" height="54" rx="5"/>
+      <text class="t-md" x="490" y="55" text-anchor="middle">事件分析器</text>
+      <text class="mono t-mut" x="490" y="72" text-anchor="middle">Event Analyzers</text>
+
+      <rect class="bx-c" x="180" y="148" width="140" height="54" rx="5"/>
+      <text class="t-md" x="250" y="170" text-anchor="middle">事件数据库</text>
+      <text class="mono t-mut" x="250" y="187" text-anchor="middle">Event Database</text>
+
+      <rect class="bx-e" x="420" y="148" width="140" height="54" rx="5"/>
+      <text class="t-md" x="490" y="170" text-anchor="middle">响应单元</text>
+      <text class="mono t-mut" x="490" y="187" text-anchor="middle">Response Units</text>
+
+      <line class="ln" x1="149" y1="60" x2="178" y2="60" marker-end="url(#ci-ar-g)"/>
+      <line class="ln-a" x1="321" y1="60" x2="418" y2="60" marker-end="url(#ci-ar)"/>
+      <text class="lbl" x="369" y="52" text-anchor="middle">GIDO</text>
+
+      <line class="ln-a" x1="250" y1="88" x2="250" y2="146" marker-end="url(#ci-ar)"/>
+      <text class="lbl" x="258" y="120">GIDO</text>
+
+      <line class="ln-a" x1="490" y1="88" x2="490" y2="146" marker-end="url(#ci-ar)"/>
+      <text class="lbl" x="498" y="120">GIDO</text>
+
+      <line class="ln-a" x1="323" y1="160" x2="417" y2="82" marker-start="url(#ci-ar-s)" marker-end="url(#ci-ar)"/>
+      <text class="lbl" x="338" y="106">GIDO</text>
+
+      <line class="ln-a" x1="561" y1="175" x2="640" y2="175" marker-end="url(#ci-ar)"/>
+      <text class="lbl" x="644" y="171">终止进程 · 切断连接</text>
+      <text class="lbl" x="644" y="185">改文件属性 · 屏蔽服务</text>
+
+      <rect class="bx-c" x="10" y="214" width="742" height="32" rx="5"/>
+      <text class="t-sm" x="381" y="228" text-anchor="middle" fill="#3f3f3f">读法：所有连线上跑的都是 GIDO（由 CISL 描述）。斜线是双向的——分析器把结果<tspan font-weight="700">写进</tspan>数据库，也从数据库<tspan font-weight="700">读取</tspan>历史数据做定期统计与关联分析。</text>
+      <text class="t-mut" x="381" y="241" text-anchor="middle">只有响应单元会对外产生动作；事件数据库可以是复杂数据库，也可以只是普通文本文件。</text>
+    </svg>
+  </div>
+
+  <div class="box key">
+    <div class="box-t">四个组件各干什么（课本 p.386–387 原文压缩，考「简述 CIDF」就答这四条）</div>
+    <ul style="margin-bottom:0">
+      <li><b>事件产生器</b>：从网络环境中采集各种<b>原始</b>网络事件（数据包、系统日志、数据库访问），<b>转换成 GIDO 形式</b>后发给事件分析器和事件数据库。<span class="muted">——它只负责「采集与格式化」，不做判断。</span></li>
+      <li><b>事件分析器</b>：按设定流程分析事件、发现可能的入侵，以标准格式输出。<b>两种工作方式：</b>① 分析事件产生器<b>刚产生</b>的事件，发现其中的非法或异常事件；② 对事件数据库中<b>已保存</b>的数据做<b>定期的统计、关联分析</b>，发现某段时间内的异常。<span class="hl">第②种是「慢速攻击」「多步骤攻击」唯一能被抓到的途径。</span></li>
+      <li><b>事件数据库</b>：保存其他组件产生的各种 GIDO 对象。<b>可以是复杂的数据库，也可以是普通的文本文件</b>——只要满足存储需求即可。</li>
+      <li><b>响应单元</b>：收到分析器发来的异常事件后，施以<b>拦截、阻断、追踪</b>等措施，如<b>终止进程运行、切断网络连接、修改文件属性、屏蔽特定的网络服务</b>。</li>
+    </ul>
+  </div>
+
+  <div class="box exam">
+    <div class="box-t">★ CIDF 存在的意义，一句话</div>
+    <p><b>所有符合 CIDF 规范的入侵检测系统都可以共享信息、相互通信、协同工作</b>，还可以与其他安全系统配合，实施统一的响应和恢复策略。<br>
+    后续：在 CIDF 基础上，美国 <b>DARPA</b> 和 <b>IETF</b> 成立的入侵检测工作组 <b>IDWG</b> 发起制定了一系列建议草案（涉及体系结构、API、通信机制、语言规范）。<b>尽管这些草案最终并未成为 IETF 标准</b>，但其中很多思想和方法在现有 IDS 中得到了广泛应用。</p>
+  </div>
+
+  <div class="box trap">
+    <div class="box-t">⚠ 教材自己给的免责声明——不要死记图上的箭头方向</div>
+    <p>课本在图 13-1 处加了一条脚注，原话大意是：<b>Denning 的原始文献只用文字描述模型、没有给出模型图，且有些内容没有准确描述，导致后来引用该模型的文献「因引用人的理解不同而画出不同的图」，课本的图是编者参考原始文献自己画的；CIDF 模型（图 13-2）也是如此。</b></p>
+    <p><b>怎么办：</b>记<b>组件名和职责</b>（这是确定的），<b>不要背箭头</b>（不同资料画得不一样，老师 PPT 上那张图和课本的图连箭头方向都有出入）。答题时用文字描述数据流向，比照搬箭头安全。</p>
+  </div>
+
+  <h3>2.3　入侵防御系统 IPS<span class="pref">PPT p.8–10（3 页）</span><span class="chip bad">课本无 · PPT 专有</span></h3>
+
+  <div class="box exam">
+    <div class="box-t">★ 为什么这一节要给这么多篇幅</div>
+    <p>IPS ＋ IDS/IPS/IMS 一共占了 <b>PPT 7 页（13%）</b>，而<b>课本从头到尾一个字都没提</b>。这是<b>老师专门加进来的内容</b>——按本资料的原则（脉络与权重以 PPT 为准），必须照写。<span class="muted">副作用：课本习题因此不会考 IPS，别拿习题的覆盖面来判断它重不重要。</span></p>
+  </div>
+
+  <div class="scene">
+    <div class="scene-k">PPT p.8 · 这一页的核心是一个减法式的定义</div>
+    <p class="scene-q">IPS ＝ 入侵检测 ＋ <b>主动防御</b></p>
+    <div class="scene-b">
+      <p><b>什么叫「主动防御」——老师给的定义（原文）：</b><span class="hl">预先对入侵活动和攻击性网络流量进行<b>拦截</b>，避免其造成任何损失，<b>而不是简单地在恶意流量传送时或传送后才发出警报</b>。</span></p>
+      <p>对照 IDS 的做法「<b>发现攻击作出响应</b>」——IDS 是<b>事后</b>响应，IPS 是<b>事前/事中</b>拦截。<b>这一个词的差别，决定了后面所有的优点和所有的问题。</b></p>
+      <div class="scene-real">
+        <div class="t">老师紧跟着自己点出的代价</div>
+        <p class="mt0">「由于增加了<b>主动阻断</b>能力，<b>检测准确程度的高低对于 IPS 来说十分关键</b>」——因为 <b>IDS 误报只是多一条告警，IPS 误报是直接把合法业务掐断</b>。<br>另两条问题：<b>多种技术融合</b>（实现复杂）、<b>误报导致合法数据被阻塞</b>。</p>
+      </div>
+    </div>
+  </div>
+
+  <h4>IPS 的定位与工作方式<span class="pref">PPT p.9</span></h4>
+  <ul>
+    <li><b>定位：</b>入侵防护系统是<b>网络入侵检测系统（NIDS）的一种特殊形式</b>，从安全防护地位上看，它<b>已经超出了入侵检测系统的范围</b>。</li>
+    <li><b>位置：</b>位于<b>网络主干位置</b>，以<b>透明网关</b>形式存在，<b>检测所有进出网络的数据</b>。<span class="muted">「透明」＝通信双方察觉不到它的存在，也不需要改网络配置。</span></li>
+    <li><b>工作流程：</b>从<b>链路层</b>获取网络数据 → 用入侵检测技术对数据包分析 → 对其中的<b>高层应用协议数据进行重组与协议追踪</b> → 对有问题的数据包<b>直接丢弃</b>，也可以<b>修改重建</b>或<b>报警</b>，<b>同时关闭连接</b>。</li>
+  </ul>
+
+  <div class="box key">
+    <div class="box-t">「协议重组与追踪」为什么必须做？（这一步是 IPS 和包过滤防火墙的分水岭）</div>
+    <p>攻击特征常常<b>被拆散在多个数据包里</b>。逐包看，每个包都人畜无害；只有把一条 TCP 流<b>按序号重新拼回完整的应用层报文</b>，才看得出里面藏着一条注入语句。<b>不做重组，就只能做到防火墙那个层次。</b>代价是——重组要<b>缓存、要排队、要维护连接状态</b>，这就是下面「分析效率较低、无法适应高速网络环境」的直接原因。</p>
+  </div>
+
+  <h4>IPS 的优点与不足<span class="pref">PPT p.10</span><span class="chip warn">四对四，两两对应</span></h4>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:50%">优点（4 条）</th><th style="width:50%">不足（4 条）</th></tr></thead>
+      <tbody>
+        <tr><td><b>① 实时阻断网络攻击</b><span class="small muted">——串在链路上，判定为攻击就当场丢包</span></td><td><b>① 分析效率较低，无法适应高速网络环境</b><span class="small muted">——协议重组与深度分析太慢，成为主干上的瓶颈</span></td></tr>
+        <tr><td><b>② 隐蔽数据检测，对通信双方完全透明</b></td><td><b>② 继承了入侵检测的误报缺陷，易造成对正常网络通信的影响</b><span class="small muted">——IDS 误报＝多条告警，IPS 误报＝业务中断</span></td></tr>
+        <tr><td><b>③ 主干检测，保证数据百分之百捕获，避免绕过攻击</b><span class="small muted">——所有流量必须穿过它，没有旁路可走</span></td><td><b>③ 为降低误报率，造成漏报情况较多</b>——<b>只对能够准确确认的攻击进行处理</b><span class="small muted">这是②的直接后果</span></td></tr>
+        <tr><td><b>④ 透明模式，不会对网络拓扑造成影响</b><span class="small muted">——像根网线一样插进去，不用改 IP 规划</span></td><td><b>④ 无法检测加密环境数据</b><span class="small muted">——和 NIDS 一样的死穴，密文在线路上看不懂</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box trap">
+    <div class="box-t">⚠ 不足②→③ 这条因果链是本节最容易被问「为什么」的地方</div>
+    <p>误报会掐断业务，代价太大 → 厂商把判定门槛<b>调高</b>，只有「板上钉钉」的攻击才动手 → <b>误报是降下来了，但一大批「像攻击但不百分百确定」的行为被放过去了，漏报因此升高</b>。<br>
+    <span class="hl">一句话：<b>IPS 用「多漏报」换「少误报」，因为它误报的代价远高于 IDS。</b></span>这正是 §4 要讲的「误报率与漏报率此消彼长」在工程上的第一个实例。</p>
+  </div>
+
+  <h3>2.4　IDS、IPS 与 IMS：三者到底怎么分工<span class="pref">PPT p.11–14（4 页，其中 3 页是图）</span><span class="chip bad">课本无</span></h3>
+  <p class="small muted">PPT p.11–13 是三张厂商示意图（P.D.R 分工图、IPS 独立部署图、IPS 分布式部署图），p.14 才给出三句文字结论。下面是<b>对这三张图的文字复述</b>，不是图片复现。</p>
+
+  <div class="box def">
+    <div class="box-t">PPT p.14 的三句结论（原文，最该背的就是这三句）</div>
+    <dl class="kv">
+      <dt>IDS</dt><dd>帮助网络系统<b>快速发现</b>网络攻击。</dd>
+      <dt>IPS</dt><dd>综合了<b>防火墙、IDS、漏洞扫描与评估</b>等安全技术，可以<b>主动地、积极地防范、阻止</b>系统入侵。</dd>
+      <dt>IMS<br><span class="small muted">Intrusion Management System<br>入侵管理系统</span></dt><dd><b>包含 IDS、IPS 的功能</b>，并通过<b>一个统一的平台</b>进行统一管理。</dd>
+    </dl>
+  </div>
+
+  <h4>PPT p.11 那张图的真正看点：部署目标决定了两者的发展方向</h4>
+  <p>这张图（标题「IPS 是深层防御、IDS 是全面检测」）把安全设备分成了<b>左右两栏</b>，中间放一个 <b>P.D.R</b> 循环，底部一句总结「<b>部署目标决定了 IPS、IDS 各自的发展方向</b>」：</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:20%"></th><th style="width:40%">左栏：检测与监控设施</th><th style="width:40%">右栏：防护与控制设施</th></tr></thead>
+      <tbody>
+        <tr><td><b>成员</b></td><td><b>入侵检测 IDS</b>、漏洞扫描、审计系统<span class="small muted">（统一挂在「监控平台」下）</span></td><td><b>入侵防御 IPS</b>、<b>防火墙</b>、接入控制</td></tr>
+        <tr><td><b>部署目标</b></td><td>· 强化风险<b>管理</b>能力<br>· 及时<b>了解</b>安全状况<br>· 为改善风险控制环境<b>提供决策依据</b></td><td>· 强化风险<b>控制</b><br>· <b>降低</b>风险<br>· 进一步<b>优化</b>风险控制环境</td></tr>
+        <tr><td><b>动词</b></td><td><b>「知道」</b>——产出的是<b>信息</b></td><td><b>「阻止」</b>——产出的是<b>动作</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box key">
+    <div class="box-t">P.D.R「一个都不能少」是什么意思</div>
+    <p>图中间画了一个三色循环箭头：<b>Protection 防护 → Detection 检测 → Response 响应 →</b> 再回到防护。<br>
+    <b>要点：这三个环节缺一不可，而 IDS 和 IPS 各自只强在其中一段。</b>只有防护（防火墙）＝挡不住的就完全不知道；只有检测（IDS）＝知道了也拦不住。<span class="hl">所以问题不是「IDS 和 IPS 哪个更好」，而是「两者本来就在补 P.D.R 的不同段」。</span>这也是 IMS 存在的理由——把两段放在一个平台上统一管。</p>
+  </div>
+
+  <h4>PPT p.12–13 两张部署图复述</h4>
+  <div class="grid g2">
+    <div class="mini"><div class="t"><span class="ic">12</span>独立部署</div>
+      <p class="mt0">Internet →（防火墙）→ <b>IPS 串接在防火墙之后</b>，再分发到办公区 1、办公区 2、数据系统；两台 IPS 之间标着 <b>HA</b>（双机热备）。</p>
+      <p><b>图上并排画了两摞协议栈</b>：一摞只到 <b>Transport / Network</b>，另一摞一直到 <b>Application / Presentation / Session</b>。<span class="hl">全图想说的就是：<b>防火墙看到传输层就到顶，IPS 一路看到应用层。</b></span></p>
+      <p class="mt0"><b>为什么要 HA：</b>IPS 是<b>串接</b>的，一宕机整条链路就断。旁路的 IDS 挂了只是没人看着，<b>串接的 IPS 挂了是全网断网</b>。</p>
+    </div>
+    <div class="mini"><div class="t"><span class="ic">13</span>分布式部署</div>
+      <p class="mt0">在<b>服务器区、数据区、办公区、分支机构</b>各放一台 IPS，全部汇到一个<b>集中管理中心</b>。图上标注的各点防护目标：<b>服务器区</b>防穿透防火墙的<b>应用层攻击</b>与 Web/FTP 外联服务；<b>数据区</b>防<b>来自内部和外部</b>对核心数据的攻击、防 <b>SQL 注入</b>；<b>办公区</b>防外部攻击与<b>病毒传播</b>，并控制 IM、网游等内部应用；<b>分支机构</b>防来自分支的攻击并控制其对内部数据的访问。</p>
+      <p style="margin:6px 0 0"><b>看点：</b>「防御来自<b>内部</b>的攻击」再次出现——<b>边界设备解决不了内网问题，必须把探测点铺到内网各个区域</b>。</p>
+    </div>
+  </div>
+
+  <div class="box exam">
+    <div class="box-t">★ IDS / IPS / 防火墙 三者对比速记表（最可能出的对比题）</div>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:16%"></th><th style="width:28%">防火墙<span class="bref">第 12 章</span></th><th style="width:28%">IDS</th><th style="width:28%">IPS</th></tr></thead>
+      <tbody>
+        <tr><td><b>连接方式</b></td><td><b>串接</b>在边界</td><td><b>旁路</b>（不在数据通路上）</td><td><b>串接</b>在网络主干，透明网关</td></tr>
+        <tr><td><b>P.D.R 位置</b></td><td>Protection 防护</td><td><b>Detection 检测</b></td><td>Protection ＋ Response</td></tr>
+        <tr><td><b>产出</b></td><td>放行 / 拒绝</td><td><b>告警 ＋ 审计信息</b></td><td><b>丢包 / 修改重建 / 关闭连接</b>（也可报警）</td></tr>
+        <tr><td><b>看到哪一层</b></td><td>包过滤到传输层</td><td>可到应用层</td><td>链路层取数据，<b>重组到应用层</b></td></tr>
+        <tr><td><b>误报的代价</b></td><td>规则写错才误拦</td><td><b>小</b>——多一条告警</td><td><b>大</b>——合法业务被阻断</td></tr>
+        <tr><td><b>它自己挂了</b></td><td>断网</td><td><b>不影响通信</b>，只是没人看着</td><td><b>断网</b>（所以要 HA 双机）</td></tr>
+        <tr><td><b>管内部攻击吗</b></td><td>不管（在边界上）</td><td><b>管</b>（这是它的核心价值）</td><td>管（前提是部署到内网各区）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>2.5　入侵检测系统的分类<span class="pref">PPT p.15–26（12 页）</span><span class="bref">课本 13.1.3 · p.386–389</span></h3>
+
+  <div class="box def">
+    <div class="box-t">先记住有两个互相独立的分类维度<span class="pref">PPT p.15</span></div>
+    <p><b>维度一：按数据源（检测对象）分</b>——基于主机 HIDS ／ 基于网络 NIDS ／ 混合 Hybrid IDS<br>
+    <b>维度二：按检测方法分</b>——基于特征 ／ 基于异常 ／ 混合</p>
+    <p><span class="hl">这两个维度<b>互相正交</b>：一台 NIDS 既可以用特征检测也可以用异常检测。</span>做选择题时先看题干问的是「数据源」还是「方法」——问错维度必错。<b>维度二是 §3 的全部内容。</b></p>
+  </div>
+
+  <div class="box trap">
+    <div class="box-t">⚠ PPT 与课本在「第三类叫什么」上口径不一致</div>
+    <p>· <b>PPT p.15</b>：按数据源分三类，第三类叫「<b>混合的入侵检测系统（Hybrid IDS）</b>」；<b>另外在 p.26 又单独讲了一个「分布式入侵检测系统」</b>，把它说成「入侵检测技术的一个研究方向」。<br>
+    · <b>课本 13.1.3</b>：直接分三类，第三类叫「<b>混合分布式入侵检测系统（Distributed IDS, DIDS）</b>」——<b>把「混合」和「分布式」合成了一个词</b>。</p>
+    <p><b>这两者说的是同一件事。</b>判据很简单：<b>只要它同时用了主机数据和网络数据，就是这一类</b>，叫混合、叫分布式、叫混合分布式都对。答题写「<b>混合分布式入侵检测系统（DIDS）</b>」最稳——那是课本的正式名。</p>
+  </div>
+
+  <h4>2.5.1　基于主机的入侵检测系统 HIDS<span class="pref">PPT p.16–20</span><span class="bref">课本 p.386–388</span></h4>
+  <p><b>一句话定义：</b>用于保护<b>单台主机</b>不受网络攻击行为侵害，<b>需要安装在被保护的主机上</b>（以<b>探针或代理程序</b>的形式运行）。数据源是<b>主机的审计数据、系统日志、应用程序日志</b>等。</p>
+
+  <div class="box key">
+    <div class="box-t">HIDS 按「检测对象」再分两类<span class="pref">PPT p.18–19</span><span class="chip bad">课本没有这个细分</span></div>
+    <p><b>① 网络连接检测</b>——对<b>试图进入该主机</b>的数据流进行检测，分析确定是否有入侵行为，<b>避免或减少这些数据流进入主机系统后造成损害</b>。<br>
+    <span class="muted">例（PPT 原例）：检测到有主机<b>尝试连接未开放的端口</b>，预示着可能有主机在进行<b>漏洞扫描</b>。</span><br>
+    <b>为什么它和 NIDS 不一样：</b>NIDS 看的是<b>整段网络上所有人的流量</b>，这里看的是<b>只发给我这台主机的那部分流量</b>——所以交换式网络、加密流量都不成问题。</p>
+    <p><b>② 主机文件检测</b>——入侵行为通常会在主机的各种相关文件中<b>留下痕迹</b>。四个检测对象：<br>
+    <b>a. 系统日志　b. 文件系统　c. 进程记录　d. 系统运行控制</b><br>
+    <span class="muted">目的：帮助系统管理员发现入侵行为或<b>入侵企图</b>，及时采取补救措施。</span></p>
+  </div>
+
+  <h5>操作系统审计记录：为什么它是 HIDS 最经典的数据源，又为什么不够用<span class="bref">课本 p.387</span></h5>
+  <div class="grid g2">
+    <div class="mini"><div class="t"><span class="ic">＋</span>两条突出优点</div>
+      <p class="mt0">① 操作系统往往使用了一些<b>安全机制对审计记录进行保护，用户难以篡改</b>；<br>② 审计记录可以反映<b>系统内核级</b>的运行信息，使 IDS 能够<b>精确发现</b>系统中的各类异常。</p>
+      <p class="mt0 small muted">审计记录由操作系统的审计子系统产生，按<b>时间顺序</b>记录系统中发生的各类事件。Anderson 1980 年报告中提出的检测方法，就是通过监控系统的日志记录发现入侵。</p>
+    </div>
+    <div class="mini"><div class="t"><span class="ic">−</span>三条缺陷<span class="chip warn">简答 2 原题</span></div>
+      <p class="mt0">① 不同操作系统在审计记录的<b>事件类型、内容组织、存储格式</b>等方面都存在差异，IDS 如果要求<b>跨平台</b>工作，就必须考虑各种操作系统审计机制的差异；<br>
+      ② 审计记录主要是为了<b>方便日常管理维护</b>，同时记录一些系统中的违规操作，<b>其设计并不是为入侵检测系统提供检测依据的</b>。在这种情况下，审计记录对 IDS 而言<b>包含的冗余信息过多，分析处理的负担较重</b>；<br>
+      ③ IDS 所需要的一些判定入侵的<b>事件信息，有些不在操作系统的审计记录中</b>，IDS 还必须通过其他渠道获取。</p>
+    </div>
+  </div>
+  <p class="small">正因为这三条，<b>一些 IDS 干脆不用操作系统的审计记录，而是直接进入操作系统底层，截获自己感兴趣的系统信息</b>（例如<b>系统调用序列、系统调用的参数</b>），并以这些信息作为检测入侵的依据。</p>
+
+  <h5>应用程序日志作为信息源：3 优 4 缺<span class="bref">课本 p.388</span><span class="chip warn">简答 3 原题</span></h5>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:50%">三条优势（简答 3 的标准答案就是这三个词）</th><th style="width:50%">四条缺陷</th></tr></thead>
+      <tbody>
+        <tr><td><b>① 精确度高</b>——操作系统的审计信息必须经过一定的处理和转化才能变为 IDS 能够理解的信息，<b>转化过程中往往会丢失部分信息</b>；直接利用应用数据可最大程度保证精确度</td><td><b>① 缺乏保护机制</b>，容易遭受篡改和删除等破坏，必须首先对数据进行必要的保护</td></tr>
+        <tr><td><b>② 完整性强</b>——对于一些网络应用特别是<b>分布式</b>应用，直接通过主机日志甚至结合网络数据都难以准确获取应用的<b>具体状态</b>，而应用数据能最全面地反映应用的运行状态</td><td><b>② 一些应用程序没有日志功能，或日志提供的信息不够详尽</b>；IDS 必须自主对应用进行监视</td></tr>
+        <tr><td><b>③ 处理开销低</b>——主机的审计信息反映的是<b>系统整体</b>运行情况，转化为应用信息必须经过计算处理；而应用程序日志<b>本身就是应用层次的活动记录</b>，可直接提供所关注的应用运行状况</td><td><b>③ 在遭受拒绝服务攻击时</b>，很多系统因资源限制会<b>停止写应用程序日志</b>，造成信息缺失<span class="small muted">——最需要日志的时候恰恰没有日志</span></td></tr>
+        <tr><td class="small muted">简答 3 的参考答案原文只有一行：<b>「精确度高；完整性强；采用应用数据作为入侵检测的信息源具有处理开销低的优势。」</b>三个词记住即可，展开靠上面三条。</td><td><b>④ 应用程序日志适合检测针对应用的攻击</b>；如果攻击针对的是<b>操作系统漏洞或网络协议漏洞</b>，由于攻击不涉及具体应用，往往<b>从应用程序日志中无法看出异常</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h5>HIDS 的优点与不足<span class="pref">PPT p.20（各 6 条）</span></h5>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:50%">优点（6 条）</th><th style="width:50%">不足（6 条）</th></tr></thead>
+      <tbody>
+        <tr><td>① <b>检测准确度较高</b>——看到的是主机上真实发生的事，不是推测</td><td>① <b>实时性较差</b>——多数依赖日志，而日志是<b>事后</b>写的</td></tr>
+        <tr><td>② 可以检测到<b>没有明显行为特征</b>的入侵<span class="small muted">（如合法用户的越权操作）</span></td><td>② <b>无法检测数据包的全部</b>——只看得到发给自己的那部分</td></tr>
+        <tr><td>③ 能够对<b>不同的操作系统</b>进行有针对性的检测</td><td>③ <b>检测效果取决于日志系统</b>——日志没记的就查不到</td></tr>
+        <tr><td>④ <b>成本较低</b>——装个软件即可，不用买专用硬件</td><td>④ <b>占用主机资源</b>——和业务抢 CPU 和内存</td></tr>
+        <tr><td>⑤ <b>不会因网络流量影响性能</b></td><td>⑤ <b>隐蔽性较差</b>——就装在主机上，攻击者拿到权限后一眼看得见</td></tr>
+        <tr><td>⑥ <span class="hl"><b>适于加密和交换环境</b></span><span class="small muted">——数据到了主机上必然已经解密，NIDS 的两大死穴在这里都不成立</span></td><td>⑥ <b>如果入侵者能够修改校验和</b>，这种入侵检测系统<b>将无法起到预期的作用</b><span class="small muted">——文件完整性检查靠比对校验和，校验和能被改，整套机制就失效</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box exam">
+    <div class="box-t">★ 优点⑥「适于加密和交换环境」＝ 单选第 9 题的答案</div>
+    <p><b>题：攻击者使用加密信道（IPsec、TLS、HTTPS）攻击，最有可能检测到的是？答：B. 基于主机的 IDS。</b><br>
+    <b>为什么：</b>密文在网线上是一堆随机字节，NIDS 看不懂；但数据<b>送到主机、交给应用之前必然要解密</b>，HIDS 看的就是解密之后的东西。同理「交换环境」——交换机只把帧发给目的端口，旁路的 NIDS 收不到别人的流量，而 HIDS 就装在目的主机上，不受影响。<br>
+    <span class="hl">这一条和 §1 的「弥补作用第 4 条」（对于加密的网络通信，防火墙无法检测，但<b>监视主机活动的</b> IDS 能够发现入侵）是同一件事，课本前后呼应。</span></p>
+  </div>
+
+  <h4>2.5.2　基于网络的入侵检测系统 NIDS<span class="pref">PPT p.21–24</span><span class="bref">课本 p.388–389</span></h4>
+  <p><b>一句话定义：</b>通常作为一个<b>独立的个体</b>放置于被保护的网络上，使用<b>原始的网络分组数据包</b>作为攻击分析的数据源，一般利用<b>一个网络适配器</b>实时监视和分析所有通过网络传输的通信。检测到攻击时，应答模块通过<b>通知、报警以及中断连接</b>等方式做出反应。</p>
+  <p><b>核心机制：</b><span class="hl">将实际的数据流量记录与<b>入侵模式库</b>中的入侵模式进行<b>匹配</b>，寻找可能的攻击特征。</span><span class="muted">——注意这句话已经预告了 §3.2 的特征检测。</span></p>
+
+  <div class="box key">
+    <div class="box-t">NIDS 的发展过程：从「只会看」到「会判断」<span class="pref">PPT p.23</span><span class="chip bad">课本无</span></div>
+    <p><b>第一代：包嗅探器和网络监视器</b><br>
+    · <b>网卡工作在混杂模式下</b><span class="muted">（否则网卡只收发给自己的帧，看不到别人的流量——这是一切 NIDS 的物理前提）</span><br>
+    · 对包进行<b>统计</b>　· <b>详细地检查</b>包<br>
+    <span class="muted">这一代只是「把流量摆给你看」，判断还得靠人。</span></p>
+    <p><b>第二代：基于网络的入侵检测</b><br>
+    · 检查<b>端口扫描</b>　· 检查<b>常见的攻击行为</b>　· 识别 <b>IP 欺骗</b>攻击<br>
+    · 检测到异常后，<b>采取干涉入侵者发来的通信</b>，或<b>重新配置附近的防火墙策略</b>以封锁入侵者的计算机或网络发来的所有通信<br>
+    <span class="hl">最后这一句就是「IDS 与防火墙联动」——也正是 IPS 的思想雏形。</span></p>
+  </div>
+
+  <h5>NIDS 的优点与不足</h5>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:50%">优点（PPT p.24，5 条）</th><th style="width:50%">不足（PPT p.24，4 条）</th></tr></thead>
+      <tbody>
+        <tr><td>① 可以提供<b>实时</b>的网络行为检测<span class="small muted">——直接看线上的包，不等日志</span></td><td>① <b>防入侵欺骗的能力通常较差</b><span class="small muted">——不同系统对 TCP/IP 的实现有差异，攻击者可利用 IDS 与主机在协议和数据处理上的理解差异绕过监控</span></td></tr>
+        <tr><td>② 可以<b>同时保护多台</b>网络主机<span class="small muted">——一台设备管一个网段</span></td><td>② 在<b>交换式网络</b>环境中难以配置<span class="small muted">——交换机只把帧送到目的端口，必须配镜像口/分光器</span></td></tr>
+        <tr><td>③ 具有<b>良好的隐蔽性</b><span class="small muted">——被动监听，对网络用户完全透明，攻击者难以判断网络中是否有 IDS、位于何处</span></td><td>③ <b>检测性能受硬件条件限制</b><span class="small muted">——宽带网络下逐包分析开销很高</span></td></tr>
+        <tr><td>④ <b>有效保护入侵证据</b><span class="small muted">——证据存在独立设备上，攻陷了主机也删不掉</span></td><td>④ <span class="hl"><b>不能处理加密后的数据</b></span><span class="small muted">——最重要的一条，和 HIDS 优点⑥正好互补</span></td></tr>
+        <tr><td>⑤ <b>不影响被保护主机的性能</b><span class="small muted">——课本补充：以<b>被动监听</b>方式获取数据包，也<b>不降低网络性能</b>（对比：包过滤防火墙要先过滤再转发，必然延长传输时间）</span></td><td class="small muted">课本另补两条：<b>粒度粗</b>（监控整个网络，从单台主机保护的角度看不如主机数据精细）；<b>移植性好</b>算优点（网络数据包遵循统一协议，标准化程度高）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box exam">
+    <div class="box-t">★★ 简答第 4 题「请分析基于网络的入侵检测系统的优点和缺点」——课本参考答案只有一行</div>
+    <p><span class="hl"><b>「基于网络的入侵检测系统具有隐蔽性好、对被保护系统影响小等优点，同时也存在粒度粗、难以处理加密数据等方面的缺陷。」</b></span></p>
+    <p>四个关键词：<b>隐蔽性好、影响小 ／ 粒度粗、难处理加密</b>。开卷考试建议先写这一行，再从上表补 2–3 条展开。</p>
+  </div>
+
+  <h4>2.5.3　两种系统的结合使用<span class="pref">PPT p.25</span><span class="bref">课本 p.389</span></h4>
+  <div class="box key">
+    <div class="box-t">PPT p.25 的核心论证：它们看的东西根本不一样</div>
+    <p>· <b>NIDS 通过检查所有的数据包头</b>来进行检测，<b>而 HIDS 并不查看包头</b>；<br>
+    · <b>NIDS 可以研究负载的内容</b>，查找特定攻击中使用的<b>命令或语法</b>，这类攻击可以被<b>实时检查包序列</b>的 IDS 迅速识别；<br>
+    · <b>而 HIDS 无法看到负载，因此也无法识别嵌入式的负载攻击。</b></p>
+    <p><b>结论：</b>这两种方式<b>各自都能发现对方无法检测到的一些网络入侵行为</b>，同时使用可以互相弥补不足，会起到良好的检测效果。</p>
+  </div>
+
+  <h4>2.5.4　混合分布式入侵检测系统 DIDS<span class="pref">PPT p.26</span><span class="bref">课本 p.389</span></h4>
+  <div class="grid g2">
+    <div class="mini"><div class="t"><span class="ic">P</span>PPT 的说法：智能代理架构</div>
+      <p class="mt0">采用<b>分布式智能代理</b>的结构，由<b>一个或多个中央智能代理</b>和<b>大量分布在网络各处的本地代理</b>组成。</p>
+      <p>· <b>本地代理</b>：负责处理<b>本地事件</b><br>· <b>中央代理</b>：统一调控各个本地代理的工作，并从<b>整体上</b>完成对网络事件的<b>综合分析</b><br>· 检测工作通过<b>全部代理互相协作</b>共同完成</p>
+      <p class="mt0 small muted">PPT 把它称为「目前入侵检测技术的一个<b>研究方向</b>」。</p>
+    </div>
+    <div class="mini"><div class="t"><span class="ic">B</span>课本的说法：探针的组合</div>
+      <p class="mt0">课本给了一个更机械、更好判断的定义。<b>现有 IDS 的分析引擎（也就是 CIDF 里的事件分析器）都同时支持主机数据源和网络数据源</b>，所以类型完全由<b>你部署了哪种探针</b>决定：</p>
+      <ul style="margin-bottom:0">
+        <li>只部署<b>主机</b>探针 → <b>HIDS</b></li>
+        <li>只部署<b>网络</b>探针 → <b>NIDS</b></li>
+        <li><b>两种都部署</b> → <b>混合分布式 IDS</b></li>
+      </ul>
+      <p style="margin:6px 0 0"><span class="hl"><b>目前大部分商用入侵检测系统都是这种混合分布式的。</b></span>做法：在主机和网络交换节点上分别安装探针采集数据，然后对主机数据和网络数据进行<b>综合分析</b>，全面掌控网络整体的安全状况。</p>
+    </div>
+  </div>
+
+  <div class="box def">
+    <div class="box-t">怎么选：课本给的两条判据（选择题常考）</div>
+    <p>· 检测目标是<b>主机用户的非授权活动</b>，或<b>利用操作系统漏洞</b>对主机的攻击 → <b>用主机数据源（HIDS）</b>更合适；<br>
+    · 检测目标是<b>网络扫描、ARP 欺骗、DDoS 攻击</b>等<b>利用网络协议</b>进行的攻击 → <b>用网络数据源（NIDS）</b>更合适。</p>
+    <p class="mt0"><span class="hl">这两条就是单选第 1 题的依据：「基于网络的 IDS 最适合检测（　）攻击」→ <b>C. 网络扫描和拒绝服务攻击</b>。</span>选项里的<b>字典攻击</b>（猜口令，痕迹在主机日志里）和<b>特洛伊木马</b>（主机上的进程和文件）都属于主机侧，所以 A、B、D 全被排除。</p>
+  </div>
+
+  <div class="chain">
+    <div class="chain-i prev"><div class="chain-k">承上</div><div class="chain-b">§1 确认了「必须有人在防火墙之后继续看」，但没说<b>看什么、谁来看</b>。</div></div>
+    <div class="chain-i now"><div class="chain-k">§2 本节</div><div class="chain-b">定义清楚了（CIDF 四组件），角色分清楚了（IDS 看 / IPS 拦 / IMS 统管），<b>看哪里</b>也分清楚了（主机 / 网络 / 两者都要）。</div></div>
+    <div class="chain-i next"><div class="chain-k">留下的坑</div><div class="chain-b">最关键的问题还没答：拿到数据以后，<b>凭什么说这一条是攻击、那一条不是</b>？<b>→ §3</b></div></div>
+  </div>
+</div>
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-num">§ 3 ── How　<span class="pref">PPT p.28–44（17 页 · 32.1%）</span><span class="bref">课本 p.390–399</span></span>
+    <h2 class="sec-t">如何进行入侵检测：两种分析方式、用什么数据、检测器放在哪</h2>
+    <p class="sec-lede">本节要回答 §2 留下的那个问题——<b>拿到数据以后，凭什么说这一条是攻击？</b>答案只有两条路，而且这两条路的优缺点<b>恰好完全互补</b>。</p>
+  </div>
+
+  <div class="scene">
+    <div class="scene-k">PPT p.28 · 一句话把整节劈成两半</div>
+    <p class="scene-q">入侵检测系统的检测分析技术主要分为两类：<b>异常检测</b>和<b>误用检测</b>。</p>
+    <div class="scene-b">
+      <p>这两条路的区别，说到底只有一个字——<b>你手上有的是「谁的模型」</b>：</p>
+      <div class="grid g2" style="margin:9px 0 0">
+        <div class="mini"><div class="t"><span class="ic">异</span>异常检测：我有<b>好人</b>的模型</div>
+          <p class="mt0">先把<b>正常行为</b>总结成模型，<b>凡是偏离模型的都算可疑</b>。<br><b>→ 认不出的东西，一律当坏人。</b></p></div>
+        <div class="mini"><div class="t"><span class="ic">误</span>误用检测：我有<b>坏人</b>的模型</div>
+          <p class="mt0">先把<b>已知攻击</b>总结成特征库，<b>凡是匹配上特征的才算攻击</b>。<br><b>→ 认不出的东西，一律当好人。</b></p></div>
+      </div>
+      <p style="margin-top:9px"><span class="hl">两句话里的最后一行，就是这两种方法所有优缺点的总根源。</span>「认不出就当坏人」→ 能抓新攻击，但<b>误报必然高</b>；「认不出就当好人」→ 判得准，但<b>新攻击必然漏</b>。后面所有的评价条目都只是这两句话的展开。</p>
+      <p class="mt0 small muted">顺序说明：PPT 先讲异常检测（p.28）再讲误用检测（p.32），课本相反（13.2.1 特征检测在前）。本资料<b>按 PPT 的顺序</b>。</p>
+    </div>
+  </div>
+
+  <h3>3.1　异常检测技术——基于行为的检测<span class="pref">PPT p.28–31</span><span class="bref">课本 13.2.2 · p.392–399</span></h3>
+
+  <div class="box def">
+    <div class="box-t">原理（PPT 原文，可直接誊抄）</div>
+    <p>异常检测技术也称为<b>基于行为的检测技术</b>，是指根据<b>用户的行为和系统资源的使用状况</b>判断是否存在网络入侵。</p>
+    <p>它<b>首先假设</b>：网络攻击行为是<b>不常见的或是异常的</b>，区别于所有的正常行为。如果能够为用户和系统的<b>所有正常行为</b>总结活动规律并建立<b>行为模型</b>，那么入侵检测系统可以将当前捕获到的网络行为<b>与行为模型相对比</b>，<b>若入侵行为偏离了正常的行为轨迹，就可以被检测出来</b>。</p>
+    <p class="mt0"><b>PPT p.29 的流程图只有四个词：</b><span class="pill">正常模式</span> ＋ <span class="pill">检测到的事件</span> → <span class="pill">比较</span> → <span class="pill">入侵</span>。</p>
+  </div>
+
+  <div class="box eg">
+    <div class="box-t">课本给的例子（p.392，最好用的举例，写简答题时直接用）</div>
+    <p>某网站的管理员账户<b>都是在工作日的上午 8 点到下午 18 点之间</b>更新网站页面。如果检测到该管理员账户<b>在凌晨</b>进行页面更新活动，则应当视为<b>异常</b>，需要进一步判断是不是有人<b>冒用管理员的身份篡改网页</b>。</p>
+    <p class="mt0"><b>这个例子同时暴露了异常检测的软肋：</b>如果这位管理员今天真的加了个夜班呢？<b>系统一样会报警——这就是误报。</b></p>
+  </div>
+
+  <h4>实施异常检测的两个关键问题<span class="bref">课本 p.392–393</span></h4>
+  <p>要实施异常检测，需要一组能够<b>标识用户特征、网络特征或系统特征的测量参数</b>，如 <b>CPU 利用率、内存利用率、系统调用序列、网络流量</b>等。基于这组参数建立被监控对象的行为模式，并检测其行为变化。此过程中有两个关键问题：</p>
+  <ul>
+    <li><b>① 选择的各项测量参数能否反映被监控对象的行为模式？</b><span class="muted">——参数选错了，模型再精也白搭。</span></li>
+    <li><b>② 如何界定正常和异常？</b>异常检测通常采用<b>定量分析</b>的方法，一般以<b>阈</b>来标明正常和异常之间的<b>临界点</b>，<b>阈值</b>指的就是阈所对应的数值。可以为<b>每个</b>测量参数设置一个阈值，也可以<b>对多个参数进行计算</b>，为计算结果设置阈值。</li>
+  </ul>
+
+  <div class="box trap">
+    <div class="box-t">⚠ 阈值就是异常检测的命门</div>
+    <p>课本原话：<b>「阈值的设置非常重要，阈值设置不当，将直接影响入侵检测的准确性，导致误报或者漏报。」</b></p>
+    <p><b>为什么这一句这么关键：</b>阈值<b>调松</b>（容忍度大）→ 正常波动不再报警，但攻击也混过去了 → <b>漏报升高</b>；阈值<b>调紧</b> → 什么都报，管理员被淹没 → <b>误报升高</b>。<span class="hl">同一个旋钮，两头都是坑，中间没有正确答案——这就是 §4 要讲的「误报率与漏报率此消彼长」在异常检测里的具体形态。</span></p>
+  </div>
+
+  <div class="box key">
+    <div class="box-t">PPT p.37 末尾那个没答的问句：「<b>用户行为？</b>」——答案就在这一节</div>
+    <p><b>能用，而且用户行为正是异常检测的立身之本。</b>课本 p.393：<b>Anderson 在 1980 年技术报告中提出的入侵检测方法就是异常检测</b>——他利用异常检测来发现<b>伪装者</b>，即<b>绕过系统的安全访问机制、以合法用户身份进入系统的攻击者</b>。做法是：<b>基于主机的审计记录，为系统中的合法用户建立正常行为模式，描述用户的行为特征</b>；监视审计记录时，<b>若用户活动与正常行为模式的差异超过了阈值就告警，差异在阈值范围内则视为正常</b>。</p>
+    <p><b>代价（也就是老师为什么在这里打了个问号）：</b>用户行为<b>是所有数据源里最难建模的</b>——它会因为换作息、换岗位、装了新软件而合法地改变。所以「用户行为」既是异常检测最有价值的数据源，也是它<b>误报率高</b>的第一来源。</p>
+  </div>
+
+  <h4>异常检测技术的评价<span class="pref">PPT p.30（3 优 3 缺）</span></h4>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:50%">优点</th><th style="width:50%">不足</th></tr></thead>
+      <tbody>
+        <tr><td><b>a. 能够检测出新的网络入侵方法的攻击</b><span class="small muted">——最重要的一条。它比对的是「正常」，不需要事先见过这个攻击。<b>单选 5「适合检测未知攻击的是」＝ A. 异常检测</b>，依据就是这条</span></td><td><b>a. 误报率高</b><span class="small muted">——最重要的一条。「偏离正常」≠「攻击」</span></td></tr>
+        <tr><td><b>b. 较少依赖于特定的主机操作系统</b><span class="small muted">——它统计的是行为指标，不是某个系统的日志格式</span></td><td><b>b. 行为模型建立困难</b><span class="small muted">——要「总结所有正常行为」，实际上做不到</span></td></tr>
+        <tr><td><b>c. 对于内部合法用户的越权违法行为的检测能力较强</b><span class="small muted">——越权者用的是合法账号、合法命令，没有任何攻击特征可匹配，<b>只有「不像他平时干的事」这一个破绽</b></span></td><td><b>c. 难以对入侵行为进行分类和命名</b><span class="small muted">——它只能说「这不正常」，说不出「这是哪种攻击」，管理员拿到告警还得自己查</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box exam">
+    <div class="box-t">★★ 简答第 6 题原题：「为什么说异常检测所发现的异常未必是攻击活动？」</div>
+    <p><b>课本参考答案（一行）：</b><span class="hl">「<b>定义的正常行为不一定完备和准确，可能会造成合法的行为被认为是异常的。</b>」</span></p>
+    <p><b>展开成两条（课本 p.393 原文）：</b><br>
+    <b>① 所选择的测量参数是否有足够强的区分度</b>，能够将正常和异常区分开来；<br>
+    <b>② 事先建立的正常模式是否足够完备</b>——例如，可能由于正常行为模式建立得不充分，<b>一些正常活动没有覆盖其中，被误判为攻击</b>。</p>
+    <p class="mt0"><b>所以课本紧接着说：「异常检测的结果通常需要进一步认证。」</b>这句话也很值得写进答案。</p>
+  </div>
+
+  <h4>异常检测技术的分类<span class="pref">PPT p.31（三类）</span></h4>
+  <p><b>a. 统计分析法　b. 人工免疫系统　c. 机器学习法</b>——PPT 到此为止，只给了三个名词。下面按 PPT 的权重，每类给一句能答题的话：</p>
+
+  <div class="grid g3">
+    <div class="mini"><div class="t"><span class="ic">a</span>统计分析法</div>
+      <p class="mt0">以<b>统计理论</b>为基础建立用户或系统的正常行为模式，用<b>频度、概率分布、均值、方差</b>等统计量描述。</p>
+      <p><b>三个常用统计模型：</b><br>· <b>操作模型</b>：对某个时间段内事件的<b>发生次数</b>设阈值，超过就可能异常<br>· <b>平均值和标准差模型</b>：可信区间 <span class="pill">mean ± d×stdev</span>，超出即可能异常<br>· <b>巴尔科夫过程模型</b>：把事件类型定义为状态变量，用<b>状态迁移矩阵</b>刻画状态之间的<b>迁移频度</b>（而不是个别状态的频率）；若观察到一个新事件，而先前状态和矩阵说明该事件<b>发生的频率太低</b>，就认为是异常事件</p>
+      <p class="mt0"><b>缺点：</b>误报率和漏报率<b>都较高</b>；对<b>存在时间顺序的复杂攻击难以准确描述</b>。</p>
+    </div>
+    <div class="mini"><div class="t"><span class="ic">b</span>人工免疫系统</div>
+      <p class="mt0">借鉴生物免疫，把问题抽象成<b>「自体（self）」与「非自体（non-self）」的识别问题</b>。自体＝机体自身的组成成分，非自体＝病原体等外来物质。</p>
+      <p><b>对应关系：</b>网络安全策略的核心是把<b>非法程序及非法应用</b>与<b>合法程序、合法数据</b>区分开，与免疫系统对自体/非自体分类<b>相类似</b>。</p>
+      <p><b>Forrest 的做法（UNIX 平台）：</b>程序的自体信息用<b>系统调用序列</b>描述；检测器集合通过<b>阴性选择</b>产生——① 系统<b>随机</b>产生一组<b>未成熟检测器</b>；② 用它们监控程序一段时间，<span class="hl"><b>凡是与正常程序行为「匹配上」的检测器一律删除</b></span>，没匹配上的保留为<b>成熟检测器</b>。此后<b>凡是与成熟检测器匹配的行为，就视为异常</b>。</p>
+      <p class="mt0 small muted"><b>为什么反着来：</b>「正常」的样子有限且可观测，「异常」的样子无穷无尽。先随机撒网、再把「会误伤好人」的网全部剪掉，剩下的网就只会网到没见过的东西。<b>代价：</b>要为每一个程序构建专门的检测器集合，成本很高。</p>
+    </div>
+    <div class="mini"><div class="t"><span class="ic">c</span>机器学习法</div>
+      <p class="mt0">通过机器学习模型或算法对<b>离散数据序列</b>进行学习，获得个体、系统和网络的行为特征。按<b>先验信息</b>分四类：<b>有监督</b>（带标签样本：神经网络、决策树、贝叶斯、KNN）· <b>半监督</b>（只有少量标签）· <b>无监督</b>（无标签，靠<b>聚类</b>：K-means、DBSCAN、One Class SVM）· <b>强化学习</b>（对错动作有奖惩）。</p>
+      <p class="mt0"><b>怎么选（课本 p.399）：</b>标记数据<b>充足</b>→<b>有监督</b>；只有<b>少数</b>攻击样本→<b>半监督</b>；<b>全新场景、没有样本</b>→只能先<b>无监督</b>，捕获异常并人工审核积累到一定量后<b>转半监督，之后转有监督</b>。</p>
+    </div>
+  </div>
+
+  <div class="box exam">
+    <div class="box-t">★ 单选第 3 题考了一个 PPT 完全没提、但课本给了公式的点：<b>用「条件熵」评估数据质量</b><span class="bref">课本 p.393</span></div>
+    <p><b>题：</b>采用异常检测方法时，可以用（　）来评估用于异常检测的<b>数据的质量</b>。质量越高，说明数据越有规律，用来进行异常检测就越准确。<b>答：A. 条件熵。</b></p>
+    <div class="fx">
+      H(X) = Σ<sub>x∈C<sub>x</sub></sub> P(x)·log[ 1 / P(x) ]　　　　H(X|Y) = Σ<sub>x,y</sub> P(x,y)·log[ 1 / P(x|y) ]
+      <small><b>熵 H(X)</b>：数据集中每个唯一的记录代表一个类。<b>熵越小，数据越有规律</b>，据此建立的模型准确性越好。<br>
+      <b>条件熵 H(X|Y)</b>：P(x,y) 为 x 和 y 的联合概率，P(x|y) 为给定 y 时 x 的条件概率。取 X=(e₁…e<sub>n</sub>)、Y=(e₁…e<sub>k</sub>)（k&lt;n），H(X|Y) 衡量的是<b>「已知前 k 个事件之后，剩下的 X 还有多少不确定性」</b>。<br>
+      <b>条件熵越小 → 不确定性越小 → 通过已知预测未知的可靠性越大 → 用这些特征数据做异常检测就越准确。</b></small>
+    </div>
+    <p class="mt0"><b>为什么用条件熵而不是熵：</b>安全审计数据通常具有<b>时间上的序列特征</b>（一件事发生在另一件事之后），<b>条件熵正好能衡量这种「前面决定后面」的特征</b>，普通的熵衡量不了。</p>
+  </div>
+
+  <div class="box beyond">
+    <div class="box-t">PPT 未讲 · 不作要求　—　异常检测的机器学习细节<span class="bref">课本 p.393–399</span></div>
+    <p>课本用了 <b>7 页</b>详细展开机器学习异常检测的具体算法，而 <b>PPT 只写了「机器学习法」五个字</b>。按本资料「以 PPT 定权重」的原则，这部分不铺开，只留边界：</p>
+    <p><b>课本讲了什么：</b>神经网络法（优点是<b>不需要指定测量参数</b>，解决了统计分析在特征选择上的困难；<b>严重缺陷是发现异常时不提供任何分析和解释</b>，只能告警说不出原因）· 聚类分析法（K 均值、模糊 C-均值、蚁群聚类）· 基于深度的异常检测（<b>Tukey 1997</b>，凸包分层，深度 ≤ k 的点为异常，只适用二三维）· 孤立森林 Isolation Forest（<b>异常＝容易被孤立的离群点</b>；两条理论基础：<b>异常数据占比很小、异常点特征值与正常点差异很大</b>；不需计算距离和密度，速度快）· 基于距离 / 基于密度（LOF 局部异常因子）· 深度学习三类模型（CNN、自编码 AE / 稀疏编码 SC、深度置信网络 DBN）。</p>
+    <p class="mt0"><b>真要考去哪查：</b>课本 p.393–399，图 13-4（阴性选择）、13-5（基于深度）、13-6（孤立森林）、13-7（K 均值）。</p>
+  </div>
+
+  <h3>3.2　误用检测技术——基于知识的检测<span class="pref">PPT p.32–35</span><span class="bref">课本 13.2.1 特征检测 · p.390–392</span></h3>
+  <p class="small muted">提醒：<b>误用检测 ＝ 特征检测 ＝ 基于知识的检测 ＝ 基于特征的入侵检测</b>，英文 <span class="pill">Signature Detection, SD</span>（也作 Misuse Detection）。四名一物，详见总览 §0.4。</p>
+
+  <div class="box def">
+    <div class="box-t">原理（PPT p.32 原文）</div>
+    <p><b>前提假设：</b>所有的网络攻击行为和方法都<b>具有一定的模式或特征</b>。如果把<b>以往发现的所有网络攻击的特征</b>总结出来并建立一个<b>入侵信息库</b>，那么入侵检测系统可以将当前捕获到的网络行为特征<b>与入侵信息库中的特征信息相比较</b>，<b>如果匹配，则当前行为就被认定为入侵行为</b>。</p>
+    <p class="mt0"><b>PPT p.33 的流程图同样只有四个词：</b><span class="pill">入侵模式库</span> ＋ <span class="pill">检测到的事件</span> → <span class="pill">比较、匹配</span> → <span class="pill">入侵</span>。<br>
+    <span class="hl">和异常检测的流程图对照——<b>结构一模一样，只是把「正常模式」换成了「入侵模式库」，把「比较」换成了「比较、匹配」。</b>两种方法的全部差别就在这一处替换。</span></p>
+  </div>
+
+  <div class="box key">
+    <div class="box-t">「攻击特征」到底可以是什么<span class="bref">课本 p.390</span></div>
+    <p><b>可以很简单：</b>字符串、<b>特征码</b>（如病毒或木马的<b>散列值</b>）、端口号、IP 地址、域名等；<br>
+    <b>也可以很复杂：</b>用<b>数学模型</b>描述的攻击行为模型。</p>
+    <p><b>课本给的实例（很好用）：</b><span class="hl"><b>Land 拒绝服务攻击</b>的一项特征是——攻击数据包的<b>源地址和目的地址相同，源端口和目的端口也相同</b>。</span></p>
+    <p><b>攻击特征的硬要求——「区分度」：</b>这种特征<b>出现在攻击活动中，而在系统正常运行过程中通常不会发生</b>。<b>攻击特征具有区分度，才能确保在准确描述攻击活动的同时，不会将正常活动覆盖其中。</b><span class="muted">Land 攻击这个例子就完美满足：正常通信里源和目的地址端口全相同是不可能的。</span></p>
+    <p class="mt0"><b>特征怎么入库：</b>收集到入侵特征后，通常需要使用<b>专门的语言</b>对特征进行描述——用语言描述攻击特征可看作<b>对攻击特征进行标准化处理</b>，在此基础上攻击特征才能够加入特征库。</p>
+  </div>
+
+  <div class="box trap">
+    <div class="box-t">⚠ 一句最容易被忽略、但直接解释了「漏报」的话<span class="bref">课本 p.391</span></div>
+    <p><span class="hl">「<b>而不匹配任何攻击特征的数据都被认为是合法和可接受的，入侵检测系统不会产生告警。</b>」</span></p>
+    <p>注意这是一个<b>默认放行</b>的设计——特征库里没有的，一律当好人。<b>所以特征检测的漏报率高低完全取决于特征库是否完备</b>，而「确保特征库内容全面、及时更新<b>需要耗费大量的时间和精力</b>，特别是在现今新的攻击方法层出不穷、老的攻击手段不断翻新的环境下，这个问题尤为突出」。</p>
+    <p class="mt0"><b>更根本的局限：</b>「<b>这种检测方法只能发现已知的攻击类型</b>。因为只有已经出现过的攻击方法或者可以预见的攻击方法才会被总结为特征，加入特征库当中。<b>如果一种攻击手段从未出现过，在特征库中没有相应攻击的特征信息，那么特征检测无法发现相应的攻击活动。</b>」</p>
+  </div>
+
+  <h4>误用检测技术的评价<span class="pref">PPT p.34（3 优 4 缺）</span></h4>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:50%">优点（3 条）</th><th style="width:50%">缺点（4 条）</th></tr></thead>
+      <tbody>
+        <tr><td><b>① 检测准确度高</b><span class="small muted">——课本：「由于攻击特征是对已知攻击活动的总结，在攻击特征区分度很好的情况下，匹配攻击特征的活动<b>可以断定为入侵</b>。因此，<b>特征检测的误报率较低，是这种分析方法最突出的优点</b>。」<b>单选 4「检测已知攻击准确率最高的方法」＝ D. 模式匹配</b></span></td><td><b>① 不能检测出新的入侵行为</b><span class="small muted">——最重要的一条，与异常检测优点 a 正好相反</span></td></tr>
+        <tr><td><b>② 技术相对成熟</b></td><td><b>② 完全依赖于入侵特征的有效性</b><span class="small muted">——特征区分度不好，要么漏、要么滥报</span></td></tr>
+        <tr><td><b>③ 便于进行系统防护</b><span class="small muted">——匹配上以后，还能<b>根据特征库的信息指明攻击的具体类型</b>，管理员知道是什么攻击就知道该怎么处置。<b>这一条与异常检测缺点 c 正好相反</b></span></td><td><b>③ 维护特征库的工作量巨大</b></td></tr>
+        <tr><td class="small muted">（PPT 只列 3 条）</td><td><b>④ 难以检测来自内部用户的攻击</b><span class="small muted">——内部越权用的都是合法命令，根本没有攻击特征可匹配。<b>与异常检测优点 c 正好相反</b></span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>误用检测技术的分类<span class="pref">PPT p.35（列了 6 种）</span><span class="bref">课本详解前 3 种 · p.391–392</span></h4>
+  <p>PPT 这一页列出了六个方法名：<b>专家系统法、模式匹配法、状态迁移法、条件概率、模型推理法、键盘监控法</b>。<span class="small muted">（PPT 原文把「模式匹配法」写成了「模式匹配发」，是错别字。）</span>课本只详解了前三种，并说明「除了上述三种特征检测方法，相关文献中提到的还有<b>条件概率误用检测、模型推理误用检测、键盘监控误用检测</b>等检测方法」。</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:14%">方法</th><th style="width:44%">怎么做</th><th style="width:42%">优缺点与现状</th></tr></thead>
+      <tbody>
+        <tr><td><b>专家系统法</b></td><td>把<b>入侵活动编码成专家系统的规则</b>，规则采用 <span class="pill">If 条件 Then 动作</span> 的形式。<b>条件</b>＝判定入侵发生的条件，<b>动作</b>＝入侵条件满足时采取的应对措施。IDS 根据收集的数据，通过<b>条件匹配</b>判断是否出现入侵并采取相应动作。<br><span class="small muted">代表系统：20 世纪 80 年代初 SRI 公司开发的 <b>IDES</b>，以及著名的 <b>NIDES</b>（下一代入侵检测专家系统）。</span></td><td><b>优：</b>实现上较为简单。<br><b>缺（四条）：</b>① <b>处理速度比较慢</b>——专家系统采用<b>说明性</b>的表达方式，要求用<b>解释系统</b>来实现，而<b>解释器比编译器处理速度慢</b>；② 需要处理的数据量较大时对性能也有影响；③ 维护规则库需要大量人力，<b>规则之间具有关联性，更改任一规则都要考虑对其他规则的影响</b>；④ 规则的<b>全面性</b>难以保证。<br><span class="hl"><b>因此，专家系统法在现代入侵检测系统中很少应用。</b></span></td></tr>
+        <tr><td><b>模式匹配法</b></td><td><b>最基本的一种特征检测方法。</b>将收集到的入侵特征<b>转换成模式</b>，存放在<b>模式数据库</b>中；检测时把收集到的数据信息与模式数据库进行匹配。<br>实现手段多样：可以通过<b>字符串匹配</b>寻找特定的指令数据，也可以采用<b>正规的数学表达式</b>描述数据负载内容。<br><span class="small muted"><b>与专家系统法的关键差别：</b>同样需要知道攻击行为的具体知识，但攻击行为的语义描述<b>不是被转换成抽象的检测规则</b>，而是把入侵行为表示成<b>一个事件序列</b>或转换成<b>某种可以直接在网络数据包审计记录中找到的数据样板</b>，<b>不需要进行规则转换</b>。</span></td><td><b>正因为省掉了「规则转换」这一步</b>，可以直接从审计数据中提取相应的数据与之匹配，<b>不需要处理大量的数据，从而提高了效率</b>。<br><span class="hl"><b>模式匹配技术非常成熟，检测的准确率和效率都很高，也是目前入侵检测系统最常用的检测方法。</b></span><br><span class="small muted">这句话解释了为什么「模式匹配」的名字会被拿去当整个大类的绰号——见总览 §0.4。</span></td></tr>
+        <tr><td><b>状态迁移法</b></td><td>攻击者实施攻击过程中往往执行<b>一系列动作</b>，这些动作使系统<b>从初始状态逐步迁移到系统安全受到破坏的某个状态</b>。<br>· <b>初始状态</b>＝攻击开始前的系统状态<br>· <b>安全被破坏的状态</b>＝攻击成功实现的系统状态<br>· 两者之间可能有<b>一个或多个中间状态</b><br>系统状态用系统的一些<b>属性</b>描述，体现系统在特定时间点的特征。做法：<b>用状态转换图描述并检测已知的入侵模式</b>，保存入侵相关的状态转换图表并监控系统状态，<b>当用户动作驱动系统状态向入侵状态迁移时触发入侵警告</b>。</td><td><b>优：</b><span class="hl"><b>能够检测出多方协同的慢速攻击。</b></span><span class="small muted">——因为它盯的是「状态有没有一步步往坏的方向走」，而不是「某一个包像不像攻击」。攻击拆得再慢、来源再分散，状态图上的路径还是那一条。</span><br><b>缺：</b>如果<b>攻击场景复杂</b>，要<b>精确描述系统状态非常困难</b>。<br><b>因此，状态迁移法通常与其他入侵检测法结合使用。</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box beyond">
+    <div class="box-t">PPT 未讲 · 不作要求　—　Snort 入侵检测系统<span class="bref">课本 13.3 · p.400–405</span></div>
+    <p><b>是什么：</b>Snort 是用 <b>C 语言</b>编写的一款<b>开源、基于网络（NIDS）</b>的入侵检测系统，特点是小巧灵活、配置简便、功能强大、检测效率高。<span class="hl"><b>它主要采用「特征检测」的工作方式</b>——通过预先设置的检测规则对网络数据包进行匹配，发现各种类型的网络攻击。</span></p>
+    <p><b>边界在哪：</b>课本用了整整 6 页讲它的三大模块（数据包解析器、检测引擎、日志与报警子系统）、二维检测规则链、规则头与规则选项的完整语法、5 种规则动作（alert / log / pass / activate / dynamic）和 8 个规则实例。<b>而老师的 PPT 一个字都没提，连内容提纲里都没列。</b>按你的要求，本资料正文<b>不展开</b>。</p>
+    <p class="mt0"><b>但有一处必须知道：课本单选第 6 题就在考它</b>——「Snort 软件采用的入侵检测方法属于（　）」，答案 <b>B. 特征检测</b>。<b>记住上面加粗的那一句就够答题了。</b>真要深究请翻课本 p.400–405。</p>
+  </div>
+
+  <h3>3.3　异常检测 vs 误用检测：一张表定生死<span class="pref">PPT p.36</span></h3>
+
+  <div class="box def">
+    <div class="box-t">PPT p.36 原文（这一页只有两段话，但每一句都是考点）</div>
+    <p><b>异常检测技术：</b>必须掌握被保护系统<b>已知行为和预期行为的所有信息</b>，<span class="hl">这一点<b>实际上无法做到</b></span>，因此入侵检测系统必须<b>不断地学习并更新已有的行为轮廓</b>。</p>
+    <p><b>误用检测技术：</b>只有拥有<b>所有可能的入侵行为的先验知识</b>，而且必须能识别各种入侵行为的<b>过程细节</b>或者每种入侵行为的<b>特征模式</b>，才能检测到所有的入侵行为；该类入侵检测系统<b>只能检测出已有的入侵模式</b>，必须对<b>不断出现的新入侵行为进行归纳总结</b>。</p>
+    <p class="mt0"><b>看出对称了吗：</b>两者都要求「掌握全部信息」才能做到完美，而两者<b>都做不到</b>——一个做不到穷举所有正常，一个做不到穷举所有攻击。<b>区别只在于「做不到的那部分」被当成了什么：异常检测把它当坏人（误报），误用检测把它当好人（漏报）。</b></p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:20%">对比项</th><th style="width:40%">异常检测（基于行为 / AD）</th><th style="width:40%">误用检测（特征检测 / SD）</th></tr></thead>
+      <tbody>
+        <tr><td><b>手上有谁的模型</b></td><td><b>正常行为</b>模型（行为轮廓 / 活动概图）</td><td><b>已知攻击</b>特征库（入侵模式库）</td></tr>
+        <tr><td><b>判定规则</b></td><td><b>偏离</b>正常模型超过阈值 → 入侵</td><td><b>匹配</b>上攻击特征 → 入侵</td></tr>
+        <tr><td><b>没见过的东西</b></td><td>当成<b>坏人</b>（所以能抓新攻击）</td><td>当成<b>好人</b>（所以放过新攻击）</td></tr>
+        <tr><td><b>能否检测未知攻击</b></td><td><span class="hl"><b>能</b></span>　<span class="chip warn">单选 5、多选 3</span></td><td><b>不能</b></td></tr>
+        <tr><td><b>准确度 / 误报率</b></td><td>准确度较低，<b>误报率高</b></td><td><span class="hl">准确度<b>高</b>，<b>误报率低</b></span>　<span class="chip warn">单选 4</span></td></tr>
+        <tr><td><b>能否说出攻击类型</b></td><td><b>不能</b>——只能说「不正常」，难以分类和命名</td><td><b>能</b>——按特征库指明具体攻击类型</td></tr>
+        <tr><td><b>内部越权行为</b></td><td><span class="hl"><b>检测能力较强</b></span>——越权者没有攻击特征，只有行为反常</td><td><b>难以检测</b></td></tr>
+        <tr><td><b>依赖什么</b></td><td>行为模型的<b>完备性</b>与<b>阈值</b>的设定</td><td>特征库的<b>完备性</b>与特征的<b>区分度</b></td></tr>
+        <tr><td><b>维护成本花在哪</b></td><td><b>不断学习、更新行为轮廓</b>（无须维护特征库，管理员在这方面开销较小）</td><td><b>不断归纳新攻击、更新特征库</b>（工作量巨大）</td></tr>
+        <tr><td><b>对操作系统的依赖</b></td><td><b>较少依赖</b>特定主机操作系统</td><td>需要各攻击的过程细节，跨平台移植成本高</td></tr>
+        <tr><td><b>典型方法</b></td><td>统计分析法、人工免疫系统、机器学习法<span class="small muted">（聚类分析、神经网络都在这一侧）</span></td><td>专家系统法、<b>模式匹配法</b>、状态迁移法<span class="small muted">（＋条件概率、模型推理法、键盘监控法）</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box exam">
+    <div class="box-t">★ 这张表直接对应 5 道课本习题，做题时只要定位到某一行</div>
+    <p><b>单选 2</b>「不是特征检测的实现方式」→ <b>C. 统计分析法</b>（它在异常检测那一列）<br>
+    <b>单选 4</b>「检测<b>已知</b>攻击准确率最高」→ <b>D. 模式匹配</b>（准确度高那一行 ＋ 最常用的方法）<br>
+    <b>单选 5</b>「适合检测<b>未知</b>攻击」→ <b>A. 异常检测</b><br>
+    <b>单选 6</b>「Snort 采用的方法」→ <b>B. 特征检测</b><br>
+    <b>多选 3</b>「要进行<b>未知</b>攻击检测应选择」→ <b>ABC 聚类分析、人工免疫、神经网络</b>（全在异常检测一侧；D 模式匹配属于特征检测，只能查已知，所以被排除）</p>
+    <p class="mt0"><span class="hl"><b>速判口诀：题干出现「未知 / 新型 / 零日」→ 选异常检测那一侧；题干出现「已知 / 准确率最高 / 最常用」→ 选特征检测那一侧。</b></span></p>
+  </div>
+
+  <h3>3.4　数据源：什么样的数据可以作为判断入侵的依据<span class="pref">PPT p.37</span></h3>
+  <p>PPT 这一页把数据源分成三类（外加一个没答的问号，已在 §3.1 作答）：</p>
+
+  <div class="grid g3">
+    <div class="mini"><div class="t"><span class="ic">应</span>应用数据</div>
+      <p class="mt0">应用程序的<b>运行数据</b>：<b>日志、配置文件、状态</b>。</p>
+      <p class="mt0 small muted">优缺点见 §2.5.1「应用程序日志作为信息源：3 优 4 缺」——<b>简答 3 原题</b>。</p></div>
+    <div class="mini"><div class="t"><span class="ic">主</span>主机数据</div>
+      <p class="mt0">· <b>系统日志文件</b><br>· <b>目录和文件的异常变化</b><br>· <b>程序执行中的异常行为</b></p>
+      <p class="mt0 small muted">对应 §2.5.1 的「主机文件检测」四个对象；操作系统审计记录的三条缺陷是<b>简答 2 原题</b>。</p></div>
+    <div class="mini"><div class="t"><span class="ic">网</span>网络数据</div>
+      <p class="mt0">· <b>网络统计数据</b><br>· 网络协议分组的<b>控制字段</b>内容：<b>IP 地址、端口号</b><br>· 网络协议分组的<b>数据字段</b>中的<b>特殊内容</b></p>
+      <p class="mt0 small muted">注意后两条正好对应 §2.5.3：<b>NIDS 既查包头（控制字段）又查负载（数据字段），HIDS 两样都看不到。</b></p></div>
+  </div>
+
+  <div class="box exam">
+    <div class="box-t">★ 多选第 2 题「下列数据中，可用于判断计算机是否被入侵的有」→ <b>ABCD 全选</b></div>
+    <p>选项是<b>操作系统日志、网络数据、应用程序日志、注册表记录</b>。前三项就是 PPT 这一页的三类；<b>注册表记录</b>属于「主机文件检测」中的<b>系统运行控制</b>类。<span class="hl">凡是能反映主体对客体做了什么的记录，都可以是数据源——回到 §2.2 的 IDES 模型，这正是「审计记录」的定义。</span></p>
+  </div>
+
+  <h3>3.5　入侵检测系统的部署<span class="pref">PPT p.38–44（7 页）</span><span class="chip bad">课本无 · PPT 专有</span></h3>
+  <p>这是本章第二块<b>「PPT 有、课本一个字都没有」</b>的内容，同样占 <b>13%</b> 的篇幅。老师专门讲了 4 个部署位置，每个都给了独立的理由。</p>
+
+  <div class="svg-wrap">
+    <svg class="flow" viewBox="0 0 760 284" role="img" aria-label="基于网络的入侵检测系统四个部署位置：外网入口、DMZ区、内网主干、关键子网">
+      <defs>
+        <marker id="dp-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,1 L9,5 L0,9 z" fill="#1b3a8f"/>
+        </marker>
+      </defs>
+
+      <ellipse class="bx-c" cx="48" cy="120" rx="40" ry="24"/>
+      <text class="t-sm" x="48" y="124" text-anchor="middle">外部网络</text>
+
+      <line class="ln" x1="88" y1="120" x2="152" y2="120"/>
+      <rect class="bx-t" x="152" y="98" width="18" height="44" rx="2"/>
+      <text class="t-mut" x="161" y="156" text-anchor="middle">防火墙</text>
+
+      <line class="ln" x1="170" y1="120" x2="300" y2="120"/>
+      <text class="lbl" x="235" y="136" text-anchor="middle">DMZ 区（对外服务器）</text>
+      <rect class="bx-t" x="300" y="98" width="18" height="44" rx="2"/>
+      <text class="t-mut" x="309" y="156" text-anchor="middle">防火墙</text>
+
+      <line class="ln" x1="318" y1="120" x2="360" y2="120"/>
+      <rect class="bx-c" x="360" y="112" width="300" height="16" rx="8"/>
+      <text class="t-sm" x="420" y="124" text-anchor="middle">以太网（内部网）</text>
+      <line class="ln" x1="660" y1="120" x2="672" y2="120"/>
+      <ellipse class="bx-c" cx="714" cy="120" rx="42" ry="24"/>
+      <text class="t-sm" x="714" y="124" text-anchor="middle">内部网主机</text>
+
+      <rect class="bx-a" x="68" y="34" width="104" height="42" rx="5"/>
+      <text class="t-md" x="120" y="52" text-anchor="middle">② 外网入口</text>
+      <text class="t-mut" x="120" y="68" text-anchor="middle">入侵检测器</text>
+      <line class="ln-a" x1="120" y1="77" x2="120" y2="117" marker-end="url(#dp-ar)"/>
+
+      <rect class="bx-a" x="183" y="34" width="104" height="42" rx="5"/>
+      <text class="t-md" x="235" y="52" text-anchor="middle">① DMZ 区</text>
+      <text class="t-mut" x="235" y="68" text-anchor="middle">入侵检测器</text>
+      <line class="ln-a" x1="235" y1="77" x2="235" y2="117" marker-end="url(#dp-ar)"/>
+
+      <rect class="bx-a" x="468" y="34" width="104" height="42" rx="5"/>
+      <text class="t-md" x="520" y="52" text-anchor="middle">③ 内网主干</text>
+      <text class="t-mut" x="520" y="68" text-anchor="middle">入侵检测器</text>
+      <line class="ln-a" x1="520" y1="77" x2="520" y2="109" marker-end="url(#dp-ar)"/>
+
+      <line class="ln" x1="620" y1="128" x2="620" y2="192"/>
+      <ellipse class="bx-c" cx="620" cy="216" rx="46" ry="22"/>
+      <text class="t-sm" x="620" y="220" text-anchor="middle">关键子网</text>
+      <rect class="bx-a" x="440" y="195" width="110" height="42" rx="5"/>
+      <text class="t-md" x="495" y="213" text-anchor="middle">④ 关键子网</text>
+      <text class="t-mut" x="495" y="229" text-anchor="middle">入侵检测器</text>
+      <line class="ln-a" x1="551" y1="216" x2="571" y2="216" marker-end="url(#dp-ar)"/>
+
+      <rect class="bx-c" x="10" y="244" width="742" height="36" rx="5"/>
+      <text class="t-sm" x="381" y="259" text-anchor="middle" fill="#3f3f3f">读法：越往左（越靠外网），看到的攻击越多、越原始，但噪声也越大、越难定位真实的源地址；</text>
+      <text class="t-mut" x="381" y="273" text-anchor="middle">越往右（越靠内网），流量已被防火墙过滤，检测器越好用、越能准确定位攻击源和目的——这就是「先过滤再检测」。</text>
+    </svg>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:12%">位置</th><th style="width:32%">在哪 / 检测什么</th><th style="width:34%">优点（PPT 原文）</th><th style="width:22%">代价</th></tr></thead>
+      <tbody>
+        <tr><td><b>① DMZ 区</b><br><span class="chip">常用</span></td><td>部署在 <b>DMZ 区的总口</b>上。可以检测到<b>所有针对用户向外提供服务的服务器</b>进行攻击的行为。<b>由于 DMZ 区中的服务器是外网可见的，因此这里部署入侵检测也是最为需要的。</b></td><td>· 检测来自外部的攻击，<b>这些攻击已经渗入过第一层防御体系</b><br>· 可以容易地<b>检测网络防火墙的性能并找到配置策略中的问题</b><br>· <b>检测的对象比较集中</b><br>· 即使进入的攻击行为<b>不可识别</b>，IDS 通过正确配置也可以<b>从被攻击主机的反馈中</b>获得受攻击的信息</td><td>只覆盖对外服务器，看不到内网内部的横向活动</td></tr>
+        <tr><td><b>② 外网入口</b></td><td>位于<b>防火墙之前</b>。可以检测所有<b>进出防火墙外网口</b>的数据，检测到<b>所有来自外部网络的可能攻击行为并记录</b>。</td><td>· 可以针对目标网络的攻击进行<b>计数</b>，并记录<b>最为原始</b>的攻击数据包<br>· 可以记录针对目标网络的<b>攻击类型</b></td><td><span class="hl"><b>PPT 明说「效果并不理想」</b></span>：受入侵检测器<b>性能</b>限制（未过滤流量最大）；<b>对使用 NAT 的内部网来说，无法定位攻击的源和目的地址</b></td></tr>
+        <tr><td><b>③ 内网主干</b><br><span class="chip">最常用</span></td><td>主要检测<b>内网流出</b>和<b>经过防火墙流入内网</b>的网络数据。可以检测<b>通过防火墙进入的攻击</b>以及<b>内部网络向外的不正常操作</b>。<span class="hl"><b>能够准确定位攻击源和目的。</b></span><br>关键前提：<b>防火墙已经过滤掉大量非法数据包，因此使入侵检测器能有效地工作。</b></td><td>· <b>检测大量的网络通信</b>，提高了检测攻击的识别可能<br>· <b>检测内网可信用户的越权行为</b><br>· 实现对<b>内部网络信息</b>的检测</td><td>流量最大的一段，对设备性能要求高</td></tr>
+        <tr><td><b>④ 关键子网</b></td><td>部署在<b>内部关键子网的出口</b>。可以检测<b>来自内部和外部的所有</b>针对<b>受保护子网</b>的不正常网络行为。<br>关键前提：<b>内部子网的进出流量比较小，可以保证入侵检测器的有效检测。</b></td><td>· <b>集中资源</b>用于检测针对<b>关键系统和资源</b>的、来自企业<b>内外部</b>的攻击<br>· 将<b>有限的资源</b>进行有效部署，<b>获取最高的使用价值</b></td><td>只保护这一个子网，覆盖面最窄</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box key">
+    <div class="box-t">四个位置背后其实只有一条规律：<b>「先过滤再检测」</b></div>
+    <p>把 ②③④ 的理由并排看就清楚了：<br>
+    <b>②</b> 在防火墙<b>之前</b>，流量最脏 → PPT 直说「<b>效果并不理想</b>」<br>
+    <b>③</b> 在防火墙<b>之后</b>，「<b>防火墙已经过滤掉大量非法数据包，因此使入侵检测器能有效地工作</b>」<br>
+    <b>④</b> 在关键子网出口，「<b>进出流量比较小，可以保证入侵检测器的有效检测</b>」</p>
+    <p class="mt0"><span class="hl"><b>结论：入侵检测器的有效性和它要处理的流量成反比。所以正确做法是让防火墙先把明显的垃圾挡掉，IDS 只在「已经筛过一遍」的流量上做深度分析。</b></span>这也正面回答了「有了防火墙为什么还要 IDS，有了 IDS 为什么还要防火墙」——<b>两者是流水线上的上下游，不是替代关系。</b></p>
+  </div>
+
+  <div class="grid g2">
+    <div class="mini"><div class="t"><span class="ic">主</span>基于主机的 IDS 怎么部署<span class="pref">PPT p.43</span></div>
+      <p class="mt0">· HIDS 的部署可以给系统提供<b>高级别的保护</b>。<br>
+      · 但由于 HIDS <b>本身需要占用服务器的计算和存储资源</b>，因此要<b>根据服务器本身的空闲负载能力</b>选取<b>不同类型</b>的入侵检测系统，并进行<b>专门的配置</b>。</p>
+      <p class="mt0 small muted">呼应 §2.5.1 的不足④「占用主机资源」——部署 HIDS 本质上是拿<b>服务器性能</b>换<b>检测精度</b>，所以要看服务器还剩多少余量。</p>
+    </div>
+    <div class="mini"><div class="t"><span class="ic">警</span>报警策略<span class="pref">PPT p.44</span></div>
+      <p class="mt0">IDS 检测到入侵行为时需要<b>报警并进行相应的反应</b>。<b>如何报警、选取什么样的报警，需要根据整个网络的环境和安全的需求进行确定。</b></p>
+      <p><b>PPT 给的两档对比：</b><br>
+      · <b>一般性服务的企业</b>：报警<b>主要集中在已知的有威胁的攻击行为上</b><span class="small muted">（宁可漏，不要吵）</span><br>
+      · <b>关键性服务企业</b>：需要将<b>尽可能多的报警进行记录</b>，并<b>对部分认定的报警进行实时的反馈</b><span class="small muted">（宁可吵，不要漏）</span></p>
+      <p class="mt0"><span class="hl"><b>注意这又是误报／漏报的取舍，只不过换成了管理策略的形式：报警策略的本质就是「你更怕误报还是更怕漏报」。</b></span></p>
+    </div>
+  </div>
+
+  <div class="chain">
+    <div class="chain-i prev"><div class="chain-k">承上</div><div class="chain-b">§2 分清了 IDS 的组成与类型，但没说<b>凭什么判定「这是攻击」</b>。</div></div>
+    <div class="chain-i now"><div class="chain-k">§3 本节</div><div class="chain-b">两条路：<b>比对正常（异常检测）</b>或<b>比对已知攻击（误用检测）</b>；数据从应用／主机／网络三处来；检测器按「先过滤再检测」的原则摆在四个位置上。</div></div>
+    <div class="chain-i next"><div class="chain-k">留下的坑</div><div class="chain-b">两条路的缺点<b>无法同时消除</b>——一个误报高，一个漏报高，而且调一个必然恶化另一个。<b>再加上 APT 和零日漏洞，两条路一起失效。→ §4</b></div></div>
+  </div>
+</div>
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-num">§ 4 ── State　<span class="pref">PPT 提纲有 · 正文 0 页</span><span class="bref">课本 p.391、p.406</span></span>
+    <h2 class="sec-t">研究现状：入侵检测的两个死结</h2>
+    <p class="sec-lede">这一节就是 PPT 内容提纲里的第 4 项。它是全章唯一「老师列了标题却没讲」的部分——也是<b>唯一能同时解释「前面三节为什么都不够用」和「§5 为什么要换思路」</b>的一节。</p>
+  </div>
+
+  <div class="box trap">
+    <div class="box-t">⚠ 关于这一节的篇幅，说明一下</div>
+    <p>本资料其它各节都<b>严格按 PPT 的详略分配篇幅</b>。<b>唯独这一节例外</b>：老师的 PPT <b>正文一页都没讲</b>，我却给了它接近一页纸。理由有三条：</p>
+    <p>① <b>它被列在「内容提纲」里，而且那张提纲在全篇重复出现了 4 次</b>——列进一级标题就是老师认账的考纲范围，正文空白只说明他打算课上口头带过或者交给课本；<br>
+    ② <b>课本习题在这里考了 3 道</b>：<b>多选 4</b>（最重要的两个评价指标）、<b>简答 7</b>（如何评估效能）、<b>简答 8</b>（入侵检测技术的局限性）；<br>
+    ③ <b>不讲这一节，§5 网络欺骗就是没头没尾的</b>——课本正是在 13.4 一开头用这两个问题引出网络欺骗的。</p>
+    <p class="mt0"><b>结论：这是「老师留给课本讲」的部分，不是「不考」的部分。</b>照写不误。</p>
+  </div>
+
+  <h3>4.1　死结一：误报率与漏报率此消彼长，永远调不平</h3>
+
+  <div class="box def">
+    <div class="box-t">两个定义（课本 p.391 原文，一个字都别改）</div>
+    <dl class="kv">
+      <dt>误报率<br><span class="small muted">rate of false positive</span></dt><dd><span class="hl"><b>正常的用户活动被判定为入侵的比率。</b></span>误报将<b>增加管理员的工作负担</b>——管理员必须从告警中区分出哪些是实际的攻击活动，哪些是入侵检测系统产生的误报。</dd>
+      <dt>漏报率<br><span class="small muted">rate of false negative</span></dt><dd><span class="hl"><b>入侵活动发生了，但却没有被发现的比率。</b></span>漏报对于重要的信息系统而言<b>非常危险</b>，因为会给管理者造成<b>虚假安全的错觉</b>：攻击已经发生了，入侵检测系统却毫无反应，<b>形同虚设</b>。</dd>
+    </dl>
+    <p class="mt0"><b>合起来一句：</b>误报率和漏报率<b>反映了入侵检测的精准程度</b>。<span class="hl"><b>误报率和漏报率越低，表明入侵检测的效能越好。</b></span></p>
+  </div>
+
+  <div class="box exam">
+    <div class="box-t">★★ 课本用两个极端情形，证明了这两者根本调不平<span class="bref">课本 p.406</span></div>
+    <p>课本原话：<b>「在实际应用中，漏报和误报是相互抵触的评价标准。」</b>然后给了两个极端例子——<b>这两个例子是本节最好用的答题素材，简答 7、8 都能用</b>：</p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">把旋钮拧到底</th><th style="width:17%">漏报率</th><th style="width:17%">误报率</th><th style="width:40%">后果</th></tr></thead>
+      <tbody>
+        <tr><td><b>极端一：</b>将主机发出的<b>所有数据包都视为异常</b><span class="small muted">（谁都不信）</span></td><td><b>0</b><span class="small muted">——一个攻击都不会漏</span></td><td><b>100%</b><span class="small muted">——所有的正常数据包都将引起误报</span></td><td><b>大量的误报会分散管理员的精力，使管理员无法应对真正的攻击。</b><span class="small muted">告警淹没了真相，等于没有告警。</span></td></tr>
+        <tr><td><b>极端二：</b>将主机发出的<b>所有数据包都视为正常</b><span class="small muted">（谁都信）</span></td><td><b>100%</b><span class="small muted">——所有的攻击数据包都将被漏报</span></td><td><b>0</b><span class="small muted">——不会冤枉任何人</span></td><td><b>漏报的频繁发生将给管理者造成虚假的安全景象——网络危机重重，管理员却得不到必要的告警。</b></td></tr>
+        <tr><td><b>现实：</b>把旋钮放在中间</td><td colspan="2" class="center"><b>两个都不为 0，而且<span class="hl">压低任何一个必然抬高另一个</span></b></td><td>「现有入侵检测技术<b>还不能很好地解决误报和漏报问题</b>。」</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box key">
+    <div class="box-t">这个死结在前三节里已经出现过四次了，回头对照一下</div>
+    <ul style="margin-bottom:0">
+      <li><b>§2.3 IPS：</b>「为降低误报率，造成<b>漏报情况较多</b>，只对能够准确确认的攻击进行处理」——<b>拿多漏报换少误报</b>。</li>
+      <li><b>§3.1 异常检测：</b>「<b>阈值设置不当</b>，将直接影响入侵检测的准确性，<b>导致误报或者漏报</b>」——<b>同一个旋钮，两头都是坑</b>。</li>
+      <li><b>§3.2 特征检测：</b>误报率低是最突出的优点，代价是<b>特征库里没有的一律放行</b>——<b>用漏报买来的低误报</b>。</li>
+      <li><b>§3.5 报警策略：</b>一般企业「只报已知威胁」＝ 少误报多漏报；关键企业「尽可能多地记录」＝ 少漏报多误报。<b>连管理策略都只是在拧同一个旋钮。</b></li>
+    </ul>
+  </div>
+
+  <div class="box exam">
+    <div class="box-t">★★ 三道习题的答案，就在这一节</div>
+    <p><b>多选 4「评价入侵检测系统性能的最重要的两个指标是」→ BD 漏报率、误报率。</b>依据是课本原话：<b>「误报率和漏报率对于入侵检测系统而言是最重要的两项评价指标。」</b>（吞吐率、速率是性能指标，不是<b>检测效能</b>指标。）</p>
+    <p><b>简答 7「如何对入侵检测系统的效能进行评估？」→ 课本参考答案：误报率、漏报率、准确率。</b><br>
+    <span class="muted">注意这里比多选 4 多了一个「准确率」。<b>不矛盾</b>：多选 4 问的是「<b>最重要的两个</b>」，简答 7 问的是「怎么评估」，可以多列一项。开卷时建议这样写：<b>「最重要的两项是误报率和漏报率，此外还有准确率。误报率＝正常活动被判为入侵的比率，漏报率＝入侵发生却未被发现的比率，两者越低效能越好；但两者相互抵触，……（接上面的极端例子）。」</b></span></p>
+    <p class="mt0"><b>简答 8「入侵检测技术主要存在哪些方面的局限性？」→ 课本答案页写的是「略」，需要自己组织。</b>建议按四层来答：<br>
+    <b>① 根本局限：</b>误报率与漏报率<b>相互抵触</b>，无法同时降低（举极端例子）；<br>
+    <b>② 方法局限：</b>特征检测<b>不能检测未知攻击</b>、维护特征库工作量巨大、难以检测内部攻击；异常检测<b>误报率高</b>、行为模型建立困难、难以对入侵行为分类命名；<br>
+    <b>③ 数据局限：</b><b>加密流量难以分析</b>（NIDS）；高速宽带网络下逐包分析<b>开销过高</b>；不同系统对 TCP/IP 实现的差异<b>可被攻击者利用来绕过监控</b>；<br>
+    <b>④ 时代局限：</b><b>不能有效应对 APT 攻击和零日漏洞</b>（见下 4.2）。</p>
+  </div>
+
+  <h3>4.2　死结二：对 APT 攻击基本无能为力<span class="bref">课本 p.406</span></h3>
+
+  <div class="box def">
+    <div class="box-t">课本原文（这段话是 §5 网络欺骗的直接引子）</div>
+    <p>近年来，随着<b>国家层面的网络攻击力量</b>的参与，以 <b>APT 攻击</b>为代表的网络攻击向 <span class="hl"><b>专业化、复杂化、隐蔽化和长期化</b></span> 方向发展，并<b>大量使用零日漏洞</b>进行攻击，给入侵检测及响应带来极大挑战。</p>
+    <p>尽管<b>机器学习</b>的应用<b>部分</b>解决了未知攻击的检测问题，但仍不足以应对日益增长的未知和复杂攻击，特别是在<b>深度跟踪、了解未知攻击的细节、增加攻击者的攻击难度</b>等方面；也<b>不能对全面、深度反映网络安全状态的网络安全感知系统提供足够的支持</b>。</p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:20%">APT 的四个特点</th><th style="width:80%">为什么恰好卡死了 §3 的两种方法</th></tr></thead>
+      <tbody>
+        <tr><td><b>专业化</b></td><td>攻击者是有组织、有资源的专业团队，会<b>专门针对你部署的检测设备做规避测试</b>，上线前就确认过不触发告警。</td></tr>
+        <tr><td><b>复杂化</b></td><td>多阶段、多手段组合。<b>每一步单独看都不构成攻击特征</b>，只有连起来才是攻击——特征检测逐条匹配根本抓不到。</td></tr>
+        <tr><td><b>隐蔽化</b></td><td>刻意<b>把行为伪装成正常业务</b>（用合法账号、走正常端口、混在日常流量里）——<b>这直接打掉了异常检测的立足点</b>：它本来就是靠「不像正常」来判断的。</td></tr>
+        <tr><td><b>长期化</b></td><td>驻留数月甚至数年，把动作<b>摊薄到很长的时间窗口</b>里，每天的量都在阈值以下。<span class="hl">回想 §1 的 FireEye 数据：外部通知类的驻留时间中位数仍有 <b>141 天</b>——这就是长期化的实测证据。</span></td></tr>
+        <tr><td><b>＋ 零日漏洞</b></td><td><b>特征库里必然没有</b>它的特征（因为世界上还没人见过），特征检测<b>结构性失效</b>；异常检测理论上有机会，但结合上面的「隐蔽化」，实际上也抓不住。<span class="chip warn">单选 8 就在考这一点</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box exam">
+    <div class="box-t">★ 单选第 8 题：零日漏洞渗透攻击，最有可能检测并防御的安全机制是？→ <b>C. 网络欺骗防御</b></div>
+    <p><b>为什么不是 IDS：</b>零日漏洞<b>没有已知特征</b>，特征检测必然漏；异常检测理论上可能报警，但 APT 会把行为伪装成正常，实际检不出。<br>
+    <b>为什么不是防火墙、杀毒软件：</b>它们同样依赖已知规则和已知病毒特征库。<br>
+    <b>为什么是网络欺骗防御：</b><span class="hl">它根本不去「识别攻击长什么样」——蜜罐是一个<b>没有任何正常业务会去访问</b>的假资源，<b>攻击者用什么漏洞进来的不重要，重要的是「他碰了不该碰的东西」</b>。零日不零日，对蜜罐来说没有区别。</span></p>
+  </div>
+
+  <div class="chain">
+    <div class="chain-i prev"><div class="chain-k">承上</div><div class="chain-b">§1–§3 沿着「检测」这条路走到了尽头：定义、组成、分类、两种方法、四个部署位置，能做的都做了。</div></div>
+    <div class="chain-i now"><div class="chain-k">§4 本节</div><div class="chain-b">承认这条路有<b>两个解不开的死结</b>：误报与漏报<b>相互抵触</b>；面对 <b>APT ＋ 零日漏洞</b>时两种方法一起失效。</div></div>
+    <div class="chain-i next"><div class="chain-k">于是</div><div class="chain-b">既然「判断一段行为是不是攻击」这条路走不通，那就<b>换一个不需要判断的办法</b>：造一个正常业务永远不会碰、<b>凡是碰它的必然是攻击者</b>的东西。<b>→ §5 网络欺骗</b></div></div>
+  </div>
+</div>
+<div class="sec pagebreak">
+  <div class="sec-head">
+    <span class="sec-num">§ 5 ── Trend　<span class="pref">PPT p.46–58（13 页 · 24.5%）</span><span class="bref">课本 13.4 · p.406–414</span></span>
+    <h2 class="sec-t">网络欺骗：不再判断「是不是攻击」，而是造一个「碰了就是攻击」的东西</h2>
+    <p class="sec-lede">占全章四分之一篇幅，课本习题在这里考了 <b>5 道</b>。它是 §4 两个死结的正面回应，不是可有可无的尾巴。</p>
+  </div>
+
+  <div class="scene">
+    <div class="scene-k">PPT p.48 · 蜜罐的定义里藏着整节最反直觉的一句</div>
+    <p class="scene-q">蜜罐是一种<b>安全资源</b>，其价值在于<b>被探测、攻击或突破</b>。</p>
+    <div class="scene-b">
+      <p>课本把这句话的出处也给了：<b>蜜网项目（The Honeynet Project）创始人 Lance Spitzner</b> 给出的定义。紧跟着两句解释才是关键：</p>
+      <p>· <b>「这种安全资源<u>是什么</u>并不重要</b>（路由器、运行仿真服务的脚本或真实的生产系统），<b>重要的是这种安全资源的<u>价值在于受到攻击</u>。」</b><br>
+      · <span class="hl"><b>「如果该系统从未受到探测或攻击，那它就没有价值。这一点与大多数受保护的工作系统正好相反，后者不希望被探测或攻击。」</b></span></p>
+      <div class="scene-real">
+        <div class="t">为什么这个反转能绕开 §4 的死结</div>
+        <p class="mt0">普通业务系统上，「访问」既可能是客户也可能是攻击者，<b>所以必须判断</b>——而判断必然产生误报和漏报。<br>
+        蜜罐是一个<b>没有任何正常业务会指向它</b>的资源：没有员工需要它，没有客户知道它，没有程序会去连它。<span class="hl"><b>因此「有人访问蜜罐」这件事本身就是证据，不需要判断内容、不需要匹配特征、不需要建行为模型。误报率天然趋近于 0。</b></span></p>
+        <p class="mt0">代价也很清楚：<b>它只能抓「主动来碰它的人」</b>。攻击者如果直奔真实目标、一次都没扫到蜜罐，蜜罐什么也发现不了。<b>所以网络欺骗是入侵检测的补充，不是替代</b>——这也正是课本最后要把它和防火墙、IDS「有机结合」的原因。</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>5.1　网络欺骗的概念与四条用途<span class="pref">PPT p.46–47</span><span class="bref">课本 p.406</span></h3>
+
+  <div class="box def">
+    <div class="box-t">出处与核心思想（PPT 与课本完全一致，可直接誊抄）</div>
+    <p><b>网络欺骗（Cyber Deception）</b>最早由美国<b>普渡大学</b>的 <b>Gene Spafford</b> 于 <b>1989 年</b>提出。</p>
+    <p><b>核心思想：</b>采用<b>引诱或欺骗策略</b>，诱使入侵者相信网络与信息系统中<b>存在有价值的、可利用的安全弱点</b>，并具有一些<b>可攻击窃取的资源</b>（<b>当然这些资源是伪造的或不重要的</b>），进而<b>将入侵者引向这些错误的资源</b>，同时<b>安全可靠地记录入侵者的所有行为</b>，以便全面地了解攻击者的<b>攻击过程</b>和使用的<b>攻击技术</b>。</p>
+    <p class="mt0"><b>理想的网络欺骗系统还有一条额外要求（课本 p.406）：</b>可以使入侵者<b>不会感到自己很轻易地达到了期望的目标</b>，并使入侵者<b>相信入侵取得了成功</b>。<span class="muted">——太容易得手会让攻击者起疑，这是欺骗设计的基本功。</span></p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:8%">#</th><th style="width:46%">网络欺骗的四条用途（PPT p.47 ＝ 课本 p.406）</th><th style="width:46%">它对应的是 §4 哪个死结</th></tr></thead>
+      <tbody>
+        <tr><td class="num">1</td><td><b>吸引攻击流量，影响入侵者使之按照防护方的意志行动</b></td><td>把攻击从真实资产上<b>引开</b>——防御方第一次<b>主动</b>掌握了节奏</td></tr>
+        <tr><td class="num">2</td><td><b>检测</b>入侵者的攻击并<b>获知其攻击技术和意图</b>，对入侵行为进行<b>告警和取证</b>，<b>收集攻击样本</b></td><td>正面回应「<b>不能有效应对 APT 和零日</b>」——课本明说，很多利用<b>未公开漏洞</b>的高级攻击就是通过高交互蜜罐发现的</td></tr>
+        <tr><td class="num">3</td><td><b>增加入侵者的工作量、拖延攻击真实目标的过程、入侵复杂度以及不确定性</b></td><td>对付 APT 的<b>「长期化」</b>——既然你耗得起时间，那就让你把时间耗在假目标上</td></tr>
+        <tr><td class="num">4</td><td>为网络防护提供<b>足够的信息来了解入侵者</b>，这些信息可以用来<b>强化现有的安全措施</b>（防火墙规则、IDS 配置、杀毒软件特征等），或生成<b>网络安全态势</b></td><td>反过来<b>喂养</b> §3 的特征库——蜜罐捕获的新攻击样本，正好补上特征检测「特征库不完备」的短板</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box key">
+    <div class="box-t">课本的一句总评（简答 9 会用到）</div>
+    <p>「网络欺骗技术能够<b>弥补传统网络防御体系的不足</b>，<span class="hl"><b>变被动防御为积极主动防御</b></span>，与其他多种网络安全防护技术相结合，<b>互为补充</b>，共同构建<b>多层次</b>的信息安全保障体系。」</p>
+  </div>
+
+  <h3>5.2　蜜罐 Honeypot<span class="pref">PPT p.48–55（8 页，本节主体）</span><span class="bref">课本 13.4.1 · p.407–410</span></h3>
+  <p><b>蜜罐是最早采用欺骗技术的网络安全系统。</b>设计一个蜜罐的目标就是——<b>使它被扫描探测、攻击或被突破，同时能够很好地进行安全控制</b>。</p>
+
+  <h4>5.2.1　三个分类维度（三道题的答案都在这里）</h4>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:14%">分类维度</th><th style="width:20%">类型</th><th style="width:66%">特点</th></tr></thead>
+      <tbody>
+        <tr><td rowspan="2"><b>按部署方式</b><span class="pref">PPT p.49</span></td><td><b>生产型蜜罐</b></td><td>部署在<b>组织内网</b>中，主要由<b>公司内部</b>用来<b>改善组织网络的整体安全状态</b>。<b>仅捕获有限的信息</b>，特点是<b>低交互、易于部署</b>，但<b>提供的攻击或攻击者信息较少</b>。</td></tr>
+        <tr><td><b>研究型蜜罐</b></td><td>部署在<b>内网的出口处或公网上</b>，由<b>某一研究团队或组织</b>负责维护。目的是通过蜜罐<b>收集网络攻击行为和入侵模式信息</b>，以便研究相应的防御方法、了解网络安全态势。<b>部署和维护非常复杂，但可以捕获大量攻击信息。</b></td></tr>
+        <tr><td rowspan="3"><b>按交互程度<br>（逼真程度）</b><span class="pref">PPT p.50</span></td><td><b>低交互蜜罐</b></td><td><b>模拟</b>服务，交互能力弱，<b>按剧本来</b>。</td></tr>
+        <tr><td><b>中交互蜜罐</b></td><td>介于两者之间。通常是<b>模拟的而不是真实实现</b>一个网络服务或设备的<b>全部</b>功能，<b>漏洞也是模拟的</b>，能与攻击者进行<b>大部分</b>交互。</td></tr>
+        <tr><td><b>高交互蜜罐</b></td><td>提供<b>真实或接近真实的服务</b>、<b>故意留下漏洞</b>、<b>部署安全监控系统</b>。</td></tr>
+        <tr><td rowspan="2"><b>按实现方式</b><span class="pref">PPT p.51</span></td><td><b>物理蜜罐</b></td><td>安装<b>真实操作系统和应用服务</b>的计算机系统，通过<b>开放容易受到攻击的端口</b>、<b>留下可被利用的漏洞</b>来诱惑攻击者。<b>日常管理维护比较烦琐，特别是在被攻陷之后，回滚到原来的配置状态需要大量的工作。</b></td></tr>
+        <tr><td><b>虚拟蜜罐</b></td><td>在物理主机上<b>安装蜜罐软件</b>使其可以模拟不同类型的系统和服务，<b>一台物理主机上可以创建很多个虚拟蜜罐</b>。两种部署方式：<br>① <b>虚拟机蜜罐</b>——用 VMware 等虚拟化工具创建虚拟操作系统，提供和真实主机一样的服务。<b>真实性高</b>，但<b>可能由于占用太多系统资源而破坏蜜罐正常运行</b>。<br>② <b>在物理主机上运行的蜜罐</b>——通过模拟服务吸引攻击者。但<b>由于自身程序只有用户层权限，不能实现完整的交互，真实性较差</b>。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>5.2.2　低交互与高交互：整节最值得对照的一组</h4>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:16%"></th><th style="width:42%">低交互蜜罐</th><th style="width:42%">高交互蜜罐</th></tr></thead>
+      <tbody>
+        <tr><td><b>本质</b></td><td>提供的网络服务只能与攻击者进行<b>非常有限</b>的交互，<span class="hl"><b>类似于按照写好的剧本与攻击者进行交互</b></span></td><td><b>不再简单模拟</b>某些协议或服务，而是提供<b>真实或接近真实</b>的网络服务，使攻击者<b>很难判断</b>与其交互的是蜜罐还是真实服务</td></tr>
+        <tr><td><b>课本给的例子</b></td><td>一个 <b>Telnet 低交互蜜罐</b>并不是完整地实现了 Telnet 服务器的<b>全部协议功能</b>，而只是「<b>模拟 Telnet 服务器</b>」对<b>有限的几个</b> Telnet 客户端请求报文进行响应，<b>响应的结果也相对固定</b></td><td>两种实现方式：<b>① 模拟</b>——完全模拟一个网络服务的<b>所有</b>功能（如 FTP 蜜罐<b>完整地实现 FTP 协议</b>，<b>其中的安全漏洞也是模拟出来的</b>）；<b>② 真实系统</b>——完全用一个<b>真实的系统</b>作为蜜罐，配上<b>无用的业务数据</b>，<b>留下真实的</b>操作系统或应用系统安全漏洞，再加上安全监控系统</td></tr>
+        <tr><td><b>资源开销</b></td><td>交互能力弱 → <b>消耗系统资源相对较少，实现也比较简单</b>，通常<b>用一个软件进程加配置文件（即交互脚本）</b>即可实现</td><td><b>成本高</b>。随着服务器性能提高和虚拟化技术发展，很多高交互蜜罐<b>用虚拟机实现</b>——一台高性能服务器上可部署多个虚拟机蜜罐，使用<b>虚拟机内省技术</b>对宿主机器上的虚拟机蜜罐的行为进行监控</td></tr>
+        <tr><td><b>关键不足<br>／能力</b></td><td><b>由于只能实现有限的交互能力，容易让攻击者发现与其交互的是一个蜜罐</b>，而不是一个实际的网络服务，因此<b>欺骗能力有限</b></td><td><b>高成本和强能力</b>使其主要用于<b>研究分析网络攻击行为，特别是复杂的网络攻击</b>。<span class="hl">当前很多高级的网络攻击，如<b>利用未公开的安全漏洞或攻击手段实施的攻击，是通过高交互蜜罐发现的</b></span></td></tr>
+        <tr><td><b>部署目的</b></td><td><b>减轻受保护网络可能会受到的网络安全威胁</b>，捕获一些<b>简单的</b>网络攻击行为</td><td>捕获<b>新的攻击方式，甚至是零日攻击</b></td></tr>
+        <tr><td><b>安全要求</b></td><td>风险低</td><td><b>蜜罐服务器中的数据不是真正的业务数据</b>，而是<b>看上去真实、但其实是专为蜜罐设计的「诱饵」数据</b>，不会泄露组织的业务数据。<span class="hl"><b>为了安全起见，必须限制或控制蜜罐主机与其他正常受保护主机或服务器之间的通信，防止攻击者利用蜜罐对其他正常系统实施攻击。</b></span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>5.2.3　蜜罐的功能与关键技术<span class="pref">PPT p.52–55（4 页）</span><span class="bref">课本 p.408–410</span></h4>
+
+  <div class="box def">
+    <div class="box-t">低交互蜜罐的功能：只有两项<span class="pref">PPT p.52</span></div>
+    <p><b>① 攻击数据捕获与处理</b>——在<b>一个或多个协议服务端口上监听</b>，当有攻击数据到来时<b>捕获并处理</b>这些攻击数据，<b>必要的时候还需给出响应</b>；将处理后的攻击数据<b>记录到本地日志</b>，同时向<b>平台服务端</b>（如果有的话）<b>实时推送</b>。</p>
+    <p class="mt0"><b>② 攻击行为分析</b>——对攻击日志进行<b>多个维度（协议维、时间维、地址维等）的统计分析</b>，<b>发现攻击行为规律</b>，并用<b>可视化方法</b>展示分析结果。</p>
+  </div>
+
+  <p><b>高交互蜜罐的功能则有四项</b>（PPT 用了 3 页逐项讲，课本 p.409–410 给了细节）。<b>四项之间是有先后顺序的</b>：</p>
+  <ol class="steps">
+    <li>
+      <div><b>网络欺骗</b>——对蜜罐进行<b>伪装</b>，使它在被攻击者<b>扫描时表现为网络上的真实主机</b>。</div>
+      <div class="small" style="border-left:2px solid var(--key-line); padding-left:8px; margin-top:3px"><b>为什么必须先做这一步：</b>蜜罐的全部价值在于「被攻击」，<b>一眼被识破的蜜罐等于零价值</b>。五种具体技术见下表。</div>
+    </li>
+    <li>
+      <div><b>攻击捕获</b>——采集攻击者对网络实施攻击的相关信息。通过分析捕获的信息，可以研究攻击者<b>所利用的系统漏洞</b>，获取<b>新的攻击方式</b>，甚至是<b>零日攻击</b>。</div>
+      <div class="small" style="border-left:2px solid var(--key-line); padding-left:8px; margin-top:3px"><b>两个难点（课本明写）：</b>① 要在<b>防止被攻击者识破</b>的情况下<b>尽可能多地记录下系统状态信息</b>——记得越细越容易露馅，这是一对矛盾；② <b>通信加密问题</b>：攻击者可能采用<b>加密连接（如 SSL/TLS 和 IPsec）</b>对服务实施攻击，<b>此时只有劫持通信过程才能捕获信息</b>。<br><b>怎么做：</b>蜜罐主机通常使用<b>内核层工具</b>或<b>虚拟机内省技术</b>捕获攻击者在蜜罐中的全部活动信息（如获取权限之后的<b>按键记录</b>、使用的<b>提权程序</b>、留下的<b>后门</b>等），并<b>实时传送到其他服务器（一般是独立的日志服务器）</b>。此外还可通过网络中的防火墙、IDS 等其他安全系统采集信息。</div>
+    </li>
+    <li>
+      <div><b>数据控制</b>——<b>限制蜜罐向外发起的连接</b>，<span class="hl"><b>确保蜜罐不会成为攻击者的跳板</b></span>。</div>
+      <div class="small" style="border-left:2px solid var(--key-line); padding-left:8px; margin-top:3px"><b>这一项是整套蜜罐技术里唯一「不为了抓人，而是为了别闯祸」的功能，最容易被漏掉，也最容易出简答题。</b><br>
+      <b>原则：</b>对<b>流出</b>蜜罐的数据，<b>限制连接的数量和速度</b>。为确保安全、<b>防止蜜罐主机沦陷而引起连锁反应</b>，数据控制应当采用<b>多层次</b>的机制：可以用<b>硬件防火墙</b>限制单个蜜罐主机在一段时间内外发起的<b>连接数以及流量速率</b>，对蜜罐外连的<b>每个数据包使用入侵防御系统（IPS）检测并控制</b>。<br>
+      <span class="muted">注意这里 IPS 又出场了——蜜罐是故意让人攻陷的，所以出口必须有能<b>当场阻断</b>的东西，光告警的 IDS 不够用。</span></div>
+    </li>
+    <li>
+      <div><b>数据分析</b>——对蜜罐采集到的信息进行<b>多个维度（协议、时间、地址、代码等）的统计分析</b>，<b>发现攻击行为规律</b>，并用<b>可视化方法</b>展示分析结果。</div>
+    </li>
+  </ol>
+
+  <div class="box trap">
+    <div class="box-t">⚠ 课本给的免责声明，答题时加一句会更稳</div>
+    <p>「<b>并不是所有的高交互蜜罐都具有上面介绍的全部功能，具体实现了哪些功能跟蜜罐的实现方式（物理的还是模拟的）、目的、成本等因素有关。</b>」</p>
+  </div>
+
+  <h5>五种网络欺骗（伪装）技术<span class="bref">课本 p.409</span></h5>
+  <p class="small muted">课本原话：常用的网络欺骗方法主要有<b>模拟各种系统协议栈指纹、网络流量仿真以及网络地址转换</b>等，具体的实现技术包括下面五种。</p>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:15%">技术</th><th style="width:52%">怎么做</th><th style="width:33%">解决什么破绽</th></tr></thead>
+      <tbody>
+        <tr><td><b>① 空间欺骗<br>技术</b></td><td>通过<b>创建蜜罐来伪装成实际不存在的主机</b>，引诱攻击者在这些蜜罐上花费时间。利用计算机系统的<b>多宿主能力</b>，<b>在单个物理主机的网卡上就能模拟出 IP 地址和 MAC 地址均不相同的蜜罐主机</b>。<b>采用该技术可以创建整个内网所需要的虚拟主机。</b></td><td>攻击者探测网络时<b>工作量会极大增加</b>——因为要找到真正的目标主机，就得<b>先排除虚假目标</b>。而且<b>有漏洞的虚拟主机相比真实主机更容易被攻击者发现</b>，从而引诱他去打假的，<b>拖延攻击进度</b></td></tr>
+        <tr><td><b>② 网络流量<br>仿真</b></td><td>为蜜罐<b>生成仿真流量</b>。两种措施：<b>一是将内网中的网络流量复制进来并重现</b>，造成以假乱真的效果；<b>二是依据一定规则自动生成流量</b>。</td><td><span class="hl">如果蜜罐主机<b>没有和其他主机的交互</b>，就会呈现出<b>孤立的状态</b>——攻击者<b>监听不到蜜罐主机的网络流量</b>就会产生怀疑，<b>进而放弃对它的利用</b></span></td></tr>
+        <tr><td><b>③ 网络动态<br>配置</b></td><td>配置<b>动态的网络路由信息</b>，使整个网络的行为<b>随时间发生改变</b>。蜜罐主机的伪造特征必须<b>尽可能和真实物理主机的特征相同</b>——例如<b>蜜罐主机应该和内网中正常主机的开机关机时间相一致</b>。</td><td>实际的网络<b>是动态变化的</b>，会有主机不断加入或退出。<b>如果欺骗是静态的</b>，攻击者<b>在长期收集网络路由信息的基础上就会识别出蜜罐主机</b>，导致欺骗失败</td></tr>
+        <tr><td><b>④ 多重地址<br>转换</b></td><td>执行<b>重定向的代理服务</b>，<b>把蜜罐主机所在位置和内部网络的位置分离开来</b>。主要由<b>代理服务功能</b>进行地址转换。</td><td>这样<b>实际进入蜜罐网络的流量，在外部看来就是进入了内部网络</b>；并且还可在<b>真实物理上绑定虚拟的服务</b>，<b>显著提高网络的真实性</b></td></tr>
+        <tr><td><b>⑤ 创建组织<br>信息欺骗</b></td><td>根据内部网络的实际情况，在蜜罐主机上<b>放置相应的虚假信息</b>。例如：在模拟的<b>邮件服务器</b>上<b>生成伪造的邮件往来</b>；在 <b>DNS 服务器</b>上，<b>存储和蜜罐网络实际情况相同的域名信息</b>。</td><td>攻击者在攻击蜜罐服务器<b>获取到这些数据后，就会相信自己攻击的是预定的目标主机</b><span class="small muted">——一台没有任何历史痕迹的「干净」服务器，本身就是最大的破绽</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box exam">
+    <div class="box-t">★ 空间欺骗里那个数字，把算式写出来（这类算式常是简答题的得分点）</div>
+    <p>课本原话：「<b>单台物理主机的最大模拟地址数一般可达 4000 以上，这相当于单个 B 类地址空间只需要 16 台物理主机就能虚拟出来。</b>」</p>
+    <div class="fx">
+      B 类地址空间 = 2<sup>16</sup> = 65 536 个地址　　4 096 = 2<sup>12</sup>（即课本说的「4000 以上」）<br>
+      65 536 ÷ 4 096 = <b>16 台物理主机</b>
+      <small>课本写「4000 以上」是取整的说法，实际对应的是 2<sup>12</sup>＝4 096。<b>16 台机器就能把整个 B 类网段填满虚假主机</b>——这就是空间欺骗成本极低、性价比极高的原因。</small>
+    </div>
+  </div>
+
+  <div class="box beyond">
+    <div class="box-t">PPT 未讲 · 不作要求　—　具体的蜜罐项目与产品名单<span class="bref">课本 p.408</span></div>
+    <p>课本列了一批开源/商用蜜罐：<b>Honeyd、The Honeynet Project、狩猎女神、Specter、Mantrap</b>；按类别还有数据库类（HoneyMysql、MongoDB）、Web 类（Shadow Daemon、StrutsHoneypot、WebTrap）、服务类（Honeyprint、SMB Honeypot、honeyntp）、工业控制类（Conpot、Gaspot、SCADA Honeynet、gridpot）。<b>PPT 一个都没提，属于背景资料。</b>真要查见课本 p.408。</p>
+  </div>
+
+  <h3>5.3　蜜网 Honeynet<span class="pref">PPT p.56</span><span class="bref">课本 13.4.2 · p.410–411</span></h3>
+
+  <div class="box def">
+    <div class="box-t">定义与要点（PPT 这一页的两段话，与课本一致）</div>
+    <p><b>蜜网（Honeynet）是由多个蜜罐组成的欺骗网络</b>，蜜网中通常<b>包含不同类型的蜜罐</b>，可以<b>在多个层面捕获攻击信息</b>，以满足不同的安全需求。</p>
+    <p>蜜网<b>既可以用多个物理蜜罐来构建，也可以由多个虚拟蜜罐组成</b>。目前，通过<b>虚拟化技术（如 VMware）</b>可以方便地把多个虚拟蜜罐<b>部署在单个服务器主机上</b>。</p>
+    <p class="mt0"><b>课本补充的关键一句：</b>蜜网<b>一般需要与其他防护设备，如防火墙、入侵检测系统配合，确保蜜网处于可控状态，不会整体沦陷</b>。<span class="muted">——呼应 5.2.3 的「数据控制」。</span></p>
+  </div>
+
+  <div class="box trap">
+    <div class="box-t">⚠ 虚拟蜜网 vs 物理蜜网：为什么实际都用「虚实结合」</div>
+    <p><b>虚拟蜜网的问题（两条）：</b>① <b>很有可能被攻击者识别</b>；② <b>可能因为架设蜜罐的服务器上存在漏洞而被攻破，从而导致虚拟蜜网的权限被攻击者获得</b>（一台宿主机被拿下，上面所有虚拟蜜罐一起沦陷）。<br>
+    <b>物理蜜网的问题：</b>需要付出<b>比较高的建设成本和维护成本</b>。<br>
+    <span class="hl"><b>因此实际应用中，多采用虚实结合的方法。</b></span></p>
+  </div>
+
+  <h4>蜜网项目的三代演进<span class="bref">课本 p.410–411</span></h4>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:14%">时间</th><th style="width:86%">事件</th></tr></thead>
+      <tbody>
+        <tr><td><b>1999</b></td><td>德国<b>曼海姆大学</b>的 <b>Lance Spitzner</b> 发起最早的蜜网项目。</td></tr>
+        <tr><td><b>2000.6</b></td><td>成立<b>蜜网项目（The Honeynet Project）</b>——<b>非赢利</b>研究小组，由来自不同行业的安全专家组成，目标是「<b>研究黑客团体的工具、策略、动机，并且共享所获得的知识</b>」，提高整个行业的水平。</td></tr>
+        <tr><td><b>2000 年初</b></td><td>提出<b>第一代蜜网</b>架构并进行实验验证。<br><b>第一代的两个缺陷：</b>① <b>各项任务由不同的蜜罐主机执行，这样在记录攻击信息时就会出现不一致的情况</b>；② <b>攻击者可以通过工具扫描整个网络的路由拓扑，增加了整个网络被攻陷的可能</b>。</td></tr>
+        <tr><td><b>2001.9</b></td><td>出版《<b>Know Your Enemy</b>》，详细描述蜜网采用的技术、蜜网的价值、工作方式和收集到的信息。</td></tr>
+        <tr><td><b>2001.12</b></td><td>宣布成立「<b>蜜网研究联盟</b>」，吸引了全球的安全团体。</td></tr>
+        <tr><td><b>2004</b></td><td>发布<b>第二代蜜网</b>的<b>集成工具包</b>，包括部署第二代蜜网所需的所有工具，应用上更加方便。</td></tr>
+        <tr><td><b>此后</b></td><td>工作集中在<b>中央管理服务器</b>的开发：<b>基于云思想</b>，把各成员蜜罐捕获的信息<b>集中上传到云服务器</b>，并提供<b>攻击趋势分析</b>功能。随后发布最新工具包，即<b>第三代蜜罐</b>。<br><b>第三代的改进：</b>体系结构和原来大致相同，但<b>基于安全考虑，工具包对系统功能进行了裁剪，删掉了很多不需要或者可能被攻击者利用的服务，只留了一些必要的服务</b>，<b>大大提高了蜜网整体的安全性</b>；并支持<b>在线自动化升级</b>。</td></tr>
+        <tr><td><b>2004.9</b><br><span class="chip">国内</span></td><td><b>狩猎女神项目（The Artemis Project）</b>启动——<b>北京大学</b>计算机科学技术研究所信息安全工程研究中心推进的蜜网研究项目。当年 <b>12 月</b>在互联网上依照<b>第二代</b>蜜网技术部署了蜜网，捕获并深入分析了包括<b>黑客攻击、蠕虫传播和僵尸网络活动</b>在内的许多攻击案例。<b>2005 年 2 月</b>被接受成为「<b>蜜网研究联盟</b>」的成员。目前该项目部署的蜜网<b>融合了「蜜网项目」的第三代蜜网框架、Honeyd 虚拟蜜罐系统以及 Mwcollect 和 Nepenthes 恶意软件自动捕获软件</b>。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>5.4　网络欺骗防御<span class="pref">PPT p.57–58</span><span class="bref">课本 13.4.3 · p.411–414</span></h3>
+
+  <div class="box def">
+    <div class="box-t">PPT p.57 的那一句，其实就是课本的「本书观点」</div>
+    <p><b>PPT 原文（＝课本 p.411「本书的观点是」那一段）：</b><span class="hl">网络欺骗防御是一种<b>体系化的防御方法</b>，它将<b>蜜罐、蜜网、混淆</b>等欺骗技术同<b>防火墙、入侵检测系统</b>等传统防护机制<b>有机结合</b>起来，构建<b>以欺骗为核心</b>的网络安全防御体系。</span></p>
+    <p class="mt0"><b>Gartner 的定义（课本 p.411，原文把 Gartner 印成了「Garter」）：</b>使用<b>骗局或假动作</b>来<b>阻挠或者推翻攻击者的认知过程</b>，<b>扰乱攻击者的自动化工具</b>，<b>延迟或阻断攻击者的活动</b>，通过使用<b>虚假的响应、有意的混淆、假动作、误导</b>等伪造信息达到「欺骗」的目的。</p>
+  </div>
+
+  <div class="box key">
+    <div class="box-t">网络欺骗防御的三条思路（课本 p.411，最能体现「和 IDS 有什么不同」）</div>
+    <p><b>前提：</b><span class="hl">它<b>并不尝试构建一个没有漏洞的系统</b>，也<b>不去刻意阻止具体的攻击行为</b>。</span><span class="muted">——这一句直接对应 §1「绝对安全的系统做不到」和 §4「判断攻击这条路走不通」。</span></p>
+    <ul style="margin-bottom:0">
+      <li><b>① 藏</b>：通过<b>混淆</b>的方法<b>隐藏系统的外部特征</b>，使系统展现给攻击者的是一个<b>有限甚至完全隐蔽或错误的攻击面</b>，<b>减少暴露给攻击者并被利用的资源</b>，导致<b>攻击复杂度和攻击者代价增长</b>。</li>
+      <li><b>② 骗</b>：通过<b>主动暴露受保护网络的真假情况</b>来提供给攻击者<b>误导性信息</b>，<b>让攻击者进入防御的圈套</b>，并通过<b>影响攻击者的行为</b>使其向着<b>有利于防御方</b>的方向发展。</li>
+      <li><b>③ 掺</b>：通过在<b>真实网络系统中布置伪造的数据</b>，<span class="hl"><b>即使攻击者成功窃取了真实的数据，也会因为虚假数据的存在而降低了所窃取数据的总体价值</b></span>。<span class="muted">——这是最后一道防线：承认可能被偷，但让偷到的东西不值钱。</span></li>
+    </ul>
+  </div>
+
+  <div class="box trap">
+    <div class="box-t">⚠ 蜜罐、蜜网、网络欺骗防御三者的关系，学界至今没有统一说法——简答 9 就在考这个</div>
+    <p>课本明写：<b>「有关『网络欺骗防御』这一名词的内涵和外延目前还没有一个统一的、权威的定义。」</b>三种流行说法：</p>
+    <div class="tbl-wrap" style="margin:8px 0">
+      <table>
+        <thead><tr><th style="width:26%">说法</th><th style="width:74%">主张</th></tr></thead>
+        <tbody>
+          <tr><td><b>甲：没有本质区别</b></td><td>从技术和功能上讲，网络欺骗防御与蜜罐<b>没有本质上的区别</b>；或认为<b>蜜罐就是网络欺骗防御的一种重要实现方式</b>；或认为<b>网络欺骗防御是一种功能强大的、可动态变化的蜜罐</b>。</td></tr>
+          <tr><td><b>乙：欺骗防御是总称</b></td><td>把「网络欺骗防御」看作是<b>利用欺骗进行防御的技术总称</b>——这样<b>蜜罐、蜜网就是网络欺骗防御的一种形式</b>，<b>不应该把网络欺骗防御看作是比蜜罐、蜜网更高级的网络防御技术</b>。</td></tr>
+          <tr><td><b>丙：本书观点</b><span class="chip warn">按这个答</span></td><td><b>网络欺骗防御是一种体系化的防御方法</b>，它把蜜罐、蜜网、混淆等欺骗技术<b>同防火墙及入侵检测系统等传统防护机制有机结合</b>起来，构建<b>以欺骗为核心</b>的网络安全防御体系。</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="mt0"><b>答简答 9 的建议写法：</b>先给三者各自的定义（蜜罐＝单个诱饵资源，价值在于被攻击；蜜网＝多个蜜罐组成的欺骗网络，能在多个层面捕获信息；网络欺骗防御＝体系化方法），<b>再点明「学界对三者关系尚无统一定义」并列出甲乙两种说法</b>，<b>最后写「本书观点是……」并采纳丙。</b><span class="hl">把争议本身写出来，比硬给一个层级关系更稳妥——因为课本自己就没给。</span></p>
+  </div>
+
+  <h4>四个层次的欺骗防御技术<span class="pref">PPT p.58（只列了四个名称）</span><span class="bref">课本 p.411–414</span></h4>
+
+  <div class="box trap">
+    <div class="box-t">⚠ 第二层的名字，PPT 和课本不一样</div>
+    <p><b>PPT p.58 写的是：</b>网络层欺骗 / <b>终端层欺骗</b> / 应用层欺骗 / 数据层欺骗<br>
+    <b>课本 p.411 写的是：</b>网络层欺骗 / <b>系统层欺骗</b> / 应用层欺骗 / 数据层欺骗</p>
+    <p class="mt0"><b>说的是同一层。</b>拆解一下就清楚了——课本 13.4.3 第 2 小节的原话是「<b>系统层的欺骗防御主要采用基于设备的欺骗技术，用来防护系统免受损害，在实现手段上，通过伪装成有漏洞的<u>终端设备</u>来欺骗攻击者</b>」。<span class="hl"><b>「终端」二字正是从「终端设备」来的。答题写「系统层欺骗」最稳（那是课本的正式名），写「终端层」也不算错。</b></span></p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:13%">层次</th><th style="width:29%">应对哪些威胁</th><th style="width:58%">核心思路与必记关键词</th></tr></thead>
+      <tbody>
+        <tr><td><b>① 网络层<br>欺骗</b></td><td><b>网络指纹探测<br>网络窃听<br>网络渗透</b><span class="small muted">（三类）</span></td><td>解决<b>如何部署欺骗节点</b>和<b>如何隐藏己方设备</b>。<span class="hl">在网络层隐藏己方设备的欺骗技术统称「<b>混淆</b>」——<b>地址混淆、协议指纹混淆、系统指纹混淆、网络拓扑混淆</b>。</span><br>· <b>对付指纹探测：</b>指纹探测发生在<b>攻击链的侦察阶段</b>，<b>干扰侦察即可混淆结果</b>——给出<b>错误的扫描结果</b>、暴露<b>错误的网络拓扑</b>（击败 traceroute）、<b>随机地址跳变</b>与随机指纹、为每台主机生成<b>各不相同且不断变化的虚拟网络视图</b>。<br>· <b>对付网络渗透：</b><b>设置虚假资产增大目标空间</b>，分散注意力；<b>网络地址随机化</b>（用 DHCP 不断重分配地址，<b>使带有目标列表的蠕虫失效</b>）。</td></tr>
+        <tr><td><b>② 系统层<br>欺骗</b><br><span class="small muted">PPT 称「终端层」</span></td><td>防护<b>系统免受损害</b><br><b>预防或探测</b>攻击<br>检测<b>内部威胁</b></td><td>采用<b>基于设备</b>的欺骗技术，<b>通过伪装成有漏洞的终端设备来欺骗攻击者</b>。<br>关键词：<b>多层诱饵框架</b>（诱饵覆盖用户配置文件、应用文件、服务器、网络与系统活动）· <b>诱骗网络接口控制器 NIC</b> · <b>把疑似受攻击的业务克隆迁移到欺骗环境</b> · <span class="hl"><b>honey 权限</b>——把<b>非法的访问权限分配给敏感资产的「镜像版本」</b>，再<b>监控谁去访问或修改这些虚假资产</b>，从而发现非法用户。</span></td></tr>
+        <tr><td><b>③ 应用层<br>欺骗</b></td><td><b>基于主机的软件攻击</b><br><b>基于 Web 的远程攻击</b><span class="small muted">（含网页挂马、钓鱼网站等被动式攻击）</span></td><td><b>原理：</b>攻击者<b>靠应用程序的响应来判断漏洞是否已修复</b>——那就<b>伪装不存在的漏洞</b>、<b>随机响应漏洞扫描</b>、<b>随机加延迟模拟系统缺陷</b>。<br>关键词：<span class="hl"><b>honey-patches</b>（部署<b>虚假但看起来有效的漏洞</b>，<b>让攻击者无法判断攻击是否成功</b>，并把他<b>无缝迁移到诱饵版本</b>里监控）</span> · <b>软件陷阱</b> · <b>诱饵链接</b>（普通用户不可见，只有爬虫和机器人会触发）· <b>蜜罐配置文件</b> · <b>让口令猜解者以为猜对了</b>再引入虚假环境。<br>· <b>对付恶意网页：</b>主动访问目标站点来发现威胁（伪装成正常用户浏览器的自动巡逻系统）。</td></tr>
+        <tr><td><b>④ 数据层<br>欺骗</b><span class="chip warn">多选 8</span></td><td><b>身份盗窃<br>数据泄露<br>侵犯隐私<br>身份假冒</b><span class="small muted">（四类）</span><br>用在<b>攻击者已突破防御设备、进入业务网络内部之后</b></td><td>利用<b>假账户、假文档</b>等特定用户数据。可<b>按需部署在真实业务系统中</b>，用来<b>检测攻击、暴露其他欺骗资源、跟踪攻击者</b>。<br>· <b>蜜罐账户（honey accounts）</b>——防身份盗窃的常用手段，可<b>追踪钓鱼者、检测恶意软件</b>。<br>· <span class="hl"><b>honeywords</b>——为防止散列用户密码泄露，<b>在口令文件中增加额外 N−1 个假的身份凭据</b>。</span><span class="small muted">真密码藏在 N 个里，破解出来也不知哪个是真的；<b>一旦有人用了假的那个登录，系统立刻知道口令文件已泄露</b>。</span><br>· <b>诱饵文档 / 伪造电子表格</b>（如含诱饵银行信息和电汇细节的假表格）。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box exam">
+    <div class="box-t">★ 多选第 8 题就靠这张表分层：「属于<b>数据层</b>欺骗技术的是」→ <b>AC</b></div>
+    <p><b>A. honeywords</b> ✔ 数据层（口令文件里的假凭据）　<b>C. 诱饵文档</b> ✔ 数据层（假文档）<br>
+    <b>B. 协议指纹混淆</b> ✘ <b>网络层</b>（「混淆」是网络层的专属词）　<b>D. 设置大量虚假主机</b> ✘ <b>网络层</b>（空间欺骗，增大目标空间）</p>
+    <p class="mt0"><span class="hl"><b>速判：出现「混淆」「虚假主机 / 虚假 IP / 拓扑」→ 网络层；出现「终端设备 / 权限 / 克隆业务」→ 系统层；出现「漏洞 / 网页 / 链接 / 口令猜解」→ 应用层；出现「账户 / 文档 / 口令文件 / 数据」→ 数据层。</b></span></p>
+  </div>
+
+  <div class="box beyond">
+    <div class="box-t">PPT 未讲 · 不作要求　—　四层欺骗防御的具体研究工作、项目与产品<span class="bref">课本 p.411–414</span></div>
+    <p><b>PPT p.58 对这四层只写了四个名称</b>，而课本用了 <b>4 页</b>罗列各层的<b>具体研究工作</b>——几十条带人名的文献引用（Le Malecot、Trassare、CINDAM、NASR、honey 权限、honey-patches、HoneyMonkey、Juels 与 Rivest 的 honeywords……）。<b>上表已把其中有考点价值的原理和关键词提炼出来</b>；<b>人名、方案代号和文献编号不展开</b>——PPT 一个都没提，习题也一个都没考。真要查见课本 <b>p.411–414</b>。</p>
+    <p class="mt0"><b>同样不展开的还有课本 p.414 的 6 个欺骗防御产品：</b>TrapX 的 <b>DeceptionGrid</b>、DARPA 的 <b>Prattle</b>、<b>CyberChaff</b>、Sandia 国家实验室的 <b>HADES</b>（2017 年 R&amp;D100 创新奖）、国内长亭科技的<b>谛听 D-Sensor</b>、默安科技的<b>幻阵</b>。</p>
+  </div>
+
+  <div class="box key">
+    <div class="box-t">全章收尾：课本给网络欺骗防御的总评（简答 9、单选 7 和 8 的共同依据）</div>
+    <p>「总的来讲，网络欺骗防御采用欺骗技术来<b>检测和防御</b>入侵，<span class="hl"><b>部分解决了传统入侵检测系统的误报和漏报问题，同时还具有防御攻击的能力，而这是传统入侵检测系统所不具有的。</b></span>当然，<b>网络欺骗防御系统的部署和实现都比传统入侵检测系统要复杂，成本也要高很多</b>。」</p>
+    <p class="mt0"><b>这段话拆成三句就是三道题的答案：</b><br>
+    ① <b>「检测和防御」兼有</b> → <b>单选 7</b>「兼有入侵检测和防御攻击的有」＝ <b>C. 网络欺骗防御</b>（防火墙只防不检，IDS 只检不防，杀毒软件不针对网络入侵）<br>
+    ② <b>「部分解决了误报和漏报」</b> → 呼应 §4 的死结一<br>
+    ③ <b>「部署实现复杂、成本高很多」</b> → 这就是本章因果链最后一格的「留下的坑」</p>
+  </div>
+
+  <div class="chain">
+    <div class="chain-i prev"><div class="chain-k">承上</div><div class="chain-b">§4 承认「判断一段行为是不是攻击」这条路有两个解不开的死结。</div></div>
+    <div class="chain-i now"><div class="chain-k">§5 本节</div><div class="chain-b">换思路：<b>造一个正常业务永远不会碰的假资源</b>。碰它的必然是攻击者，<b>不需要判断，误报天然趋近于 0</b>。蜜罐 → 蜜网 → 体系化的网络欺骗防御（四个层次）。</div></div>
+    <div class="chain-i next"><div class="chain-k">它自己留下的坑</div><div class="chain-b"><b>部署和实现比传统 IDS 复杂得多、成本高很多</b>；只能抓「主动来碰它的人」；蜜罐可能<b>被识破</b>，甚至<b>被当成跳板</b>（所以必须做数据控制）。<b>因此它是补充，不是替代——全章的结论就是「有机结合」。</b></div></div>
+  </div>
+</div>
+<div class="sec pagebreak">
+  <div class="sec-head">
+    <span class="sec-num">§ 6 ── 习题　<span class="bref">课本 13.5 · p.415–417</span></span>
+    <h2 class="sec-t">课本习题全解：10 单选 ＋ 8 多选 ＋ 9 简答 ＋ 综合题第(4)问</h2>
+    <p class="sec-lede">答案已<b>逐题对着课本答案页（p.494）核过</b>，与课本上的手写答案<b>完全一致</b>。答案页写「略」的题目，解析为本资料自编，已逐条标注。</p>
+  </div>
+
+  <div class="box def">
+    <div class="box-t">收题范围说明</div>
+    <p><b>收：</b>单选 10 道、多选 8 道、简答 9 道、综合题第 <b>(4)</b> 问 —— 共 <b>28 道</b>。<br>
+    <b>不收：</b>综合题的第 (1)(2)(3) 问。它们分别考<b>强制访问控制（第 4 章）</b>、<b>密码学方案设计（第 2、3 章）</b>、<b>IPsec VPN 与 SSL VPN 的选型（第 6、7 章）</b>，<b>与本章无关</b>。只有第 (4) 问「边界部署防火墙就够了吗」是第 13 章的内容。<span class="muted">如果你想连那三问一起复习，说一声就补上。</span></p>
+  </div>
+
+  <h3>6.1　单项选择题（10 道）</h3>
+
+  <div class="mc">
+    <div class="mc-h"><span class="qn">单1</span><span>基于网络的 IDS 最适合检测（　）攻击。</span></div>
+    <div class="mc-o"><span>A. 字典攻击和特洛伊木马</span><span>B. 字典攻击和拒绝服务攻击</span><span class="ok">C. 网络扫描和拒绝服务攻击 ✔</span><span>D. 拒绝服务攻击和木马</span></div>
+    <div class="mc-a"><b>答案 C。</b>课本给的判据：<b>网络扫描、ARP 欺骗、DDoS 等「利用网络协议进行的攻击」适合用网络数据源</b>；<b>主机用户的非授权活动、利用操作系统漏洞的攻击适合用主机数据源</b>。<br><b>逐项排除：字典攻击</b>是反复猜口令，痕迹在<b>主机的登录日志</b>里，属 HIDS；<b>特洛伊木马</b>是主机上的进程与文件，也属 HIDS。所以含这两项的 A、B、D 全错。<span class="bref">§2.5.4</span></div>
+  </div>
+
+  <div class="mc">
+    <div class="mc-h"><span class="qn">单2</span><span>下列入侵检测方法中，（　）不是特征检测的实现方式。</span></div>
+    <div class="mc-o"><span>A. 模式匹配法</span><span>B. 专家系统法</span><span class="ok">C. 统计分析法 ✔</span><span>D. 状态迁移法</span></div>
+    <div class="mc-a"><b>答案 C。</b><b>特征检测（＝误用检测）的三种典型技术是：专家系统法、模式匹配法、状态迁移法</b>，A、B、D 全在其中。<br><b>统计分析法属于「异常检测」</b>——异常检测的三类方法是<b>统计分析法、人工免疫系统、机器学习法</b>。<span class="hl">凡是「统计、免疫、机器学习/神经网络/聚类」都在异常检测一侧。</span><span class="bref">§3.2、§3.3 对比表</span></div>
+  </div>
+
+  <div class="mc">
+    <div class="mc-h"><span class="qn">单3</span><span>采用异常检测方法进行入侵检测时，可以用（　）来评估用于异常检测的数据的质量。质量越高，说明数据越有规律，用来进行异常检测就越准确。</span></div>
+    <div class="mc-o"><span class="ok">A. 条件熵 ✔</span><span>B. 数据量</span><span>C. 数据类别</span><span>D. 概率</span></div>
+    <div class="mc-a"><b>答案 A。</b>课本 p.393 明写：可以利用信息论的<b>熵、条件熵、相对熵和信息增益</b>等概念来<b>定量地描述一个数据集的特征，分析数据源的质量</b>。<b>熵越小，数据越有规律</b>，据此建立的模型准确性越好；<b>条件熵越小，不确定性越小，通过已知预测未知的可靠性越大</b>。<br><b>为什么是条件熵而不是熵：</b>题干强调「用来进行异常检测就越准确」——安全审计数据具有<b>时间上的序列特征</b>，<b>条件熵正好衡量「已知前 k 个事件后，剩下的还有多少不确定性」</b>。<span class="bref">§3.1 公式框</span></div>
+  </div>
+
+  <div class="mc">
+    <div class="mc-h"><span class="qn">单4</span><span>如果要检测<b>已知</b>攻击，检测准确率最高的方法是（　）。</span></div>
+    <div class="mc-o"><span>A. 聚类分析</span><span>B. 人工免疫</span><span>C. 神经网络</span><span class="ok">D. 模式匹配 ✔</span></div>
+    <div class="mc-a"><b>答案 D。</b>题眼是<b>「已知」＋「准确率最高」</b>——两个词都指向<b>特征检测</b>那一侧。课本 p.392 原话：<span class="hl">「<b>模式匹配技术非常成熟，检测的准确率和效率都很高，也是目前入侵检测系统最常用的检测方法。</b>」</span><br>A、B、C 全是<b>异常检测</b>的方法，优势在于查<b>未知</b>攻击，但<b>准确度通常没有特征检测高</b>。<span class="bref">§3.2、§3.3</span></div>
+  </div>
+
+  <div class="mc">
+    <div class="mc-h"><span class="qn">单5</span><span>下列方法中，适合检测<b>未知</b>攻击的是（　）。</span></div>
+    <div class="mc-o"><span class="ok">A. 异常检测 ✔</span><span>B. 特征检测</span><span>C. 专家系统</span><span>D. 模式匹配</span></div>
+    <div class="mc-a"><b>答案 A。</b>与单 4 <b>互为镜像</b>：题眼是<b>「未知」</b>。异常检测的第一条优点就是<b>「能够检测出新的网络入侵方法的攻击」</b>——它比对的是「正常」，<b>不需要事先见过这个攻击</b>。<br>B 特征检测的第一条缺点正是<b>「不能检测出新的入侵行为」</b>；C 专家系统法、D 模式匹配法都是<b>特征检测的具体实现</b>，一并排除。<span class="bref">§3.3 对比表「能否检测未知攻击」那一行</span></div>
+  </div>
+
+  <div class="mc">
+    <div class="mc-h"><span class="qn">单6</span><span>Snort 软件采用的入侵检测方法属于（　）。</span></div>
+    <div class="mc-o"><span>A. 异常检测</span><span class="ok">B. 特征检测 ✔</span><span>C. 神经网络</span><span>D. 机器学习</span></div>
+    <div class="mc-a"><b>答案 B。</b>课本 13.3 开头原话：<b>「Snort 主要采用<u>特征检测</u>的工作方式，通过预先设置的<u>检测规则</u>对网络数据包进行<u>匹配</u>，发现各种类型的网络攻击。」</b><br><span class="hl"><b>速判：只要看到「规则 / 匹配 / 规则库」就是特征检测。</b></span>Snort 是<b>开源的、基于网络的（NIDS）</b>入侵检测系统，用 <b>C 语言</b>编写。<span class="muted">本资料正文未展开 Snort（老师 PPT 一个字没提），完整内容见课本 p.400–405；记住这一句就够答本题。</span></div>
+  </div>
+
+  <div class="mc">
+    <div class="mc-h"><span class="qn">单7</span><span>下列安全机制中，<b>兼有</b>入侵检测和防御攻击的有（　）。</span></div>
+    <div class="mc-o"><span>A. 防火墙</span><span>B. 杀毒软件</span><span class="ok">C. 网络欺骗防御 ✔</span><span>D. 入侵检测系统</span></div>
+    <div class="mc-a"><b>答案 C。</b>课本 p.414 最后一段原话：<b>「网络欺骗防御采用欺骗技术来<u>检测和防御</u>入侵，部分解决了传统入侵检测系统的误报和漏报问题，<u>同时还具有防御攻击的能力，而这是传统入侵检测系统所不具有的</u>。」</b><br><b>逐项排除：</b>A 防火墙<b>只防不检</b>（P.D.R 里只占 Protection）；D 入侵检测系统<b>只检不防</b>（只占 Detection）；B 杀毒软件针对的是恶意代码，不是网络入侵。<br><span class="muted">留意：<b>IPS 确实也兼有检测和防御</b>，但它<b>不在选项里</b>——因为 IPS 是老师 PPT 加的内容，课本从头到尾没讲，所以课本习题不会用它当选项。</span><span class="bref">§5.4</span></div>
+  </div>
+
+  <div class="mc">
+    <div class="mc-h"><span class="qn">单8</span><span>如果攻击者使用一个<b>零日漏洞</b>对目标网络进行渗透攻击，则最有可能检测并防御这种攻击的安全机制是（　）。</span></div>
+    <div class="mc-o"><span>A. 防火墙</span><span>B. 杀毒软件</span><span class="ok">C. 网络欺骗防御 ✔</span><span>D. 入侵检测系统</span></div>
+    <div class="mc-a"><b>答案 C。</b><b>零日漏洞的定义决定了「特征库里必然没有它」</b>——防火墙的规则、杀毒软件的病毒特征库、IDS 的入侵特征库<b>全部失效</b>；异常检测理论上有机会，但 APT 会把行为伪装成正常业务，实际也抓不住。<br><span class="hl"><b>而网络欺骗防御根本不需要「认识」这个攻击</b>——蜜罐是没有任何正常业务会去访问的假资源，<b>攻击者用什么漏洞进来的不重要，重要的是「他碰了不该碰的东西」</b>。</span>课本还明确说：<b>当前很多利用未公开安全漏洞实施的攻击，是通过高交互蜜罐发现的。</b><span class="bref">§4.2、§5.2</span></div>
+  </div>
+
+  <div class="mc">
+    <div class="mc-h"><span class="qn">单9</span><span>如果攻击者使用<b>加密信道</b>（如 IPsec、TLS、HTTPS）对目标网络进行攻击，则最有可能检测到这种攻击的是（　）。</span></div>
+    <div class="mc-o"><span>A. 基于网络的 IDS</span><span class="ok">B. 基于主机的 IDS ✔</span><span>C. 基于网络的 IDS 和基于主机的 IDS</span><span>D. 防火墙</span></div>
+    <div class="mc-a"><b>答案 B。</b>密文在网线上是一堆随机字节，<b>NIDS 的第四条不足就是「不能处理加密后的数据」</b>，防火墙同理。<span class="hl">而数据<b>送到主机、交给应用之前必然要解密</b>——HIDS 看的就是解密之后的东西</span>，所以 HIDS 的优点⑥是<b>「适于加密和交换环境」</b>。<br><b>C 为什么错：</b>题目问「最有可能」，既然 NIDS 明确不行，把它并进来就不成立了。<br><b>课本的原始依据（§1 弥补作用第 4 条）：</b>「对于加密的网络通信，防火墙无法检测，但是<b>监视主机活动的</b>入侵检测系统能够发现入侵。」<span class="bref">§1.2、§2.5.1</span></div>
+  </div>
+
+  <div class="mc">
+    <div class="mc-h"><span class="qn">单10</span><span>如果攻击者在扫描一个网络时，扫描到了<b>大量活动的主机</b>，但在实施进一步攻击时，却发现<b>很多主机有些异常</b>，则该网络很可能采取了（　）防御机制。</span></div>
+    <div class="mc-o"><span>A. 基于主机的入侵检测</span><span>B. 基于网络的入侵检测</span><span>C. 防火墙</span><span class="ok">D. 网络混淆 ✔</span></div>
+    <div class="mc-a"><b>答案 D。</b>题干描述的现象<b>正是「空间欺骗技术」的效果</b>：<b>利用多宿主能力，在单个物理主机的网卡上模拟出 IP 和 MAC 均不相同的大量蜜罐主机</b>——所以扫描时会看到「大量活动的主机」；而这些主机是假的，真去攻击时自然「有些异常」。<br><b>为什么叫「网络混淆」：</b>课本 p.412 明写<span class="hl">「在网络层隐藏己方设备所采用的欺骗技术，称为<b>『混淆』</b>，如<b>地址混淆</b>、协议指纹混淆、系统指纹混淆和<b>网络拓扑混淆</b>等」</span>。<br><b>A、B、C 为什么错：</b>IDS 和防火墙都是<b>被动</b>的，它们<b>不会改变攻击者看到的网络面貌</b>——扫描结果该是什么样还是什么样。<span class="bref">§5.2.3 空间欺骗、§5.4 网络层欺骗</span></div>
+  </div>
+
+  <h3>6.2　多项选择题（8 道）</h3>
+
+  <div class="mc">
+    <div class="mc-h"><span class="qn">多1</span><span>单位网络边界处已配置了网络防火墙，在内网中再配置入侵检测系统的主要原因包括（　）。</span></div>
+    <div class="mc-o"><span class="ok">A. 防火墙并不能阻止所有的网络攻击 ✔</span><span class="ok">B. 防火墙自身可能存在安全漏洞导致攻击者可以绕过防火墙 ✔</span><span class="ok">C. 如果防火墙配置不当，可能会起不到预期的防护作用 ✔</span><span class="ok">D. 攻击流量不经过防火墙，而是通过无线接入单位内网，防火墙无法进行控制 ✔</span></div>
+    <div class="mc-a"><b>答案 ABCD（全选）。</b>四个选项<b>逐条对应</b> PPT p.3 老师列的防火墙五条局限：A ＝「不是万能」、B ＝「本身问题」、C ＝「配置不当」、D ＝「网络边界有缺口（Modem、无线）」。<br><b>提醒：</b>老师还有第五条——<b>内部攻击（Abuse）与误用（Misuse）根本不经过边界</b>，选项里没出现，但它<b>才是 IDS 最核心的价值</b>，简答题里一定要写。<span class="bref">§1 场景卡</span></div>
+  </div>
+
+  <div class="mc">
+    <div class="mc-h"><span class="qn">多2</span><span>下列数据中，可用于判断计算机是否被入侵的有（　）。</span></div>
+    <div class="mc-o"><span class="ok">A. 操作系统日志 ✔</span><span class="ok">B. 网络数据 ✔</span><span class="ok">C. 应用程序日志 ✔</span><span class="ok">D. 注册表记录 ✔</span></div>
+    <div class="mc-a"><b>答案 ABCD（全选）。</b>A、B、C 就是 PPT p.37 列的三类数据源（<b>主机数据 / 网络数据 / 应用数据</b>）；<b>D 注册表记录</b>属于「主机文件检测」四个对象中的<b>「系统运行控制」</b>类。<br><span class="hl">回到 IDES 模型：<b>凡是能记录「主体对客体做了什么」的信息，都可以是审计记录，都可以作为数据源。</b></span><span class="bref">§3.4</span></div>
+  </div>
+
+  <div class="mc">
+    <div class="mc-h"><span class="qn">多3</span><span>如果要进行<b>未知</b>攻击检测，则应选择（　）。</span></div>
+    <div class="mc-o"><span class="ok">A. 聚类分析 ✔</span><span class="ok">B. 人工免疫 ✔</span><span class="ok">C. 神经网络 ✔</span><span>D. 模式匹配</span></div>
+    <div class="mc-a"><b>答案 ABC。</b>题眼仍是<b>「未知」</b>→ 选<b>异常检测</b>一侧的全部方法。A 聚类分析和 C 神经网络都属于<b>机器学习法</b>，B 人工免疫系统是异常检测的三类方法之一。<br><b>D 模式匹配</b>是<b>特征检测</b>的实现方式，<b>只能查已知攻击</b>，必须排除。<br><span class="muted">和单选 5 是同一个考点，只是把单选变成了多选——<b>把异常检测那一侧的名字全选上即可</b>。</span><span class="bref">§3.1、§3.3</span></div>
+  </div>
+
+  <div class="mc">
+    <div class="mc-h"><span class="qn">多4</span><span>评价入侵检测系统性能的<b>最重要的两个</b>指标是（　）。</span></div>
+    <div class="mc-o"><span>A. 吞吐率</span><span class="ok">B. 漏报率 ✔</span><span>C. 速率</span><span class="ok">D. 误报率 ✔</span></div>
+    <div class="mc-a"><b>答案 BD。</b>课本 p.406 原话：<span class="hl">「<b>误报率和漏报率对于入侵检测系统而言是最重要的两项评价指标</b>，但现有入侵检测技术还不能很好地解决误报和漏报问题。」</span><br><b>A 吞吐率、C 速率</b>是<b>设备的性能</b>指标（能处理多大流量），不是<b>检测效能</b>指标（判得准不准）——题干问的是「评价入侵检测系统性能」，但对照课本原文，指的是<b>检测效能</b>。<br><b>定义务必记牢：误报率＝正常的用户活动被判定为入侵的比率；漏报率＝入侵活动发生了但没有被发现的比率。</b><span class="bref">§4.1</span></div>
+  </div>
+
+  <div class="mc">
+    <div class="mc-h"><span class="qn">多5</span><span>下列安全技术中，采用<b>网络欺骗技术</b>的是（　）。</span></div>
+    <div class="mc-o"><span>A. 防火墙</span><span>B. 入侵检测</span><span class="ok">C. 蜜罐 ✔</span><span class="ok">D. 蜜网 ✔</span></div>
+    <div class="mc-a"><b>答案 CD。</b><b>蜜罐是最早采用欺骗技术的网络安全系统</b>；<b>蜜网是由多个蜜罐组成的欺骗网络</b>。两者都建立在「<b>造一个假资源引诱攻击者</b>」的欺骗思想上。<br>A 防火墙靠<b>规则过滤</b>、B 入侵检测靠<b>分析判断</b>，都<b>没有「伪造资源、引诱攻击者」</b>这个环节。<span class="bref">§5.2、§5.3</span></div>
+  </div>
+
+  <div class="mc">
+    <div class="mc-h"><span class="qn">多6</span><span>下列安全技术中，可用于<b>检测</b>网络攻击的有（　）。</span></div>
+    <div class="mc-o"><span>A. 防火墙</span><span>B. VPN</span><span class="ok">C. 入侵检测系统 ✔</span><span class="ok">D. 蜜网 ✔</span></div>
+    <div class="mc-a"><b>答案 CD。</b>题眼是<b>「检测」</b>（不是「防御」）。C 入侵检测系统顾名思义；D 蜜网的核心功能之一就是<b>攻击捕获</b>——「在多个层面<b>捕获攻击信息</b>」。<br><b>A 防火墙</b>只做<b>过滤放行</b>，属于 P.D.R 里的 Protection，<b>不做检测</b>；<b>B VPN</b>提供的是<b>加密通信隧道</b>，和检测完全无关。<br><span class="muted">对照多 5：多 5 问「用了欺骗技术」→ CD 是蜜罐、蜜网；多 6 问「能检测」→ CD 是 IDS、蜜网。<b>两题的 CD 内容不同，别凭位置记答案。</b></span><span class="bref">§2.4 三者对比表、§5.2.3</span></div>
+  </div>
+
+  <div class="mc">
+    <div class="mc-h"><span class="qn">多7</span><span>下列安全机制中，可用于<b>引诱攻击者发起攻击</b>的是（　）。</span></div>
+    <div class="mc-o"><span>A. 防火墙</span><span class="ok">B. 蜜罐 ✔</span><span>C. 入侵检测系统</span><span class="ok">D. 蜜网 ✔</span></div>
+    <div class="mc-a"><b>答案 BD。</b>题眼是<b>「引诱……发起攻击」</b>——这正是蜜罐定义的核心：<span class="hl"><b>「蜜罐是一种安全资源，其价值在于被探测、攻击或突破」「如果该系统从未受到探测或攻击，那它就没有价值」。</b></span>蜜网是多个蜜罐组成的，同理。<br>A 防火墙和 C 入侵检测系统<b>都不希望被攻击</b>，它们属于课本说的「<b>大多数受保护的工作系统</b>」那一类——<b>正好和蜜罐相反</b>。<span class="bref">§5.2 场景卡</span></div>
+  </div>
+
+  <div class="mc">
+    <div class="mc-h"><span class="qn">多8</span><span>下列选项中，属于<b>数据层</b>欺骗技术的是（　）。</span></div>
+    <div class="mc-o"><span class="ok">A. honeywords ✔</span><span>B. 协议指纹混淆</span><span class="ok">C. 诱饵文档 ✔</span><span>D. 设置大量虚假主机</span></div>
+    <div class="mc-a"><b>答案 AC。</b>数据层欺骗<b>涵盖利用「假账户、假文档」等特定用户数据的欺骗技术</b>，防范<b>身份盗窃、数据泄露、侵犯隐私、身份假冒</b>四类威胁。<br><b>A honeywords</b> ✔ 在<b>口令文件</b>中增加额外 <b>N−1 个假的身份凭据</b>，防止散列密码泄露——<b>假账户</b>，数据层。<br><b>C 诱饵文档</b> ✔ 典型的<b>假文档</b>，数据层。<br><b>B 协议指纹混淆</b> ✘ <b>网络层</b>——「混淆」是网络层的专属词（地址混淆、协议指纹混淆、系统指纹混淆、网络拓扑混淆）。<br><b>D 设置大量虚假主机</b> ✘ <b>网络层</b>——这是<b>空间欺骗</b>／增大目标空间（也正是单选 10 的考点）。<br><span class="hl"><b>四层速判：「混淆 / 虚假主机 / 拓扑」→网络层；「终端设备 / 权限 / 克隆业务」→系统层；「漏洞 / 网页 / 链接 / 口令猜解」→应用层；「账户 / 文档 / 口令文件 / 数据」→数据层。</b></span><span class="bref">§5.4 四层表</span></div>
+  </div>
+
+  <h3>6.3　简答题（9 道）</h3>
+
+  <div class="qa">
+    <div class="qa-h"><span class="qn">简1</span><span>入侵检测系统对防火墙的安全弥补作用主要体现在哪些方面？</span></div>
+    <div class="qa-b">
+      <p><b>共六条（课本 p.385 原文，直接誊抄即可）：</b></p>
+      <ol class="steps tight">
+        <li><div><b>入侵检测可以发现<u>内部的攻击事件</u>以及<u>合法用户的越权访问行为</u></b>，而位于网络边界的防火墙对于这些类型的攻击活动<b>无能为力</b>。</div></li>
+        <li><div>如果防火墙<b>开放的网络服务存在安全漏洞</b>，那么入侵检测系统可以在网络攻击发生时<b>及时发现并进行告警</b>。</div></li>
+        <li><div>在<b>防火墙配置不完善</b>的条件下，攻击者可能利用配置漏洞<b>穿越防火墙</b>，入侵检测系统能够发现此类攻击行为。</div></li>
+        <li><div>对于<b>加密的网络通信</b>，防火墙无法检测，但是<b>监视主机活动的</b>入侵检测系统能够发现入侵。</div></li>
+        <li><div>入侵检测系统能够有效发现<b>入侵企图</b>。如果防火墙允许外网访问某台主机，当攻击者利用<b>扫描工具</b>对主机实施扫描时，防火墙会<b>直接放行</b>，但是入侵检测系统能够识别此类网络异常并进行告警。</div></li>
+        <li><div>入侵检测系统可以提供丰富的<b>审计信息</b>，详细记录网络攻击过程，帮助管理员发现网络中的<b>脆弱点</b>。</div></li>
+      </ol>
+      <p class="mt0"><b>收尾建议加一句：</b>因此<b>入侵检测系统被视为防火墙之后的第二道安全防线，是防火墙的必要补充</b>。</p>
+      <div class="qa-src">课本答案页写「略」；上述六条为<b>课本 p.385 正文原文</b>，就是本题的标准答案。参见本资料 §1.2。</div>
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-h"><span class="qn">简2</span><span>从信息源的角度看，以操作系统的审计记录作为入侵检测的信息源存在哪些缺陷？</span></div>
+    <div class="qa-b">
+      <p><b>课本参考答案（三条，原文）：</b></p>
+      <ol class="steps tight">
+        <li><div>不同操作系统在<b>审计的事件类型、内容组织、存储格式</b>等方面都存在<b>差异</b>，入侵检测系统如果要<b>跨平台</b>工作，必须考虑各种操作系统<b>审计机制的差异</b>；</div></li>
+        <li><div>操作系统的审计记录主要是为了<b>方便日常管理维护</b>，同时记录一些系统中的违规操作，<b>其设计并不是为入侵检测系统提供检测依据的</b>。在这种情况下，审计记录对于入侵检测系统而言<b>包含的冗余信息过多，分析处理的负担较重</b>；</div></li>
+        <li><div>入侵检测系统所需要的一些<b>判定入侵的事件信息，可能操作系统的审计记录中没有提供</b>，由于信息的缺失，入侵检测系统<b>还必须通过其他渠道获取</b>。</div></li>
+      </ol>
+      <p class="mt0"><b>可以加的一句（课本 p.388）：</b>正因如此，<b>一些入侵检测系统不采用操作系统的审计记录作为数据源，而是直接进入操作系统底层，截获自己感兴趣的系统信息（如<u>系统调用序列、系统调用的参数</u>）</b>作为检测依据。</p>
+      <div class="qa-src">答案逐字核对自课本答案页 p.494 第 2 题。参见本资料 §2.5.1。</div>
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-h"><span class="qn">简3</span><span>以应用程序的运行记录作为入侵检测系统的信息源，对于检测针对应用的攻击活动存在哪些优势？</span></div>
+    <div class="qa-b">
+      <p><b>课本参考答案（原文只有一行）：</b><span class="hl"><b>精确度高；完整性强；采用应用数据作为入侵检测的信息源具有处理开销低的优势。</b></span></p>
+      <p><b>展开（课本 p.388 正文，开卷考建议展开写）：</b></p>
+      <ol class="steps tight">
+        <li><div><b>精确度高</b>——操作系统的审计信息<b>必须经过一定的处理和转化</b>之后才能变为入侵检测系统能够理解的信息，而<b>此转化过程中往往会丢失部分信息</b>。直接利用应用数据，可以在最大程度上保证入侵检测系统所获得信息的精确度。</div></li>
+        <li><div><b>完整性强</b>——对于一些网络应用，<b>特别是分布式的网络应用</b>，直接通过主机的日志信息、甚至结合收集到的网络数据，都<b>难以准确获取应用的具体状态</b>；但是<b>应用数据能够最全面地反映应用的运行状态信息</b>。</div></li>
+        <li><div><b>处理开销低</b>——主机的审计信息反映的是<b>系统整体</b>运行情况，要将其转化为应用信息<b>必须经过计算处理</b>；而<b>应用程序日志本身就是应用层次的活动记录</b>，可以<b>直接</b>向入侵检测系统提供其所关注的应用的运行状况。</div></li>
+      </ol>
+      <div class="qa-src">答案逐字核对自课本答案页 p.494 第 3 题。参见本资料 §2.5.1。</div>
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-h"><span class="qn">简4</span><span>请分析基于网络的入侵检测系统的优点和缺点。</span></div>
+    <div class="qa-b">
+      <p><b>课本参考答案（原文一行）：</b><span class="hl"><b>基于网络的入侵检测系统具有<u>隐蔽性好、对被保护系统影响小</u>等优点，同时也存在<u>粒度粗、难以处理加密数据</u>等方面的缺陷。</b></span></p>
+      <p class="mt0"><b>先写上面这一行，再各补 3 条展开（完整清单见本资料 §2.5.2 的对照表，那里逐条带了「为什么」）：</b><br>
+      <b>优点：</b>① <b>实时</b>检测网络行为　② <b>同时保护多台</b>主机　③ <b>隐蔽性好</b>——被动监听、对用户完全透明，<b>本身不易遭受攻击</b>　④ <b>有效保护入侵证据</b>　⑤ <b>不影响被保护主机的性能</b>，被动监听也<b>不降低网络性能</b>　⑥ 标准化程度高、<b>便于移植</b><br>
+      <b>缺点：</b>① <b>不能处理加密后的数据</b>（最重要）　② <b>粒度粗</b>　③ <b>交换式网络中难以配置</b>　④ <b>检测性能受硬件条件限制</b>　⑤ <b>防入侵欺骗能力较差</b>——攻击者可利用 IDS 与主机<b>对 TCP/IP 实现的理解差异</b>绕过监控</p>
+      <div class="qa-src">一行答案逐字核对自课本答案页 p.494 第 4 题；展开条目取自 PPT p.24 与课本 p.388–389。参见本资料 §2.5.2。</div>
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-h"><span class="qn">简5</span><span>什么是基于异常和基于误用的入侵检测方法？它们各有什么特点？</span></div>
+    <div class="qa-b">
+      <p><b>【定义】</b></p>
+      <p>· <b>基于异常的入侵检测（异常检测 / 基于行为的检测，AD）：</b>根据<b>用户的行为和系统资源的使用状况</b>判断是否存在网络入侵。它<b>假设攻击行为是不常见的、异常的</b>，因此先为用户和系统的<b>正常行为</b>建立<b>行为模型</b>，再把当前捕获的行为与模型对比，<b>若偏离正常行为轨迹（超过阈值）就判定为入侵</b>。</p>
+      <p>· <b>基于误用的入侵检测（误用检测 / 特征检测 / 基于知识的检测，SD）：</b><b>假设所有攻击行为和方法都具有一定的模式或特征</b>，把已发现的攻击特征总结出来建成<b>入侵特征库</b>，再把当前捕获的行为特征与库中特征<b>比对，匹配则判定为入侵</b>。</p>
+      <p><b>【特点对比】</b></p>
+      <div class="tbl-wrap" style="margin:6px 0">
+        <table>
+          <thead><tr><th style="width:22%"></th><th style="width:39%">异常检测</th><th style="width:39%">误用检测</th></tr></thead>
+          <tbody>
+            <tr><td><b>比对基准</b></td><td>正常行为模型</td><td>已知攻击特征库</td></tr>
+            <tr><td><b>未知攻击</b></td><td><b>能</b>检测（最大优点）</td><td><b>不能</b>检测（最大缺点）</td></tr>
+            <tr><td><b>准确度</b></td><td>较低，<b>误报率高</b></td><td><b>高，误报率低</b>（最突出优点）</td></tr>
+            <tr><td><b>能否指明攻击类型</b></td><td>不能，<b>难以对入侵行为分类和命名</b></td><td>能，可指明具体攻击类型，<b>便于系统防护</b></td></tr>
+            <tr><td><b>内部越权行为</b></td><td><b>检测能力较强</b></td><td><b>难以检测</b></td></tr>
+            <tr><td><b>其他</b></td><td>较少依赖特定操作系统；<b>行为模型建立困难</b>；须<b>不断学习更新行为轮廓</b></td><td><b>技术相对成熟</b>；<b>完全依赖入侵特征的有效性</b>；<b>维护特征库工作量巨大</b></td></tr>
+            <tr><td><b>典型方法</b></td><td>统计分析法、人工免疫系统、机器学习法</td><td>专家系统法、模式匹配法、状态迁移法</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="qa-src"><b>课本答案页写「略」</b>，本答案为<b>本资料自编</b>，全部内容取自 PPT p.28–36 与课本 13.2 节。参见本资料 §3.3。</div>
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-h"><span class="qn">简6</span><span>为什么说异常检测所发现的异常未必是攻击活动？</span></div>
+    <div class="qa-b">
+      <p><b>课本参考答案（原文一行）：</b><span class="hl"><b>定义的正常行为不一定完备和准确，可能会造成合法的行为被认为是异常的。</b></span></p>
+      <p><b>展开成两条（课本 p.393 正文）：</b></p>
+      <ol class="steps tight">
+        <li><div><b>所选择的测量参数是否有足够强的区分度</b>，能够将正常和异常区分开来；</div></li>
+        <li><div><b>事先建立的正常模式是否足够完备</b>——例如，可能由于正常行为模式建立得不充分，<b>一些正常活动没有覆盖其中，被误判为攻击</b>。</div></li>
+      </ol>
+      <p class="mt0"><b>收尾（课本原话）：</b>因此，<b>异常检测的结果通常需要进一步认证</b>。<br>
+      <b>可举的例子：</b>网站管理员平时都在工作日 8:00–18:00 更新页面，某天他加班到凌晨更新——<b>行为确实偏离了正常模型，但并不是攻击</b>。</p>
+      <div class="qa-src">答案逐字核对自课本答案页 p.494 第 6 题。参见本资料 §3.1。</div>
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-h"><span class="qn">简7</span><span>如何对入侵检测系统的效能进行评估？</span></div>
+    <div class="qa-b">
+      <p><b>课本参考答案（原文一行）：</b><span class="hl"><b>误报率、漏报率、准确率。</b></span></p>
+      <p><b>建议这样展开：</b></p>
+      <ol class="steps tight">
+        <li><div><b>误报率（rate of false positive）：正常的用户活动被判定为入侵的比率。</b>误报会<b>增加管理员的工作负担</b>——管理员必须从告警中区分出哪些是实际攻击、哪些是系统误报。</div></li>
+        <li><div><b>漏报率（rate of false negative）：入侵活动发生了，但却没有被发现的比率。</b>漏报<b>非常危险</b>，会给管理者造成<b>虚假安全的错觉</b>：攻击已经发生，IDS 却毫无反应，<b>形同虚设</b>。</div></li>
+        <li><div><b>误报率和漏报率反映了入侵检测的精准程度，两者越低表明入侵检测的效能越好</b>；此外还可以用<b>准确率</b>来评估。<b>误报率和漏报率是最重要的两项评价指标。</b></div></li>
+        <li><div><b>但要指出：这两项指标相互抵触。</b>极端情况下，<b>把主机发出的所有数据包都视为异常，则漏报率为 0，而所有正常数据包都将引起误报</b>；反之<b>都视为正常，则误报率为 0，而所有攻击数据包都将被漏报</b>。因此<b>现有入侵检测技术还不能很好地解决误报和漏报问题</b>。</div></li>
+      </ol>
+      <div class="qa-src">一行答案逐字核对自课本答案页 p.494 第 7 题；展开取自课本 p.391、p.406。参见本资料 §4.1。<br>
+      <b>注意：</b>多选第 4 题答 <b>BD（漏报率、误报率）</b>——那题问的是「<b>最重要的两个</b>」，本题问的是「如何评估」，可以多列<b>准确率</b>。两者不矛盾。</div>
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-h"><span class="qn">简8</span><span>入侵检测技术主要存在哪些方面的局限性？</span></div>
+    <div class="qa-b">
+      <p><b>建议按四层来答：</b></p>
+      <ol class="steps tight">
+        <li><div><b>根本局限：误报率与漏报率相互抵触，无法同时降低。</b>（举上面简 7 的两个极端例子。）大量的误报会<b>分散管理员的精力，使管理员无法应对真正的攻击</b>；漏报的频繁发生则会<b>给管理者造成虚假的安全景象——网络危机重重，管理员却得不到必要的告警</b>。</div></li>
+        <li><div><b>检测方法本身的局限：</b><br>· <b>特征检测：</b>不能检测出新的入侵行为；<b>完全依赖入侵特征的有效性</b>；维护特征库的工作量巨大；难以检测来自内部用户的攻击。<br>· <b>异常检测：</b>误报率高；<b>行为模型建立困难</b>（要求掌握「已知行为和预期行为的所有信息」，<b>实际上无法做到</b>）；难以对入侵行为进行分类和命名。</div></li>
+        <li><div><b>数据与环境的局限：</b><b>加密流量难以分析</b>（NIDS 和防火墙均无法处理）；<b>宽带网络下逐包分析处理开销过高</b>；<b>粒度粗</b>；不同系统对 <b>TCP/IP 实现存在差异</b>，<b>攻击者可利用 IDS 与主机在协议和数据处理上的差异绕过监控</b>；HIDS 则<b>实时性较差、占用主机资源、隐蔽性较差、检测效果取决于日志系统</b>。</div></li>
+        <li><div><b>时代局限：不能有效应对 APT 攻击。</b>以 APT 为代表的攻击向<b>专业化、复杂化、隐蔽化和长期化</b>发展，并<b>大量使用零日漏洞</b>。<b>尽管机器学习的应用部分解决了未知攻击的检测问题，但仍不足以应对日益增长的未知和复杂攻击</b>，特别是在<b>深度跟踪、了解未知攻击的细节、增加攻击者的攻击难度</b>等方面；也不能为<b>全面、深度反映网络安全状态的网络安全感知系统</b>提供足够的支持。</div></li>
+      </ol>
+      <p class="mt0"><b>收尾可加：</b>正因为这些局限，才发展出了<b>网络欺骗防御</b>——它<b>部分解决了传统入侵检测系统的误报和漏报问题，同时还具有防御攻击的能力</b>。</p>
+      <div class="qa-src"><b>课本答案页写「略」</b>，本答案为<b>本资料自编</b>，全部内容取自课本 p.406、p.388–389 与 PPT p.30、p.34。参见本资料 §4。</div>
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-h"><span class="qn">简9</span><span>谈谈你对蜜罐、蜜网、网络欺骗防御这三个概念的理解。</span></div>
+    <div class="qa-b">
+      <p><b>【三个定义】</b></p>
+      <p>· <b>蜜罐（Honeypot）：</b>一种<b>安全资源</b>，<b>其价值在于被探测、攻击或突破</b>（Lance Spitzner）。这种资源<b>是什么并不重要</b>（路由器、仿真脚本或真实生产系统），<b>重要的是它的价值在于受到攻击</b>。<span class="hl"><b>如果该系统从未受到探测或攻击，那它就没有价值——这一点与大多数受保护的工作系统正好相反。</b></span>它是<b>最早采用欺骗技术的网络安全系统</b>。</p>
+      <p>· <b>蜜网（Honeynet）：</b><b>由多个蜜罐组成的欺骗网络</b>，通常<b>包含不同类型的蜜罐</b>，可以<b>在多个层面捕获攻击信息</b>，以满足不同的安全需求。一般需要<b>与防火墙、入侵检测系统等配合</b>，确保蜜网<b>处于可控状态、不会整体沦陷</b>。</p>
+      <p>· <b>网络欺骗防御：</b>一种<b>体系化的防御方法</b>，把<b>蜜罐、蜜网、混淆</b>等欺骗技术同<b>防火墙、入侵检测系统</b>等传统防护机制<b>有机结合</b>，构建<b>以欺骗为核心</b>的网络安全防御体系。按作用位置分为<b>网络层、系统层、应用层、数据层</b>四个层次。</p>
+      <p><b>【三者的关系——这一问的关键，务必写上「学界尚无统一定义」】</b></p>
+      <p>课本明确指出：<b>「有关『网络欺骗防御』这一名词的内涵和外延目前还没有一个统一的、权威的定义。」</b>主要有两种不同看法：<br>
+      <b>①</b> 一些文献认为<b>网络欺骗防御与蜜罐没有本质上的区别</b>，或认为<b>蜜罐就是网络欺骗防御的一种重要实现方式</b>，或认为<b>网络欺骗防御是一种功能强大的、可动态变化的蜜罐</b>；<br>
+      <b>②</b> 也有文献把<b>「网络欺骗防御」看作利用欺骗进行防御的技术总称</b>，这样<b>蜜罐、蜜网就是网络欺骗防御的一种形式</b>，<b>不应把网络欺骗防御看作比蜜罐、蜜网更高级的技术</b>。<br>
+      <b>③ 本书的观点：网络欺骗防御是一种体系化的防御方法（见上）。</b></p>
+      <p><b>【价值与代价——收尾】</b></p>
+      <p class="mt0">网络欺骗的核心思想是<b>采用引诱或欺骗策略，诱使入侵者相信系统中存在有价值、可利用的安全弱点和可窃取的资源（实际上是伪造的或不重要的），把入侵者引向这些错误的资源，同时安全可靠地记录其所有行为</b>。它<b>变被动防御为积极主动防御</b>，<span class="hl"><b>部分解决了传统入侵检测系统的误报和漏报问题，同时还具有防御攻击的能力，而这是传统入侵检测系统所不具有的</b></span>；<b>当然，其部署和实现都比传统入侵检测系统要复杂，成本也要高很多。</b></p>
+      <div class="qa-src"><b>课本答案页写「略」</b>，本答案为<b>本资料自编</b>，全部内容取自课本 13.4 节（p.406–414）与 PPT p.46–58。参见本资料 §5。</div>
+    </div>
+  </div>
+
+  <h3>6.4　综合题第 (4) 问</h3>
+
+  <div class="qa">
+    <div class="qa-h"><span class="qn">综(4)</span><span>该企业领导认为，在总部和下属单位网络的边界处部署防火墙就可以将攻击者阻挡在网络之外，不需要再在内网部署其他安全设备或系统。你作为单位的网络安全负责人，是否认同领导的这种观点？为什么？</span></div>
+    <div class="qa-b">
+      <p><b>课本参考答案：不认同。</b>（原因课本写「略」，以下为本资料自编的完整作答。）</p>
+      <p><b>【结论】</b>不认同。<b>防火墙是必要的，但远不是充分的</b>；只在边界部署防火墙，会在内网留下大片无人看管的区域。</p>
+      <p><b>【理由一：防火墙原理上就管不着的四件事】</b></p>
+      <ol class="steps tight">
+        <li><div><b>防火墙并不能阻止所有的网络攻击。</b>入侵教程和攻击工具随处可见，<b>攻击模式是多样的</b>，一套规则不可能覆盖所有攻击。</div></li>
+        <li><div><b>防火墙自身可能存在安全漏洞</b>，从防护设备变成<b>被攻击的对象</b>，攻击者可以绕过它。</div></li>
+        <li><div><b>防火墙配置不当</b>就<b>起不到预期的防护作用</b>，攻击者可能利用配置漏洞穿越防火墙。</div></li>
+        <li><div><b>网络边界存在缺口</b>——例如员工私接<b>无线 AP</b>或使用 Modem 拨号，<b>攻击流量根本不经过防火墙</b>，防火墙无法进行控制。<span class="muted">本题背景中，总部与各地下属单位<b>通过公网相连</b>、员工出差还要<b>通过公网访问单位服务器</b>，边界本身就很复杂，缺口的风险更高。</span></div></li>
+      </ol>
+      <p><b>【理由二：最关键的一条——内部攻击与越权根本不经过边界】</b></p>
+      <p><b>并不是所有攻击都来自外部。</b>防火墙站在网络边界上，而<b>内部员工访问内部服务器压根不穿过边界</b>；合法用户拿着合法账号做越权的事（<b>误用</b>），在防火墙看来<b>完全合规</b>。<span class="hl">对于一个「文件密级分为绝密、机密、秘密、公开」的军工企业来说，<b>内部人员的越权访问恰恰是最需要防范的威胁</b>，而这正是防火墙的盲区。</span></p>
+      <p><b>【理由三：应该补什么】</b></p>
+      <ul>
+        <li><b>在内网部署入侵检测系统（IDS）。</b>它是<b>防火墙之后的第二道安全防线，是防火墙的必要补充</b>，能够发现<b>内部攻击事件和合法用户的越权访问行为</b>、发现<b>穿越防火墙的攻击</b>、识别<b>扫描等入侵企图</b>（防火墙会直接放行），并提供丰富的<b>审计信息</b>用于取证与加固。</li>
+        <li><b>部署位置有讲究：</b>在 <b>DMZ 区总口</b>（保护对外服务器）、<b>内网主干</b>（检测内网可信用户的越权行为，且<b>能准确定位攻击源和目的</b>）、<b>关键子网出口</b>（集中资源保护关键系统）。注意<b>防火墙先过滤掉大量非法数据包，才能使入侵检测器有效工作</b>——两者是<b>流水线上的上下游，不是替代关系</b>。</li>
+        <li><b>在关键服务器上部署基于主机的 IDS。</b>题目中员工要通过<b>公网</b>访问单位服务器，通信多半是<b>加密</b>的；<b>加密流量防火墙和 NIDS 都看不懂，只有 HIDS 能在主机解密之后发现入侵</b>。</li>
+        <li><b>可进一步考虑网络欺骗防御（蜜罐 / 蜜网）。</b>军工企业是 <b>APT 攻击</b>的典型目标，而 APT <b>专业化、隐蔽化、长期化并大量使用零日漏洞</b>，传统 IDS 难以应对；蜜罐<b>不需要识别攻击特征</b>，凡是碰它的就是攻击者，能有效发现渗透行为并<b>拖延攻击者、收集攻击情报</b>。</li>
+      </ul>
+      <p class="mt0"><b>【收尾】</b>安全<b>不仅仅是技术设备的问题</b>，还涉及<b>人和管理</b>；而且<b>没有一种技术能完全阻止所有攻击，特别是一些未知攻击</b>。正确的做法是<b>纵深防御</b>：边界防火墙负责「挡」，内网 IDS/HIDS 负责「看」，欺骗防御负责「引诱与取证」，再配合访问控制、加密传输与安全管理制度，构成<b>多层次的信息安全保障体系</b>。</p>
+      <div class="qa-src">课本答案页 p.494 综合题第 (4) 问只写了「<b>不认同，原因：略</b>」。上述理由为<b>本资料自编</b>，依据为 PPT p.3、课本 p.385 的弥补作用六条、PPT p.38–44 的部署方案与课本 p.406 的 APT 论述。</div>
+    </div>
+  </div>
+</div>
+<div class="sec pagebreak">
+  <div class="sec-head">
+    <span class="sec-num">§ 7 ── 速查卡</span>
+    <h2 class="sec-t">考场定位用：翻到这一页就能找到东西</h2>
+    <p class="sec-lede">全部内容都在前面出现过，这里只做<b>压缩与定位</b>。</p>
+  </div>
+
+  <div class="two grid g2">
+    <div class="mini"><div class="t">卡 1 · 一物多名对照（最大的坑）</div>
+      <p class="mt0"><b>【同一类检测方法的四个名字】</b><br>
+      <b>特征检测</b>（课本正式名，SD）＝ <b>误用检测</b>（PPT 主名，Misuse）＝ <b>基于知识的检测</b> ＝ <b>基于特征的入侵检测</b>。<br>
+      ⚠ <b>「模式匹配」既是这一类的绰号，也是这一类里的一个具体方法</b>。看语境：<b>与「异常检测」并列＝大类；与「专家系统法／状态迁移法」并列＝小方法</b>。</p>
+      <p><b>【另一侧三名一物】</b><br><b>异常检测 ＝ 基于异常的入侵检测（AD）＝ 基于行为的检测</b>。怎么写都对。</p>
+      <p><b>【第三类 IDS 的名字】</b><br>PPT：<b>混合的 IDS</b>（Hybrid）＋ 单讲一页<b>分布式 IDS</b>；课本：<b>混合分布式 IDS（DIDS）</b>。<b>答题写「混合分布式入侵检测系统」最稳。</b></p>
+      <p class="mt0"><b>【欺骗防御第二层】</b><br>PPT 叫<b>终端层欺骗</b>，课本叫<b>系统层欺骗</b>。同一层——课本原话是「伪装成有漏洞的<b>终端设备</b>」。<b>写「系统层」最稳。</b></p>
+    </div>
+
+    <div class="mini"><div class="t">卡 2 · 速判口诀（选择题直接套）</div>
+      <p class="mt0"><b>① 特征检测还是异常检测？</b><br><span class="mark">只看它「拿什么去比」</span>——比<b>已知攻击</b>＝特征／误用；比<b>正常行为</b>＝异常。<br>题干有<b>「未知／新型／零日」</b>→ 异常侧；有<b>「已知／准确率最高／最常用」</b>→ 特征侧。</p>
+      <p><b>② HIDS 还是 NIDS？</b><br>题干有<b>加密、交换环境、字典攻击、木马、越权</b> → <b>HIDS</b>；<br>题干有<b>网络扫描、DDoS、ARP 欺骗、包头、负载</b> → <b>NIDS</b>。</p>
+      <p><b>③ 防火墙 / IDS / 欺骗防御？</b><br><b>只防不检</b>＝防火墙；<b>只检不防</b>＝IDS；<span class="mark"><b>兼有检测和防御</b>＝网络欺骗防御</span>；<b>零日</b>＝网络欺骗防御。</p>
+      <p class="mt0"><b>④ 欺骗防御分哪一层？</b><br><b>混淆 / 虚假主机 / 拓扑 / 地址</b> → <b>网络层</b><br><b>终端设备 / 权限 / 克隆业务 / 诱骗 NIC</b> → <b>系统层</b><br><b>漏洞 / 网页 / 链接 / 口令猜解 / patch</b> → <b>应用层</b><br><span class="mark"><b>账户 / 文档 / 口令文件 / honeywords</b> → <b>数据层</b></span></p>
+    </div>
+
+    <div class="mini"><div class="t">卡 3 · 分类框架（默写用）</div>
+      <p class="mt0"><b>【IDS 两个正交维度】</b><br>
+      · <b>按数据源：</b>HIDS ／ NIDS ／ 混合分布式 DIDS<br>
+      · <b>按检测方法：</b>基于特征 ／ 基于异常 ／ 混合</p>
+      <p><b>【HIDS 再分两类】</b>（PPT 专有）<br>· <b>网络连接检测</b>（试图进入本机的数据流）<br>· <b>主机文件检测</b> → <b>系统日志 / 文件系统 / 进程记录 / 系统运行控制</b></p>
+      <p><b>【两种方法的具体技术】</b><br>· <b>特征检测 3＋3：</b>专家系统法、<b>模式匹配法</b>、状态迁移法 ＋（条件概率、模型推理法、键盘监控法）<br>· <b>异常检测 3：</b>统计分析法、人工免疫系统、机器学习法</p>
+      <p><b>【蜜罐三个维度】</b><br>· <b>部署方式：</b>生产型 / 研究型<br>· <b>交互程度：</b>低 / 中 / 高<br>· <b>实现方式：</b>物理 / 虚拟</p>
+      <p class="mt0"><b>【欺骗防御四层】</b>网络层 · 系统层 · 应用层 · 数据层</p>
+    </div>
+
+    <div class="mini"><div class="t">卡 4 · 「几条」清单（简答题按数量给分）</div>
+      <p class="mt0">· 入侵检测对防火墙的<b>弥补作用 —— 6 条</b><span class="bref">简1</span><br>
+      · 防火墙的局限（PPT 开场）—— <b>5 条</b><br>
+      · 审计记录作数据源的<b>缺陷 —— 3 条</b><span class="bref">简2</span><br>
+      · 应用日志的<b>优势 3 条 / 缺陷 4 条</b><span class="bref">简3</span><br>
+      · <b>HIDS：6 优 6 缺</b>　· <b>NIDS：5 优 4 缺</b><span class="bref">简4</span><br>
+      · <b>IPS：4 优 4 缺</b>（课本无，PPT 专有）<br>
+      · <b>异常检测：3 优 3 缺</b>　· <b>误用检测：3 优 4 缺</b><br>
+      · <b>IDS 部署位置 —— 4 个</b>（DMZ / 外网入口 / 内网主干 / 关键子网）<br>
+      · <b>CIDF 组件 —— 4 个</b>；<b>IDES 组成 —— 6 部分</b><br>
+      · <b>网络欺骗用途 —— 4 条</b><br>
+      · <b>低交互蜜罐功能 2 项 / 高交互 4 项</b>（网络欺骗·攻击捕获·<b>数据控制</b>·数据分析）<br>
+      · <b>网络欺骗（伪装）技术 —— 5 种</b><br>
+      · <b>欺骗防御层次 —— 4 层</b>；<b>网络层应对威胁 —— 3 类</b>；<b>数据层应对威胁 —— 4 类</b></p>
+    </div>
+
+    <div class="mini"><div class="t">卡 5 · 必记人名 · 年份 · 数字</div>
+      <div class="mustnum" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+        <div class="n"><b>Anderson · 1980</b><span>《计算机安全威胁的监控》<b>首次提出入侵检测</b>；也是最早的异常检测方法（抓伪装者）</span></div>
+        <div class="n"><b>Denning · 1987</b><span><b>IDES</b> 模型，<b>6 部分</b>（主体/客体/审计记录/活动概图/异常记录/规则集）</span></div>
+        <div class="n"><b>加州大学戴维斯分校 · 1998</b><span><b>CIDF</b>，4 组件 ＋ <b>GIDO</b>（由 <b>CISL</b> 描述）</span></div>
+        <div class="n"><b>Gene Spafford · 普渡大学 · 1989</b><span>最早提出<b>网络欺骗</b>（Cyber Deception）</span></div>
+        <div class="n"><b>Lance Spitzner · 曼海姆大学</b><span><b>1999</b> 发起、<b>2000.6</b> 成立<b>蜜网项目</b>；也是<b>蜜罐定义</b>的提出者</span></div>
+        <div class="n"><b>2001.9 / 2001.12 / 2004</b><span>《Know Your Enemy》/ 蜜网研究联盟 / <b>第二代</b>蜜网工具包</span></div>
+        <div class="n"><b>北京大学 · 狩猎女神</b><span><b>2004.9</b> 启动，当年 12 月按<b>第二代</b>部署；<b>2005.2</b> 加入蜜网研究联盟</span></div>
+        <div class="n"><b>65 536 ÷ 4 096 ＝ 16</b><span><b>空间欺骗</b>：单台物理主机模拟 <b>4000＋</b>（＝2<sup>12</sup>）个地址，<b>16 台</b>就能虚拟出整个 <b>B 类</b>地址空间</span></div>
+        <div class="n"><b>56 / 30 / 141 天</b><span>FireEye M-Trends <b>2019</b> 驻留时间中位数：全部 / 内部自己发现 / <b>外部通知才知道</b></span></div>
+        <div class="n"><b>N − 1</b><span><b>honeywords</b>：在口令文件中增加额外 <b>N−1 个假的身份凭据</b></span></div>
+      </div>
+    </div>
+
+    <div class="mini"><div class="t">卡 6 · 优缺点「互补对」（记一半推另一半）</div>
+      <p class="mt0"><b>【HIDS ↔ NIDS】</b><br>
+      HIDS <b>适于加密和交换环境</b> ↔ NIDS <b>不能处理加密数据、交换网难配置</b><br>
+      HIDS <b>隐蔽性差、占用主机资源</b> ↔ NIDS <b>隐蔽性好、不影响主机性能</b><br>
+      HIDS <b>看不到包头和负载</b> ↔ NIDS <b>既查包头又查负载</b><br>
+      HIDS <b>实时性差（靠日志）</b> ↔ NIDS <b>实时（看线上的包）</b></p>
+      <p><b>【异常检测 ↔ 误用检测】</b><br>
+      异常 <b>能查未知攻击</b> ↔ 误用 <b>不能检测新的入侵行为</b><br>
+      异常 <b>误报率高</b> ↔ 误用 <b>误报率低、准确度高</b><br>
+      异常 <b>难以分类和命名</b> ↔ 误用 <b>能指明攻击类型</b><br>
+      异常 <b>对内部越权检测能力强</b> ↔ 误用 <b>难以检测内部用户攻击</b><br>
+      异常 <b>行为模型难建</b> ↔ 误用 <b>特征库维护量巨大</b></p>
+      <p class="mt0"><span class="mark"><b>只要记住「异常＝认不出就当坏人，误用＝认不出就当好人」，上面八条全能现推。</b></span></p>
+    </div>
+  </div>
+
+  <div class="box exam" style="margin-top:14px">
+    <div class="box-t">★★★ 如果只剩五分钟，就看这五句</div>
+    <ol class="steps tight" style="margin-bottom:0">
+      <li><div><b>入侵检测系统是防火墙之后的第二道安全防线，是防火墙的必要补充</b>——因为<b>内部攻击和合法用户的越权访问根本不经过网络边界</b>，防火墙对此无能为力。</div></li>
+      <li><div><b>只有两种检测方法：比对「正常行为」＝异常检测（能查未知、但误报率高）；比对「已知攻击特征」＝特征／误用检测（准确度高、但查不出新攻击）。</b>其余所有名词都是这两者的下属。</div></li>
+      <li><div><b>误报率＝正常活动被判为入侵；漏报率＝入侵发生却没发现。这是最重要的两项评价指标，而且相互抵触</b>——全部当异常则漏报为 0 但误报 100%，全部当正常则误报为 0 但漏报 100%。</div></li>
+      <li><div><b>蜜罐是一种安全资源，其价值在于被探测、攻击或突破；从未被攻击的蜜罐就没有价值</b>——这和普通受保护系统<b>正好相反</b>。正因为正常业务不会碰它，<b>凡碰它者即攻击者，不需要判断，所以能对付零日漏洞</b>。</div></li>
+      <li><div><b>网络欺骗防御是体系化的防御方法，把蜜罐、蜜网、混淆同防火墙和入侵检测系统有机结合，构建以欺骗为核心的防御体系</b>；它<b>兼有检测和防御能力</b>，<b>部分解决了误报和漏报问题</b>，代价是<b>部署实现复杂、成本高很多</b>。</div></li>
+    </ol>
+  </div>
+</div>
+<hr>
+<p class="small muted" style="text-align:center">
+第 13 章　入侵检测与网络欺骗 · 开卷打印资料　|　PPT 58 页（正文 53 页）＋ 课本 pp.384–414 整合　|　课本习题 28 道全解<br>
+本页专为 A4 打印设计：无折叠、无脚本、无外部资源，屏幕所见即打印所得。
+</p>
+</div>
+</body>
+</html>
