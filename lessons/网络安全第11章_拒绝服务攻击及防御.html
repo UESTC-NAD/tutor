@@ -1,0 +1,4090 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>第11章 拒绝服务攻击及防御 · 开卷打印资料</title>
+<style>
+/* ==========================================================================
+   第 11 章 · 拒绝服务攻击及防御 —— A4 打印资料
+   设计原则：所见即所打。
+   · 屏幕栏宽 == 打印栏宽：A4 210mm − 左右页边距 2×10mm = 190mm（≈718px）
+   · 从屏幕到纸只有「字号」在变（15px → 9pt），排版结构完全不动
+   · 单一浅色外观，不做暗色；零 JS；零折叠
+   ========================================================================== */
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+
+:root{
+  --ink:#141414; --ink2:#3f3f3f; --ink3:#6e6b64;
+  --line:#c6c2b9; --line2:#e0ddd5; --line3:#efece5;
+  --paper:#fff; --gray:#f4f3f0; --gray2:#eae8e2;
+
+  --accent:#1b3a8f;                                   /* 深蓝，黑白打印下也够深 */
+  --def:#14548c;  --def-bg:#eef4fa;  --def-line:#b9d3e8;
+  --key:#2b3f8f;  --key-bg:#eef0fa;  --key-line:#c0c6e8;
+  --trap:#a81f1f; --trap-bg:#fdeeed; --trap-line:#f0bfbc;
+  --exam:#8a5a00; --exam-bg:#fdf5e2; --exam-line:#e8d29a;
+  --eg:#126b4a;   --eg-bg:#eaf5ef;   --eg-line:#b3ddc8;
+  --ok:#126b4a;
+
+  --font:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --mono:"SF Mono",SFMono-Regular,ui-monospace,Menlo,Consolas,monospace;
+}
+
+body{
+  margin:0; background:var(--gray2); color:var(--ink);
+  font-family:var(--font); font-size:15px; line-height:1.72;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- 版心：屏幕上模拟一张 A4 ---------- */
+.page{
+  max-width:210mm; margin:0 auto; padding:14mm 10mm 20mm;
+  background:var(--paper); box-shadow:0 0 0 1px rgba(0,0,0,.06),0 8px 40px rgba(0,0,0,.10);
+}
+
+/* ---------- 排版 ---------- */
+p{margin:0 0 .72em}
+ul,ol{margin:0 0 .8em; padding-left:1.45em}
+li{margin:0 0 .3em}
+li>ul,li>ol{margin-top:.3em}
+b,strong{font-weight:700}
+a{color:inherit; text-decoration:none}
+hr{border:0; border-top:1px solid var(--line2); margin:1.6em 0}
+
+.hdr{border-bottom:2.5px solid var(--ink); padding-bottom:12px; margin-bottom:18px}
+.hdr .eyebrow{font-size:12px; letter-spacing:.14em; color:var(--accent); font-weight:750}
+.hdr h1{font-size:29px; line-height:1.25; margin:7px 0 9px; letter-spacing:-.02em; font-weight:800}
+.hdr p{font-size:14px; color:var(--ink2); margin:0 0 5px}
+
+.sec{margin-top:30px}
+.sec-head{border-top:2px solid var(--ink); padding-top:11px; margin-bottom:12px}
+.sec-num{display:block; font-size:11.5px; font-weight:800; letter-spacing:.14em; color:var(--accent); margin-bottom:4px}
+h2.sec-t{font-size:23px; font-weight:800; letter-spacing:-.018em; line-height:1.3; margin:0 0 4px}
+.sec-lede{font-size:13.5px; color:var(--ink2); margin:5px 0 0}
+
+h3{font-size:18px; font-weight:760; margin:26px 0 9px; line-height:1.4; letter-spacing:-.01em;
+   border-left:4px solid var(--accent); padding-left:9px}
+h4{font-size:15.5px; font-weight:740; margin:19px 0 7px; line-height:1.5}
+h5{font-size:14.4px; font-weight:720; margin:15px 0 5px; color:var(--ink2)}
+
+.lead{font-size:15.4px; color:var(--ink2); border-left:3px solid var(--accent); padding-left:13px; margin:0 0 18px}
+
+/* ---------- 行内标记 ---------- */
+.hl{background:#fdf0c4; padding:0 2px; font-weight:650; print-color-adjust:exact; -webkit-print-color-adjust:exact}
+mark{background:#fdf0c4; padding:0 3px; border-radius:2px}
+code{font-family:var(--mono); font-size:.87em; background:var(--gray); border:1px solid var(--line2);
+     padding:1px 4px; border-radius:4px; overflow-wrap:anywhere;
+     print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.pill{display:inline-block; font-family:var(--mono); font-size:.85em; background:var(--gray);
+      border:1px solid var(--line2); border-radius:4px; padding:0 5px; overflow-wrap:anywhere}
+.en{font-family:var(--mono); font-size:.9em; color:var(--ink2)}
+.small{font-size:13px}
+.muted{color:var(--ink3)}
+.center{text-align:center}
+.mt0{margin-top:0}
+
+/* ---------- 来源徽标（双轨）----------
+   .pref = PPT 页码（考纲范围），.bref = 课本页码（详解出处）。
+   两者都必须显式 text-transform:none —— 否则塞进任何 uppercase 容器里
+   「p.108」会被渲染成「P.108」。本表整套 CSS 都不使用 uppercase。 */
+.pref,.bref{
+  display:inline-block; font-family:var(--mono); font-size:10.5px; font-weight:700;
+  border-radius:3px; padding:0 4px; margin-left:5px; vertical-align:1px;
+  white-space:nowrap; line-height:1.6; text-transform:none;
+  print-color-adjust:exact; -webkit-print-color-adjust:exact;
+}
+.pref{color:var(--accent); background:#eaeefa; border:1px solid #c2cbea}
+.bref{color:var(--ink3); background:var(--gray); border:1px solid var(--line2)}
+
+.chip{
+  display:inline-block; font-size:11.5px; font-weight:700; padding:.5px 7px;
+  border-radius:10px; border:1px solid var(--line); background:var(--gray); color:var(--ink2);
+  white-space:nowrap; line-height:1.6; text-transform:none;
+  print-color-adjust:exact; -webkit-print-color-adjust:exact;
+}
+.chip.warn{background:var(--exam-bg); border-color:var(--exam-line); color:var(--exam)}
+.chip.bad{background:var(--trap-bg); border-color:var(--trap-line); color:var(--trap)}
+.chips{display:flex; flex-wrap:wrap; gap:6px; margin:10px 0}
+
+/* ---------- 提示框 ---------- */
+.box{
+  border:1px solid var(--line2); border-left:3.5px solid var(--ink3);
+  background:var(--gray); border-radius:0 6px 6px 0; padding:11px 14px; margin:15px 0;
+  font-size:14.4px; break-inside:avoid;
+  print-color-adjust:exact; -webkit-print-color-adjust:exact;
+}
+.box>:last-child{margin-bottom:0}
+.box-t{font-size:12px; font-weight:800; letter-spacing:.06em; margin-bottom:5px; text-transform:none}
+.box.def {border-left-color:var(--def);  background:var(--def-bg);  border-color:var(--def-line)}
+.box.def  .box-t{color:var(--def)}
+.box.key {border-left-color:var(--key);  background:var(--key-bg);  border-color:var(--key-line)}
+.box.key  .box-t{color:var(--key)}
+.box.trap{border-left-color:var(--trap); background:var(--trap-bg); border-color:var(--trap-line)}
+.box.trap .box-t{color:var(--trap)}
+.box.exam{border-left-color:var(--exam); background:var(--exam-bg); border-color:var(--exam-line)}
+.box.exam .box-t{color:var(--exam)}
+.box.eg  {border-left-color:var(--eg);   background:var(--eg-bg);   border-color:var(--eg-line)}
+.box.eg   .box-t{color:var(--eg)}
+/* 课本有、PPT 未讲：灰底 + 虚线框，视觉降级到权重为零（不折叠） */
+.box.beyond{border:1px dashed var(--line); border-left:3.5px dashed var(--line);
+            background:var(--gray); color:var(--ink2)}
+.box.beyond .box-t{color:var(--ink3)}
+
+/* ---------- 表格 ---------- */
+.tbl-wrap{margin:15px 0; border:1px solid var(--line2); border-radius:6px; overflow:hidden; break-inside:avoid}
+table{border-collapse:collapse; width:100%; font-size:13.6px; line-height:1.6}
+th,td{padding:6px 9px; text-align:left; border-bottom:1px solid var(--line3); vertical-align:top}
+thead th{background:var(--gray2); font-weight:750; font-size:13px; color:var(--ink2);
+         border-bottom:1px solid var(--line);
+         print-color-adjust:exact; -webkit-print-color-adjust:exact}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{font-family:var(--mono); font-variant-numeric:tabular-nums; white-space:nowrap}
+.tbl-cap{font-size:12.5px; color:var(--ink3); margin:-9px 0 15px; text-align:center}
+
+/* ---------- 卡片网格 ---------- */
+.grid{display:grid; gap:10px; margin:15px 0}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.mini{border:1px solid var(--line2); border-radius:6px; padding:9px 11px; font-size:13.6px;
+      line-height:1.65; background:var(--paper); break-inside:avoid; min-width:0}
+.mini>:last-child{margin-bottom:0}
+.mini .t{font-weight:750; font-size:13.8px; margin-bottom:4px; display:flex; align-items:center; gap:6px}
+.mini .t .ic{flex:0 0 18px; width:18px; height:18px; border-radius:4px; background:var(--accent); color:#fff;
+             display:grid; place-items:center; font-size:11px; font-weight:800;
+             print-color-adjust:exact; -webkit-print-color-adjust:exact}
+
+/* ---------- 武器一：场景卡 ---------- */
+.scene{border:1px solid var(--line); border-radius:8px; margin:18px 0; padding:13px 15px;
+       background:var(--gray); break-inside:avoid;
+       print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.scene-k{font-size:11.5px; font-weight:800; letter-spacing:.1em; color:var(--trap); margin-bottom:5px; text-transform:none}
+.scene-q{font-size:17px; font-weight:780; line-height:1.45; margin:0 0 8px; letter-spacing:-.012em}
+.scene-b{font-size:14.2px; color:var(--ink2); line-height:1.72}
+.scene-b>:last-child{margin-bottom:0}
+.scene-real{margin:10px 0 0; padding:9px 12px; border-radius:6px; background:var(--paper);
+            border:1px dashed var(--line); font-size:13.4px; line-height:1.7}
+.scene-real .t{font-size:11.5px; font-weight:800; letter-spacing:.08em; color:var(--ink3); margin-bottom:4px}
+.scene-real>:last-child{margin-bottom:0}
+
+/* ---------- 武器二：因果链 ---------- */
+.chain{border:1px solid var(--line); border-radius:7px; overflow:hidden; margin:16px 0; break-inside:avoid}
+.chain-i{display:grid; grid-template-columns:minmax(0,64px) minmax(0,1fr); gap:11px;
+         padding:9px 13px; border-bottom:1px solid var(--line2);
+         print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.chain-i:last-child{border-bottom:0}
+.chain-k{font-size:11.5px; font-weight:800; letter-spacing:.05em; padding-top:2px; line-height:1.5; text-transform:none}
+.chain-b{font-size:14px; line-height:1.68; min-width:0}
+.chain-b>:last-child{margin-bottom:0}
+.chain-i.prev{background:var(--trap-bg)} .chain-i.prev .chain-k{color:var(--trap)}
+.chain-i.now {background:var(--eg-bg)}   .chain-i.now  .chain-k{color:var(--eg)}
+.chain-i.next{background:var(--exam-bg)} .chain-i.next .chain-k{color:var(--exam)}
+
+/* ---------- 武器三：步骤表 ---------- */
+.steps{list-style:none; padding:0; margin:14px 0; counter-reset:st}
+.steps>li{position:relative; padding-left:29px; margin-bottom:8px; counter-increment:st; break-inside:avoid}
+.steps>li::before{
+  content:counter(st); position:absolute; left:0; top:2px; width:20px; height:20px;
+  border-radius:50%; background:var(--accent); color:#fff;
+  display:grid; place-items:center; font-size:11.5px; font-weight:800; font-variant-numeric:tabular-nums;
+  print-color-adjust:exact; -webkit-print-color-adjust:exact;
+}
+.steps.tight>li{margin-bottom:4px}
+
+/* ---------- 定义列表 ---------- */
+.kv{display:grid; grid-template-columns:minmax(0,max-content) minmax(0,1fr); gap:5px 14px;
+    font-size:14px; margin:12px 0}
+.kv dt{font-weight:750; color:var(--ink2)}
+.kv dd{margin:0}
+
+/* ---------- 公式 / 算式 ---------- */
+.fx{font-family:var(--mono); font-size:14px; text-align:center; padding:10px 12px; line-height:1.75;
+    background:var(--gray); border:1px solid var(--line2); border-radius:6px; margin:14px 0;
+    break-inside:avoid; overflow-wrap:anywhere;
+    print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.fx.fx-l{text-align:left}
+.fx small{display:block; font-family:var(--font); font-size:12.8px; color:var(--ink3); margin-top:6px; line-height:1.65}
+sub{font-size:.72em; vertical-align:-.25em}
+sup{font-size:.72em; vertical-align:.45em}
+
+/* ---------- PPT 页数权重条 ----------
+   .wfill 是 <span>，且不是 grid 的直接子元素（它在 .wtrack 里），
+   不会被自动 blockify —— 必须显式 display:block，否则五根条整根不显示。 */
+.wt{display:grid; gap:6px; margin:14px 0; break-inside:avoid}
+.wt-r{display:grid; grid-template-columns:minmax(0,110px) minmax(0,1fr) auto; gap:9px;
+      align-items:center; font-size:13.4px}
+.wt-n{font-weight:700; min-width:0; overflow-wrap:anywhere}
+.wtrack{display:block; height:13px; border-radius:7px; background:var(--gray2); overflow:hidden; min-width:0;
+        print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.wfill{display:block; height:100%; border-radius:7px; background:var(--accent);
+       print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.wfill.hot{background:var(--trap)}
+.wfill.cold{background:#9c988f}
+.wt-v{font-family:var(--mono); font-size:12px; color:var(--ink3); white-space:nowrap}
+
+/* ---------- 放大倍数条 ---------- */
+.amp{display:grid; gap:5px; margin:12px 0; break-inside:avoid}
+.amp-r{display:grid; grid-template-columns:minmax(0,86px) minmax(0,1fr) auto; gap:8px;
+       align-items:center; font-size:13px}
+.amp-n{font-weight:700; min-width:0; overflow-wrap:anywhere}
+.amptrack{display:block; height:11px; border-radius:6px; background:var(--gray2); overflow:hidden; min-width:0;
+          print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.ampfill{display:block; height:100%; border-radius:6px; background:var(--trap);
+         print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.ampfill.mid{background:var(--exam)} .ampfill.low{background:#9c988f}
+.amp-v{font-family:var(--mono); font-size:12px; color:var(--ink3); white-space:nowrap}
+
+/* ---------- 必背数字卡 ---------- */
+.mustnum{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin:14px 0}
+.mustnum .n{border:1px solid var(--exam-line); background:var(--exam-bg); border-radius:6px;
+            padding:7px 10px; font-size:13px; line-height:1.5; min-width:0; break-inside:avoid;
+            print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.mustnum .n b{display:block; font-family:var(--mono); font-size:14.5px; color:var(--exam);
+              font-weight:800; overflow-wrap:anywhere; line-height:1.35}
+.mustnum .n span{display:block; font-size:12px; color:var(--ink2); margin-top:2px}
+
+/* ---------- 关键词索引 ---------- */
+.idx table{font-size:12.8px}
+.idx th,.idx td{padding:4px 8px}
+.idx td:last-child{font-family:var(--mono); font-weight:700; color:var(--accent); white-space:nowrap}
+
+/* ---------- 选择题 ---------- */
+.mc{border:1px solid var(--line2); border-radius:6px; padding:9px 12px; margin:9px 0;
+    background:var(--paper); font-size:13.8px; break-inside:avoid}
+.mc-h{font-weight:640; line-height:1.7; margin-bottom:6px; display:flex; gap:7px; align-items:baseline}
+.qn{flex:0 0 auto; font-family:var(--mono); font-size:11.5px; font-weight:800; color:#fff;
+    background:var(--accent); border-radius:3px; padding:1px 5px; text-transform:none;
+    print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.mc-o{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:2px 14px;
+      font-size:13.4px; line-height:1.65; margin-bottom:6px}
+.mc-o span{min-width:0; overflow-wrap:anywhere}
+.mc-o span.ok{font-weight:750; color:var(--ok)}
+.mc-a{font-size:13.2px; line-height:1.7; background:var(--gray); border:1px solid var(--line2);
+      border-radius:5px; padding:7px 10px;
+      print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.mc-a b{color:var(--ok)}
+
+/* ---------- 简答题（静态，不折叠） ---------- */
+.qa{border:1px solid var(--line2); border-radius:6px; margin:11px 0; overflow:hidden;
+    background:var(--paper); break-inside:avoid}
+.qa-h{padding:8px 12px; font-weight:700; font-size:14.2px; line-height:1.65;
+      background:var(--gray); border-bottom:1px solid var(--line2);
+      display:flex; gap:8px; align-items:baseline;
+      print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.qa-b{padding:10px 12px; font-size:13.8px; line-height:1.72}
+.qa-b>:last-child{margin-bottom:0}
+.qa-src{font-size:12.2px; color:var(--ink3); margin-top:8px; padding-top:6px; border-top:1px dashed var(--line2)}
+
+/* ---------- SVG 图 ---------- */
+.svg-wrap{margin:14px 0; padding:8px; border:1px solid var(--line2); border-radius:6px;
+          background:var(--paper); break-inside:avoid}
+svg.flow{display:block; width:100%; height:auto}
+svg.flow text{font-family:var(--font); fill:var(--ink); font-size:11px}
+svg.flow .mono{font-family:var(--mono)}
+svg.flow .ttl{font-size:12.5px; font-weight:750}
+svg.flow .t-md{font-size:12px; font-weight:700}
+svg.flow .t-sm{font-size:11px}
+svg.flow .lbl{font-size:10.5px; fill:var(--ink3)}
+svg.flow .t-mut{font-size:10px; fill:var(--ink3)}
+svg.flow .bx  {fill:#fff;            stroke:var(--line);  stroke-width:1.3}
+svg.flow .bx-a{fill:var(--key-bg);   stroke:var(--accent);stroke-width:1.5}
+svg.flow .bx-c{fill:var(--gray);     stroke:var(--line);  stroke-width:1.3}
+svg.flow .bx-t{fill:var(--trap-bg);  stroke:var(--trap);  stroke-width:1.4}
+svg.flow .bx-e{fill:var(--eg-bg);    stroke:var(--eg);    stroke-width:1.4}
+svg.flow .ln  {stroke:var(--line);   stroke-width:1.4; fill:none}
+svg.flow .ln-a{stroke:var(--accent); stroke-width:1.8; fill:none}
+svg.flow .ln-t{stroke:var(--trap);   stroke-width:1.8; fill:none}
+
+/* ---------- 强制分页（节制使用：只给最大的几节） ---------- */
+.pagebreak{break-before:page; page-break-before:always}
+
+/* ==========================================================================
+   打印
+   ========================================================================== */
+@page{ size:A4; margin:11mm 10mm; }
+
+@media print{
+  body{background:#fff; font-size:9pt; line-height:1.52}
+  .page{max-width:none; width:auto; margin:0; padding:0; box-shadow:none}
+
+  .hdr{padding-bottom:7pt; margin-bottom:10pt; border-bottom-width:1.6pt}
+  .hdr h1{font-size:19pt; margin:4pt 0 5pt}
+  .hdr p{font-size:9pt; margin:0 0 3pt}
+  .hdr .eyebrow{font-size:8pt}
+
+  .sec{margin-top:16pt}
+  .sec-head{border-top-width:1.4pt; padding-top:6pt; margin-bottom:7pt; break-after:avoid}
+  .sec-num{font-size:8pt; margin-bottom:2pt}
+  h2.sec-t{font-size:14.5pt; break-after:avoid}
+  .sec-lede{font-size:8.6pt; margin-top:3pt}
+  h3{font-size:12pt; margin:13pt 0 5pt; border-left-width:3pt; padding-left:6pt; break-after:avoid; break-inside:avoid}
+  h4{font-size:10.2pt; margin:9pt 0 4pt; break-after:avoid; break-inside:avoid}
+  h5{font-size:9.4pt; margin:7pt 0 3pt; break-after:avoid}
+  .lead{font-size:9.4pt; margin:0 0 9pt; padding-left:7pt}
+
+  p{margin:0 0 5pt}
+  ul,ol{margin:0 0 5pt; padding-left:1.35em}
+  li{margin:0 0 2pt}
+  p,li,dd,dt{orphans:2; widows:2}
+
+  .box{padding:6pt 8pt; margin:7pt 0; font-size:8.6pt; border-left-width:2.4pt}
+  .box-t{font-size:7.8pt; margin-bottom:3pt}
+  .tbl-wrap{margin:7pt 0}
+  table{font-size:7.9pt; line-height:1.45}
+  th,td{padding:2.6pt 4pt}
+  thead th{font-size:7.7pt}
+  .tbl-cap{font-size:7.6pt; margin:-4pt 0 7pt}
+
+  .grid{gap:5pt; margin:7pt 0}
+  .mini{padding:5pt 7pt; font-size:8.4pt; line-height:1.5}
+  .mini .t{font-size:8.6pt; margin-bottom:2pt}
+  .mini .t .ic{flex-basis:11pt; width:11pt; height:11pt; font-size:6.6pt}
+
+  .scene{padding:7pt 9pt; margin:9pt 0}
+  .scene-k{font-size:7.6pt; margin-bottom:3pt}
+  .scene-q{font-size:11pt; margin:0 0 5pt}
+  .scene-b{font-size:8.6pt; line-height:1.58}
+  .scene-real{padding:5pt 7pt; margin-top:5pt; font-size:8.2pt; line-height:1.55}
+  .scene-real .t{font-size:7.4pt; margin-bottom:2pt}
+
+  .chain{margin:8pt 0}
+  .chain-i{padding:5pt 8pt; grid-template-columns:minmax(0,38pt) minmax(0,1fr); gap:6pt}
+  .chain-k{font-size:7.6pt}
+  .chain-b{font-size:8.6pt; line-height:1.55}
+
+  .steps{margin:7pt 0}
+  .steps>li{padding-left:16pt; margin-bottom:4pt}
+  .steps>li::before{width:11.5pt; height:11.5pt; font-size:7.2pt; top:1pt}
+  .steps.tight>li{margin-bottom:2pt}
+
+  .kv{font-size:8.4pt; gap:3pt 9pt; margin:6pt 0}
+  .fx{font-size:8.6pt; padding:5pt 7pt; margin:7pt 0; line-height:1.6}
+  .fx small{font-size:7.6pt; margin-top:3pt}
+
+  .chips{gap:3pt; margin:5pt 0}
+  .chip{font-size:7.4pt; padding:0 4pt}
+  .pref,.bref{font-size:6.9pt; padding:0 3pt; margin-left:3pt}
+  code,.pill{font-size:7.9pt; padding:0 2.5pt}
+  .small{font-size:8pt}
+
+  .wt{gap:3pt; margin:7pt 0}
+  .wt-r{font-size:8pt; grid-template-columns:minmax(0,74pt) minmax(0,1fr) auto; gap:5pt}
+  .wtrack{height:8pt}
+  .wt-v{font-size:7.2pt}
+
+  .amp{gap:2.5pt; margin:6pt 0}
+  .amp-r{font-size:7.8pt; grid-template-columns:minmax(0,56pt) minmax(0,1fr) auto; gap:5pt}
+  .amptrack{height:7pt}
+  .amp-v{font-size:7.2pt}
+
+  .mustnum{gap:3.5pt; margin:7pt 0; grid-template-columns:repeat(3,minmax(0,1fr))}
+  .mustnum .n{padding:4pt 6pt; font-size:7.8pt; line-height:1.42}
+  .mustnum .n b{font-size:9pt}
+  .mustnum .n span{font-size:7.1pt}
+
+  .idx table{font-size:7.5pt}
+  .idx th,.idx td{padding:2pt 4pt}
+
+  .mc{padding:5pt 7pt; margin:5pt 0; font-size:8.4pt}
+  .mc-h{font-size:8.6pt; margin-bottom:3pt; line-height:1.55}
+  .mc-o{font-size:8.2pt; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1pt 8pt; margin-bottom:3pt}
+  .mc-a{font-size:8pt; padding:4pt 6pt; line-height:1.55}
+  .qn{font-size:7.2pt; padding:0 3pt}
+
+  .qa{margin:6pt 0}
+  .qa-h{padding:4.5pt 7pt; font-size:8.8pt; line-height:1.55}
+  .qa-b{padding:6pt 7pt; font-size:8.4pt; line-height:1.58}
+  .qa-src{font-size:7.4pt; margin-top:5pt; padding-top:4pt}
+
+  .svg-wrap{margin:7pt 0; padding:4pt}
+  svg.flow text{font-size:9px}
+  svg.flow .ttl{font-size:10px} svg.flow .t-md{font-size:9.6px}
+  svg.flow .t-sm{font-size:9px} svg.flow .lbl{font-size:8.6px} svg.flow .t-mut{font-size:8.2px}
+
+  hr{margin:10pt 0}
+}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="hdr">
+  <div class="eyebrow">计算机网络安全原理（第 2 版）· 开卷考试打印资料</div>
+  <h1>第 11 章　拒绝服务攻击及防御</h1>
+  <p>脉络与详略按<b>老师 PPT 的 71 页</b>分配，课本 p.330–357 只用来把 PPT 的每一页展开讲透。
+     每个知识点都先回答「它在解决什么问题、这个问题怎么来的」，再给定义。</p>
+  <p class="small muted">
+    <span class="pref">p.41</span> ＝ PPT 页码（考纲范围）
+    <span class="bref">p.335</span> ＝ 课本页码（详解出处）
+    <span class="chip warn">★</span> 越多越可能考
+    <span class="chip">PPT 未讲</span> ＝ 课本内容，因课本习题在考而写入正文
+  </p>
+</div>
+
+<section class="sec" id="overview">
+  <div class="sec-head">
+    <span class="sec-num">§ 0　总览</span>
+    <h2 class="sec-t">这一章在解决什么问题</h2>
+    <p class="sec-lede">先把整章串成一根绳，后面所有攻击名词才不会散。</p>
+  </div>
+
+<p class="lead">这一章看上去是一大堆攻击名词（WinNuke、泪滴、Land、SYN Flood、CC、NTP 反射……），
+背起来毫无头绪。其实它们是<b>一条链</b>：每一种攻击都在补上一种的短板，同时留下新的短板，逼出下一种。
+先把这根绳看懂，后面所有名词都会各就各位。</p>
+
+<h3 id="ov-toc">总目录</h3>
+
+<div class="tbl-wrap idx"><table>
+<thead><tr><th>节</th><th>内容</th><th>要点</th><th>PPT</th></tr></thead>
+<tbody>
+<tr><td>§1</td><td>什么是拒绝服务攻击</td><td>定义 · DDoS · 根本原因</td><td>4 页</td></tr>
+<tr><td>§2</td><td>拒绝服务攻击的分类</td><td>六套分类标准</td><td>5 页</td></tr>
+<tr><td>§3</td><td>剧毒包型 DoS</td><td>WinNuke · 泪滴（含三变种）· Land · PoD · 循环</td><td>16 页</td></tr>
+<tr><td>§4</td><td>风暴型 DDoS 总原理</td><td>三步骤 · 五条原因 · 直接/反射分水岭</td><td>8 页</td></tr>
+<tr><td>§5</td><td>直接风暴型 DDoS</td><td>SYN Flood · 连接耗尽 · CC · Trinoo</td><td>10 页</td></tr>
+<tr><td>§6</td><td>反射型 DDoS（DRDoS）</td><td>选协议三标准 · 放大倍数 · NTP · SSDP</td><td>13 页</td></tr>
+<tr><td>§7</td><td>僵尸网络</td><td>IRC vs P2P · Mirai</td><td>—</td></tr>
+<tr><td>§8</td><td>5·19 网络瘫痪案</td><td>两次 DoS · 延迟一天的原因</td><td>—</td></tr>
+<tr><td>§9</td><td>重定向型 DoS</td><td>ARP / DNS 改路标</td><td>2 页</td></tr>
+<tr><td>§10</td><td>DoS 攻击的作用</td><td>作为其他攻击的辅助手段</td><td>—</td></tr>
+<tr><td>§11</td><td>检测、响应与防范</td><td>两类检测 · 四种响应 · 流量清洗</td><td>8 页</td></tr>
+<tr><td>§12</td><td>PPT 讨论题（3 道）</td><td>UDP 好处 · 伪造源 IP · 直接型式微</td><td>—</td></tr>
+<tr><td>§13</td><td>课本习题全解（38 题）</td><td>单选 10 · 多选 9 · 简答 17 · 综合 2</td><td>—</td></tr>
+<tr><td>§14</td><td>考前速查卡</td><td>必背数字 · 对照总表 · <b>关键词索引</b></td><td>—</td></tr>
+</tbody>
+</table></div>
+
+<div class="box exam">
+  <div class="box-t">★ 考场上怎么用这份资料</div>
+  <p><b>① 先翻 §14.3「关键词 → 节号索引」</b>，用题干里的名词（比如「monlist」「半连接」「回注」）直接定位到节号；
+  <b>② 翻到那一节看正文</b>；<b>③ 题目眼熟就直接翻 §13</b>——课本 38 道习题的答案都在里面，
+  17 道简答题是逐题写出来的。</p>
+</div>
+
+<h3 id="ov-chain">全章因果链：一个病根，三条路线</h3>
+
+<div class="box def">
+  <div class="box-t">病根（整章只有这一条）</div>
+  <p><b>网络带宽和系统资源是有限的。</b><span class="pref">p.6</span><span class="bref">p.334</span>
+  只要攻击者能让受害者<b>花掉的代价远大于自己花掉的代价</b>，服务就会瘫。
+  <b>课本单选第 4 题问「拒绝服务攻击导致目标瘫痪的根本原因」，答案就是这一句</b>——不是「防护能力弱」，
+  也不是「攻击能力太强」，而是资源本身有上限，这一点<b>永远消不掉</b>，所以拒绝服务攻击<b>无法被彻底根除</b>。</p>
+</div>
+
+<div class="svg-wrap">
+<svg class="flow" viewBox="0 0 700 250" role="img" aria-label="全章知识地图：一个病根分出三条攻击路线，风暴型再分为直接型与反射型，最后落到防御">
+  <rect x="230" y="10" width="240" height="34" class="bx-t"/>
+  <text x="350" y="26" text-anchor="middle" class="t-md">病根：资源与带宽有限</text>
+  <text x="350" y="39" text-anchor="middle" class="t-mut">改不掉 → DoS 只能缓解、不能根除</text>
+
+  <path d="M290 46 L150 70" class="ln"/><path d="M350 46 L350 70" class="ln"/><path d="M410 46 L556 70" class="ln"/>
+
+  <rect x="24" y="72" width="212" height="40" class="bx-a"/>
+  <text x="130" y="88" text-anchor="middle" class="t-sm" font-weight="700">① 剧毒包型　§3</text>
+  <text x="130" y="103" text-anchor="middle" class="t-mut">畸形包触发漏洞 · 一个包打死</text>
+
+  <rect x="244" y="72" width="212" height="40" class="bx-a"/>
+  <text x="350" y="88" text-anchor="middle" class="t-sm" font-weight="700">② 风暴型　§4–6</text>
+  <text x="350" y="103" text-anchor="middle" class="t-mut">包本身合法，只是太多</text>
+
+  <rect x="464" y="72" width="212" height="40" class="bx-c"/>
+  <text x="570" y="88" text-anchor="middle" class="t-sm" font-weight="700">③ 重定向型　§9</text>
+  <text x="570" y="103" text-anchor="middle" class="t-mut">改 ARP / DNS，让包送错地方</text>
+
+  <text x="24" y="128" class="t-mut">补丁一打就废 → 已过时</text>
+  <text x="464" y="128" class="t-mut">争议大，常归入网络监听</text>
+
+  <path d="M310 114 L250 140" class="ln-a"/><path d="M390 114 L452 140" class="ln-a"/>
+
+  <rect x="112" y="142" width="196" height="40" class="bx-a"/>
+  <text x="210" y="158" text-anchor="middle" class="t-sm" font-weight="700">直接风暴型　§5</text>
+  <text x="210" y="173" text-anchor="middle" class="t-mut">自己的肉鸡发包 · 1:1 无放大</text>
+
+  <rect x="392" y="142" width="196" height="40" class="bx-t"/>
+  <text x="490" y="158" text-anchor="middle" class="t-sm" font-weight="700">反射型 DRDoS　§6</text>
+  <text x="490" y="173" text-anchor="middle" class="t-mut">借正常服务器 · 放大几百倍</text>
+
+  <path d="M310 162 L388 162" class="ln-t"/>
+  <text x="349" y="156" text-anchor="middle" class="t-mut">被取代</text>
+
+  <text x="112" y="198" class="t-mut">暴露 IP、成本高 → 越来越少（§12 讨论三）</text>
+  <text x="392" y="198" class="t-mut">攻击者隐身、无须大僵尸网络 → 当前主流</text>
+
+  <path d="M350 204 L350 216" class="ln"/>
+  <rect x="180" y="218" width="340" height="26" class="bx-e"/>
+  <text x="350" y="236" text-anchor="middle" class="t-sm">防御 §11：检测 → 响应（四种，均只能缓解）→ <tspan font-weight="700">流量清洗</tspan></text>
+</svg>
+</div>
+
+<p>围绕这个病根，攻击者有三条完全不同的路线，这三条路线就是课本 11.1 节
+「<b>按攻击机制分类</b>」的三大类<span class="bref">p.331</span>，也是本资料 §3 到 §9 的骨架：</p>
+
+<div class="chain">
+  <div class="chain-i prev">
+    <div class="chain-k">路线一</div>
+    <div class="chain-b"><b>剧毒包型：不拼量，拼漏洞。</b>精心构造一个<b>畸形</b>数据包，让对方处理时崩溃。
+    代价比接近 1 : ∞，一台掌上电脑就能打死一台大型机。<br>
+    <b>留下的坑：</b>它靠的是<b>软件实现的 bug</b>，厂商打个补丁就全废了。所以这类攻击今天基本绝迹。</div>
+  </div>
+  <div class="chain-i now">
+    <div class="chain-k">路线二</div>
+    <div class="chain-b"><b>风暴型：不依赖漏洞，纯拼量。</b>补丁挡不住「合法但太多」的请求——
+    这是它<b>取代剧毒包型成为主流</b>的原因，也是今天说「DDoS」时默认指的东西。<br>
+    <b>但拼量要有量：</b>攻击者自己没那么多带宽 → 于是有了<b>僵尸网络</b>（借别人的机器，§7）；
+    僵尸网络仍然暴露傀儡机 IP、且规模有限 → 于是有了<b>反射放大</b>（借别人的带宽还隐身，§6）。</div>
+  </div>
+  <div class="chain-i next">
+    <div class="chain-k">路线三</div>
+    <div class="chain-b"><b>重定向型：不耗资源，改路标。</b>篡改 ARP 表或 DNS 缓存，让数据包压根送不到受害者。
+    因为它更常被用于窃听和中间人攻击，<b>很多文献把它归到网络监听而不算 DoS</b>——
+    PPT 只给了 2 页，课本也只有一段，属于「知道有这回事」即可（§9）。</div>
+  </div>
+</div>
+
+<p>风暴型内部还有第二层因果链，这是本章最该看懂的一段，PPT 用了 31 页（占全章 44%）讲它：</p>
+
+<div class="chain">
+  <div class="chain-i prev">
+    <div class="chain-k">直接型</div>
+    <div class="chain-b">攻击者用<b>自己控制的傀儡机直接</b>向受害者发包（§5）。
+    <b>坑：</b>傀儡机 IP 暴露在受害者日志里；而且要打垮一个大站，得先攒出足够大的僵尸网络，成本高。</div>
+  </div>
+  <div class="chain-i now">
+    <div class="chain-k">补一半</div>
+    <div class="chain-b"><b>伪造源 IP</b>（SYN Flood 就这么干）。既躲开追踪，又让受害者的半连接一直挂着不释放。
+    <b>还剩的坑：</b>攻击流量的<b>总量</b>仍然等于攻击者发出去的量，一分不多。</div>
+  </div>
+  <div class="chain-i next">
+    <div class="chain-k">反射型</div>
+    <div class="chain-b">把源地址伪造成<b>受害者</b>，向互联网上成千上万台<b>正常服务器</b>发小请求，
+    让它们把<b>大得多的响应</b>全砸向受害者（§6）。攻击者发 234 字节、受害者收 48200 字节，<b>放大 206 倍</b>。
+    攻击者<b>不必掌控大规模僵尸网络、且彻底隐身</b>——这就是它成为<b>当前主流</b>的原因。<span class="bref">p.337</span></div>
+  </div>
+</div>
+
+<div class="box key">
+  <div class="box-t">★ 一句话记住三条路线的区别</div>
+  <p><b>剧毒包型＝包本身有毒（畸形）；风暴型＝包本身没毒、但太多；反射型＝毒包是别人替你发的。</b></p>
+</div>
+
+<h3 id="ov-weight">PPT 页数权重：老师的重点在哪</h3>
+
+<p>下面是 71 页 PPT 各主题实际占的页数。<b>页数就是老师认为的重要性</b>，本资料的篇幅严格照它分配：</p>
+
+<div class="wt">
+  <div class="wt-r"><div class="wt-n">风暴型 DDoS</div><div class="wtrack"><span class="wfill hot" style="width:100%"></span></div><div class="wt-v">31 页 · 44%</div></div>
+  <div class="wt-r"><div class="wt-n">剧毒包型 DoS</div><div class="wtrack"><span class="wfill" style="width:52%"></span></div><div class="wt-v">16 页 · 23%</div></div>
+  <div class="wt-r"><div class="wt-n">检测与防御</div><div class="wtrack"><span class="wfill" style="width:26%"></span></div><div class="wt-v">8 页 · 11%</div></div>
+  <div class="wt-r"><div class="wt-n">分类</div><div class="wtrack"><span class="wfill cold" style="width:16%"></span></div><div class="wt-v">5 页 · 7%</div></div>
+  <div class="wt-r"><div class="wt-n">概念（是什么）</div><div class="wtrack"><span class="wfill cold" style="width:13%"></span></div><div class="wt-v">4 页 · 6%</div></div>
+  <div class="wt-r"><div class="wt-n">重定向型 DoS</div><div class="wtrack"><span class="wfill cold" style="width:7%"></span></div><div class="wt-v">2 页 · 3%</div></div>
+</div>
+
+<p>风暴型 31 页里，<b>反射型占 13 页、直接型占 10 页</b>——反射型（尤其 NTP，单独 6 页）
+是这一章密度最高的地方，也是课本给了完整计算过程的地方。<b>要考计算题，只可能考它。</b></p>
+
+<h3 id="ov-scope">PPT 与课本的范围对照</h3>
+
+<p>这门课的 PPT 和课本对不上的地方不少，取舍规则如下：</p>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>情况</th><th>具体内容</th><th>本资料怎么处理</th></tr></thead>
+<tbody>
+<tr><td><b>PPT 有<br>课本没有</b></td>
+    <td>WinNuke 带外攻击（3 页）；<b>泪滴攻击的三个变种</b>（小片段 / 重叠分片 / 拖垮防火墙）；
+        常规分类六套标准（5 页）；Trinoo 的三个端口与口令；反射协议三特点；邮件炸弹</td>
+    <td><b>全部补齐。</b>老师专门加的内容几乎一定考——而且<b>课本习题第 13 题正在考「分片穿透防火墙」</b></td></tr>
+<tr><td><b>课本有<br>PPT 没有</b></td>
+    <td>僵尸网络 IRC / P2P 结构（§7）；5·19 网络瘫痪案（§8）；「DoS 攻击的作用」（§10）；
+        表 11-1 完整放大倍数表；流量清洗四种回注方式；追溯三方法</td>
+    <td><b>全部写进正文。</b>因为<b>课本习题第 7、8、10、12 题和单选第 3、8、9 题都在考它们</b>，
+        开卷考试很可能直接从课本习题出题</td></tr>
+<tr><td><b>PPT 提了问<br>没给答案</b></td>
+    <td>① 用 UDP 攻击的好处是什么　② SYN 风暴为什么必须伪造源地址　③ 为什么直接风暴型越来越少</td>
+    <td><b>单独一节逐题作答（§12）。</b>这类「为什么这样设计」的题翻书翻不到，是开卷考试最爱出的</td></tr>
+</tbody>
+</table></div>
+
+<div class="box trap">
+  <div class="box-t">⚠ 关于 §7、§8、§10 这三节的篇幅，说明一下</div>
+  <p>本资料其他各节都<b>严格按 PPT 的详略分配篇幅</b>。<b>唯独这三节例外</b>：
+  老师的 PPT <b>一页都没讲</b>（僵尸网络只在原理图里出现了「Zombie」两个字），
+  但<b>课本合计用了 7 页</b>，而且<b>课本习题在这三处考了 7 道</b>
+  （简答 7、8、10、12 题，单选 3、8、9 题）。<br>
+  <b>结论：这是「老师留给课本讲」的部分，不是「不考」的部分。</b>照写不误。</p>
+</div>
+
+</section>
+<section class="sec" id="what">
+  <div class="sec-head">
+    <span class="sec-num">§ 1　What</span>
+    <h2 class="sec-t">什么是拒绝服务攻击</h2>
+    <p class="sec-lede">PPT p.3–6 · 课本 11.1 节 p.330–331　｜　4 页，占全章 6%</p>
+  </div>
+
+<div class="scene">
+  <div class="scene-k">先想清楚这个问题</div>
+  <p class="scene-q">网站程序没被改、数据一条没丢、服务器也没被入侵——但用户就是打不开。这算不算被攻击？</p>
+  <div class="scene-b">
+    <p>前面几章讲的攻击，目标都是<b>「拿到不该拿的东西」</b>：口令破解拿账号、SQL 注入拿数据、
+    嗅探拿明文——破坏的是<b>机密性</b>；篡改网页、改数据库——破坏的是<b>完整性</b>。</p>
+    <p>拒绝服务攻击是完全不同的一类：它<b>什么也不偷、什么也不改</b>，
+    只让服务<b>用不了</b>。破坏的是安全三性里的第三性——<b class="hl">可用性（Availability）</b>。
+    课本第 11 章开篇第一句就点明了这一点：<b>「拒绝服务攻击是一种应用广泛、难以防范、
+    严重威胁网络安全（破坏可用性）的攻击方式。」</b><span class="bref">p.330</span></p>
+    <div class="scene-real">
+      <div class="t">这四个例子说明它有多严重</div>
+      <ul class="mt0">
+        <li><b>2000 年 2 月 7–11 日</b>：Yahoo!、Amazon、Buy.com、eBay 被攻击，损失<b>上亿美元</b>。</li>
+        <li><b>2009 年 5 月 19 日</b>：江苏、安徽、广西、海南、甘肃、浙江<b>六省区断网</b>（「5·19 网络瘫痪案」，详见 §8）。</li>
+        <li><b>2016 年 10 月 21 日</b>：美国域名解析商 <b>Dyn</b> 遭 DDoS，大量知名网站掉线近一天；
+            流量来自<b>数百万台 Mirai 僵尸网络控制的 IoT 设备</b>，峰值达 <b>1.2 Tbps</b>。<span class="bref">p.330</span></li>
+        <li><b>2018 年</b>：CNCERT 指出<b>云平台上的 DDoS 攻击次数占比超过 50%</b>。</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<h3 id="what-dos">1.1　DoS 的定义与攻击方式</h3>
+
+<div class="box def">
+  <div class="box-t">定义 · PPT 原文（可直接抄）</div>
+  <p><b>拒绝服务攻击（Denial of Service, DoS）</b>：攻击者通过某种手段，<b>有意地</b>造成计算机或网络
+  不能正常运转，从而<b>不能向合法用户提供所需服务</b>，或者<b>使服务质量降低</b>。<span class="pref">p.3</span></p>
+</div>
+
+<p>这个定义要拆开看，三个词都在考点上：</p>
+
+<div class="kv">
+  <dt>服务 Service</dt><dd>系统提供的、用户在对其使用中会<b>受益</b>的功能。<span class="pref">p.3</span></dd>
+  <dt>拒绝服务 DoS</dt><dd><b>任何</b>对服务的干涉，只要<b>使其可用性降低或失去可用性</b>，就叫拒绝服务。</dd>
+  <dt>有意地</dt><dd>区别于「机房停电」这类事故。<b>意图</b>是构成攻击的必要条件。</dd>
+</div>
+
+<div class="box key">
+  <div class="box-t">★ 注意「或者使服务质量降低」这半句</div>
+  <p>很多人以为必须把服务打死才算 DoS。<b>不是。</b>只要让网站变慢到用户受不了，就已经构成拒绝服务。
+  <b>课本单选第 1 题</b>就是这么出的：「Web 服务器访问速度突然变得比平常慢很多，甚至无法访问，
+  最可能遭到的攻击是——<b>拒绝服务攻击</b>」。「慢」也是 DoS。</p>
+</div>
+
+<h4>攻击的三种手段与两种典型后果</h4>
+
+<div class="grid g3">
+  <div class="mini"><div class="t"><span class="ic">1</span>消耗资源</div>
+    消耗<b>系统资源</b>（CPU、内存、磁盘）或<b>网络资源</b>（带宽）。这是绝大多数 DoS 走的路。</div>
+  <div class="mini"><div class="t"><span class="ic">2</span>阻断访问路径</div>
+    不消耗资源，而是让数据包<b>送不到</b>——对应后面的<b>重定向型</b>（§9）。</div>
+  <div class="mini"><div class="t"><span class="ic">3</span>更改系统配置</div>
+    例如<b>改掉路由器的路由表</b>，使系统无法正常工作。<span class="bref">p.330</span></div>
+</div>
+
+<p>典型后果 PPT 举了三个：<b>计算机系统崩溃</b>、<b>带宽耗尽</b>、<b>硬盘被填满</b>。<span class="pref">p.3</span>
+（硬盘被填满对应后面的<b>邮件炸弹</b>，见 §5.6。）</p>
+
+<h3 id="what-ddos">1.2　DDoS 的定义</h3>
+
+<div class="box def">
+  <div class="box-t">定义 · PPT 原文（可直接抄）</div>
+  <p><b>分布式拒绝服务攻击（Distributed Denial of Service, DDoS）</b>：如果处于<b>不同位置的多个攻击者</b>
+  同时向一个或多个目标发起拒绝服务攻击，<b>或者</b>一个或多个攻击者<b>控制了位于不同位置的多台机器</b>
+  并利用这些机器对受害者同时实施拒绝服务攻击。<span class="pref">p.4</span><span class="bref">p.330</span></p>
+</div>
+
+<p>注意定义里的「<b>或者</b>」——它涵盖了两种情形：<b>多人合伙打</b>，以及<b>一个人控制很多台机器打</b>。
+现实中几乎都是后者，被控制的那些机器就是<b>僵尸主机</b>（§7）。</p>
+
+<div class="box key">
+  <div class="box-t">★ DDoS 的三个特点（PPT 原文，容易出填空/简答）</div>
+  <p>攻击来源的<b>分散性</b>、<b>协同性</b>，攻击力度的<b>汇聚性</b>。<span class="pref">p.4</span></p>
+  <p class="small muted">怎么理解：分散性＝来源 IP 遍布全球，没法靠封一个 IP 解决；协同性＝这些来源受同一个人指挥、同时发作；
+  汇聚性＝分散的小水流最后<b>汇到同一个受害者</b>身上变成洪水。这三条正好解释了 DDoS 为什么比 DoS 难防。</p>
+</div>
+
+<div class="box eg">
+  <div class="box-t">时间点</div>
+  <p><b>1999 年 11 月</b>，在 <b>CERT/CC</b> 组织的<b>分布式系统入侵者工具研讨会（DSIT Workshop）</b>上，
+  与会专家<b>首次概括了 DDoS 攻击技术</b>。<span class="pref">p.4</span><span class="bref">p.330</span></p>
+</div>
+
+<h3 id="what-rel">1.3　★ DDoS 与 DoS 的关系</h3>
+
+<p>这是一道很容易问的辨析题。PPT 用「广义 / 狭义」两句话说清楚：<span class="pref">p.5</span></p>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>角度</th><th>说法</th><th>含义</th></tr></thead>
+<tbody>
+<tr><td><b>广义上</b></td><td>DDoS <b>属于</b> DoS，且是 DoS <b>主流的攻击模式</b></td>
+    <td>DDoS 只是 DoS 的一种实现方式，两者是<b>包含关系</b></td></tr>
+<tr><td><b>狭义上</b></td><td>DoS 指<b>单一攻击者</b>针对<b>单一受害者</b>（传统 DoS）；DDoS 指<b>多个攻击者</b>向同一受害者</td>
+    <td>此时两者是<b>并列关系</b>，靠「攻击源是一个还是多个」区分</td></tr>
+</tbody>
+</table></div>
+
+<p class="small muted">课本的说法与此一致：DDoS「是拒绝服务攻击<b>最主要的一种形式</b>」<span class="bref">p.330</span>。
+答题时把广义、狭义两层都写上，才算完整。</p>
+
+<h3 id="what-why">1.4　★★ DDoS 为什么能成功</h3>
+
+<div class="scene">
+  <div class="scene-k">PPT p.6 · 问题</div>
+  <p class="scene-q">DDoS 为什么能成功？</p>
+  <div class="scene-b">
+    <p>换个问法：既然这类攻击这么老，为什么二十多年了还是防不住？
+    答案不在「技术不够好」，而在<b>互联网的设计本身</b>——下面三条（课本扩展成五条）
+    <b>全是当年设计 TCP/IP 时的取舍</b>，不是 bug，改不掉。</p>
+  </div>
+</div>
+
+<p>PPT 给了三条<span class="pref">p.6</span>，课本在 11.3.1 节给了更完整的五条<span class="bref">p.334</span>。
+<b>建议按课本五条背，PPT 三条是其中的子集</b>：</p>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>#</th><th>原因</th><th>它导致了什么</th><th>PPT</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><b>TCP/IP 协议存在漏洞</b>，可以被攻击者利用</td>
+    <td>三次握手的半连接机制 → SYN Flood；IP 分片重组 → 泪滴攻击</td><td>✔</td></tr>
+<tr><td>2</td><td><b>网络提供 best-effort（尽力而为）服务，不区分数据流量是否是攻击流量</b></td>
+    <td>路由器只管转发，不判断善恶，攻击包和正常包<b>一视同仁</b></td><td>✔</td></tr>
+<tr><td>3</td><td><b>因特网没有认证机制</b>，从而容易遭受 <b>IP 欺骗</b></td>
+    <td>源 IP 随便填 → 反射型 DDoS 与 SYN Flood 的地基</td><td>—</td></tr>
+<tr><td>4</td><td><b>因特网中的路由器不具备数据追踪功能</b>，无法验证一个数据包是否来自它所声称的位置</td>
+    <td>追不到攻击者 → 追溯（traceback）成了难题，见 §11.4</td><td>—</td></tr>
+<tr><td>5</td><td class="hl"><b>网络带宽和系统资源是有限的——这是最根本原因</b></td>
+    <td>无论怎么优化，总有一个上限；打到上限服务就瘫</td><td>✔</td></tr>
+</tbody>
+</table></div>
+
+<div class="box exam">
+  <div class="box-t">★ 考点：「根本原因」只有一个</div>
+  <p>课本<b>单选第 4 题</b>：「拒绝服务攻击导致攻击目标瘫痪的<b>根本原因</b>是（　）」，
+  答案 <b>A. 网络和系统资源是有限的</b>。五条原因里<b>只有第 5 条是「根本」</b>，
+  前四条是「使攻击容易实施」的原因，别选混。</p>
+  <p>顺带记一句结论，简答题常用：<b>正因为病根是「资源有限」这个改不掉的事实，
+  拒绝服务攻击只能缓解、不能根除</b>——课本原话是「完全阻止是不可能的，防范可减少被攻击的机会」<span class="pref">p.69</span>。</p>
+</div>
+
+</section>
+<section class="sec" id="type">
+  <div class="sec-head">
+    <span class="sec-num">§ 2　Type</span>
+    <h2 class="sec-t">拒绝服务攻击的分类</h2>
+    <p class="sec-lede">PPT p.8–12（5 页）· 课本 11.1 节 p.330–331　｜　占全章 7%</p>
+  </div>
+
+<div class="box trap">
+  <div class="box-t">⚠ 先说清楚这一节为什么值得花时间</div>
+  <p>课本关于分类只写了<b>一段话</b>，PPT 却<b>连续用了 5 页</b>（p.8–12），还配了 6 张树形图。
+  <b>PPT 花的篇幅就是老师的重点</b>——这种「一个对象、六套分类标准」的内容，
+  最适合出<b>选择题和填空题</b>。本节按 PPT 的六套讲，并标出课本对应的说法。</p>
+</div>
+
+<h3 id="type-6">2.1　★ PPT 的六套分类标准</h3>
+
+<p>同一堆攻击，站在不同角度看就有不同的分法。<b>关键是记住「按什么分」和「分成几类」</b>：</p>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>按什么分</th><th>分成</th><th>各自是什么</th><th>PPT</th></tr></thead>
+<tbody>
+<tr><td rowspan="2"><b>①　最粗的一刀</b></td>
+    <td><b>物理的</b> Physical DoS</td>
+    <td>偷窃、破坏物理设备、破坏电源</td><td rowspan="2"><span class="pref">p.8</span></td></tr>
+<tr><td><b>逻辑的</b> Logic DoS</td>
+    <td>通过数据包/软件手段实施——<b>本章讲的全是这一类</b></td></tr>
+
+<tr><td rowspan="3"><b>②　按攻击的目标</b></td>
+    <td><b>节点型</b>　→　<b>主机型</b></td>
+    <td>耗的是主机自身的资源：<b>CPU、磁盘、OS</b> 等</td><td rowspan="3"><span class="pref">p.9</span></td></tr>
+<tr><td><b>节点型</b>　→　<b>应用型</b></td>
+    <td>打某个具体应用：<b>Email、DNS、Web</b> 等</td></tr>
+<tr><td><b>网络连接型</b></td>
+    <td>打的不是某台机器，而是<b>链路/带宽</b>本身</td></tr>
+
+<tr><td rowspan="3"><b>③　按攻击方式</b></td>
+    <td><b>资源消耗</b></td><td>耗尽<b>带宽、内存、CPU、磁盘</b></td><td rowspan="3"><span class="pref">p.10</span></td></tr>
+<tr><td><b>服务中止</b></td><td>攻击导致<b>服务崩溃或中止</b></td></tr>
+<tr><td><b>物理破坏</b></td><td><b>雷击、电流、水火</b>等</td></tr>
+
+<tr><td rowspan="2"><b>④　按受害者类型</b></td>
+    <td><b>服务器端 DoS</b></td><td><b>特定服务</b>不能提供服务</td><td rowspan="2"><span class="pref">p.11</span></td></tr>
+<tr><td><b>客户端 DoS</b></td><td><b>特定客户</b>不能使用服务</td></tr>
+
+<tr><td rowspan="2"><b>⑤　按是否直接针对受害者</b></td>
+    <td><b>直接 DoS</b></td><td>直接打受害者本人</td><td rowspan="2"><span class="pref">p.12</span></td></tr>
+<tr><td><b>间接 DoS</b></td><td>打一个「对受害者有致命影响的<b>其他目标</b>」</td></tr>
+
+<tr><td rowspan="2"><b>⑥　按攻击地点</b></td>
+    <td><b>本地 DoS</b></td><td>与受害者<b>同处一地</b></td><td rowspan="2"><span class="pref">p.12</span></td></tr>
+<tr><td><b>远程 DoS</b></td><td><b>通过网络</b>实施</td></tr>
+</tbody>
+</table></div>
+
+<h4>第 ⑤ 套要单独讲：直接 vs 间接</h4>
+
+<p>这一套课本讲得比 PPT 细，而且<b>课本在这一句下面画了红线</b>，说明老师强调过<span class="bref">p.330–331</span>：</p>
+
+<div class="grid g2">
+  <div class="mini"><div class="t"><span class="ic">直</span>直接型 DoS</div>
+    <b>直接对受害者发起攻击。</b><br>
+    课本举例：<b>直接攻击某个 Email 账号使之不可用（邮件炸弹攻击）</b>。</div>
+  <div class="mini"><div class="t"><span class="ic">间</span>间接型 DoS</div>
+    <b>通过攻击「对受害者有致命影响的其他目标」，从而间接导致受害者不能提供服务。</b><br>
+    课本举例：攻击 <b>Email 服务器</b>来间接攻击某个账号；攻击<b>域名服务器</b>来阻塞客户访问 Web 服务器。</div>
+</div>
+
+<div class="box exam">
+  <div class="box-t">★ 「间接型」正是 5·19 案和 Dyn 案的模型</div>
+  <p>2016 年 Dyn 事件里，攻击者<b>没有打任何一个网站</b>，只打了<b>域名解析服务商</b>，
+  结果几百个网站全部掉线——这就是教科书式的<b>间接型 DoS</b>。5·19 案同理（§8）。
+  记住这个对应关系，简答题「举例说明间接型 DoS」就有话写了。</p>
+</div>
+
+<h3 id="type-book">2.2　课本的三套分类标准</h3>
+
+<p>课本 11.1 节给的是另外三套，其中两套与 PPT 重合但<b>用词不同</b>，容易在选择题里被拿来做干扰项：</p>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>课本按什么分</th><th>分成</th><th>与 PPT 的关系</th></tr></thead>
+<tbody>
+<tr><td><b>按攻击方式</b></td>
+    <td><b>资源破坏型</b>（耗尽网络带宽、主机内存、CPU、磁盘）<br>
+        <b>物理破坏型</b>（摧毁主机或网络节点）<br>
+        <b>服务终止型</b>（攻击导致服务崩溃或终止）</td>
+    <td>就是 PPT 第 ③ 套，<b>只是三个名字都换了说法</b>：<br>
+        资源消耗＝资源破坏型、服务中止＝服务终止型、物理破坏＝物理破坏型</td></tr>
+<tr><td><b>按是否直接针对受害者</b></td>
+    <td><b>直接型 DoS</b> / <b>间接型 DoS</b></td>
+    <td>与 PPT 第 ⑤ 套完全相同</td></tr>
+<tr><td class="hl"><b>按攻击机制</b></td>
+    <td><b>剧毒包型</b>（Killer Packet）<br><b>风暴型</b>（Flood Type）<br><b>重定向型</b></td>
+    <td><b>PPT 没有把它列进「分类」那 5 页</b>，但 PPT 的正文（§3–§9）<b>正是按这三类组织的</b></td></tr>
+</tbody>
+</table></div>
+
+<div class="box trap">
+  <div class="box-t">⚠ 教材自己用了两套名字，别被绕进去</div>
+  <p>同一套分类，<b>PPT 叫「资源消耗 / 服务中止 / 物理破坏」，课本叫「资源破坏型 / 物理破坏型 / 服务终止型」</b>。
+  说的是同一件事。答题时<b>跟着题干的用词走</b>：题目用哪套词，你就用哪套词答，两套混着写反而会显得没读懂。</p>
+</div>
+
+<h3 id="type-mech">2.3　★★ 按攻击机制分：本章真正的主线</h3>
+
+<p>上面六套分类里，<b>只有「按攻击机制」这一套会贯穿全章</b>——因为 §3 到 §9 就是照它排的。
+这也是课本明确说「<b>本章主要讨论前两种攻击</b>」的那一套<span class="bref">p.331</span>。</p>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>类别</th><th>课本定义（可直接抄）</th><th>别名</th><th>本资料</th></tr></thead>
+<tbody>
+<tr><td><b>剧毒包型</b><br><span class="en">Killer Packet</span></td>
+    <td>主要利用<b>协议本身或其软件实现中的漏洞</b>，向目标发送一些<b>异常的（畸形的）数据包</b>，
+        使目标系统在处理时出现异常，甚至崩溃</td>
+    <td><b>漏洞攻击</b>（Vulnerability Attack）<br><b>协议攻击</b>（Protocol Attack）<br>PPT 还叫「杀手包」</td>
+    <td><b>§3</b></td></tr>
+<tr><td><b>风暴型</b><br><span class="en">Flood Type</span></td>
+    <td>主要通过向目标发送<b>大量的网络数据包</b>，导致目标系统或网络的<b>资源耗尽而瘫痪</b></td>
+    <td><b>带宽攻击</b>（Bandwidth Attack）<br>PPT 称「数据风暴」</td>
+    <td><b>§4–§6</b></td></tr>
+<tr><td><b>重定向型</b></td>
+    <td>通过<b>修改网络中的一些参数</b>，如 <b>ARP 表、DNS 缓存</b>，使得从受害者发出的或发向受害者的
+        数据包<b>被重定向到别的地方</b></td>
+    <td>—</td>
+    <td><b>§9</b></td></tr>
+</tbody>
+</table></div>
+
+<div class="box key">
+  <div class="box-t">★ 剧毒包型的一个反直觉特点（很好出简答题）</div>
+  <p>课本原话：这类攻击<b>「对攻击者的计算能力和网络带宽没有什么要求」</b>，
+  因此<b>「一台很普通的计算机，甚至一台连网的掌上电脑，就可攻破一台运算能力超强的大型机」</b>。<span class="bref">p.331</span></p>
+  <p>为什么？因为它不靠「量」取胜，靠的是<b>对方代码里的 bug</b>——一个包就够。
+  这一点<b>正好与风暴型相反</b>（风暴型必须拼带宽），是两者最本质的区别。</p>
+</div>
+
+<div class="box trap">
+  <div class="box-t">⚠ 重定向型「算不算 DoS」，教材自己是留了口子的</div>
+  <p>课本原话：如果重定向的目标是<b>攻击者的主机</b>，那是通常说的<b>中间人攻击</b>；
+  如果重定向到<b>不存在的主机或目标主机</b>，才是一种拒绝服务攻击。
+  并明确写了「<b>也有文献将重定向攻击归为网络监听类攻击，而不是拒绝服务攻击</b>」<span class="bref">p.331</span>。
+  PPT 的说法一致：「常被用于窃听或中间人攻击，因此通常在网络窃听中研究，<b>很多人不把它当作 DoS 攻击</b>」<span class="pref">p.62</span>。</p>
+  <p><b>怎么答题：</b>问「重定向是不是 DoS」，就答<b>「看重定向到哪里」</b>——
+  指向攻击者＝中间人攻击，指向黑洞＝拒绝服务；并补一句两本教材都承认这个分类有争议。</p>
+</div>
+
+</section>
+<section class="sec" id="killer">
+  <div class="sec-head">
+    <span class="sec-num">§ 3　How · 一</span>
+    <h2 class="sec-t">剧毒包型 DoS</h2>
+    <p class="sec-lede">PPT p.14–29（16 页，占全章 23%）· 课本 11.2 节 p.331–333</p>
+  </div>
+
+<div class="chain">
+  <div class="chain-i prev"><div class="chain-k">承上</div>
+    <div class="chain-b">§1 说了病根是「资源有限」。但如果对方资源比你多得多呢？硬拼你必输。</div></div>
+  <div class="chain-i now"><div class="chain-k">本节</div>
+    <div class="chain-b"><b>换个思路：不拼资源，拼对方代码里的 bug。</b>
+    构造一个<b>畸形</b>的数据包，让对方在「解析 / 重组 / 处理」它的时候自己崩溃。
+    这样<b>一个包就能打死一台大机器</b>。</div></div>
+  <div class="chain-i next"><div class="chain-k">留下的坑</div>
+    <div class="chain-b">靠 bug 吃饭，<b>补丁一打就全废</b>。所以这五种攻击今天都已过时 →
+    逼出不依赖漏洞的<b>风暴型</b>（§4）。</div></div>
+</div>
+
+<h3 id="kl-what">3.1　什么是剧毒包型（三个别名要认得）</h3>
+
+<div class="box def">
+  <div class="box-t">定义 · PPT 原文</div>
+  <p><b>剧毒包型 / 杀手包（Killer Packet）DoS 攻击</b>：利用<b>协议本身或其软件实现中的漏洞</b>，
+  通过一些<b>畸形的数据包</b>使受害者系统崩溃。<span class="pref">p.15</span></p>
+  <p>三个别名都要认得：<b>漏洞攻击</b>（Vulnerability Attack）、<b>协议攻击</b>（Protocol Attack）、
+  <b>杀手包</b>。<span class="bref">p.331</span></p>
+</div>
+
+<p>为什么这类攻击今天基本绝迹？课本讲得很清楚：早期 <b>Windows 3.x/95/NT、Linux</b> 在实现 TCP/IP 协议栈时
+存在安全漏洞，加上<b>用户升级意识不强</b>，才让它非常流行；<b>目前这类攻击已经较少出现</b>，
+主要集中在一些存在严重漏洞的<b>应用软件</b>上。<span class="bref">p.331</span></p>
+
+<div class="box exam">
+  <div class="box-t">★ 老师专门强调了一句</div>
+  <p>PPT 结尾写着：<b>「上述攻击方式虽已过时，但其思路仍值得借鉴！」</b><span class="pref">p.15</span>
+  课本也说「<b>剧毒包型拒绝服务攻击的思想仍值得我们研究</b>」。
+  这意味着<b>考的是「思路」不是「细节」</b>——记住每一种<b>利用了什么漏洞、怎么触发</b>就够，
+  不必背版本号。</p>
+</div>
+
+<p>PPT 列了五种（<b>WinNuke、泪滴、Land、Ping of Death、循环攻击</b>），
+课本列了四种（<b>少了 WinNuke</b>）。先用一张表把五种的「病灶」对齐：</p>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>攻击</th><th>利用哪个环节的漏洞</th><th>怎么构造那个畸形包</th><th>后果</th></tr></thead>
+<tbody>
+<tr><td><b>WinNuke</b></td><td>处理 <b>TCP 带外数据（OOB）</b></td>
+    <td>向 139 等端口发 <b>URG=1</b> 的包，紧急指针与数据实际位置<b>不符/重合</b></td><td>停止响应、<b>蓝屏</b></td></tr>
+<tr><td><b>泪滴 Teardrop</b></td><td>处理 <b>IP 分片重组</b></td>
+    <td>发送<b>偏移量互相重叠</b>的 UDP 分片</td><td>重组时异常，<b>崩溃或重启</b></td></tr>
+<tr><td><b>Land</b></td><td>处理 <b>TCP 连接请求</b></td>
+    <td>SYN 包的<b>源 IP = 目的 IP = 受害者</b>，<b>源端口 = 目的端口</b></td><td>自己和自己建空连接，挂起/崩溃</td></tr>
+<tr><td><b>Ping of Death</b></td><td>处理 <b>ICMP 包长度</b></td>
+    <td>发送<b>超长</b>的 Ping 包，超过 <b>65507 字节</b>上限</td><td><b>内存分配错误</b>，协议栈崩溃</td></tr>
+<tr><td><b>循环攻击</b></td><td>两个<b>都会产生输出</b>的服务</td>
+    <td>伪造源地址，让 <b>Echo(7)</b> 与 <b>Chargen(19)</b> 互相喂包</td><td>两端口间无限来回，耗尽资源</td></tr>
+</tbody>
+</table></div>
+
+<h3 id="kl-winnuke">3.2　WinNuke 攻击 <span class="chip warn">课本没有 · PPT 讲了 3 页</span></h3>
+
+<div class="box trap">
+  <div class="box-t">⚠ 这一节课本一个字都没有</div>
+  <p>课本 11.2 节只讲了碎片攻击、Ping of Death、Land、循环攻击<b>四种</b>，<b>没有 WinNuke</b>。
+  但 PPT 用了<b>整整 3 页</b>（p.16–18）讲它，还配了两张蓝屏截图。
+  <b>老师专门加进来的内容几乎一定考</b>，所以这里按 PPT 补全。</p>
+</div>
+
+<div class="box def">
+  <div class="box-t">定义 · PPT 原文</div>
+  <p><b>WinNuke</b>：以<b>带外数据</b>攻击目标端口，导致受害者处理带外数据时出现异常，
+  从而使系统<b>停止响应</b>并在显示上出现<b>蓝屏</b>。<span class="pref">p.16</span></p>
+  <p>因此它又称 <b>「带外攻击」/「带外传输攻击」</b>、<b>「蓝屏攻击」</b>。</p>
+</div>
+
+<h4>什么是「带外数据」，为什么它能出事</h4>
+
+<p>TCP 正常传输的数据是按顺序排队的。但 TCP 还留了一个<b>插队通道</b>：把首部的
+<b class="hl">URG（紧急）位置 1</b>，再用<b>紧急指针</b>字段指出「紧急数据到哪里为止」，
+接收方就会<b>优先处理</b>这段数据——这就是<b>带外数据（Out Of Band, OOB）</b>。
+设计它是为了传 Ctrl+C 这类中断信号。</p>
+
+<p>WinNuke 的做法：<span class="pref">p.17</span></p>
+<ul>
+  <li>目标端口通常是 <b class="hl">139（NetBIOS）、138、137、113、53</b>；</li>
+  <li><b>URG 位设为 1</b>，即紧急模式；</li>
+  <li>关键在于：包里<b>紧急指针字段与数据的实际位置不符，即存在重合</b>。</li>
+</ul>
+
+<p>接收方拿着一个<b>自相矛盾</b>的指针去取数据——指针说紧急数据在这里，实际数据却在别处，
+早期系统的处理代码没有做这个校验，于是<b>越界读取 / 处理异常</b>，
+表现为<b>系统停止响应并蓝屏</b>。PPT 的原话是：「传统的一些基于上述端口的服务，
+在处理带外数据时<b>存在缺陷</b>，导致 DoS 攻击的发生。」<span class="pref">p.18</span></p>
+
+<div class="box key">
+  <div class="box-t">★ 一句话答题版</div>
+  <p>WinNuke＝向 <b>139</b> 等 NetBIOS 端口发送 <b>URG=1</b> 的 <b>带外数据（OOB）</b> 包，
+  且<b>紧急指针与实际数据位置重合/不符</b>，触发早期 Windows 处理 OOB 的缺陷，使系统<b>蓝屏</b>。
+  别名：带外攻击、蓝屏攻击。</p>
+</div>
+
+<h3 id="kl-tear">3.3　★★ 泪滴（Teardrop）碎片攻击</h3>
+
+<p class="small muted">PPT p.19–25（<b>7 页，是剧毒包型里篇幅最大的</b>）· 课本 11.2 节「1. 碎片攻击」<span class="bref">p.331</span></p>
+
+<h4 id="kl-frag">先补前置知识：IP 分片是怎么回事</h4>
+
+<div class="scene">
+  <div class="scene-k">问题从哪来</div>
+  <p class="scene-q">一个 3800 字节的数据报，要走一条最多只能传 1500 字节的链路，怎么办？</p>
+  <div class="scene-b">
+    <p>答案是<b>分片（Fragmentation）</b>：把它切成几段分别发，<b>由接收方重新拼起来</b>。
+    「怎么拼」全靠 IP 首部里的<b>片偏移</b>字段告诉接收方——<b>而这个字段是发送方自己填的</b>。
+    泪滴攻击就出在这里：<b>攻击者故意填错。</b></p>
+  </div>
+</div>
+
+<p>分片的三条规则，记住就够用了：<span class="bref">p.331</span></p>
+<div class="kv">
+  <dt>DF 标志</dt><dd>IP 首部标志位中的 <b>DF（Don't Fragment）为 0 时，指示可以对该分组进行分片传输</b>。</dd>
+  <dt>片偏移 offset</dt><dd>指示某一分片在原分组中的<b>相对位置</b>——相对于用户数据字段的起点，该片从何处开始。</dd>
+  <dt>单位</dt><dd class="hl"><b>以 8 字节为偏移单位</b>。所以「偏移值 × 8 ＝ 实际字节位置」。</dd>
+</div>
+
+<div class="svg-wrap">
+<svg class="flow" viewBox="0 0 660 250" role="img" aria-label="IP 分片示意：3800 字节数据被切成三片，偏移分别为 0、175、350">
+  <text x="10" y="18" class="ttl">正常分片：数据部分共 3800 字节，切成 3 片</text>
+
+  <!-- 原始数据报 -->
+  <text x="10" y="46" class="lbl">需分片的数据报</text>
+  <rect x="118" y="32" width="44" height="24" class="bx-c"/>
+  <text x="140" y="48" text-anchor="middle" class="t-sm">首部</text>
+  <rect x="162" y="32" width="468" height="24" class="bx"/>
+  <text x="396" y="48" text-anchor="middle" class="t-sm">数据部分共 3800 字节</text>
+  <text x="162" y="70" class="lbl">字节 0</text>
+  <text x="630" y="70" text-anchor="end" class="lbl">3799</text>
+
+  <!-- 分片 1 -->
+  <text x="10" y="112" class="lbl">数据报片 1</text>
+  <rect x="118" y="98" width="44" height="24" class="bx-c"/>
+  <text x="140" y="114" text-anchor="middle" class="t-sm">首部 1</text>
+  <rect x="162" y="98" width="172" height="24" class="bx-a"/>
+  <text x="248" y="114" text-anchor="middle" class="t-sm">字节 0 ~ 1399</text>
+  <text x="346" y="114" class="t-sm mono">偏移 = 0 / 8 = 0</text>
+
+  <!-- 分片 2 -->
+  <text x="10" y="152" class="lbl">数据报片 2</text>
+  <rect x="118" y="138" width="44" height="24" class="bx-c"/>
+  <text x="140" y="154" text-anchor="middle" class="t-sm">首部 2</text>
+  <rect x="162" y="138" width="172" height="24" class="bx-a"/>
+  <text x="248" y="154" text-anchor="middle" class="t-sm">字节 1400 ~ 2799</text>
+  <text x="346" y="154" class="t-sm mono">偏移 = 1400 / 8 = 175</text>
+
+  <!-- 分片 3 -->
+  <text x="10" y="192" class="lbl">数据报片 3</text>
+  <rect x="118" y="178" width="44" height="24" class="bx-c"/>
+  <text x="140" y="194" text-anchor="middle" class="t-sm">首部 3</text>
+  <rect x="162" y="178" width="124" height="24" class="bx-a"/>
+  <text x="224" y="194" text-anchor="middle" class="t-sm">2800 ~ 3799</text>
+  <text x="346" y="194" class="t-sm mono">偏移 = 2800 / 8 = 350</text>
+
+  <text x="10" y="232" class="t-mut">三片首尾相接、不重不漏 → 接收方按偏移放回原位，重组成功。</text>
+</svg>
+</div>
+
+<h4>泪滴攻击：把偏移量故意填成重叠的</h4>
+
+<div class="box def">
+  <div class="box-t">定义 · PPT + 课本</div>
+  <p><b>泪滴（Teardrop）攻击</b>，也称<b>碎片攻击</b>：利用 <b>Windows 3.1 / 95 / NT 和低版本 Linux 中处理 IP 分片的漏洞</b>，
+  向受害者发送<b>分片偏移地址异常（互相重叠）的 UDP 数据包分片</b>，
+  使目标主机在<b>重组分片时出现异常而崩溃或重启</b>。<span class="pref">p.20</span><span class="bref">p.331</span></p>
+  <p class="small muted">「Teardrop」本来是那段 DoS 攻击程序的<b>程序名</b>，后来成了这类攻击的名字。</p>
+</div>
+
+<div class="svg-wrap">
+<svg class="flow" viewBox="0 0 660 200" role="img" aria-label="泪滴攻击：第二个分片的偏移落在第一个分片中间，造成重叠">
+  <text x="10" y="18" class="ttl">泪滴攻击：第 2 片的偏移「不接在第 1 片后面，而落进第 1 片中间」</text>
+
+  <text x="10" y="60" class="lbl">分片 1</text>
+  <rect x="90" y="46" width="230" height="24" class="bx-a"/>
+  <text x="205" y="62" text-anchor="middle" class="t-sm">字节 0 ~ 1399　（偏移 0）</text>
+
+  <text x="10" y="106" class="lbl">分片 2</text>
+  <rect x="205" y="92" width="230" height="24" class="bx-t"/>
+  <text x="320" y="108" text-anchor="middle" class="t-sm">声称从 字节 800 开始（偏移 100）</text>
+
+  <!-- 重叠区标注 -->
+  <line x1="205" y1="70" x2="205" y2="92" class="ln-t" stroke-dasharray="3 3"/>
+  <line x1="320" y1="70" x2="320" y2="92" class="ln-t" stroke-dasharray="3 3"/>
+  <text x="262" y="86" text-anchor="middle" class="t-sm" fill="#b91c1c">重叠区</text>
+
+  <text x="10" y="146" class="t-sm">接收方按偏移把第 2 片贴回去，发现这段位置<tspan font-weight="700">已经被第 1 片占了</tspan>——</text>
+  <text x="10" y="166" class="t-sm">早期协议栈算「还要拷贝多少字节」时会算出<tspan font-weight="700" fill="#b91c1c">负数</tspan>，</text>
+  <text x="10" y="186" class="t-sm">于是<tspan font-weight="700">堆栈损坏 / IP 模块不可用 / 系统挂起</tspan>，主机崩溃或重启。</text>
+</svg>
+</div>
+
+<p>课本把这个过程说得很直白：「攻击者通过<b>精心构造分片中的 offset 值</b>，例如，
+<b>第 2 个分片的偏移不是紧接第 1 个分片的后面，而是设置成第 1 个分片的中间某个位置</b>，
+就有可能导致目标主机在分片重组时出现异常，如<b>堆栈损坏、IP 模块不可用或系统挂起</b>等。」<span class="bref">p.331</span></p>
+
+<h4 id="kl-tear3">★ 三个变种：目的不是 DoS，而是穿透防火墙 <span class="chip warn">课本没有 · 但习题在考</span></h4>
+
+<div class="box trap">
+  <div class="box-t">⚠ 这三页是本章最容易被漏掉、却最可能考的地方</div>
+  <p>PPT p.23、24、25 <b>连着三页</b>讲「利用数据报分片的其他攻击」，<b>课本正文一个字都没有</b>。
+  而<b>课本简答题第 13 题</b>问的正是：「为了应对攻击者利用分片来穿透防火墙，防火墙在检测时进行数据包的重组，
+  仅当重组后的数据包符合通行规则时，数据包片段才可放行。<b>攻击者如何利用防火墙这一处理机制对防火墙进行攻击？</b>」
+  ——那道题的答案就是下面的<b>变种三</b>。</p>
+</div>
+
+<div class="grid g3">
+  <div class="mini"><div class="t"><span class="ic">1</span>小片段攻击</div>
+    <b>目的：穿透防火墙</b>（不是 DoS）。<br>
+    <b>原理：</b>把分片切得<b>非常小</b>，使防火墙需要检查的信息<b>被挤到下一个片段里去</b>。<br>
+    <b>例子：</b>对 TCP 包，把 TCP 头拆到两个片段中，让 <b>TCP 标志位（Flag）进入第二个片段</b>，
+    于是靠检测标志位过滤的防火墙<b>在第一片里找不到标志位而放行</b>。<br>
+    <span class="small muted">前提：这种攻击<b>寄希望于防火墙只检测数据包的第一个片段</b>。<span class="pref">p.23</span></span></div>
+
+  <div class="mini"><div class="t"><span class="ic">2</span>重叠分片攻击</div>
+    <b>目的：穿透防火墙。</b><br>
+    <b>原理：</b>防火墙和终端系统在处理<b>重叠分片</b>时可能不一致——有的系统<b>以先到的数据为主</b>，
+    有的<b>用后到的数据覆盖先前的</b>。<br>
+    <b class="hl">成功前提：防火墙重组数据时与受害者主机不同。</b><br>
+    <b>例子：</b>受害者「后到优先」。第 1 分片写<b>端口 80（HTTP）</b>——防火墙看了放行；
+    第 2 分片<b>用端口 23（Telnet）改写</b>掉那个 80。防火墙以为放进去的是 HTTP，
+    受害者重组出来的却是 <b>Telnet</b>。<span class="pref">p.24</span></div>
+
+  <div class="mini"><div class="t"><span class="ic">3</span>拖垮防火墙 / IDS</div>
+    <b>目的：这个才是真 DoS，打的是防火墙自己。</b><br>
+    <b>原理：</b>有些防火墙/IDS 为了防住上面两种攻击，设置了<b>碎片重组</b>——
+    收到分片时<b>不单独检测</b>，而是<b>等所有分片都到齐（必须缓存已到的分片）</b>，重组完再检测。<br>
+    <b>攻击：</b>攻击者伪造并发送<b>大量的分片，但故意不让它们凑成完整的数据报</b>。
+    防火墙只能一直缓存、一直等，<b>CPU 和存储单元被占满</b>，构成 DoS。<span class="pref">p.25</span></div>
+</div>
+
+<div class="box key">
+  <div class="box-t">★ 三个变种一句话对比</div>
+  <p><b>变种一钻「只查第一片」的空子；变种二钻「防火墙和主机重组规则不一样」的空子；
+  变种三钻「防火墙必须先缓存再检查」的空子。</b>前两个是为了<b>混进去</b>，第三个是为了<b>把门卫累死</b>。</p>
+</div>
+
+<h3 id="kl-land">3.4　Land 攻击：让机器自己攻击自己</h3>
+
+<div class="box def">
+  <div class="box-t">定义 · PPT + 课本</div>
+  <p><b>Land 攻击</b>（得名于最早的攻击程序源程序名 <b>Land.c</b>）：向受害者发送一个特别构造的 <b>TCP SYN 包</b>，
+  这个包的<b class="hl">源 IP 地址和目的 IP 地址都被伪造成受害者主机的 IP 地址</b>，
+  <b class="hl">源端口和目的端口也相同</b>，目标系统收到后可能<b>挂起、崩溃或重启</b>。<span class="pref">p.26</span><span class="bref">p.332</span></p>
+</div>
+
+<div class="svg-wrap">
+<svg class="flow" viewBox="0 0 620 200" role="img" aria-label="Land 攻击：受害者收到源和目的都是自己的 SYN 包后，向自己回复并建立空连接">
+  <text x="10" y="18" class="ttl">Land 攻击：三次握手在同一台机器上自己完成</text>
+
+  <rect x="30" y="42" width="150" height="46" class="bx-t"/>
+  <text x="105" y="62" text-anchor="middle" class="t-sm" font-weight="700">攻击者</text>
+  <text x="105" y="80" text-anchor="middle" class="t-mut">只发这一个包</text>
+
+  <path d="M182 65 L300 65" class="ln-t" marker-end="url(#ah11)"/>
+  <text x="241" y="56" text-anchor="middle" class="t-sm">TCP SYN</text>
+  <text x="241" y="84" text-anchor="middle" class="t-mut mono">源IP = 目的IP = 受害者</text>
+  <text x="241" y="97" text-anchor="middle" class="t-mut mono">源端口 = 目的端口</text>
+
+  <rect x="304" y="30" width="280" height="140" class="bx-a"/>
+  <text x="444" y="52" text-anchor="middle" class="t-md">受害者主机</text>
+
+  <text x="322" y="80" class="t-sm">① 收到 SYN，以为是「自己」来连接</text>
+  <text x="322" y="102" class="t-sm">② 向<tspan font-weight="700">自己</tspan>回 SYN + ACK（第二次握手）</text>
+  <text x="322" y="124" class="t-sm">③ 又向<tspan font-weight="700">自己</tspan>回 ACK（第三次握手）</text>
+  <text x="322" y="146" class="t-sm" fill="#b91c1c">④ 建立一条<tspan font-weight="700">空连接</tspan>，保持到超时</text>
+
+  <text x="10" y="192" class="t-mut">每收到一个这样的包就新建并保持一条连接 → 连接堆积 → 挂起 / 崩溃 / 重启。</text>
+  <defs><marker id="ah11" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+    <path d="M0,0 L8,4 L0,8 z" fill="#b91c1c"/></marker></defs>
+</svg>
+</div>
+
+<p>课本把后果写得很具体：被攻击的主机<b>每接收一个这样的数据包，都将创建一条新连接并保持，直到超时</b>，
+最终导致主机挂起、崩溃或者重启。例如<b>许多 UNIX 系统将崩溃，Windows NT 将变得极其缓慢（大约持续 5 分钟）</b>。<span class="bref">p.332</span></p>
+
+<div class="box trap">
+  <div class="box-t">⚠ Land 攻击有一个前提条件，常被拿来出判断题</div>
+  <p><b>所使用的端口必须是打开的（即打开并处于监听状态）</b>，
+  否则主机会<b>直接回复一个 TCP RST 包，终止三次握手过程</b>，攻击不成立。<span class="bref">p.332</span>
+  PPT 也强调了「端口必须是激活的」<span class="pref">p.26</span>。</p>
+</div>
+
+<h3 id="kl-pod">3.5　★ Ping of Death：算出那个 65507</h3>
+
+<p class="small muted">别名一大串，都要认得：<b>Ping O' death、死亡之 Ping、ICMP Bug 攻击</b>，
+以及 ssping、jolt、sPING、IceNewk、Win95Ping。编号 <b>CA-1996-26 / CVE-1999-0128</b>。<span class="pref">p.27</span></p>
+
+<div class="box def">
+  <div class="box-t">定义</div>
+  <p><b>Ping of Death</b>：利用<b>协议实现时的漏洞</b>，向受害者发送<b>超长的 Ping 数据包（ICMP 包）</b>，
+  导致受害者系统异常，如<b>死机、重启或崩溃</b>。<span class="bref">p.331–332</span></p>
+</div>
+
+<h4>那几个数字是怎么来的（会考计算）</h4>
+
+<div class="fx fx-l">
+  RFC 791：IP 数据包最大长度 ≤ <b>65535</b> 字节（即 64 KB）<br>
+  IP 首部占 <b>20</b> 字节　→　IP 数据部分 ≤ 65535 − 20 = <b>65515</b> 字节<br>
+  ICMP 首部占 <b>8</b> 字节，且 ICMP 包封装在 IP 包中传送<br>
+  →　一个 ICMP 包中的<b>数据部分</b> ≤ 65515 − 8 = <b class="hl">65507</b> 字节
+  <small>课本 p.332 的完整推导。三个数字 65535 / 65515 / 65507 都可能单独考。</small>
+</div>
+
+<p><b>攻击怎么生效：</b>如果攻击者发送给受害者的 ICMP 包中的数据<b>超过 65507 字节</b>，
+该数据包封装到 IP 包后<b>总长度就超过了 IP 包长的限制</b>。
+早期系统在<b>读取包的首部后，要根据首部里的信息为有效载荷生成缓存</b>——
+当包<b>声称自己的尺寸超过上限</b>时，就会出现<b class="hl">内存分配错误</b>，
+导致 <b>TCP/IP 协议栈崩溃</b>，接收方死机。<span class="pref">p.27</span><span class="bref">p.332</span></p>
+
+<div class="box key">
+  <div class="box-t">★ 两个容易被忽略的补充（课本 p.332）</div>
+  <p>① <b>不一定要真的超过 65507</b>：「实际上，对于有的系统，攻击者只需向其发送
+  <b>数据部分（有效载荷）超过 4000 字节</b>的 ICMP 包就可达到攻击目的。」</p>
+  <p>② <b>今天还想复现得自己写程序</b>：Ping of Death 出现后，大多数操作系统<b>对 Ping 命令所能发送的数据长度做了限制</b>，
+  不允许发送长度超过 65507 字节的数据，所以要实现这一攻击，<b>攻击者需自己编写程序</b>。</p>
+  <p>③ <b>它并没有彻底消失</b>：<b>2020 年 10 月 14 日</b>微软修复了一个 <b>Windows IPv6 协议栈</b>中的严重远程代码执行漏洞——
+  远程攻击者<b>无须用户验证</b>，通过发送恶意构造的 <b>ICMPv6 路由广播包</b>就可导致目标系统代码执行或<b>蓝屏崩溃</b>，
+  出现<b>类似 Ping of Death 的攻击效果</b>。</p>
+</div>
+
+<h3 id="kl-loop">3.6　循环攻击（振荡攻击 / 乒乓攻击）</h3>
+
+<div class="box def">
+  <div class="box-t">定义 · PPT 原文</div>
+  <p><b>循环攻击</b>，也称<b>振荡攻击（Oscillate Attack）</b>或<b>乒乓攻击</b>：
+  当<b>两个都会产生输出的端口</b>（可以是同一台机器的两个端口，也可以是不同机器的两个端口）之间建立连接以后，
+  <b>第一个端口的输出成为第二个端口的输入，导致第二个端口产生输出；同时第二个端口的输出又成为第一个端口的输入。</b>
+  如此，两个端口间将会有<b>大量的数据包</b>产生，导致拒绝服务。<span class="pref">p.29</span><span class="bref">p.332</span></p>
+</div>
+
+<h4>典型例子：Echo–Chargen</h4>
+
+<div class="kv">
+  <dt>Chargen · UDP 19</dt><dd>字符生成服务。收到一个数据包，就<b>产生一个字符串</b>作为回应。</dd>
+  <dt>Echo · UDP 7</dt><dd>回显服务。收到一个数据包，<b>原样返回</b>。</dd>
+</div>
+
+<p>把这两个服务对接起来会发生什么？<b>Chargen 吐字符 → Echo 原样弹回 → Chargen 又吐 →</b> ……无限循环。</p>
+
+<p>课本给出的具体做法：攻击者向<b>主机 A 的 UDP Echo 端口</b>发送一个<b>来自主机 B 的 UDP Chargen 端口</b>的
+UDP 包（<b>即假冒主机 B 的 IP 地址和 Chargen 端口</b>），或者向主机 B 的 Chargen 端口发送一个来自主机 A 的 Echo 端口的数据包，
+则在主机 A、B 的这两个端口间将来回不停地产生 UDP 包，导致 A、B 系统被拒绝服务。<span class="bref">p.332–333</span></p>
+
+<div class="box exam">
+  <div class="box-t">★ 这一节有两个高价值考点</div>
+  <p>① <b>攻击者只需要发送一个数据包</b>，就可导致受害主机收到大量数据包——
+  课本原话：「从上述过程可以看出，攻击者<b>只需发送一个数据包</b>，即可导致受害主机接收到大量数据包。」</p>
+  <p>② <b>它的归类是「两栖」的</b>：课本明确说「因此，这类攻击<b>既可归类为剧毒包型拒绝服务攻击，
+  也可归入风暴型拒绝服务攻击</b>。<b>即使到今天，这种攻击依然频繁出现。</b>」<span class="bref">p.333</span>
+  ——这是全章唯一一个横跨两类的攻击，很适合出辨析题。</p>
+</div>
+
+<div class="box key">
+  <div class="box-t">★ 为什么它比其他剧毒包型活得久</div>
+  <p>因为它<b>没有利用任何 bug</b>——Echo 和 Chargen 的行为完全符合各自的协议规范，
+  「问题」只出在<b>把两个正常服务对接起来</b>。既然不是 bug，就<b>没有补丁可打</b>，
+  只能靠<b>关掉这些用不着的服务</b>来防（呼应 §11.6「运行尽可能少的服务」）。</p>
+</div>
+
+</section>
+<section class="sec" id="flood">
+  <div class="sec-head">
+    <span class="sec-num">§ 4　How · 二</span>
+    <h2 class="sec-t">风暴型 DDoS：总原理</h2>
+    <p class="sec-lede">PPT p.30–37 · 课本 11.3.1 节 p.333–334　｜　风暴型合计 31 页，占全章 44%，是本章绝对重心</p>
+  </div>
+
+<div class="chain">
+  <div class="chain-i prev"><div class="chain-k">承上</div>
+    <div class="chain-b">剧毒包型靠 bug 吃饭，<b>补丁一打就废</b>（§3）。</div></div>
+  <div class="chain-i now"><div class="chain-k">本节</div>
+    <div class="chain-b"><b>那就发「一点毛病都没有」的包——只是发得太多。</b>
+    每个包单独看都合法，补丁无从下手，防火墙也不好判断。<br>
+    <b>课本原话：</b>「风暴型拒绝服务攻击是<b>最主要</b>的拒绝服务攻击形式，
+    通常情况下，<b>谈到拒绝服务攻击时就是指这种类型的攻击</b>。」<span class="bref">p.333</span></div></div>
+  <div class="chain-i next"><div class="chain-k">留下的坑</div>
+    <div class="chain-b">拼量就得<b>有量</b>：攻击者自己哪来那么多带宽？→ 逼出<b>僵尸网络</b>（§7）与<b>反射放大</b>（§6）。</div></div>
+</div>
+
+<div class="box def">
+  <div class="box-t">定义 · PPT 原文</div>
+  <p><b>风暴型 DoS 攻击</b>：通过大量的<b>「无用」数据包</b>占用过多的资源以达到拒绝服务的目的，
+  也称为<b>「带宽攻击」（Bandwidth Attack）</b>。<span class="pref">p.31</span><span class="bref">p.331</span></p>
+  <p>它分为两个分支，本章后两节分别讲：<b>直接风暴型</b>（§5）和<b>反射攻击 DRDoS</b>（§6）。</p>
+</div>
+
+<h3 id="fl-3step">4.1　★ 攻击的三个步骤（课本图 11-1）</h3>
+
+<p>发动一次风暴型 DDoS，攻击者要先建好一支「部队」。这支部队有<b>三个层级</b>——
+PPT 的原理图（p.32）画的就是 <b>黑客 Hacker → 主控端 Master（主攻手）→ 僵尸主机 Zombie（肉鸡）</b>
+这条指挥链，课本称之为 <b>攻击者 → 管理者 handler → 攻击代理 agent</b>。</p>
+
+<ol class="steps">
+  <li><b>找地方安装「管理者」。</b>攻击者通过<b>扫描工具</b>寻找一个或多个能够入侵的系统，获得控制权，
+      然后在被攻陷的系统中<b>安装 DoS 的管理者（handler）</b>。
+      这一步常常针对<b>缓存溢出漏洞或系统安全配置漏洞</b>来进行。<span class="bref">p.333</span></li>
+  <li><b>大量发展「攻击代理」。</b>攻击者利用扫描工具<b>大量扫描并攻击存在安全漏洞的系统</b>，获得控制权，
+      在被攻陷的系统中<b>安装并运行 DoS 的攻击代理（agent）</b>。</li>
+  <li><b>下令开打。</b>攻击者通过 <b>handler</b> 通知攻击代理<b>攻击的目标以及攻击类型</b>。
+      很多攻击工具会<b>把攻击者、攻击代理和 handler 之间的通信信道加密</b>，以便更好地隐藏 DoS 攻击网络。
+      收到指令后，<b>攻击代理发起真正的攻击</b>。</li>
+</ol>
+
+<div class="box key">
+  <div class="box-t">★ 为什么要多出「管理者 handler」这一层</div>
+  <p>直接从攻击者的机器去指挥成千上万台肉鸡，等于把自己的 IP 写在每一条控制指令上。
+  中间垫一层 handler 后，受害者顺着攻击流量只能查到<b>攻击代理</b>，
+  查攻击代理只能查到 <b>handler</b>，<b>攻击者本人始终隔着两层</b>。
+  这就是 §11.1 会讲的「<b>通过攻击代理的攻击，只能找到攻击代理的位置</b>」。</p>
+</div>
+
+<p>PPT 还把「制造一台肉鸡」的动作拆开了，这一串适合直接背：<span class="pref">p.32</span></p>
+<div class="fx fx-l">发现漏洞 → 取得用户权 → 取得控制权 → 植入木马 → 清除痕迹、留后门 → 做好攻击准备</div>
+
+<p>课本补充了一句很重要的<b>趋势</b>：早期攻击者大多<b>手工</b>安装工具，要求水平较高；
+随着攻击工具发展，<b>自动化程度越来越高</b>，从扫描探测到安装、发起攻击都可以自动完成，
+「攻击者能够在<b>几秒钟内</b>入侵一台主机并安装攻击工具」。
+再加上<b>物联网（IoT）设备</b>的大量应用，利用其安全漏洞<b>可以在很短时间内建立起数量庞大的僵尸网络</b>，
+如著名的 <b>Mirai</b> 僵尸网络。<span class="bref">p.334</span></p>
+
+<h3 id="fl-pkt">4.2　★ 用哪些分组来打（四类）</h3>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>分组类型</th><th>怎么打</th><th>为什么有效 / 备注</th></tr></thead>
+<tbody>
+<tr><td><b>TCP 洪流</b><br><span class="en">TCP Flood</span></td>
+    <td>向目标发送大量<b>设置了不同标志</b>的 TCP 分组。常被利用的标志：<b class="hl">SYN、ACK、RST</b></td>
+    <td><b>TCP SYN 攻击</b>导致目标主机<b>不断地为 TCP 连接分配内存</b>，从而使其他程序不能分配到足够的内存。
+        <b>Trinoo</b> 就是一种分布式的 TCP SYN DoS 攻击工具</td></tr>
+<tr><td><b>ICMP Echo</b><br>请求/响应报文</td>
+    <td>向目标主机发送大量的 ICMP 分组，即 <b>Ping floods</b></td>
+    <td>简单直接。缺点：<b>大多防火墙会过滤 ICMP 包</b><span class="pref">p.40</span></td></tr>
+<tr><td><b>UDP 洪流</b></td>
+    <td>向目标发送大量<b>各种基于 UDP 协议的应用协议包</b>（如 <b>NTP、SSDP、DNS</b> 等）</td>
+    <td class="hl">课本点破了关键：<b>使用 UDP 协议的好处是攻击时可以很方便地伪造源地址</b>（§12 讨论题一）</td></tr>
+<tr><td><b>应用层协议</b></td>
+    <td>向目标<b>直接或间接</b>发送大量特定应用层协议数据包</td>
+    <td>常用作攻击的应用层协议：<b>HTTP/HTTPS、NTP、SSDP、DNS、SNMP</b><span class="bref">p.334</span></td></tr>
+</tbody>
+</table></div>
+
+<div class="box eg">
+  <div class="box-t">现实里谁最多（PPT p.34–37 贴了三张统计图）</div>
+  <p><b>2019 年 DDoS 类型 Top 10</b>：DNS 放大 20.89%、LDAP 放大 17.24%、TCP/SYN flood 11.63%、
+  UDP flood 10.25%、TCP/ACK flood 7.29%、NTP 放大 6.90%、GRE flood 2.76%、TCP/RST 2.56%、SSDP 放大 1.77%。</p>
+  <p><b>2020 BOTNET 趋势报告</b>（CNCERT + 绿盟）：UDP_FLOOD 35.92%、TCP_FLOOD 24.06%、
+  CC_FLOOD 19.72%、SYN_FLOOD 11.82%、HTTP_FLOOD 4.66%。结论一句话：
+  <b>「利用 UDP、TCP、慢速攻击仍然是僵尸网络进行 DDoS 攻击的主要手段。」</b></p>
+  <p class="small muted">不必背具体百分比，记住<b>排在最前面的都是「放大 / 洪流」两类，且 UDP 系占了大头</b>即可——
+  这正好印证了「UDP 便于伪造源地址、便于放大」这条主线。</p>
+</div>
+
+<h3 id="fl-field">4.3　攻击者会改分组里的哪些字段</h3>
+
+<p>为了提高攻击效果，很多 DDoS 工具<b>综合利用多种分组</b>来发起攻击，
+同时<b>改变攻击分组流中分组的某些字段</b>来达到各种目的：<span class="bref">p.334</span></p>
+
+<div class="grid g3">
+  <div class="mini"><div class="t"><span class="ic">1</span>源 IP 地址</div>
+    <b>假冒 IP 地址（IP spoofing）</b>主要有<b>两个目的</b>：<br>
+    ① <b>隐藏分组的真正源地址</b>；<br>
+    ② <b>使主机将响应发送给被攻击的主机</b>（这一条就是<b>反射型</b>的地基，§6）。</div>
+  <div class="mini"><div class="t"><span class="ic">2</span>源/目的端口号</div>
+    很多利用 TCP 或 UDP 分组洪流的 DoS 工具，通过<b>改变分组中的源或目的端口号</b>
+    来<b>抵抗分组过滤</b>。</div>
+  <div class="mini"><div class="t"><span class="ic">3</span>其他 IP 头字段</div>
+    有些工具除了<b>保持分组首部目的 IP 地址不变</b>，会<b>随机改变分组 IP 首部中其他字段的值</b>，
+    让特征更难提取。</div>
+</div>
+
+<div class="box key">
+  <div class="box-t">★ 为什么攻击者能随便改这些字段</div>
+  <p>课本给了一句根子上的解释：「攻击者只要拥有足够的特权，就可以轻易产生和发送带有伪造属性值的网络分组，
+  这是因为 <b>TCP/IP 协议栈中的 IP 协议不保证分组的完整性</b>。」<span class="bref">p.334</span>
+  换句话说，<b>IP 首部没有任何机制去验证「你说你是谁」</b>——这正是 §1.4 第 3 条原因
+  「因特网没有认证机制，容易遭受 IP 欺骗」的具体体现。</p>
+</div>
+
+<h3 id="fl-why">4.4　★★ 风暴型能成功的五条原因</h3>
+
+<p>这五条与 §1.4 是同一份清单（课本把它放在 11.3.1 节），<b>考试问「DDoS 为什么能成功」或
+「拒绝服务攻击存在的根本原因」，答的都是它</b>。这里再列一遍，方便考场直接抄：<span class="bref">p.334</span></p>
+
+<ol class="steps tight">
+  <li><b>TCP/IP 协议存在漏洞</b>，可以被攻击者利用。</li>
+  <li><b>网络提供 best-effort 服务</b>，不区分数据流量是否是攻击流量。</li>
+  <li><b>因特网没有认证机制</b>，从而容易遭受 IP 欺骗。</li>
+  <li><b>因特网中的路由器不具备数据追踪功能</b>，因而无法验证一个数据包是否来自于其所声称的位置。</li>
+  <li class="hl"><b>网络带宽和系统资源是有限的，这是最根本原因。</b></li>
+</ol>
+
+<h3 id="fl-two">4.5　★★ 直接型 vs 反射型：本章最重要的一条分界线</h3>
+
+<div class="box def">
+  <div class="box-t">课本原文（简答题、综合题都直接用这段）</div>
+  <p><b>直接风暴型：</b>特点是攻击者<b>直接利用自己控制的主机</b>向攻击目标发送大量的网络数据包。</p>
+  <p><b>反射型：</b>特点是攻击者<b>伪造攻击数据包，其源地址为被攻击主机的 IP 地址，目的地址为网络上大量网络服务器
+  或某些高速网络服务器</b>，通过这些服务器（<b>作为反射器</b>）的<b>响应</b>实施对目标主机的拒绝服务攻击。<span class="bref">p.334</span></p>
+</div>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>对比项</th><th>直接风暴型（§5）</th><th>反射型 DRDoS（§6）</th></tr></thead>
+<tbody>
+<tr><td><b>谁在向受害者发包</b></td><td>攻击者控制的<b>傀儡主机</b></td><td class="hl">互联网上<b>无辜的正常服务器</b>（反射器）</td></tr>
+<tr><td><b>源地址伪造成谁</b></td><td>随便伪造，或干脆不伪造（如 Trinoo、CC）</td><td class="hl"><b>必须伪造成受害者的 IP</b>，响应才会打向受害者</td></tr>
+<tr><td><b>是否需要庞大僵尸网络</b></td><td><b>需要</b>，规模决定攻击力</td><td><b>无须掌控大量僵尸网络</b>，只需修改源地址</td></tr>
+<tr><td><b>攻击流量 vs 攻击者发出的流量</b></td><td>基本 <b>1 : 1</b></td><td class="hl"><b>放大几十到几百倍</b>（NTP 可达 206～556 倍）</td></tr>
+<tr><td><b>反射器/中间主机是否被入侵</b></td><td>傀儡主机<b>已被攻陷</b></td><td><b>反射器完全没有被入侵</b>，它只是<b>老老实实地回应请求</b></td></tr>
+<tr><td><b>追踪难度</b></td><td>受害者日志里有傀儡机 IP，可顺藤摸瓜</td><td class="hl">日志里全是<b>正规服务器</b>的 IP，<b>攻击者隐蔽、难以追踪</b></td></tr>
+<tr><td><b>现状</b></td><td>「现在不是主流，但曾经很风光」<span class="pref">p.38</span></td><td class="hl"><b>目前主流</b>的风暴型拒绝服务攻击方法<span class="bref">p.337</span></td></tr>
+</tbody>
+</table></div>
+
+<div class="box exam">
+  <div class="box-t">★ PPT 的原图里藏着一句关键注释</div>
+  <p>反射型原理图上写着：<b>「Note: Reflectors are NOT compromised. They simply answer requests.」</b>
+  （反射器<b>没有</b>被攻陷，它们只是在回应请求。）<span class="pref">p.49</span></p>
+  <p>这句话是<b>反射型区别于直接型的本质</b>——也是它最难防的地方：
+  你不能把这些反射器当成攻击者去封，它们是<b>合法的、被广泛使用的公共服务器</b>（DNS、NTP……）。
+  课本补了一刀：「在反射型 DDoS 攻击的整个攻击过程中，<b>反射节点也无法识别请求发起源是否具有恶意动机</b>。」<span class="bref">p.337</span></p>
+</div>
+
+<p class="small muted">最后记一句 PPT 的定位描述：DDoS 攻击会造成<b>骨干网络资源浪费、链路堵塞、业务中断</b>，
+危害分<b>骨干级、链路级、应用级</b>三个层次。<span class="pref">p.32</span></p>
+
+</section>
+<section class="sec" id="direct">
+  <div class="sec-head">
+    <span class="sec-num">§ 5　How · 二之一</span>
+    <h2 class="sec-t">直接风暴型 DDoS</h2>
+    <p class="sec-lede">PPT p.38–47（10 页）· 课本 11.3.2 节 p.334–336　｜　PPT 开篇一句话定调：「<b>现在不是主流，但曾经很风光！</b>」</p>
+  </div>
+
+<h3 id="dr-syn">5.1　★★ SYN Flood 攻击（本节最重要）</h3>
+
+<p class="small muted">别名：<b>SYN 洪泛攻击、SYN 洪水攻击、SYN 风暴攻击</b>。<span class="bref">p.335</span>
+课本称它是<b>「当前最流行的拒绝服务攻击方式之一」</b>；PPT 补了一句统计：
+<b>「在反射式 DDoS 流行之前，90% 的拒绝服务攻击使用的是 TCP 协议，而 SYN 风暴攻击又是最常用的一种攻击！」</b><span class="pref">p.41</span></p>
+
+<h4 id="dr-syn-flow">先看正常的三次握手，再看它是怎么被卡住的</h4>
+
+<div class="svg-wrap">
+<svg class="flow" viewBox="0 0 660 300" role="img" aria-label="正常三次握手与 SYN Flood 的对比：攻击者不回第三次握手，服务器的半连接堆积">
+  <text x="10" y="16" class="ttl">正常三次握手</text>
+  <text x="352" y="16" class="ttl" fill="#b91c1c">SYN Flood：第三次握手永不到来</text>
+  <line x1="330" y1="0" x2="330" y2="300" class="ln" stroke-dasharray="4 4"/>
+
+  <!-- 左：正常 -->
+  <rect x="20" y="30" width="86" height="22" class="bx"/><text x="63" y="45" text-anchor="middle" class="t-sm">客户端</text>
+  <rect x="220" y="30" width="86" height="22" class="bx"/><text x="263" y="45" text-anchor="middle" class="t-sm">服务器</text>
+  <line x1="63" y1="52" x2="63" y2="250" class="ln"/><line x1="263" y1="52" x2="263" y2="250" class="ln"/>
+
+  <path d="M63 80 L259 80" class="ln-a" marker-end="url(#a1)"/>
+  <text x="161" y="74" text-anchor="middle" class="t-sm">① SYN（我要连）</text>
+
+  <path d="M263 116 L67 116" class="ln-a" marker-end="url(#a1)"/>
+  <text x="165" y="110" text-anchor="middle" class="t-sm">② SYN + ACK（可以）</text>
+  <text x="268" y="132" class="t-mut">此刻记一条</text>
+  <text x="268" y="146" class="t-mut">半连接</text>
+
+  <path d="M63 172 L259 172" class="ln-a" marker-end="url(#a1)"/>
+  <text x="161" y="166" text-anchor="middle" class="t-sm">③ ACK（收到）</text>
+
+  <rect x="196" y="190" width="132" height="24" class="bx-e"/>
+  <text x="262" y="206" text-anchor="middle" class="t-sm">半连接 → 正式连接</text>
+  <text x="20" y="245" class="t-mut">半连接表里那一条被<tspan font-weight="700">及时清掉</tspan>。</text>
+
+  <!-- 右：攻击 -->
+  <rect x="352" y="30" width="86" height="22" class="bx-t"/><text x="395" y="45" text-anchor="middle" class="t-sm">攻击者</text>
+  <rect x="552" y="30" width="86" height="22" class="bx"/><text x="595" y="45" text-anchor="middle" class="t-sm">服务器</text>
+  <line x1="395" y1="52" x2="395" y2="250" class="ln"/><line x1="595" y1="52" x2="595" y2="250" class="ln"/>
+
+  <path d="M395 80 L591 80" class="ln-t" marker-end="url(#a2)"/>
+  <text x="493" y="74" text-anchor="middle" class="t-sm">① SYN（源 IP 是伪造的）</text>
+
+  <path d="M595 116 L470 116" class="ln-t" marker-end="url(#a2)" stroke-dasharray="5 3"/>
+  <text x="500" y="110" text-anchor="middle" class="t-sm">② SYN + ACK 发往那个假地址</text>
+  <text x="416" y="134" class="t-mut">发给了不存在的主机 → 石沉大海</text>
+
+  <text x="416" y="166" class="t-sm" fill="#b91c1c">③ <tspan font-weight="700">没有第三次握手</tspan></text>
+
+  <rect x="500" y="182" width="140" height="42" class="bx-t"/>
+  <text x="570" y="198" text-anchor="middle" class="t-sm" font-weight="700">半连接表被塞满</text>
+  <text x="570" y="214" text-anchor="middle" class="t-mut">上限一般 1024 条</text>
+
+  <text x="352" y="245" class="t-mut">服务器只能<tspan font-weight="700">重试 SYN+ACK</tspan>，并<tspan font-weight="700">等 30 秒～2 分钟</tspan>超时才丢弃。</text>
+  <text x="10" y="278" class="t-sm">结论：一条半连接要占用服务器资源<tspan font-weight="700">几十秒到两分钟</tspan>，而攻击者制造它只需<tspan font-weight="700">发一个包</tspan>——这就是代价的不对称。</text>
+  <text x="10" y="294" class="t-mut">半连接数超过上限后，服务器<tspan font-weight="700">不再接受任何新的连接请求，包括正常用户的</tspan>。从正常客户看来，服务器失去响应了。</text>
+
+  <defs>
+    <marker id="a1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#4338ca"/></marker>
+    <marker id="a2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#b91c1c"/></marker>
+  </defs>
+</svg>
+</div>
+
+<div class="box def">
+  <div class="box-t">定义 · PPT 原文（可直接抄）</div>
+  <p><b>SYN 风暴攻击</b>：发送<b>大量 SYN 报文</b>，但<b>对服务器的 SYN + ACK 应答报文不作应答</b>，
+  即<b>三次握手的第三次握手无法完成</b>，造成服务器维护<b>大量的半连接列表</b>，
+  <b>消耗服务器半连接资源</b>（一般系统的上限为 <b class="hl">1024</b>，超过此数则不接受新的连接请求）的攻击方式。<span class="pref">p.41</span></p>
+</div>
+
+<h4>课本补充的四个细节（都是考点）</h4>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>细节</th><th>内容</th><th>为什么重要</th></tr></thead>
+<tbody>
+<tr><td><b>半连接</b></td>
+    <td>服务器发出 SYN+ACK 后、还没收到 ACK 的这个<b>未完成的连接</b>，称为<b>半连接</b>，<b>放在半连接表中</b></td>
+    <td>这是攻击真正消耗的资源，不是带宽</td></tr>
+<tr><td><b>SYN Timeout</b></td>
+    <td>服务器一般会<b>重试</b>（再次发送 SYN+ACK 给客户端）并<b>等待一段时间</b>——
+        称为 <b class="hl">SYN Timeout，分钟级，大约 30 秒～2 分钟</b>——后才丢弃这个未完成的连接</td>
+    <td><b>时间越长，攻击效率越高。</b>这也是为什么要伪造成「不存在的地址」</td></tr>
+<tr><td><b>半连接上限</b></td>
+    <td>一般系统 <b>1024</b>，超过此限制则<b>不接受新的连接请求，即使是正常用户的</b>
+        （当然它也不知道请求是否来自正常用户）</td>
+    <td>说明攻击成功的<b>门槛其实很低</b>——只要维持一千多条半连接</td></tr>
+<tr><td><b>额外开销</b></td>
+    <td>「即使是简单的保存并遍历也会消耗非常多的 CPU 和内存资源，何况还要<b>不断对这个列表中的各个客户端进行
+        TCP SYN + ACK 的重试</b>，这将导致部分系统崩溃」</td>
+    <td>攻击的伤害<b>不止于「连不上」</b>，还会拖垮 CPU</td></tr>
+</tbody>
+</table></div>
+
+<p class="small muted">课本还点了两句现实：这种攻击最主要的目标是<b>一些对外提供 Web 服务的网站</b>；
+且<b>互联网能找到大量 SYN Flood 攻击程序代码</b>，使得这种 DDoS 攻击非常流行。<span class="bref">p.335</span></p>
+
+<h4 id="dr-syn-spoof">★★ 讨论题：为什么<b>必须</b>伪造源地址？</h4>
+
+<div class="scene">
+  <div class="scene-k">PPT p.41 · 问题（老师提了问没给答案）</div>
+  <p class="scene-q">「需伪造地址，一方面逃避追踪，另一方面<b>为了攻击能成功</b>。Why？」</p>
+  <div class="scene-b">
+    <p>「逃避追踪」谁都想得到。真正的考点是<b>第二个理由</b>：
+    <b>不伪造的话，攻击根本打不出效果</b>——而且是<b>反过来伤自己</b>。
+    课本 p.335 用一整段解释了这件事，下面拆成三步。</p>
+  </div>
+</div>
+
+<ol class="steps">
+  <li><b>如果不伪造源地址，攻击者自己的系统会「好心」把连接关掉。</b>
+      在<b>未修改攻击主机 TCP 协议栈</b>的情况下，系统会<b>自动对收到的 TCP SYN+ACK 做出响应</b>：
+      要么以 <b>TCP ACK</b> 作为响应<b>建立连接</b>，要么以 <b>TCP RST</b> 作为响应<b>取消连接</b>
+      （<b>通常会回应 RST</b>）。</li>
+  <li><b>这两种响应都会「释放」服务器上的那条半连接。</b>
+      于是受害者服务器<b>较早地释放了对应的半连接，减少了占用半连接的时间，攻击效果被削弱</b>。
+      同时这些响应还会<b>反过来影响攻击主机自己的性能</b>。</li>
+  <li><b>用假地址才能把时间拖到最长。</b>课本原话：「如果用的是假地址（<b>根本不存在或没开机</b>），
+      则<b>受害者必须等待超时才能释放相应的半连接</b>。」——也就是硬等那 <b>30 秒～2 分钟</b>。</li>
+</ol>
+
+<div class="box key">
+  <div class="box-t">★ 三句话答题版</div>
+  <p><b>① 逃避追踪</b>：受害者日志里留下的是假 IP，追不到攻击者。<br>
+  <b>② 让半连接占得更久</b>：伪造成不存在/未开机的地址，SYN+ACK 无人应答，服务器只能重试到超时（30 秒～2 分钟）才释放，
+  资源占用时间最大化。<br>
+  <b>③ 避免自伤</b>：不伪造时攻击主机的协议栈会自动回 RST/ACK，既提前帮受害者释放了半连接、削弱攻击效果，
+  又消耗了攻击主机自身性能。</p>
+</div>
+
+<h3 id="dr-ping">5.2　Ping 风暴攻击</h3>
+
+<div class="box def">
+  <div class="box-t">定义</div>
+  <p><b>Ping 风暴攻击</b>：攻击者利用控制的大量主机向受害者发送大量的
+  <b>ICMP 回应请求（ICMP Echo Request，即 Ping）</b>消息，使受害者系统<b>忙于处理这些消息而降低性能</b>，
+  严重者可能导致系统<b>无法对其他的消息做出响应</b>。<span class="pref">p.40</span><span class="bref">p.335</span></p>
+  <p class="small muted">课本评价：「<b>这种攻击简单而有效。</b>」</p>
+</div>
+
+<div class="box trap">
+  <div class="box-t">⚠ 但它有两个硬伤（PPT 特意列出）</div>
+  <p>① <b>需要大规模僵尸网络的支持</b>——因为它没有任何放大效果，纯靠堆量。<br>
+  ② <b class="hl">大多防火墙会过滤 ICMP 包</b>——第一道门就把它挡了。<span class="pref">p.40</span></p>
+  <p>这两点正好解释了<b>为什么它今天几乎见不到</b>，也解释了<b>课本多选第 1 题</b>：
+  「网络安全管理员配置防火墙时会阻止 ICMP 协议通过，主要目的是防止攻击者实施（ <b>B 主机扫描</b>、<b>D 拒绝服务攻击</b> ）」。</p>
+</div>
+
+<h3 id="dr-tcp">5.3　★ TCP 连接耗尽攻击（空连接攻击）</h3>
+
+<div class="box def">
+  <div class="box-t">定义</div>
+  <p><b>TCP 连接耗尽型攻击</b>：也向被攻击主机<b>发起连接请求（发送 TCP SYN 数据包）</b>，
+  但与 SYN Flood 不同的是，它<b class="hl">通常会完成三次握手过程，即真的建立 TCP 连接</b>。
+  通过建立<b>众多的 TCP 连接</b>耗尽受害者的<b>连接资源</b>，从而无法接受正常用户的连接请求，
+  因此也称为<b>「空连接攻击」</b>。<span class="pref">p.42</span><span class="bref">p.335</span></p>
+</div>
+
+<div class="box exam">
+  <div class="box-t">★★ 与 SYN Flood 的区别（这一对最爱考）</div>
+  <div class="tbl-wrap"><table>
+  <thead><tr><th></th><th>SYN Flood</th><th>TCP 连接耗尽</th></tr></thead>
+  <tbody>
+  <tr><td><b>握手完成吗</b></td><td><b>不完成</b>（缺第三次握手）</td><td><b>完成</b>，建立真实连接</td></tr>
+  <tr><td><b>耗的什么</b></td><td><b>半连接</b>资源（半连接表）</td><td><b>连接</b>资源（真实连接数）</td></tr>
+  <tr><td><b>要不要一直发</b></td><td class="hl"><b>必须不停地发</b></td><td class="hl"><b>不需要不停地发起连接</b>，只需<b>连接数量到达一定程度即可</b></td></tr>
+  <tr><td><b>停手会怎样</b></td><td class="hl"><b>一旦停止，受害者即可恢复</b></td><td>连接还挂着，不会马上恢复</td></tr>
+  <tr><td><b>源地址</b></td><td>一般<b>伪造</b></td><td>要完成握手，<b>只能用真实 IP</b>（傀儡主机）</td></tr>
+  </tbody></table></div>
+  <p class="small">PPT 用一句话概括：「<b>与 SYN 风暴的区别：不需要不停地向受害者发起连接</b>」<span class="pref">p.42</span>；
+  课本的表述见 p.335 末段。PPT 配图里受害者在喊「<b>怎么这么多请求啊！</b>」，合法用户则收到 <b>Request Denied</b>。</p>
+</div>
+
+<h3 id="dr-udp">5.4　UDP 风暴攻击与 Trinoo</h3>
+
+<div class="box def">
+  <div class="box-t">定义</div>
+  <p><b>UDP 风暴攻击</b>：向目标主机<b>连续发送大量较长的 UDP 数据包</b>，
+  <b>占用网络带宽</b>，达到<b>阻塞网络</b>的目的。<span class="pref">p.43</span></p>
+  <p class="small muted">注意它和前几种的差别：SYN Flood 耗的是<b>半连接表</b>、连接耗尽耗的是<b>连接数</b>，
+  而 UDP 风暴耗的是<b>带宽</b>——所以它才被叫作典型的「带宽攻击」。</p>
+</div>
+
+<h4>Trinoo 攻击</h4>
+
+<div class="kv">
+  <dt>攻击方式</dt><dd>向被攻击目标主机的<b>随机端口</b>发出<b class="hl">全零的 4 字节 UDP 包</b>。
+      被攻击主机在处理这些超出其处理能力的垃圾数据包的过程中，<b>网络性能不断下降，直到不能提供正常服务，乃至崩溃</b>。</dd>
+  <dt>源地址</dt><dd class="hl"><b>它并不假冒 IP 地址。</b>（这一点常被拿来出判断题——不是所有风暴型都伪造源地址。）</dd>
+  <dt>控制信道</dt><dd>攻击者 → 主控端：<b>TCP 27665</b>；主控端 → 代理端：<b>UDP 27444</b>（<b>通常需要密码 betaaalmostdone</b>）；
+      代理端 → 主服务器：<b>UDP 31335</b>。<span class="pref">p.43</span></dd>
+</div>
+
+<div class="box trap">
+  <div class="box-t">⚠ 教材自己在两个地方写了不同的端口号，考前要知道</div>
+  <div class="tbl-wrap"><table>
+  <thead><tr><th>出处</th><th>攻击者→主控端</th><th>其余两个</th></tr></thead>
+  <tbody>
+  <tr><td>PPT p.43（讲 Trinoo 原理那页）</td><td><b>TCP 27665</b></td><td>UDP 27444 / 31335</td></tr>
+  <tr><td>PPT p.65（讲检测特征那页）</td><td><b>TCP 27655</b></td><td>UDP 27444 / 31335</td></tr>
+  <tr><td>课本 p.349（11.5.1 检测技术）</td><td><b>TCP 27655</b></td><td>UDP 27444 / 31335</td></tr>
+  </tbody></table></div>
+  <p><b>27665 还是 27655？</b>两个数字只差一位。<b>后两个端口（27444、31335）三处完全一致，不会错。</b>
+  第一个端口<b>课本和 PPT 检测页都写 27655</b>，只有 PPT 原理页写 27665，
+  <b>按「课本 + 两处一致」的原则，考试答 27655 更稳妥</b>；若题目就是照 PPT p.43 出的，写 27665。
+  两个都记住第一位「276」和末尾「5」，别把 27444 / 31335 记混才是关键。</p>
+</div>
+
+<div class="box trap">
+  <div class="box-t">⚠ 另一处不一致：Trinoo 到底算哪一类</div>
+  <p>课本 p.334 在讲 <b>TCP 洪流</b>时写：「<b>Trinoo 就是一种分布式的 TCP SYN DoS 攻击工具</b>」；
+  而 PPT p.43 把 Trinoo 放在 <b>UDP 风暴攻击</b>下面讲，描述的也是「发全零的 4 字节 UDP 包」。</p>
+  <p><b>怎么理解：</b>Trinoo 是一个<b>攻击工具/僵尸网络框架</b>，它的<b>控制信道</b>用 TCP+UDP，
+  <b>实际打出去的攻击流量是 UDP 洪流</b>。<b>答题时看题干问的是「攻击流量类型」还是「课本原话」</b>：
+  问攻击方式 → UDP 风暴；若是照课本 p.334 那句考 → TCP SYN 工具。</p>
+</div>
+
+<h3 id="dr-http">5.5　★ HTTP 风暴攻击 / CC 攻击</h3>
+
+<div class="box def">
+  <div class="box-t">定义</div>
+  <p><b>HTTP 风暴攻击</b>：用 HTTP 协议对网页进行<b>语义上合法的请求</b>，
+  <b>不停地从受害者处获取数据</b>，<b>占用连接的同时占用带宽</b>。
+  也叫 <b class="hl">CC（Challenge Collapsar，挑战黑洞）攻击</b>，又称 <b>HTTP 代理攻击</b>。<span class="pref">p.45</span><span class="bref">p.336</span></p>
+</div>
+
+<h4>「挑战黑洞」这个名字是怎么来的（课本讲了个故事，好记）</h4>
+
+<p>在 DDoS 攻击发展的初期，有一种名为<b>「黑洞（Collapsar）」</b>的抗拒绝服务攻击系统被用来防御 DDoS，
+意为「<b>DDoS 攻击流量像掉进黑洞一样无声无息地消失了</b>」。
+为了突破「黑洞」，黑客们研究出一种新的<b>利用 HTTP 协议</b>发起 DDoS 攻击的方法，
+<b>声称「黑洞」设备无法防御</b>，于是就称这种攻击为<b>「挑战黑洞」</b>，并一直沿用至今。<span class="bref">p.336</span></p>
+
+<h4>★ 为什么打动态页面特别狠（这段几乎是简答题模板）</h4>
+
+<div class="grid g2">
+  <div class="mini"><div class="t"><span class="ic">静</span>访问静态页面</div>
+    <b>不需要消耗服务器多少资源</b>，甚至可以说<b>直接从内存中读出发给用户就可以</b>。</div>
+  <div class="mini"><div class="t"><span class="ic">动</span>访问动态页面</div>
+    以论坛看帖为例：系统需要<b>到数据库中判断是否有读帖子的权限</b>，如果有，<b>再读出帖子内容</b>显示出来
+    ——<b>至少访问了两次数据库</b>。如果数据库有 <b>200 MB</b> 大小，系统很可能要在这 200 MB 的数据空间里
+    <b>搜索一遍</b>，这需要占用多少 CPU 资源和时间？</div>
+</div>
+
+<p>课本还比较了两种查询：<b>查找一个关键字</b>比<b>按用户权限查用户表</b>更耗时——
+因为后者「<b>搜索可以限定在一个很小的范围内</b>，而且<b>查到就可以马上停止查询</b>」，
+而<b>搜索会对所有数据进行一次判断，消耗的时间是相当多的</b>。</p>
+
+<div class="box key">
+  <div class="box-t">★ CC 攻击的核心思想（一句话）</div>
+  <p><b>CC 攻击充分利用了「动态页面比静态页面贵得多」这个特点</b>，
+  模拟多个用户不停地进行访问，<b>特别是访问那些需要大量数据操作的请求，即大量占用 CPU 时间的页面
+  （比如 asp / php / jsp / cgi）</b>。<span class="bref">p.336</span></p>
+  <p>换句话说：<b>它不拼带宽，拼的是「让服务器替你干重活」</b>——
+  这也是它与 UDP 风暴（拼带宽）最本质的区别。</p>
+</div>
+
+<h4>★ 为什么 CC 攻击要用代理（课本自问自答，很适合出题）</h4>
+
+<ol class="steps tight">
+  <li><b>隐藏身份。</b></li>
+  <li><b>绕开防火墙。</b>因为基本上所有防火墙都会<b>检测并发的 TCP 连接数目</b>，
+      超过一定数目、一定频率就会被认为是前面所述的 <b>TCP 连接耗尽型 DDoS</b>。</li>
+  <li><b>很好地保持连接。</b>攻击主机把攻击请求发送给代理后<b>就可以马上断开</b>，
+      由<b>代理转发给目标服务器，并且代理会继续保持着和对方的连接</b>。</li>
+</ol>
+
+<p class="small muted">课本给的战果：<b>曾经有攻击者利用 2000 个代理产生了 35 万条并发连接。</b><span class="bref">p.336</span></p>
+
+<h4>另外三个要点</h4>
+
+<div class="kv">
+  <dt>取大文件</dt><dd>进行连接耗尽攻击的一个有效手段是<b>不停地获取受害者网站上的大文件</b>（如大的图像和视频文件），
+      从而使<b>一次请求占用系统更多的资源</b>。<b>2003 年 10 月 14 日左右对 Weakness.com 的 DDoS 攻击就是 HTTP 风暴：不断地取大的图像文件。</b><span class="pref">p.45</span></dd>
+  <dt>它的缺点</dt><dd class="hl"><b>一般要使用真实的 IP 地址</b>（通常是被攻击者控制的<b>傀儡主机</b>的 IP）。
+      因为 HTTP 走 TCP，<b>必须完成三次握手才能发出请求</b>，源地址伪造不了。
+      所以攻击者一般都控制了由<b>大量僵尸主机构成的僵尸网络</b>（§7）。</dd>
+  <dt>HTTPS SSL/CC</dt><dd>「一种比 HTTP CC 效果更好的攻击方式。」由于 <b>HTTPS 采用了加密机制，
+      处理 HTTPS 请求比处理 HTTP 请求要占用服务器更多的资源</b>，因此<b>更容易导致服务器瘫痪</b>。
+      随着支持 HTTPS 的网站服务器越来越多，这种攻击也越来越多。<span class="pref">p.45</span><span class="bref">p.336</span></dd>
+</div>
+
+<h3 id="dr-mail">5.6　对邮件系统的 DoS 攻击</h3>
+
+<div class="grid g2">
+  <div class="mini"><div class="t"><span class="ic">炸</span>邮件炸弹</div>
+    往<b>一个邮件地址或邮件服务器</b>发送<b>大量的相同或不同的邮件</b>，<b class="hl">耗尽其存储空间</b>。<br>
+    <span class="small muted">这是 §1.1「硬盘被填满」那条后果的具体例子；也是课本 §2 里<b>「直接型 DoS」的标准举例</b>。</span></div>
+  <div class="mini"><div class="t"><span class="ic">垃</span>垃圾邮件</div>
+    <b>不请自来</b>的邮件，<b class="hl">目的在于宣传，而不是攻击</b>，
+    但<b>由于数量多，常常造成与 DoS 同样的效果</b>。<br>
+    <span class="small muted">辨析点：<b>垃圾邮件不是攻击</b>（没有攻击意图），但<b>效果等同于 DoS</b>——
+    呼应 §1.1 定义里的「<b>有意地</b>」三个字。</span></div>
+</div>
+
+<h3 id="dr-cmp">5.7　★★ 三种连接类攻击的优缺点对比（课本简答第 16 题）</h3>
+
+<p>课本简答题第 16 题：「<b>分析 SYN Flood 攻击、TCP 连接耗尽型攻击、HTTP 风暴型攻击的优缺点。</b>」
+这三种正好是一条递进链，答案直接看下表：</p>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th></th><th>SYN Flood</th><th>TCP 连接耗尽</th><th>HTTP 风暴 / CC</th></tr></thead>
+<tbody>
+<tr><td><b>打在哪一层</b></td><td>传输层（TCP 握手）</td><td>传输层（连接数）</td><td><b>应用层</b>（业务处理）</td></tr>
+<tr><td><b>消耗对方什么</b></td><td>半连接表 + CPU</td><td>连接资源</td><td><b>CPU / 数据库 / 带宽</b></td></tr>
+<tr><td><b>优点</b></td><td>可<b>伪造源地址</b>，隐蔽、难追踪；<b>攻击成本极低</b>（一个包换几十秒占用）；程序代码满网都是</td>
+    <td><b>不必持续发包</b>，连接建起来就一直占着，<b>维持成本低</b></td>
+    <td>请求<b>语义上完全合法</b>，与正常用户几乎无法区分，<b>防火墙和特征匹配很难过滤</b>；一次请求就能让服务器干重活，<b>效率最高</b></td></tr>
+<tr><td><b>缺点</b></td><td><b>必须不停地发</b>，<b>一旦停止受害者即可恢复</b>；现代系统有 SYN Cookie 等缓解手段</td>
+    <td><b>必须完成三次握手 → 只能用真实 IP</b>，会暴露傀儡主机；防火墙会<b>检测并发连接数</b>而察觉</td>
+    <td><b>必须用真实 IP（傀儡主机）</b>，需要庞大僵尸网络或大量代理；成本最高</td></tr>
+<tr><td><b>怎么被发现</b></td><td>半连接数暴增、大量来源不可达的 SYN</td><td>并发连接数异常</td><td>请求速率异常、集中访问高开销页面</td></tr>
+</tbody>
+</table></div>
+
+<div class="box key">
+  <div class="box-t">★ 一句话串起这三种</div>
+  <p><b>SYN Flood 最便宜但停手就失效；连接耗尽不用一直发但藏不住身份；CC 最难防但最贵。</b>
+  三者的共同代价是：<b>越往应用层走，越难被识别，但越需要真实身份和更多资源。</b></p>
+</div>
+
+</section>
+<section class="sec" id="drdos">
+  <div class="sec-head">
+    <span class="sec-num">§ 6　How · 二之二</span>
+    <h2 class="sec-t">反射型 DDoS（DRDoS）</h2>
+    <p class="sec-lede">PPT p.48–60（13 页，全章篇幅最大的单一主题）· 课本 11.3.3 节 p.336–342　｜　<b>当前主流，也是唯一会考计算的地方</b></p>
+  </div>
+
+<div class="chain">
+  <div class="chain-i prev"><div class="chain-k">承上</div>
+    <div class="chain-b">直接风暴型（§5）要么<b>暴露真实 IP</b>（CC、连接耗尽），要么<b>攻击流量 = 自己发出的流量</b>（SYN Flood）。
+    想打垮一个大站，得先攒出巨大的僵尸网络，<b>又贵又容易被追</b>。</div></div>
+  <div class="chain-i now"><div class="chain-k">本节</div>
+    <div class="chain-b"><b>借刀杀人：把源地址写成受害者，去请求互联网上的正常服务器。</b>
+    服务器的「回信」全部寄到受害者家里。<b>你只出邮费，砖头是别人搬的。</b></div></div>
+  <div class="chain-i next"><div class="chain-k">留下的坑</div>
+    <div class="chain-b">反射器是<b>合法公共服务</b>，不能一封了之 → 只能靠<b>关掉高危功能（monlist/UPnP）+ 源地址验证 + 流量清洗</b>来防（§11）。</div></div>
+</div>
+
+<h3 id="rf-why">6.1　★ 反射的原理：借刀杀人</h3>
+
+<div class="box def">
+  <div class="box-t">定义 · 课本原文（可直接抄）</div>
+  <p><b>反射型拒绝服务攻击（Distributed Reflection Denial of Service, DRDoS）</b>：
+  与直接风暴型不同的是，它在实施时<b>并不直接向目标主机发送数据包</b>，
+  而是<b>通过中间主机（反射器）间接向目标主机发送大量数据包</b>，以达到拒绝服务攻击的目的。<span class="bref">p.336</span></p>
+</div>
+
+<h4>攻击链条：四方角色</h4>
+
+<div class="svg-wrap">
+<svg class="flow" viewBox="0 0 660 250" role="img" aria-label="反射型 DDoS 的四方角色：攻击者、主控端、代理端、反射器、受害者">
+  <text x="10" y="16" class="ttl">反射型 DDoS：攻击者发小包给反射器，反射器把大包砸向受害者</text>
+
+  <rect x="14" y="40" width="92" height="34" class="bx-t"/>
+  <text x="60" y="55" text-anchor="middle" class="t-sm" font-weight="700">攻击者</text>
+  <text x="60" y="68" text-anchor="middle" class="t-mut">Attacker</text>
+
+  <path d="M108 57 L156 57" class="ln" marker-end="url(#a3)"/>
+  <rect x="158" y="40" width="92" height="34" class="bx-c"/>
+  <text x="204" y="55" text-anchor="middle" class="t-sm" font-weight="700">主控端</text>
+  <text x="204" y="68" text-anchor="middle" class="t-mut">Master</text>
+
+  <path d="M252 57 L300 57" class="ln" marker-end="url(#a3)"/>
+  <rect x="302" y="40" width="92" height="34" class="bx-c"/>
+  <text x="348" y="55" text-anchor="middle" class="t-sm" font-weight="700">代理端</text>
+  <text x="348" y="68" text-anchor="middle" class="t-mut">Agent（肉鸡）</text>
+
+  <text x="14" y="92" class="t-mut">—— 以上是控制流（control packet），与直接型完全一样 ——</text>
+
+  <path d="M348 78 L348 122" class="ln-t" marker-end="url(#a4)"/>
+  <text x="356" y="104" class="t-sm">② 发出「触发包」</text>
+
+  <rect x="256" y="126" width="184" height="44" class="bx-a"/>
+  <text x="348" y="144" text-anchor="middle" class="t-sm" font-weight="700">反射器 Reflector（大量）</text>
+  <text x="348" y="160" text-anchor="middle" class="t-mut">DNS / NTP / SSDP / Chargen 服务器</text>
+
+  <text x="452" y="118" class="t-sm" font-weight="700">关键的一步：</text>
+  <text x="452" y="134" class="t-sm">触发包的<tspan font-weight="700">源地址被伪造成</tspan></text>
+  <text x="452" y="150" class="t-sm"><tspan font-weight="700" fill="#b91c1c">受害者 V 的 IP</tspan>（spoofed）</text>
+  <text x="452" y="166" class="t-mut">→ 服务器以为是 V 在问它</text>
+
+  <path d="M348 174 L348 208" class="ln-t" marker-end="url(#a4)" stroke-width="3"/>
+  <text x="356" y="194" class="t-sm" font-weight="700">③ 巨大的「响应包」</text>
+
+  <rect x="256" y="212" width="184" height="30" class="bx-t"/>
+  <text x="348" y="232" text-anchor="middle" class="t-sm" font-weight="700">受害者 Victim</text>
+
+  <text x="14" y="200" class="t-sm">① 反射器<tspan font-weight="700">没有被入侵</tspan>，</text>
+  <text x="14" y="216" class="t-sm">它只是在<tspan font-weight="700">正常回应请求</tspan>。</text>
+  <text x="14" y="232" class="t-mut">所以受害者日志里全是正规服务器 IP。</text>
+
+  <defs>
+    <marker id="a3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a867c"/></marker>
+    <marker id="a4" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#b91c1c"/></marker>
+  </defs>
+</svg>
+</div>
+
+<p>课本把这段说得更完整：攻击者一般用一个<b>假的源地址（被攻击的主机地址）</b>，
+向<b>一台高性能、高带宽的服务器或大量服务器</b>发数据包（如 <b>TCP SYN 包、ICMP Echo Request、UDP 报文</b>等），
+服务器收到数据包以后，将向这个源地址<b>回送一个或多个响应包</b>（<b>SYN-ACK 或 TCP RST、ICMP、UDP 包</b>）。
+这样，就变成了<b>一台高性能/高带宽的服务器或大量服务器向目标主机发起 DDoS 攻击</b>，
+目标主机<b>几乎是「必死无疑」的</b>。<span class="bref">p.336–337</span></p>
+
+<div class="box key">
+  <div class="box-t">★ 反射型为什么成为主流（三条，必背）</div>
+  <p>① <b>发起者无须掌控大量僵尸网络</b>，只需通过<b>修改源 IP 地址</b>就可以发起攻击；<br>
+  ② 因此具有<b>攻击者隐蔽、难以追踪</b>的特性；<br>
+  ③ 攻击过程中<b>反射节点也无法识别请求发起源是否具有恶意动机</b>——它没法自我保护。<br>
+  <span class="small muted">课本结论：「<b>是目前主流的风暴型拒绝服务攻击方法</b>。」<span class="bref">p.337</span></span></p>
+</div>
+
+<h3 id="rf-pick">6.2　★★ 选协议的三条标准（必考）</h3>
+
+<div class="scene">
+  <div class="scene-k">PPT p.51 · 问题</div>
+  <p class="scene-q">用作反射型 DDoS 的协议一般具有哪些特点？</p>
+  <div class="scene-b">
+    <p>这一页 PPT <b>自己给了答案</b>，而且<b>课本多选第 2 题、简答第 6 题、综合第 1 题都在考它</b>，
+    是全章最该背死的三句话。</p>
+  </div>
+</div>
+
+<ol class="steps">
+  <li><b>互联网上有很多可探测到的支持该协议的服务器。</b><br>
+      <span class="small muted"><b>为什么需要：</b>反射器越多，汇聚到受害者身上的流量才越大，
+      而且分散在成千上万个 IP 上，受害者<b>没法靠封 IP 解决</b>。
+      课本举例：互联网上开放的 NTP 时间服务器约 <b>80 万台</b>；使用 SSDP 的即插即用设备约 <b>1100 万台</b>，
+      其中约 <b>38%（410 万台）</b>极有可能被利用。</span></li>
+  <li><b>部分协议的请求报文大小远小于响应报文的大小。</b><br>
+      <span class="small muted"><b>为什么需要：</b>这就是<b>放大倍数</b>的来源。
+      如果一问一答一样大，那就没有「放大」，攻击者还不如自己直接发。</span></li>
+  <li><b>协议具有无连接特性。</b><br>
+      <span class="small muted"><b>为什么需要：</b>无连接（UDP）<b>不需要三次握手</b>，
+      所以<b>源 IP 可以随便伪造</b>，服务器不会验证「你真的是这个地址吗」。
+      课本原话：「由于协议是无连接的，所以客户端发送请求包的<b>源 IP 很容易伪造</b>，
+      当把源 IP 修改为受害者的 IP，最终服务端返回的响应包就会返回到受害者的 IP，从而形成了一次反射攻击。」<span class="bref">p.337</span></span></li>
+</ol>
+
+<div class="box exam">
+  <div class="box-t">★ 陷阱：多选题的干扰项</div>
+  <p>课本<b>多选第 2 题</b>的选项 <b>D 是「协议具有有连接特性」——这是错的</b>，正确答案是 <b>A、B、C</b>。
+  <b>「无连接」才是条件，「有连接」正好相反</b>：TCP 要三次握手，伪造源地址后握手根本完不成，反射不了。
+  这也解释了<b>多选第 7 题</b>「下列协议中可用作反射型 DDoS 的是」答案为
+  <b>B. SSDP 和 D. NTP</b>——<b>C. TCP 不行</b>（有连接）；
+  <b>A. UDP 也没选</b>，因为 UDP 只是<b>传输层协议</b>，题目问的是<b>被反射利用的应用层协议</b>。</p>
+</div>
+
+<h3 id="rf-amp">6.3　★ 放大倍数表（课本表 11-1，会考选择题）</h3>
+
+<p>课本<b>表 11-1「反射型 DDoS 常用协议信息表」</b>列了 11 个协议。
+<b>不必全背，但要记住谁大谁小的量级</b>——尤其是 <b>NTP 最大、Chargen 次之、DNS 常用</b>：<span class="bref">p.337</span></p>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>协议名称</th><th class="num">放大倍数</th><th>被利用的协议请求报文</th></tr></thead>
+<tbody>
+<tr><td><b>NTP</b></td><td class="num hl"><b>206 ~ 556</b></td><td>Monlist Request</td></tr>
+<tr><td><b>Chargen</b></td><td class="num"><b>358.8</b></td><td>Character Generation Request</td></tr>
+<tr><td><b>QOTD</b></td><td class="num">140.3</td><td>Quote Request</td></tr>
+<tr><td><b>Quake Network Protocol</b></td><td class="num">63.9</td><td>Server Information Exchange</td></tr>
+<tr><td><b>DNS</b></td><td class="num hl"><b>28 ~ 54</b></td><td>DNS Query（QR = 0）</td></tr>
+<tr><td><b>SSDP</b></td><td class="num"><b>30.8</b></td><td>Search Request</td></tr>
+<tr><td><b>Kad</b></td><td class="num">16.3</td><td>Peer List Exchange</td></tr>
+<tr><td><b>SNMPv2</b></td><td class="num">6.3</td><td>GetBulk Request</td></tr>
+<tr><td><b>Steam Protocol</b></td><td class="num">5.5</td><td>Server Information Exchange</td></tr>
+<tr><td><b>NetBIOS</b></td><td class="num">3.8</td><td>Name Resolution</td></tr>
+<tr><td><b>BitTorrent</b></td><td class="num">3.8</td><td>File Search</td></tr>
+</tbody>
+</table></div>
+
+<div class="amp">
+  <div class="amp-r"><div class="amp-n">NTP</div><div class="amptrack"><span class="ampfill" style="width:100%"></span></div><div class="amp-v">206–556×</div></div>
+  <div class="amp-r"><div class="amp-n">Chargen</div><div class="amptrack"><span class="ampfill" style="width:64%"></span></div><div class="amp-v">358.8×</div></div>
+  <div class="amp-r"><div class="amp-n">QOTD</div><div class="amptrack"><span class="ampfill mid" style="width:25%"></span></div><div class="amp-v">140.3×</div></div>
+  <div class="amp-r"><div class="amp-n">DNS</div><div class="amptrack"><span class="ampfill mid" style="width:10%"></span></div><div class="amp-v">28–54×</div></div>
+  <div class="amp-r"><div class="amp-n">SSDP</div><div class="amptrack"><span class="ampfill low" style="width:6%"></span></div><div class="amp-v">30.8×</div></div>
+  <div class="amp-r"><div class="amp-n">SNMPv2</div><div class="amptrack"><span class="ampfill low" style="width:2%"></span></div><div class="amp-v">6.3×</div></div>
+</div>
+
+<div class="box trap">
+  <div class="box-t">⚠ 放大倍数最大 ≠ 用得最多</div>
+  <p>NTP 放大倍数最高（556 倍），但 <b>2019 年实际攻击里 DNS 放大排第一（20.89%）</b>，NTP 只排第六（6.90%）。
+  原因：<b>DNS 服务器数量多得多、且必须对公网开放</b>，而很多 NTP 服务器已经关掉了 monlist。
+  <b>课本多选第 3 题</b>问「DNS 经常被用作反射源的主要原因」，答案是
+  <b>A（响应包远大于请求包）、C（区域传送或递归查询过程中响应报文数量远大于请求报文数量）、D（因特网上有很多 DNS 服务器）</b>；
+  <b>B「DNS 报文比较短」是干扰项</b>——报文短不是理由，<b>「回的比问的大」才是</b>。</p>
+</div>
+
+<h3 id="rf-ntp">6.4　★★ NTP 反射攻击：把 206 倍算出来</h3>
+
+<p class="small muted">PPT 单独给了 <b>6 页</b>（p.52–57），课本给了 <b>3 页</b>完整推导（p.337–339）。
+<b>本章唯一可能出计算题的地方就是这里。</b></p>
+
+<h4>第一步：NTP 是什么，为什么不能一关了之</h4>
+
+<div class="kv">
+  <dt>NTP</dt><dd><b>Network Time Protocol，网络时间协议</b>，用于<b>计算机间的时间同步</b>。
+      最新版本 <b>NTPv4</b>，IETF 标准编号 <b>RFC 5905</b>。</dd>
+  <dt>模型与端口</dt><dd>采用<b>客户-服务器模型</b>；<b class="hl">使用 UDP 通信，服务器端口号 123</b>。</dd>
+  <dt>时间从哪来</dt><dd>时间服务器获得<b>国际标准时间（UTC）</b>，来源可以是<b>原子钟、天文台、卫星</b>，也可以是因特网；
+      独立局域网内常用<b>时间服务器自己的时钟</b>作为标准时间。</dd>
+</div>
+
+<div class="box key">
+  <div class="box-t">★ 为什么 NTP 是必须的（PPT p.53，防御那一节会用到）</div>
+  <p><b>金融、电信、工业、铁路及航空运输业</b>等行业的应用系统——如<b>实时备份系统、计费系统、网络的安全认证系统</b>
+  ——由不同的服务器组成，<b>系统要正常运行，必须确保不同服务器之间的时钟是一样的</b>。</p>
+  <p>所以<b>「把 NTP 服务器关掉」这个最简单的防御，在很多场合根本行不通</b>——这正是后面
+  「<b>禁用 monlist 而不是关掉 NTP</b>」这个折中方案的由来。</p>
+</div>
+
+<h4>第二步：monlist 是那个「问一句、答一百句」的功能</h4>
+
+<div class="box def">
+  <div class="box-t">monlist 是什么</div>
+  <p>为了对 NTP 服务进行<b>监控和管理</b>，NTP 协议提供 <b>monlist 请求功能</b>（又称 <b>MON_GETLIST</b>）。
+  当一个 NTP 服务器收到 monlist 请求后，就会返回<b class="hl">与该服务器进行过时间同步的最后 600 个客户端的 IP 地址</b>，
+  响应包<b class="hl">按照每 6 个 IP 地址一组</b>，一次请求<b class="hl">最多会返回 100 个响应包</b>。<span class="pref">p.54</span><span class="bref">p.338</span></p>
+  <p class="small muted">600 ÷ 6 = 100，这就是「最多 100 个响应包」的来历。</p>
+</div>
+
+<p>课本给了实际验证的方法（Linux 下向 IP 为 a.b.c.d 的时间服务器发 monlist 请求）：</p>
+<div class="fx fx-l"><code>ntpdc -n -c monlist a.b.c.d | wc -l</code>
+<small>若该服务器已与 600 个以下客户端同步过，会收到 <b>602 行</b>数据——除头两行是无效数据外，正好是 <b>600 个客户端 IP 列表</b>。
+用 <b>Wireshark</b> 抓包则会看到 <b>101 个</b> NTP 包：除去 <b>1 个请求包</b>，正好 <b>100 个响应包</b>。</small></div>
+
+<h4>第三步：★ 算放大倍数（考试就考这个）</h4>
+
+<div class="fx fx-l">
+  Wireshark 实测：请求包大小 <b>234 字节</b>，每个响应包 <b>482 字节</b>，共 <b>100 个</b>响应包<br><br>
+  受害者收到的总字节 ＝ 482 × 100 ＝ <b>48 200 字节</b><br>
+  放大倍数 ＝ 48 200 ÷ 234 ＝ <b class="hl">206 倍</b>
+  <small>课本原式写作 <b>482 × 100 / 234 = 206</b> 倍。<br>
+  <b>若通过编写优化的攻击脚本，请求包会更小，最大可放大 556 倍</b>——这就是表 11-1 里「206 ~ 556」的由来。</small>
+</div>
+
+<h4>第四步：★ 算攻击流量（课本 p.338 与 PPT p.56 给了两种算法，都要会）</h4>
+
+<div class="grid g2">
+  <div class="mini"><div class="t"><span class="ic">书</span>课本版：20 万台 → 77 Gb/s</div>
+    <b>假定</b>：可利用互联网上 <b>20 万台</b>时间服务器，攻击者给<b>每台每秒发 1 个请求包</b>
+    （实际发送速率往往要远超此速率）。<br>
+    <div class="fx fx-l" style="margin:6px 0 0">1（包/秒）× 200000（台）× 100（个）× 482（字节/包）× 8（比特/字节）<br>
+    ＝ 7.712 × 10<sup>10</sup> bps ≈ <b>77 Gb/s</b></div>
+    <span class="small muted">课本原话：「如果攻击者再结合其他攻击方式，产生 <b>400 Gbps</b> 的攻击流量就可轻松实现。
+    面对这样的攻击，对于一般只有 <b>10 G 左右接入链路带宽</b>的企业已经<b>毫无招架之力</b>。」</span></div>
+
+  <div class="mini"><div class="t"><span class="ic">P</span>PPT 版：10 万台 → 385.6 Gb/s</div>
+    <b>假定</b>：<b>10 万台</b>反射服务器，每台<b>每秒 10 个请求</b>，每个回复 <b>48200 字节</b>。<br>
+    <div class="fx fx-l" style="margin:6px 0 0">10（请求/秒）× 48200（字节/回复）× 100000（台）× 8（比特/字节）<br>
+    ＝ 3856 × 10<sup>8</sup> bps ＝ <b>385.6 Gb/s</b></div>
+    <span class="small muted">漏洞编号 <b>CNVD-2014-00082</b>。<span class="pref">p.56</span></span></div>
+</div>
+
+<div class="box exam">
+  <div class="box-t">★ 计算题的通用公式（背这个，数字可换）</div>
+  <div class="fx">攻击流量(bps) ＝ 每台每秒请求数 × 反射器台数 × 单次响应总字节 × 8</div>
+  <p class="small">其中「单次响应总字节」＝ 响应包大小 × 响应包个数（NTP 就是 482 × 100 = 48200）。
+  <b>最后那个 ×8 是「字节 → 比特」，最容易漏，漏了结果就差 8 倍。</b></p>
+</div>
+
+<h4>第五步：真实战例与规模数据</h4>
+
+<div class="kv">
+  <dt>2014 年 2 月</dt><dd><b>CloudFlare</b> 击退了针对某客户的 NTP DDoS 攻击，<b>峰值带宽略低于 400 Gbps</b>，
+      是当年 DDoS 攻击的最高值。数天后 <b>Arbor Networks</b> 确认观察到峰值 <b>325 Gbps</b> 的 NTP DDoS。<span class="pref">p.57</span></dd>
+  <dt>服务器规模</dt><dd>CNCERT 2014 年初监测：互联网上开放的时间服务器约 <b>80 万台</b>，
+      其中<b>频繁被请求的约 1800 台</b>；被请求次数最多的<b>前 50 台</b> NTP 服务器，
+      IP 主要位于<b>美国（56%）和中国（26%）</b>。</dd>
+  <dt>峰值纪录</dt><dd>2014 年 NTP 攻击峰值 <b>400 Gbps</b>；据 CNCERT 统计，<b>2018 年我国境内峰值流量超 Tbps 级的
+      DDoS 攻击次数达 68 起</b>，其中 2018 年 12 月浙江省某 IP 地址遭 DDoS 攻击的峰值流量达 <b>1.27 Tbps</b>。<span class="bref">p.337</span></dd>
+</div>
+
+<h4>第六步：★ NTP 攻击的实施与防御</h4>
+
+<div class="grid g2">
+  <div class="mini"><div class="t"><span class="ic">攻</span>攻击者分两步走</div>
+    <b>① 扫描。</b>利用扫描软件（如 <b>Nmap</b>）在互联网上<b>扫描开放 123 端口的服务器</b>，
+    并进一步确定<b>是否开启了 NTP 服务器</b>。<br>
+    <b>② 攻击。</b>利用控制的<b>僵尸网络伪造被攻击主机</b>向 NTP 服务器<b>发送 monlist 请求</b>。<br>
+    <span class="small muted">为强化效果，攻击者通常还会<b>加入其他 DoS 方式，如 TCP SYN 攻击</b>。</span></div>
+  <div class="mini"><div class="t"><span class="ic">防</span>防御分三层</div>
+    <b>① 发现攻击。</b>通过<b>流量监测设备</b>——NTP DRDoS 的流量就是<b>大量的 monlist 响应</b>，
+    <b>特征明显</b>，短时间内收到大量 monlist 响应即可认为发生了攻击。<br>
+    <b>② 挡住攻击。</b>需要被攻击目标有<b>足够的网络带宽</b>；专业的 DDoS 安全服务提供商一般采用
+    <b>流量清洗</b>过滤攻击流量（§11.5）。<br>
+    <b>③ 治本（网管侧）。</b>见下方。</span></div>
+</div>
+
+<div class="box key">
+  <div class="box-t">★ 网络管理者该怎么做（三档，层层退让）</div>
+  <p><b>最简单：关掉 NTP 服务器，或把 NTP 服务器置于内网</b>，使攻击者无法访问。
+  <b>但很多应用场合必须开放 NTP</b>（见前面「NTP 为什么是必须的」），所以往往行不通。</p>
+  <p><b>折中（推荐）：禁用 monlist 功能。</b>UNIX/Linux 中，<b>NTPD 4.2.7 以后的版本已经默认关闭了 monlist</b>；
+  4.2.7 以前的老版本，可在配置文件 <code>ntp.conf</code> 中增加 <b><code>disable monitor</code></b> 选项禁用。</p>
+  <p><b>更细：限制响应的源地址。</b>在 <code>ntp.conf</code> 中用 <code>restrict ... noquery</code> 或
+  <code>restrict ... ignore</code>：</p>
+  <div class="fx fx-l"><code>IPV4: restrict default kod nomodify notrap nopeer noquery</code><br>
+  <code>IPv6: restrict -6 default kod nomodify notrap nopeer noquery</code>
+  <small>加上这两行后，不管 IPv4 还是 IPv6，<b>允许发起时间同步的 IP 与本服务器进行时间同步，
+  但不允许修改 NTP 服务器信息，也不允许查询服务器的状态信息（如 monlist）</b>。</small></div>
+  <p><b>运营商侧：</b>电信运营商应在全网范围认真<b>实施源地址验证</b>，深入推进<b>虚假源地址的整治</b>；
+  并建设完善的<b>流量监测手段</b>，在国际出入口和互联互通层面对 NTP 流量进行监测和调控。
+  <b>据中国电信 2014 年 2 月的监测报告，采取上述措施后其国际出入口的 NTP 流量从 300 G 降低到了几十 G。</b><span class="bref">p.339</span></p>
+</div>
+
+<h3 id="rf-ssdp">6.5　SSDP 反射攻击与 UPnP</h3>
+
+<p class="small muted">PPT p.58–60（3 页）· 课本 11.3.3 节「2. SSDP 反射型拒绝服务攻击」p.340–342</p>
+
+<h4>问题从哪来：家里的智能设备太「热情」了</h4>
+
+<p>近几年随着互联网、物联网、车联网的快速发展，<b>网络摄像头、智能家电、无线路由器、网络打印机、
+游戏控制器、智能汽车</b>等设备越来越多，这些智能设备<b>普遍采用通用即插即用技术（Universal Plug and Play, UPnP）</b>。
+UPnP 的目的是让设备<b>在「零配置」的前提下自动发现、自动声明、直接信息交换和互操作</b>，
+真正实现<b>「设备即插即用」</b>。<span class="bref">p.340</span></p>
+
+<div class="kv">
+  <dt>SSDP</dt><dd><b>Simple Service Discovery Protocol，简单服务发现协议</b>。
+      UPnP 体系结构中<b>用于发现网络中的 UPnP 设备</b>的那个协议。<span class="pref">p.58</span></dd>
+  <dt>关键参数</dt><dd>保留<b>多播地址 IPv4：239.255.255.250</b>，<b class="hl">UDP 端口 1900</b>。</dd>
+  <dt>三条消息</dt><dd><b>M-SEARCH</b>（控制点接入网络时广播「谁在？」）、
+      <b>ssdp:alive</b>（设备接入时用 NOTIFY 方法宣告「我在」，必须在 HTTP 头 <b>CACHE-CONTROL</b> 里指定超时值并按时重发）、
+      <b>ssdp:byebye</b>（设备计划下线时宣告「我走了」）。</dd>
+</div>
+
+<p class="small muted">UPnP 体系里的其他协议顺带认一下：<b>GENA</b>（通用事件通知结构）、<b>SOAP</b>（简单对象访问协议）、
+<b>XML</b>（对设备和服务进行统一描述）、<b>HTTP</b>（支持信息交互）。
+UPnP 设备的工作流程六步：<b>设备寻址 → 设备发现 → 设备描述 → 设备控制 → 设备事件 → 设备展示</b>。<span class="bref">p.340</span></p>
+
+<div class="box key">
+  <div class="box-t">★ 课本点破问题所在的那一句</div>
+  <p>「实际上，NOTIFY（消息）指示也不是单单发送给计算机听，<b>别的网络设备也可以听到</b>。
+  <b>就是在上述的一播一听之间，出现了问题！</b>」<span class="bref">p.341</span></p>
+</div>
+
+<h4>★ SSDP 反射的四步攻击过程</h4>
+
+<ol class="steps">
+  <li><b>向多播地址发出查询请求</b>，查询域内可用的即插即用设备。请求头内容：
+      <div class="fx fx-l" style="text-align:left"><code>M-SEARCH * HTTP / 1.1</code><br>
+      <code>HOST: 239.255.255.250: 1900</code><br>
+      <code>MAN: "ssdp: discover"</code><br>
+      <code>MX: 5</code><br>
+      <code>ST: upnp: rootdevice</code>
+      <small>①<b>HOST</b>：协议保留多播地址和端口，必须是 <b>239.255.255.250:1900</b>（IPv4）或 FF0x::C（IPv6）；
+      ②<b>MAN</b>：指定服务查询类型，<b>只能填 ssdp: discover</b>；
+      ③<b>MX</b>：指定设备或服务响应的<b>最长等待时间</b>；
+      ④<b>ST</b>：指定<b>服务查询目标</b>。</small></div></li>
+  <li><b>收集可利用的设备。</b>与查询请求匹配的即插即用设备返回响应消息，
+      其中 <b>LOCATION 字段</b>为该设备描述文件的地址，<b>攻击者从中获得可利用的设备</b>。</li>
+  <li><b class="hl">攻击者将源地址伪造成攻击目标地址</b>，向第（2）步发现的即插即用设备的 <b>1900 端口</b>服务发起查询请求。</li>
+  <li><b>即插即用设备向攻击目标返回 SSDP 应答消息。</b>由于大量的即插即用设备被利用，
+      攻击者将<b>巨大的攻击流量引向了特定攻击目标</b>。</li>
+</ol>
+
+<div class="box key">
+  <div class="box-t">★ SSDP 的检测与防御</div>
+  <p><b>检测：</b>SSDP DRDoS 的攻击流量就是<b>大量的 SSDP 应答消息</b>，消息中具有<b>特有的字段内容</b>，
+  如 <b>「ST: upnp: rootdevice」「USN: uuid」「SERVER:」「LOCATION:」</b>等，
+  <b>只要根据这些特有字段就可识别出 SSDP 攻击消息</b>；短时间内收到大量 SSDP 应答消息即可认为发生了攻击。</p>
+  <p><b>防御：</b>一旦检测到攻击，一般<b>采用流量清洗</b>的方法防御（§11.5）。<br>
+  治本的做法：<b>对不需要启用即插即用服务的设备，将即插即用服务停止运行</b>——
+  例如<b>家用路由器出厂设置默认是开启此功能的，需要手动将其关闭</b>（PPT p.60 的配图标注就是「<b>关闭 UPnP</b>」）；
+  同时应检查确认<b>所有连接外网的设备没有将即插即用服务暴露于 Internet 上</b>，
+  <b>对非信任网络禁用 SSDP 协议</b>；另外，<b>应屏蔽设备未用的协议，关闭相应无用端口</b>。<span class="bref">p.341–342</span></p>
+</div>
+
+<h3 id="rf-def">6.6　★ 一句话总结：反射型防不住，只能一层层拧紧</h3>
+
+<div class="box trap">
+  <div class="box-t">⚠ 课本给了一句很清醒的话</div>
+  <p>「如前所述，尽管有一些措施可以防止 NTP 和 SSDP 被攻击者利用，
+  但因各种原因<b>完全防止几乎是不可能的</b>。同时，<b>一些新的服务或协议不断被攻击者发现可用作反射拒绝服务攻击</b>。」<span class="bref">p.342</span></p>
+  <p><b>最新的例子（2020 年 2 月，Radware）：</b>全球范围内约 <b>1.2 万台 Jenkins 服务器</b>可能被劫持
+  （<b>CVE-2020-2100</b>，由默认启用并在面向公众的服务器上公开的 <b>Jenkins UDP 自动发现协议</b>触发，
+  <b>UDP 端口 33848</b>），可进行两种 DDoS 攻击：<b>反射式放大攻击（放大倍数约 100 倍）</b>
+  和<b>无限循环攻击</b>（攻击者可以利用一个欺骗包使两台服务器陷入无限循环的应答中，
+  除非其中一台服务器重新启动或者 Jenkins 服务重新启动）。</p>
+  <p class="small muted">注意最后那个「<b>无限循环攻击</b>」——它就是 §3.6 讲的<b>循环攻击</b>在 2020 年的翻版。
+  这正好印证了 PPT 那句「<b>上述攻击方式虽已过时，但其思路仍值得借鉴</b>」。</p>
+</div>
+
+</section>
+<section class="sec" id="botnet">
+  <div class="sec-head">
+    <span class="sec-num">§ 7　补充</span>
+    <h2 class="sec-t">僵尸网络 <span class="chip warn">PPT 未讲 · 课本 3.5 页</span></h2>
+    <p class="sec-lede">课本 11.3.4 节 p.343–346　｜　<b>课本简答第 12 题、单选第 3 题、多选第 5 题都在考它，所以写进正文</b></p>
+  </div>
+
+<div class="box trap">
+  <div class="box-t">⚠ 这一节 PPT 只画了个图，没有展开</div>
+  <p>PPT 的 DDoS 原理图（p.32）里画了 <b>Hacker（黑客）→ Master（主攻手）→ Zombie（僵尸）</b> 三层结构，
+  也标了「僵尸」两个字，但<b>没有任何一页展开讲僵尸网络本身</b>。课本却用了 3.5 页。<br>
+  <b>之所以要写进正文：</b>课本<b>简答第 12 题</b>直接问「简述僵尸网络有几种类型，并分析每种类型的优缺点」，
+  <b>单选第 3 题</b>考 Mirai，<b>多选第 5 题</b>考「为什么选物联网设备当肉鸡」。这些题不看这一节答不出来。</p>
+</div>
+
+<h3 id="bn-what">7.1　定义与三个角色</h3>
+
+<div class="box def">
+  <div class="box-t">定义 · 课本原文（可直接抄）</div>
+  <p><b>僵尸网络（Botnet）</b>是<b>僵尸主人（BotMaster）</b>通过<b>命令与控制（Command and Control, C&amp;C）信道</b>
+  控制的<b>具有协同性的恶意计算机群</b>。其中，被控制的计算机称为<b>僵尸主机（Zombie，俗称「肉鸡」）</b>，
+  僵尸主人用来控制僵尸主机的计算机程序称为<b>僵尸程序（Bot）</b>。<span class="bref">p.343</span></p>
+</div>
+
+<div class="grid g3">
+  <div class="mini"><div class="t"><span class="ic">人</span>僵尸主人 BotMaster</div>幕后控制者。</div>
+  <div class="mini"><div class="t"><span class="ic">机</span>僵尸主机 Zombie</div>被控制的机器，俗称<b>肉鸡</b>。</div>
+  <div class="mini"><div class="t"><span class="ic">码</span>僵尸程序 Bot</div>装在肉鸡上、听命令干活的程序。</div>
+</div>
+
+<div class="box key">
+  <div class="box-t">★ 为什么黑客青睐这种模式（课本原话，答题好用）</div>
+  <p>「正是这种<b>一对多的控制关系</b>，使得攻击者能够以<b>极低的代价高效控制大量的资源</b>为其服务，
+  <b>这也是僵尸网络攻击模式近年来受到黑客青睐的根本原因</b>。」</p>
+  <p>「在执行恶意行为时，僵尸网络充当了<b>攻击平台</b>的角色，是一种<b>效能巨大的网络战武器</b>。」</p>
+  <p><b>用途：</b>主要应用于<b>网络侦察和攻击</b>——<b>平时</b>隐蔽被控主机的主机信息，
+  <b>战时</b>发动大规模流量攻击（即风暴型拒绝服务攻击），<b>是实施大规模拒绝服务攻击的主要方式</b>。<span class="bref">p.343</span></p>
+</div>
+
+<h3 id="bn-irc">7.2　IRC 型僵尸网络：结构最简单，也最脆弱</h3>
+
+<p><b>IRC 类僵尸网络</b>基于<b>标准 IRC 协议</b>在 <b>IRC 聊天服务器</b>上构建其命令与控制信道，
+控制者通过 C&amp;C 信道实现对大量受控主机的<b>僵尸程序版本更新、恶意攻击</b>等行为的控制。
+它的四个实体是：<b>控制者、命令与控制服务器（IRC 服务器）、Bot、被攻击对象</b>（课本图 11-3）。<span class="bref">p.343</span></p>
+
+<div class="svg-wrap">
+<svg class="flow" viewBox="0 0 660 210" role="img" aria-label="IRC 僵尸网络结构：控制者通过 IRC 服务器指挥多个 Bot 攻击目标">
+  <text x="10" y="16" class="ttl">IRC 僵尸网络：所有 Bot 都连到同一台 IRC 服务器（星形）</text>
+
+  <rect x="500" y="80" width="140" height="34" class="bx-t"/>
+  <text x="570" y="101" text-anchor="middle" class="t-sm" font-weight="700">控制者</text>
+
+  <rect x="300" y="80" width="150" height="34" class="bx-a"/>
+  <text x="375" y="96" text-anchor="middle" class="t-sm" font-weight="700">IRC 服务器</text>
+  <text x="375" y="109" text-anchor="middle" class="t-mut">C&amp;C 信道 · 只是中间桥梁</text>
+
+  <path d="M498 97 L454 97" class="ln" marker-end="url(#a5)"/>
+
+  <rect x="120" y="34" width="80" height="26" class="bx-c"/><text x="160" y="51" text-anchor="middle" class="t-sm">Bot</text>
+  <rect x="120" y="84" width="80" height="26" class="bx-c"/><text x="160" y="101" text-anchor="middle" class="t-sm">Bot</text>
+  <rect x="120" y="134" width="80" height="26" class="bx-c"/><text x="160" y="151" text-anchor="middle" class="t-sm">Bot</text>
+  <path d="M298 92 L204 50" class="ln" marker-end="url(#a5)"/>
+  <path d="M298 97 L204 97" class="ln" marker-end="url(#a5)"/>
+  <path d="M298 102 L204 144" class="ln" marker-end="url(#a5)"/>
+
+  <rect x="10" y="84" width="92" height="26" class="bx-t"/>
+  <text x="56" y="101" text-anchor="middle" class="t-sm">被攻击对象</text>
+  <path d="M118 97 L106 97" class="ln-t" marker-end="url(#a6)"/>
+
+  <text x="270" y="150" class="t-sm" fill="#b91c1c" font-weight="700">↑ 致命弱点：单点失效</text>
+  <text x="270" y="166" class="t-sm">摧毁这一台 IRC 服务器，就切断了控制者与所有 Bot 的联系，</text>
+  <text x="270" y="182" class="t-sm">整个僵尸网络瘫痪。</text>
+  <text x="270" y="200" class="t-mut">蜜罐（Honeypot）/ 蜜网（Honeynet）技术正是利用了这个弱点。</text>
+
+  <defs>
+    <marker id="a5" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a867c"/></marker>
+    <marker id="a6" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#b91c1c"/></marker>
+  </defs>
+</svg>
+</div>
+
+<h4>弱点怎么补：两种改良（课本图 11-4）</h4>
+
+<div class="grid g2">
+  <div class="mini"><div class="t"><span class="ic">a</span>僵尸网络控制转换</div>
+    Bot 的僵尸程序<b>使用域名而非固定 IP 地址</b>连接 IRC 服务器；控制者使用<b>动态域名服务</b>
+    将该域名映射到其控制的<b>多台 IRC 服务器</b>上。
+    <b>一旦正在工作的 IRC 服务器失效，受控主机会连接到其他 IRC 服务器上，整个僵尸网络继续运转。</b><br>
+    <span class="small muted">这种「主动或被动改变其 IRC 服务器」的行为称为<b class="hl">僵尸网络的迁移</b>。</span></div>
+  <div class="mini"><div class="t"><span class="ic">b</span>分层管理模式</div>
+    出于<b>管理便捷</b>的考虑，某些<b>大型</b>僵尸网络采用分层管理：
+    由<b>多个 IRC 服务器控制各自不同的 Bot 群体</b>，而<b>所有的 IRC 服务器由僵尸网络控制者统一控制</b>。</div>
+</div>
+
+<div class="box key">
+  <div class="box-t">★ 为什么 IRC 僵尸网络「非常难检测」（课本给了三条理由）</div>
+  <p>① <b>IRC 服务器与僵尸网络（控制者）并不一定是一一对应的关系</b>，
+  且两者的对应关系<b>可能随时间发生转变</b>，很难用数据分析方法获得对应关系；<br>
+  ② <b>Bot 与控制者是实体，IRC 服务器只是中间桥梁</b>——要准确掌握僵尸网络，
+  必须掌握<b>僵尸网络（控制者）与 Bot 的对应关系</b>，而中间隔着会迁移的服务器；<br>
+  ③ 由于<b>复杂衍变特性</b>（图 11-4）以及 <b>IRC 服务器与控制者通信检测的困难</b>，
+  <b>因此检测僵尸网络非常困难</b>。<span class="bref">p.344</span></p>
+</div>
+
+<h3 id="bn-p2p">7.3　P2P 型僵尸网络：为什么杀不死</h3>
+
+<p>为了克服 IRC 僵尸网络<b>命令与控制机制的不足</b>，使僵尸网络<b>更加健壮</b>，就需要更具<b>鲁棒性</b>的 C&amp;C 机制。
+<b>P2P 命令与控制机制靠着其出色的分散和对等性质成了黑客的首选之一。</b><span class="bref">p.345</span></p>
+
+<div class="kv">
+  <dt>结构</dt><dd>网络中<b>每台僵尸主机都与该僵尸网络中的某一台或某几台僵尸主机存在连接</b>。</dd>
+  <dt>怎么加入</dt><dd>新的被感染主机<b>在感染时就会得到该僵尸网络中某台或某些僵尸主机的 IP 地址</b>，然后建立连接。</dd>
+  <dt>怎么长大</dt><dd>建立连接之后，它可以<b>对所要连接的 IP 地址进行更新</b>。
+      这样，僵尸网络中的<b>每台僵尸主机都可同其他任何一台僵尸主机建立通信链路</b>。</dd>
+  <dt>怎么下令</dt><dd>僵尸主人可以<b>通过普通的一台对等主机</b>向整个僵尸网络发送命令和控制信息。</dd>
+  <dt>为什么杀不死</dt><dd class="hl">由于 Bot 程序本身包含了 P2P 的客户端，可以连入已有的 P2P 服务器，利用公开的 P2P 协议方便地相互通信。
+      由于僵尸主机间是<b>多对多连接</b>的，<b>当一些 Bot 被查杀时，并不会影响到 Botnet 的生存</b>，
+      所以这类僵尸网络<b>不存在单点失效的缺点</b>。</dd>
+</div>
+
+<h3 id="bn-cmp">7.4　★★ 两类对比（课本简答第 12 题的答案）</h3>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th></th><th>IRC 型僵尸网络</th><th>P2P 型僵尸网络</th></tr></thead>
+<tbody>
+<tr><td><b>拓扑</b></td><td><b>星形</b>：每个 Bot 直连 IRC 服务器</td><td><b>网状</b>：Bot 之间多对多互连</td></tr>
+<tr><td><b>C&amp;C 信道</b></td><td>标准 <b>IRC 协议</b>的聊天服务器</td><td><b>P2P 协议</b>，任意一台对等主机都能下令</td></tr>
+<tr><td class="hl"><b>优点</b></td>
+    <td><b>结构简单</b>，因为每个僵尸主机都与 IRC 服务器直接相连，
+        因此 IRC 僵尸网络具有<b>非常高的效率</b>（命令传达快）</td>
+    <td><b>不存在单点失效</b>，查杀部分 Bot 不影响整体生存；
+        <b>健壮性（鲁棒性）强</b>，隐蔽性也更好</td></tr>
+<tr><td class="hl"><b>缺点</b></td>
+    <td><b>健壮性差，存在单点失效问题</b>——摧毁单个 IRC 服务器就能切断控制者与 Bot 的联系，
+        导致整个僵尸网络瘫痪；<b>IRC 服务器被关闭，僵尸主人就完全失去了僵尸网络</b>
+        （<b>蜜罐 Honeypot / 蜜网 Honeynet 技术正是利用了该弱点</b>，捕获了大量 IRC 僵尸网络）</td>
+    <td><b>构建复杂</b>；实践中应用的 P2P 僵尸网络大多基于<b>公开的 P2P 协议</b>，
+        其覆盖网拓扑结构和 C&amp;C 机制的<b>设计都缺乏针对性</b>。
+        以 <b>Storm</b> 为例：它用 Kademlia(Kad) 算法的 Overnet 协议作 C&amp;C，以异或(XOR)为距离度量建立 DHT，
+        <b>提高了路由查询速度、增加了拓扑网络的韧性</b>，但<b>拓扑结构过于严格、定位过于精确</b>，
+        导致<b>容错性、安全性和匿名性方面存在过多缺陷</b>，现在已有有效反制措施</td></tr>
+<tr><td><b>代表</b></td><td>GT-Bot、Sdbot、Agobot</td><td>Slapper、Sinit、Phatbot、Storm、Peacomm、<b>Mozi</b></td></tr>
+</tbody>
+</table></div>
+
+<div class="box key">
+  <div class="box-t">★ 一句话记住差别</div>
+  <p><b>IRC 型 ＝ 效率高但怕断头（单点失效）；P2P 型 ＝ 砍不死但难造（构建复杂、现成协议有缺陷）。</b>
+  发展方向就是从前者走向后者——课本说「僵尸网络家族<b>加速向 P2P 控制结构转变</b>，
+  例如以 <b>Mozi</b> 为代表的使用 P2P 协议的僵尸网络不断壮大」。</p>
+</div>
+
+<div class="qa">
+  <div class="qa-h">僵尸网络发展史上的关键节点（可能出填空/选择）</div>
+  <div class="qa-b">
+  <div class="kv">
+    <dt>1993</dt><dd><b>EggDrop</b>（Jeff Fisher 开发）——<b>最早的僵尸程序</b>。</dd>
+    <dt>1999</dt><dd><b>PrettyPark</b>——因特网上<b>第一个具有僵尸网络特性的恶意代码</b>。</dd>
+    <dt>2000</dt><dd><b>GT-Bot</b>——<b>第一个</b>在聊天网络 <b>mIRC 客户端程序上通过脚本实现</b>的恶意僵尸程序。</dd>
+    <dt>2002</dt><dd><b>Sdbot</b>——<b>第一个独立运用 IRC 协议</b>的僵尸程序，且<b>开源发布</b>，因而在互联网上广泛流传。</dd>
+    <dt>2002</dt><dd class="hl"><b>Slapper</b>——使僵尸网络进入新阶段，<b>第一个采用 P2P 协议</b>作为通信协议的。</dd>
+    <dt>2003–2004</dt><dd><b>Sinit</b>（用<b>随机方法</b>寻找和发现对等实体）与 <b>Phatbot</b>
+        （<b>Agobot 的直接变种</b>，把通信和控制机制改良为更具健壮性的 P2P 方式，
+        先用一小段引导程序感染主机，然后在底层利用 <b>WASTE 协议</b>通信）——典型的 P2P 僵尸网络。</dd>
+    <dt>2007</dt><dd>基于 P2P 的 <b>Peacomm</b> 开始大规模爆发；同年最大规模的电子邮件病毒 <b>Storm</b> 也通过 P2P 控制。</dd>
+    <dt>2016</dt><dd class="hl"><b>Mirai</b>——著名的 <b>IoT（物联网）僵尸网络</b>，Dyn 事件的元凶（<b>单选第 3 题答案</b>）。</dd>
+    <dt>2018</dt><dd><b>HNS</b> 僵尸网络。2020 年 CNCERT 监测发现，DDoS 僵尸网络家族活动主要以
+        <b>Mirai 和 Gafgyt</b> 为代表的<b>传统 IoT 木马家族</b>为主导。</dd>
+    <dt>2019</dt><dd><b>Mozi</b>——采用 P2P 结构，通过<b>「认证证书」</b>对加入的节点进行<b>身份校验</b>，
+        同时<b>对通信加密</b>，提高了隐匿度和顽固程度。</dd>
+  </div>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h">评价僵尸网络的四个指标 + BYOB 开源项目 + 规模数据</div>
+  <div class="qa-b">
+  <p><b>评价指标</b>（学术界常用，简答题可加分）：<span class="bref">p.346</span></p>
+  <div class="kv">
+    <dt>效力 effectiveness</dt><dd>比如僵尸网络<b>发起 DDoS 攻击的能力</b>。</dd>
+    <dt>效率 efficiency</dt><dd><b>控制命令传递到整个网络的时间度量</b>。</dd>
+    <dt>鲁棒性 robustness</dt><dd><b>存活性和韧性</b>。</dd>
+    <dt>隐蔽性</dt><dd>另有学者提出，即<b>无法通过覆盖网回溯攻击源的位置和相关信息</b>。</dd>
+  </div>
+  <p><b>检测研究：</b>由于传统僵尸网络都基于 IRC，<b>2006 年以前</b>的检测研究大都集中在这个领域，
+  最有代表性的是<b>乔治亚技术研究院 G. Gu 等人</b>提出的 <b>BotHunter、BotSniffer 和 BotMiner</b>。
+  自 Storm 大规模爆发后，针对 <b>P2P</b> 僵尸网络的检测方法研究也逐渐引起关注。</p>
+  <p><b>BYOB（Build Your Own Botnet）</b>是一个<b>僵尸网络的开源项目</b>，提供构建和运行基本僵尸网络的框架，
+  <b>用于对僵尸网络的研究</b>。开发人员无须从头编写 <b>RAT（远程管理工具）</b>和 <b>C2 服务器</b>，
+  并提供了很多功能模块：<b>Keylogger</b>（记录击键与窗口名）、<b>Screenshot</b>、<b>Webcam</b>、
+  <b>Ransom</b>（加密文件并生成随机比特币钱包以支付赎金）、<b>Outlook</b>、<b>Packet Sniffer</b>、
+  <b>Persistence</b>（5 种方法建立持久性）、<b>Phone</b>、<b>Escalate Privileges</b>（尝试 UAC 绕过）、
+  <b>Portscanner</b>、<b>Process Control</b>。</p>
+  <p><b>规模数据（CNCERT《2019 年上半年我国互联网安全态势报告》）：</b>
+  监测发现的因感染计算机恶意程序而形成的僵尸网络中，规模在 <b>100 台主机以上的 1842 个</b>，
+  规模在 <b>10 万台以上的 21 个</b>；2019 年上半年我国境内<b>峰值超过 10 Gbps 的大流量分布式拒绝服务攻击事件
+  数量平均每月约 4300 起，同比增长 18%</b>，并且<b>仍然有超过 60% 的 DDoS 攻击事件是僵尸网络控制发起的</b>。<span class="bref">p.343</span></p>
+  </div>
+</div>
+
+<div class="box exam">
+  <div class="box-t">★ 为什么攻击者偏爱物联网设备当肉鸡（多选第 5 题）</div>
+  <p>答案 <b>A、B、D</b>：<b>A 物联网设备数量大</b>、<b>B 安全防护弱</b>、<b>D 安全漏洞多</b>。<br>
+  <b>C「物联网设备计算能力弱」不选</b>——计算能力弱对攻击者<b>不是优点而是缺点</b>，
+  攻击者要的是「多、好攻破、漏洞多」，不是「弱」。这道题的陷阱就在这里。</p>
+</div>
+
+</section>
+<section class="sec" id="case">
+  <div class="sec-head">
+    <span class="sec-num">§ 8　补充</span>
+    <h2 class="sec-t">典型案例：5·19 网络瘫痪案 <span class="chip warn">PPT 未讲 · 课本 2 页</span></h2>
+    <p class="sec-lede">课本 11.3.5 节 p.347–348　｜　<b>课本简答第 7、8 题直接考这个案例，其中第 7 题是课本正文明说「留作习题」的那道</b></p>
+  </div>
+
+<div class="scene">
+  <div class="scene-k">这个案子为什么值得单独讲</div>
+  <p class="scene-q">攻击者想打的是一家私服网站，结果打瘫了六个省的互联网。中间隔着好几层，是怎么传导过去的？</p>
+  <div class="scene-b">
+    <p>它是本章<b>所有概念的一次总演习</b>：<b>间接型 DoS</b>（§2）、<b>风暴型</b>（§4）、
+    <b>DNS 作为攻击杠杆</b>（§10）、<b>软件设计缺陷把普通用户变成攻击者</b>——全在这一个案子里。
+    而且它<b>有两次拒绝服务攻击，第二次不是任何人有意发起的</b>。</p>
+  </div>
+</div>
+
+<h3>事件经过</h3>
+
+<div class="kv">
+  <dt>时间</dt><dd><b>2009 年 5 月 19 日 21 时 50 分</b>开始，<b>江苏、安徽、广西、海南、甘肃和浙江六省区</b>用户
+      访问网站速度变慢或干脆断网。截至 <b>20 日凌晨 1 时 20 分</b>，受影响地区的互联网服务才基本恢复正常。</dd>
+  <dt>事后定性</dt><dd><b>暴风影音网站（baofeng.com）的域名解析系统受到拒绝服务攻击出现故障</b>，
+      <b>间接导致</b>电信运营企业的<b>递归域名解析服务器</b>受到<b>风暴型拒绝服务攻击而瘫痪</b>，造成用户不能正常上网。</dd>
+  <dt>起因</dt><dd>某<b>私服</b>经营者小兵（化名）经常遭到对手攻击，于是<b>租用了 81 台服务器</b>专门用来攻击其他私服，
+      但<b>流量不够效果不佳</b>。后来他得到一个<b>专用网络攻击程序</b>，让员工小卿（化名）用它发起攻击。</dd>
+  <dt>攻击本身有多短</dt><dd class="hl"><b>5 月 18 日晚 7 时左右</b>，小卿用 <b>30 多台服务器</b>试着发起攻击，
+      整个操作过程<b>才二十几分钟</b>，实施的攻击<b>不到五分钟</b>，当时<b>也没什么效果</b>，后来就停止了。
+      可就是这短短二十几分钟，造成了<b>第二天晚上</b>的六省区网络瘫痪。</dd>
+  <dt>关键策略</dt><dd>该攻击程序<b>不直接攻击对手的私服</b>，而是攻击私服网站的<b>「引路人」——DNSPod 服务器</b>。<br>
+      <span class="small muted">DNSPod 是一个<b>免费域名解析服务器</b>，早期属于烟台帝思普网络科技公司，
+      <b>2011 年被腾讯收购</b>，主要为国内众多网站提供智能域名解析服务。
+      <b>一旦 DNSPod 受攻击瘫痪，很多网站都会受影响。</b></span></dd>
+</div>
+
+<h3 id="cs-flow">8.1　十一步因果链（课本 11.3.5 原文整理）</h3>
+
+<ol class="steps">
+  <li>攻击者通过<b>租借服务器</b>的方式建立了攻击用的「<b>僵尸网络</b>」。</li>
+  <li>攻击者利用「僵尸网络」中的主机对 DNS 提供商 <b>DNSPod 的所有 6 台服务器</b>
+      （<code>ns1.dnspod.net ~ ns6.dnspod.net</code>）进行<b>风暴式 DNS 查询攻击</b>。</li>
+  <li>网络运营商（中国电信）通过网络检测发现 <b>DNSPod 的流量耗尽了将近 1/3 的带宽</b>，
+      并初步判定其遭受 DDoS 攻击。因为流量巨大，<b>为了不影响其他用户</b>，
+      当地电信运营商<b class="hl">在骨干网上封掉了 DNSPod 电信主域名服务器的 IP</b>。</li>
+  <li>众多<b>暴风影音软件</b>无法在 DNSPod 解析域名的情况下，向各地运营商的 DNS 服务器发起
+      <code>baofeng.com</code> 的域名解析请求（请求广告或者升级等）。</li>
+  <li>运营商 DNS 服务器本地缓冲中的 <b>A 记录过期</b>（<b class="hl">超时时间 3600 s</b>），
+      如 <code>baofeng.com. 37305 IN A 60.28.110.233</code> 过期。</li>
+  <li>运营商 DNS 服务器本地缓冲中的 <code>baofeng.com</code> 指向 DNSPod 的 <b>NS 记录还没有过期</b>
+      （<b class="hl">一般是 24 小时</b>，DNSPod 与中国电信签订的协议中规定的过期时间）。</li>
+  <li>于是各地的 DNS 服务器<b>继续向已经被封禁 IP 的 DNSPod 服务器</b>发送域名解析查询。</li>
+  <li>由于 DNSPod 服务器被封禁，电信运营商的 DNS 服务器发起的域名解析请求<b>本地超时</b>。
+      <b>由于域名查询使用 UDP 协议，运营商的 DNS 服务器不会马上探测到对方主机不可达</b>，在超时以后才放弃查询。
+      但由于 <b>DNS 服务器一般被配置为不缓存失败的查询</b>，
+      所以<b class="hl">下一个 DNS 请求来的时候它还是得向被封禁的 DNSPod 服务器的 IP 发送查询</b>。</li>
+  <li>暴风影音客户端域名解析请求<b>本地超时</b>。</li>
+  <li class="hl">暴风影音软件在<b>发生无法解析域名的时候会每隔 20 s 向本地 DNS 服务器发起域名解析请求</b>
+      （<b>这是暴风影音软件的一个设计缺陷</b>）。由于这些 DNS 服务器<b>始终无法解析出域名</b>，
+      这些请求<b>逐渐堆积在内存里</b>。<b>每个请求需要有一个请求 ID 以对应每一个客户端，而这个 ID 数量是有限的</b>，
+      当并发请求数达到一定数量的时候<b>内存或者 ID 耗尽，DNS 服务器就拒绝服务了</b>。
+      由于暴风影音的用户分布极为广泛，<b>全国上亿的暴风影音用户</b>都向本地 DNS 服务器发出请求，
+      其「<b>攻击能力</b>」<b>高出普通「僵尸网络」几个数量级</b>。</li>
+  <li>因为电信运营商大量的本地 DNS 服务器受到暴风影音软件的 DDoS 攻击（由于软件设计的问题），
+      所以<b>整个本地网络用户的域名解析服务都受到了影响</b>，导致因 DNS 解析失败引起的<b>大规模网络瘫痪</b>。</li>
+</ol>
+
+<h3 id="cs-two">8.2　★ 为什么说「此次事故有两次拒绝服务攻击」</h3>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th></th><th>第一次 DoS</th><th>第二次 DoS</th></tr></thead>
+<tbody>
+<tr><td><b>谁发起的</b></td><td><b>攻击者直接发起的</b></td><td class="hl"><b>没有人发起</b>——是由第一次攻击<b>引起的</b></td></tr>
+<tr><td><b>打谁</b></td><td><b>DNSPod</b> 的 6 台域名服务器</td><td><b>电信运营商的 DNS 服务器</b></td></tr>
+<tr><td><b>谁在发包</b></td><td>租来的「僵尸网络」主机</td><td class="hl"><b>全国上亿台装了暴风影音的普通用户电脑</b></td></tr>
+<tr><td><b>类型</b></td><td>风暴式 DNS 查询攻击</td><td>风暴式拒绝服务攻击</td></tr>
+<tr><td><b>根源</b></td><td>攻击者的恶意</td><td class="hl"><b>暴风影音软件的设计缺陷</b>（失败后每 20 s 无限重试）</td></tr>
+</tbody>
+</table></div>
+
+<p class="small muted">课本原话：「此次事故有两次拒绝服务攻击。<b>第一次是攻击者直接发起的针对 DNSPod 的风暴式拒绝服务攻击；
+第二次是由第一次攻击引起的，因暴风影音软件设计缺陷而产生的针对电信 DNS 服务器的风暴式拒绝服务攻击</b>。」<span class="bref">p.348</span></p>
+
+<div class="box key">
+  <div class="box-t">★ 这个案子把「间接型 DoS」演到了极致</div>
+  <p>攻击者<b>想打的</b>是竞争对手的私服 → <b>实际打的</b>是它的域名解析商 DNSPod →
+  <b>结果瘫的</b>是六个省的电信 DNS → <b>受害的</b>是所有上网用户。
+  <b>整条链上，攻击者只碰了第二环。</b>这就是 §2 里「<b>间接型 DoS：攻击对受害者有致命影响的其他目标</b>」的教科书案例。</p>
+</div>
+
+<h3 id="cs-lag">8.3　★★ 为什么隔了一天才全面爆发（课本简答第 7 题）</h3>
+
+<div class="box exam">
+  <div class="box-t">课本自己把这题留给读者了</div>
+  <p>课本原文：「也许大家会问，<b>DNSPod 被攻击后，为何 18 日当晚没有出现网络瘫痪，而一直到 19 日晚才全面爆发？
+  这一问题留作习题让读者自己完成。</b>」<span class="bref">p.348</span>
+  对应<b>简答第 7 题</b>。下面是依据 11.3.5 节那 11 步推出的答案。</p>
+</div>
+
+<p><b>核心：瘫痪的触发条件不是「DNSPod 被封」这一瞬间，而是「缓存全部过期 + 用户量到达高峰」两个条件同时满足。</b>
+分三条写：</p>
+
+<ol class="steps">
+  <li><b>缓存还在，解析就没失败——所以当晚没事。</b>
+      18 日晚攻击时，各地运营商 DNS 服务器的<b>本地缓存里还存着 <code>baofeng.com</code> 的 A 记录</b>。
+      只要 A 记录没过期，DNS 服务器<b>根本不需要去问 DNSPod</b>，直接用缓存回答暴风影音客户端即可，
+      <b>解析成功 → 客户端不重试 → 什么事都没有</b>。
+      而且当晚攻击<b>实际只持续了不到五分钟</b>，本身也没造成什么效果。</li>
+  <li><b>A 记录 1 小时过期，NS 记录 24 小时不过期——这个「时间差」是引信。</b>
+      A 记录 <b>TTL 只有 3600 s（1 小时）</b>，很快就过期了；
+      但告诉 DNS 服务器「该去问谁」的 <b>NS 记录 TTL 长达 24 小时</b>。
+      于是形成一个死循环：<b>缓存里没有答案（A 记录没了），却仍然只认那个已经被封禁的 DNSPod（NS 记录还在）</b>。
+      每一次查询都必然走向超时，而且因为 <b>DNS 服务器不缓存失败的查询</b>，
+      <b>下一个请求来了还得再问一遍、再超时一遍</b>——失败请求开始只增不减地堆积。</li>
+  <li><b>19 日晚是上网高峰，堆积量突破了 DNS 服务器的 ID/内存上限——于是全面爆发。</b>
+      暴风影音<b>每 20 s 重试一次</b>，用户基数是<b>全国上亿</b>。
+      白天到傍晚在线用户不断增加，每个用户每 20 s 贡献一次注定失败的请求，
+      失败请求<b>在 DNS 服务器内存里持续累积</b>；每个待处理请求要占一个<b>请求 ID</b>，而 <b>ID 数量有限</b>。
+      到 <b>19 日 21 时 50 分</b>这个上网高峰，<b>并发请求数终于把 ID 和内存耗尽</b>，
+      DNS 服务器<b>开始拒绝服务</b>，整个本地网络的域名解析全部失效，网络瘫痪。</li>
+</ol>
+
+<div class="box key">
+  <div class="box-t">★ 一句话版（考场可直接写这句再展开）</div>
+  <p><b>因为 18 日晚 DNS 缓存中的 A 记录尚未过期，解析仍能成功，故未爆发；
+  待 A 记录（TTL 3600 s）过期而 NS 记录（TTL 24 小时）仍指向已被封禁的 DNSPod 后，
+  所有解析必然超时且失败结果不被缓存，暴风影音又每 20 s 无限重试，
+  失败请求在运营商 DNS 服务器上持续累积，直到 19 日晚上网高峰时并发请求耗尽其请求 ID 与内存，才全面瘫痪。</b></p>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">简答 8</span>给出 DNSPod、暴风影音软件的改进方案</div>
+  <div class="qa-b">
+    <p><b>DNSPod 侧（服务提供者）：</b></p>
+    <ul>
+      <li><b>提高抗 DDoS 能力</b>：接入<b>流量清洗</b>服务（§11.5），不要一被打就只能靠运营商封 IP；
+          增加带宽冗余与<b>多地分布式部署（Anycast）</b>，避免 6 台服务器在同一处被一锅端。</li>
+      <li><b>缩短 NS 记录的 TTL</b>，或提供<b>备用 NS</b>指向不同网段/不同运营商的服务器——
+          本案的关键放大器就是「NS 记录 24 小时不过期，把所有查询锁死在被封的 IP 上」。</li>
+      <li>与运营商建立<b>应急联动机制</b>：被封禁前先切换解析，而不是被直接在骨干网上封掉。</li>
+    </ul>
+    <p><b>暴风影音侧（客户端软件，本案的真正放大器）：</b></p>
+    <ul>
+      <li><b>取消「无限固定间隔重试」</b>，改为<b>指数退避</b>（20 s → 40 s → 80 s …）并设<b>最大重试次数</b>，
+          失败到一定次数后<b>放弃并静默</b>。</li>
+      <li><b>本地缓存解析失败结果</b>（负缓存），在一段时间内不再发起同一域名的解析。</li>
+      <li><b>解析失败不应影响主功能</b>：广告/升级这类<b>非核心请求</b>失败就跳过，不该让播放器反复骚扰 DNS。</li>
+      <li>给重试<b>加随机抖动（jitter）</b>，避免上亿客户端<b>同一时刻整齐发包</b>形成脉冲。</li>
+      <li>把广告/升级域名<b>与核心业务域名分离</b>，并<b>内置多个备用解析途径</b>。</li>
+    </ul>
+    <p class="qa-src">本题课本未给标准答案，以上依据 11.3.5 节第 (5)(6)(8)(10) 步的缺陷逐条对治。</p>
+  </div>
+</div>
+
+</section>
+<section class="sec" id="redirect">
+  <div class="sec-head">
+    <span class="sec-num">§ 9　How · 三</span>
+    <h2 class="sec-t">重定向型 DoS</h2>
+    <p class="sec-lede">PPT p.61–62（<b>只有 2 页，占 3%</b>）· 课本 11.1 节末段　｜　<b>知道有这回事、知道它为什么有争议即可</b></p>
+  </div>
+
+<div class="box def">
+  <div class="box-t">定义 · PPT 原文</div>
+  <p><b>重定向 DoS 攻击</b>：通过<b>修改网络中的一些参数或 ARP 表、DNS 缓存</b>，
+  使得<b>受害者发出的、或者发向受害者的数据包被重定向到了其他地方</b>。<span class="pref">p.62</span><span class="bref">p.331</span></p>
+</div>
+
+<div class="chain">
+  <div class="chain-i prev"><div class="chain-k">前两条路</div>
+    <div class="chain-b">剧毒包型<b>让机器崩溃</b>，风暴型<b>把资源占满</b>——都要「打」到受害者身上。</div></div>
+  <div class="chain-i now"><div class="chain-k">这一条路</div>
+    <div class="chain-b"><b>压根不打。</b>把「路标」改掉，让数据包<b>根本走不到受害者那里</b>。
+    不消耗任何资源，效果同样是「服务不可用」。</div></div>
+  <div class="chain-i next"><div class="chain-k">争议</div>
+    <div class="chain-b">因为它<b>更常被用于窃听和中间人攻击</b>，很多人不把它算作 DoS——见下。</div></div>
+</div>
+
+<div class="box trap">
+  <div class="box-t">⚠ 这一节唯一的考点就是「它算不算 DoS」</div>
+  <p><b>PPT 的说法：</b>「常被用于窃听或中间人攻击。因此，<b>通常在网络窃听中研究，很多人不把它当作 DoS 攻击</b>。」<span class="pref">p.62</span></p>
+  <p><b>课本的说法（更细，给了判据）：</b><span class="bref">p.331</span></p>
+  <div class="tbl-wrap"><table>
+  <thead><tr><th>数据包被重定向到哪</th><th>这叫什么</th></tr></thead>
+  <tbody>
+  <tr><td><b>攻击者的主机</b></td><td>通常所说的<b>中间人攻击</b>（攻击者能看、能改，属于机密性/完整性问题）</td></tr>
+  <tr><td class="hl"><b>不存在的主机或目标主机</b></td><td>一种<b>拒绝服务攻击</b>（包送不到，服务不可用）</td></tr>
+  </tbody></table></div>
+  <p>课本还写明：「<b>也有文献将重定向攻击归为网络监听类攻击，而不是拒绝服务攻击。本章主要讨论前两种攻击。</b>」<br>
+  <b>答题模板：</b>先说判据（重定向到哪里），再说两本教材都承认这个归类有争议，最后点明本章重点是前两类。</p>
+</div>
+
+<p class="small muted">实现手段本身属于前面章节的内容：<b>ARP 欺骗</b>改的是局域网内的 <b>ARP 表</b>，
+<b>DNS 欺骗 / 缓存投毒</b>改的是 <b>DNS 缓存</b>。本章不展开，只需知道<b>「改参数、不发洪水」</b>是它与前两类的分界。</p>
+
+</section>
+
+<section class="sec" id="role">
+  <div class="sec-head">
+    <span class="sec-num">§ 10　补充</span>
+    <h2 class="sec-t">拒绝服务攻击的作用 <span class="chip warn">PPT 未讲 · 课本 1.5 页</span></h2>
+    <p class="sec-lede">课本 11.4 节 p.348–349　｜　<b>课本简答第 10 题、单选第 8 题和第 9 题都在考这一节</b></p>
+  </div>
+
+<div class="scene">
+  <div class="scene-k">换一个角度看这一章</div>
+  <p class="scene-q">前面九节都在讲「怎么把对方打瘫」。但如果攻击者的目的<b>根本不是打瘫呢</b>？</p>
+  <div class="scene-b">
+    <p>课本用了一整节讲这件事：<b>拒绝服务攻击除了直接用于瘫痪攻击目标，
+    还可以作为特权提升攻击、获得非法访问的一种辅助手段。</b>
+    这时候，<b class="hl">拒绝服务攻击服从于其他攻击的目的</b>。</p>
+    <p>课本给的定位很准：「通常，攻击者<b>不能单纯通过拒绝服务攻击获得对某些系统、信息的非法访问</b>，
+    但<b>可将其作为间接手段使用</b>。」<span class="bref">p.348</span></p>
+  </div>
+</div>
+
+<h3>五个典型应用场合</h3>
+
+<div class="grid g2">
+  <div class="mini"><div class="t"><span class="ic">1</span>为 IP 劫持 / IP 欺骗铺路</div>
+    <b>用的是 SYN Flood。</b><br>
+    当攻击者想要<b>冒充 C 跟 B 通信</b>时，通常要求 <b>C 不能响应 B 的消息</b>
+    （否则 C 一说话就穿帮了）。为此，攻击者可以<b>先攻击 C</b>（如果它在线）<b>使其无法对 B 的消息进行响应</b>，
+    然后通过<b>窃听发向 C 的数据包</b>，或者<b>猜测发向 C 的数据包中的序列号</b>等，
+    然后<b>冒充 C 与第三方通信</b>。</div>
+
+  <div class="mini"><div class="t"><span class="ic">2</span>逼系统重启，趁重启下手</div>
+    <b>一些系统在启动时会有漏洞</b>，可以通过拒绝服务攻击<b>使之重启</b>，
+    然后<b>在该系统重启时针对漏洞进行攻击</b>。<br>
+    例如 <b>RARP-boot</b>：如果能令其重启，就可以将其攻破——
+    只需知道 <b>RARP-boot 在引导时监听的端口号（通常为 69）</b>，
+    通过向其发送伪造的数据包<b>几乎可以完全控制其引导过程</b>。</div>
+
+  <div class="mini"><div class="t"><span class="ic">3</span>把防火墙打关，趁虚而入</div>
+    在有些网络中，<b>当防火墙关闭时允许所有数据包都能通过</b>
+    （特别是对于那些<b>提供服务比保障安全更加重要</b>的场合，如普通的 ISP），
+    则可通过<b>对防火墙进行拒绝服务攻击使其失去作用</b>，
+    从而达到<b>非法访问受保护网络</b>的目的。<br>
+    <span class="small muted">这是「fail-open（失效开放）」设计被反向利用的经典例子。</span></div>
+
+  <div class="mini"><div class="t"><span class="ic">4</span>让偷偷改的配置生效</div>
+    在 <b>Windows</b> 系统中，<b>大多数配置变动在生效前都需要重新启动系统</b>。
+    这样一来，<b>如果攻击者已经修改了系统的管理权限</b>，
+    可能需要采取拒绝服务攻击的手段<b>使系统重启，或者迫使真正的管理员重启系统</b>，
+    以便使改动的配置生效。<br>
+    <span class="small muted"><b>单选第 8 题</b>考的就是这条：「有时是为了（<b>A 重启目标系统</b>），
+    帮助安装的后门生效或提升权限」。</span></div>
+
+  <div class="mini"><div class="t"><span class="ic">5</span>打瘫 DNS 以冒充域名</div>
+    <b>对 DNS 的拒绝服务攻击可以达到地址冒充的目的。</b>
+    攻击者可以<b>致瘫 DNS 后，冒充 DNS 的域名解析</b>，
+    把<b>错误的域名-IP 地址映射关系</b>提供给用户，以便把用户（受害者）的<b>数据包指向错误的网站</b>
+    （如攻击者的网站），或者把受害者的<b>邮件指向错误的邮件服务器</b>。<br>
+    <span class="small muted"><b>单选第 9 题</b>考的就是这条：对 DNS 实施 DoS「有时也是为了（<b>A 假冒目标 DNS</b>）」。</span></div>
+
+  <div class="mini"><div class="t"><span class="ic">目</span>攻击者的两种最终目的</div>
+    针对上面第 5 条，课本总结攻击者的最终目的<b>大致有两种</b>：<br>
+    <b>一是窃取受害者的信息</b>——客观上导致用户不能应用相应的服务，<b>也构成拒绝服务攻击</b>；<br>
+    <b>二是拒绝服务攻击本身</b>，如<b>蓄意使用户不能访问需要访问的网站，不能发送邮件到特定邮件服务器</b>等。</div>
+</div>
+
+<div class="box key">
+  <div class="box-t">★ 这一节的答题主线（简答第 10 题）</div>
+  <p>题目：「在网络攻击中，拒绝服务攻击除了用于致瘫攻击目标，<b>是否还可作为其他攻击的辅助手段？试举例说明。</b>」</p>
+  <p><b>答：是。</b>拒绝服务攻击可作为<b>特权提升攻击、获得非法访问</b>的辅助手段，此时它<b>服从于其他攻击的目的</b>。举例：<br>
+  ① 用 <b>SYN Flood</b> 打瘫主机 C，使其无法响应，从而<b>冒充 C 与 B 通信</b>（IP 劫持 / IP 欺骗）；<br>
+  ② 用 DoS <b>迫使系统重启</b>，趁其<b>启动时的漏洞</b>发起攻击（如 <b>RARP-boot，端口 69</b>）；<br>
+  ③ 攻击<b>防火墙</b>使其失效，在<b>失效开放</b>的网络中借机非法访问受保护网络；<br>
+  ④ 在 <b>Windows</b> 中<b>迫使系统重启</b>，使攻击者已修改的权限配置<b>生效</b>；<br>
+  ⑤ 打瘫 <b>DNS</b> 后<b>冒充其域名解析</b>，把用户流量或邮件<b>导向攻击者的服务器</b>，以窃取信息。</p>
+</div>
+
+</section>
+<section class="sec" id="defend">
+  <div class="sec-head">
+    <span class="sec-num">§ 11　Defend</span>
+    <h2 class="sec-t">检测、响应与防范</h2>
+    <p class="sec-lede">PPT p.64–71（8 页，占 11%）· 课本 11.5 节 p.349–353　｜　<b>流量清洗是本节最重点，PPT 单独给了 2 页</b></p>
+  </div>
+
+<div class="chain">
+  <div class="chain-i prev"><div class="chain-k">承上</div>
+    <div class="chain-b">§1 已经定性：病根是「资源有限」，<b>这一点消不掉</b>。</div></div>
+  <div class="chain-i now"><div class="chain-k">本节</div>
+    <div class="chain-b">所以防御的目标<b>不是「杜绝」，而是「减轻」</b>。
+    整节按三步走：<b>检测（发现它）→ 响应（打断它）→ 防范（少挨打）</b>。</div></div>
+  <div class="chain-i next"><div class="chain-k">结论</div>
+    <div class="chain-b">前面所有方法<b>都只能部分缓解</b> → 于是有了商业化的<b>流量清洗</b>，
+    它是 PPT 明确点名的「<b>最有效</b>的对抗风暴型 DDoS 的方法」。</div></div>
+</div>
+
+<div class="box trap">
+  <div class="box-t">⚠ 先记住课本最后的那句定性（简答题开头写这句最稳）</div>
+  <p>「总之，<b>拒绝服务攻击是最容易实现，却最难防护的攻击手段，因为很难分辨哪些是合法的请求，
+  哪些是伪造的请求。</b>」<span class="bref">p.353</span><br>
+  PPT 的说法：「<b>完全阻止是不可能的，防范可减少被攻击的机会。</b>」<span class="pref">p.69</span></p>
+</div>
+
+<h3 id="df-hard">11.1　★ 检测难在哪里（PPT 专门问了这个问题）</h3>
+
+<div class="scene">
+  <div class="scene-k">PPT p.64 · 问题</div>
+  <p class="scene-q">检测难点在哪里？</p>
+  <div class="scene-b">
+    <p>PPT 自己给了答案，<b>核心只有一句：不容易定位攻击者的位置</b>。往下拆成三条，
+    <b>正好对应前面三节讲过的三种躲避手段</b>：</p>
+  </div>
+</div>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>难点</th><th>为什么</th><th>对应前文</th></tr></thead>
+<tbody>
+<tr><td><b>源地址可以随便伪造</b></td>
+    <td>Internet 上<b>绝大多数网络都不限制源地址</b>，也就使<b>伪造源地址非常容易</b></td>
+    <td>§1.4 原因 ③④；§5.1 SYN Flood</td></tr>
+<tr><td><b>只能查到攻击代理</b></td>
+    <td>通过攻击代理的攻击，<b>只能找到攻击代理的位置</b>（攻击者隔着 handler 和 agent 两层）</td>
+    <td>§4.1 三步骤</td></tr>
+<tr><td class="hl"><b>反射式攻击完全无法定位</b></td>
+    <td>各种反射式攻击，<b>无法定位源攻击者</b>——受害者看到的全是正规服务器的 IP</td>
+    <td>§6 反射型 DRDoS</td></tr>
+</tbody>
+</table></div>
+
+<h3 id="df-sign">11.2　★ 检测方法一：按 DoS 攻击工具的特征标志检测</h3>
+
+<p class="small muted">这种方法主要针对攻击者利用<b>已知特征的 DoS 攻击工具</b>发起的攻击。攻击特征主要包括三类：<span class="bref">p.349</span></p>
+
+<div class="grid g3">
+  <div class="mini"><div class="t"><span class="ic">1</span>特定端口</div>
+    <b>NTP DDoS</b> 使用 <b>123</b> 端口；<b>SSDP 攻击</b>使用 <b>1900</b> 端口；<br>
+    <b>Trinoo</b>：<b>TCP 27655、UDP 27444 和 31335</b>；<br>
+    <b>Stacheldraht</b>：<b>TCP 16660 和 65000</b>；<br>
+    <b>Trinity</b>：<b>TCP 6667 和 33270</b>。</div>
+  <div class="mini"><div class="t"><span class="ic">2</span>标志位</div>
+    <b>Shaft</b> 攻击所用的 TCP 分组的<b>序列号都是 <span class="pill">0x28374839</span></b>。<br>
+    <span class="small muted">固定不变的序列号是最典型的「工具指纹」。</span></div>
+  <div class="mini"><div class="t"><span class="ic">3</span>特定数据内容</div>
+    如 <b>Trinoo</b> 的<b>全零 4 字节 UDP 包</b>；
+    <b>TFN2K</b> 的数据段中有<b>一串 A 字符（AAA…）</b>。</div>
+</div>
+
+<div class="box trap">
+  <div class="box-t">⚠ 这种方法的局限（课本明确指出，简答题常问「为什么特征检测不够」）</div>
+  <p>「根据攻击者使用的工具的特征，能检测到一些简单、采用著名工具的 DoS 攻击。但是，<b>攻击工具的发展非常迅速</b>，
+  不但所<b>使用的端口可以轻易地被用户改变</b>，而且功能更强大、隐蔽性更强
+  （如基于 IRC 和基于 P2P 的 DDoS 攻击），例如<b>对关键字符串和控制命令加密、对自身进行数字签名</b>等，
+  <b>这些技术使得特征标志检测技术无效</b>。」</p>
+  <p>「还有一类，<b>纯粹野蛮地采用大量网络活动来消耗网络资源</b>实现 DoS 攻击，
+  例如采用自编程序用多台计算机同时对一攻击目标发送 ICMP 包，或同时打开许多 TCP 连接，
+  <b>这种攻击在发送的数据包上并没有什么异常，或者说没有特别的特征</b>。
+  对此类攻击，<b>仅靠简单的特征匹配显然不能解决问题</b>。」<span class="bref">p.350</span></p>
+  <p><b>→ 所以必须有第二种方法：看流量的「量」，而不是看包的「内容」。</b></p>
+</div>
+
+<h3 id="df-flow">11.3　★★ 检测方法二：根据异常流量来检测</h3>
+
+<p>这类攻击有一个共同特征：<b>当这类攻击出现时，网络中会出现大量的某一类型的数据包。</b>
+可以根据这一特征来检测是否发生了 DoS 攻击。</p>
+
+<h4>先分清 DoS 工具产生的两种通信</h4>
+
+<div class="grid g2">
+  <div class="mini"><div class="t"><span class="ic">控</span>控制信息</div>
+    在 <b>DoS 管理者与攻击代理之间</b>。<br>
+    <span class="small muted">关键：<b>控制信息数据包的目标地址是没有伪造的</b>——
+    所以「<b>一旦捕获到（没有经过伪造的）控制信息，DDoS 服务器的位置就暴露出来了</b>」。</span></div>
+  <div class="mini"><div class="t"><span class="ic">攻</span>攻击时的网络通信</div>
+    在 <b>DoS 攻击代理与目标主机之间</b>。<br>
+    <span class="small muted">这部分源地址通常是伪造的，追不到人。</span></div>
+</div>
+
+<h4>★ 五类异常现象（课本 11.5.1，可直接作为简答题答案）</h4>
+
+<ol class="steps">
+  <li><b>大量目标主机域名解析。</b>攻击者在进行 DDoS 攻击前<b>总要解析目标的主机名</b>，
+      <b>BIND 域名服务器能够记录这些请求</b>。由于每台攻击服务器在进行一个攻击前会发出
+      <b class="hl">PTR 反向查询请求</b>，也就是说在 DDoS 攻击前<b>域名服务器会接收到大量的反向解析目标 IP 主机名的 PTR 查询请求</b>。
+      <b>虽然这不是真正的「DDoS」通信，但能够用来确定 DDoS 攻击的来源。</b></li>
+  <li><b>极限通信流量。</b>当 DDoS 攻击一个站点时，会出现<b>明显超出该网络正常工作时的极限通信流量</b>的现象。
+      现在的技术能够<b>对不同的源地址计算出对应的极限值</b>，当明显超出此极限值时就表明存在 DDoS 攻击的通信。
+      因此可以<b class="hl">在主干路由器端建立访问控制列表（ACL）访问控制规则以监测和过滤这些通信</b>。</li>
+  <li><b>特大型的 ICMP 和 UDP 数据包。</b><b>正常的 UDP 会话一般使用小的 UDP 包，通常有效数据内容不超过 10 字节；
+      正常的 ICMP 消息长度在 64 到 128 字节之间。</b>那些明显大得多的数据包<b>很可能就是 DDoS 攻击控制信息</b>，
+      主要含有加密后的目标地址和一些命令选项。</li>
+  <li><b>不属于正常连接通信的 TCP 和 UDP 数据包。</b>最隐蔽的 DDoS 工具<b>随机使用多种通信协议
+      （包括基于连接的和无连接协议）</b>发送数据。优秀的防火墙和路由规则能够发现这些数据包。
+      另外，那些<b class="hl">连接到高于 1024 而且不属于常用网络服务的目标端口</b>的数据包也非常值得怀疑。</li>
+  <li><b>数据段内容只包含文字和数字字符</b>（例如，<b>没有空格、标点和控制字符</b>）的数据包。
+      <b>这往往是数据经过 BASE64 编码后的特征。</b>TFN2K 发送的控制信息数据包就是这种类型；
+      TFN2K 及其变种的特征模式是<b>在数据段中有一串 A 字符（AAA…）</b>，这是<b>调整数据段大小和加密算法后的结果</b>。
+      <b>如果没有使用 BASE64 编码，那么对于使用了加密算法的数据包，这种连续的字符就是空格。</b></li>
+</ol>
+
+<div class="box exam">
+  <div class="box-t">★ 课本多选第 9 题</div>
+  <p>「下列选项中，可用于检测拒绝服务攻击的有（　）」答案 <b>A、B</b>：
+  <b>A. DoS 攻击工具的特征</b>（＝ §11.2）、<b>B. 网络异常流量特征</b>（＝ §11.3）。<br>
+  <b>C. 源 IP 地址、D. 目的地址都不选</b>——因为<b>源 IP 可以随便伪造</b>（§11.1 难点一），
+  目的地址就是受害者自己，不携带任何「是不是攻击」的信息。这道题正好把整节的逻辑串起来了。</p>
+</div>
+
+<h3 id="df-resp">11.4　★ 响应技术：四种方法</h3>
+
+<p>课本原话：「从原理上讲，主要有<b>四种</b>应对 DoS 攻击的方法。」PPT 的表述完全一致。<span class="pref">p.68</span><span class="bref">p.350</span></p>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>#</th><th>方法</th><th>怎么做</th><th>局限</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><b>分组过滤</b><br>（通过丢弃恶意分组的方法保护网络或系统）</td>
+    <td>对特定的流量进行<b>过滤（丢弃）</b>。例如用防火墙过滤掉所有来自某些主机的报文；
+        为了防止著名的 <b>Smurf 攻击</b>而设置过滤器<b>过滤掉所有 ICMP 协议的 ECHO 报文</b>。<br>
+        另有一种<b>「输入诊断」</b>方案：<b>由受害者提供攻击特征，互联网服务提供商（ISP）配合将攻击分组过滤掉</b>。</td>
+    <td>这种基于特定攻击主机或者内容的过滤方法<b>作用只限于已经定义的固定的过滤器，不适合动态变化的攻击模式</b>；
+        「输入诊断」<b>需要各个 ISP 的网络管理员人工配合，工作强度高、时间耗费大，因此较难实施</b>。</td></tr>
+<tr><td>2</td><td><b>源端控制</b><br>（在源端控制 DoS 攻击）</td>
+    <td>通常参与 DoS 攻击的分组使用的<b>源 IP 地址都是假冒的</b>，因此<b>如果能够防止 IP 地址假冒就能够防止此类 DoS 攻击</b>。
+        例如<b class="hl">路由器检查来自与其直接相连的网络分组的源 IP 地址，如果源 IP 地址非法（与该网络不匹配）则丢弃该分组</b>。
+        电信服务提供商利用自身的优势加强假冒地址的控制，<b>可大大降低 DDoS 攻击的影响</b>。</td>
+    <td><b>源端过滤并不能彻底消除 IP 地址假冒。</b>例如，<b>一个 ISP 的客户计算机仍然能够假冒成该 ISP 网络内
+        成百上千台计算机中的一台</b>（在本网段内伪造，源端过滤查不出来）。</td></tr>
+<tr><td>3</td><td><b>追溯</b><br><span class="en">traceback</span></td>
+    <td>见下方展开。<b>它在 IP 地址假冒的情况下也可以工作</b>，是<b>采取必要的法律手段防止未来攻击的关键一步</b>。</td>
+    <td><b>追溯过程中并不能实时控制攻击的危害</b>，<b>当攻击很分散时也不能做到有效追溯</b>。</td></tr>
+<tr><td>4</td><td><b>路由器动态检测和控制</b></td>
+    <td>在路由器上<b>动态检测和控制 DoS 攻击引起的拥塞</b>。依据：DoS 攻击分组虽然可能来源于多个流，
+        但这些流<b>肯定有某种共同特征</b>，比如<b>有共同的目的地址或源地址（或地址前缀）、或者都是 TCP SYN 类型的报文</b>。
+        这些有共同特征的流称为<b class="hl">流聚集（aggregate）</b>。<br>
+        主要设想：流聚集所通过的路由器<b>通过分析分组的丢失辨识出这种流聚集</b>；
+        一旦识别出来，就<b>通知上游路由器限制其发送速率</b>。这种由发生拥塞的路由器发起的
+        <b class="hl">回推（pushback）</b>信号可能一直递归地传播到源端。</td>
+    <td>「这种机制从直观上不难理解，如果能够实际使用，对于解决 DoS 攻击问题就有很好的效果。
+        <b>但是这种机制在实际的网络中面临着检测标准、公平性机制、高效实现以及运营管理等很多未解决的问题。</b>」</td></tr>
+</tbody>
+</table></div>
+
+<div class="qa">
+  <div class="qa-h">追溯（traceback）的三种具体方法</div>
+  <div class="qa-b">
+  <p>追溯的定位：这些方法<b>假定存在源地址假冒</b>，它<b>试图在攻击的源处抑制攻击，并判定恶意的攻击源</b>。<span class="bref">p.351</span></p>
+  <div class="kv">
+    <dt>① IP 追溯</dt><dd>路由器<b>使用部分路径信息标记经过的分组</b>。由于 DoS 攻击发生时，攻击流中包括<b>大量的具有共同特征的分组</b>，
+        因此追溯机制<b>只需以一定的概率抽样标记其中的部分分组</b>。受害主机利用这些标记分组中的路径信息
+        <b>重构攻击路径</b>从而定位攻击源。<b class="hl">在攻击结束之后依然可以追溯。</b></dd>
+    <dt>② ICMP 追溯</dt><dd>路由器<b>以一定的概率抽样标记其转发的部分分组</b>，并<b>向所标记的分组的目的地址发送 ICMP 消息</b>。
+        消息中包括<b>该路由器的身份、抽样分组的内容、邻近的路由器信息</b>。
+        在受到攻击时，受害主机可以利用这些信息<b>重构攻击路径</b>，找到攻击者。</dd>
+    <dt>③ 链路测试</dt><dd>从<b>离受害主机最近的路由器</b>开始，<b>交互测试其上游链路</b>，<b>递归执行</b>，直到确定攻击路径。
+        <b class="hl">它只有在攻击进行时才有效。</b>具体方法包括：<b>输入调试（input debugging）</b>、
+        <b>受控涌入（controlled flooding）</b>等。</dd>
+  </div>
+  <p class="small muted"><b>对比记忆：</b>①②都靠「<b>路由器抽样标记</b>」，区别是<b>把信息写在分组里（IP 追溯）</b>还是
+  <b>另发一条 ICMP 消息（ICMP 追溯）</b>；<b>只有①能在攻击结束后追溯，只有③必须在攻击进行时做</b>。</p>
+  </div>
+</div>
+
+<div class="box trap">
+  <div class="box-t">⚠ 四种方法的共同结论（这句是通向「流量清洗」的桥）</div>
+  <p>「<b>上述措施只能部分地缓解 DDoS 攻击所造成的危害，而不能从根本上解决问题。</b>
+  在商业化的流量清洗技术出现之前，<b>早期遭遇 DDoS 攻击时一般只有下线或断网，待攻击者停止攻击后再恢复</b>。」<span class="bref">p.351</span></p>
+  <p>PPT 说得更直接：<b>「最有效的对抗风暴型 DDoS 的方法是：流量清洗。」</b><span class="pref">p.68</span></p>
+  <p class="small">这也解释了<b>课本多选第 8 题</b>：「当拒绝服务攻击发生时，被攻击目标的网络安全人员通常可采取的措施包括（　）」
+  答案 <b>A（用流量清洗设备对攻击流量进行清洗）、B（断开网络，待攻击停止后再连通）</b>——
+  <b>B 看着很消极，但它正是课本说的「早期唯一办法」，所以是对的</b>；C 关机、D 不采取任何措施则不选。</p>
+</div>
+
+<h3 id="df-clean">11.5　★★ 流量清洗（本节最重点）</h3>
+
+<div class="box def">
+  <div class="box-t">定义 · PPT 原文</div>
+  <p><b>DDoS 攻击防御就是对 DDoS 攻击与正常业务数据混合在一起的流量进行净化，
+  净化掉 DDoS 攻击流量，保留正常业务流量，保证客户业务 7×24 小时的不间断提供。</b><span class="pref">p.70</span></p>
+  <p><b>流量清洗服务</b>是提供给<b>租用 IDC 服务的政企客户</b>，针对对其发起的 DoS/DDoS 攻击的
+  <b>监控、告警和防护</b>的一种网络安全服务。<span class="pref">p.71</span></p>
+</div>
+
+<h4>★ 四个关键环节（PPT 原文，必背）</h4>
+
+<div class="svg-wrap">
+<svg class="flow" viewBox="0 0 660 120" role="img" aria-label="流量清洗四环节：攻击监测和判断、流量牵引、清洗过滤、流量回送">
+  <text x="10" y="16" class="ttl">DDoS 攻击阻断过程的四个关键环节</text>
+  <rect x="10" y="34" width="140" height="44" class="bx-a"/>
+  <text x="80" y="54" text-anchor="middle" class="t-sm" font-weight="700">① 攻击监测和判断</text>
+  <text x="80" y="69" text-anchor="middle" class="t-mut">专用检测设备逐包分析</text>
+
+  <path d="M154 56 L166 56" class="ln-a" marker-end="url(#a7)"/>
+  <rect x="170" y="34" width="140" height="44" class="bx-a"/>
+  <text x="240" y="54" text-anchor="middle" class="t-sm" font-weight="700">② 流量牵引</text>
+  <text x="240" y="69" text-anchor="middle" class="t-mut">用 BGP 把流量引到清洗中心</text>
+
+  <path d="M314 56 L326 56" class="ln-a" marker-end="url(#a7)"/>
+  <rect x="330" y="34" width="140" height="44" class="bx-a"/>
+  <text x="400" y="54" text-anchor="middle" class="t-sm" font-weight="700">③ 清洗过滤</text>
+  <text x="400" y="69" text-anchor="middle" class="t-mut">剥离恶意流量，还原合法流量</text>
+
+  <path d="M474 56 L486 56" class="ln-a" marker-end="url(#a7)"/>
+  <rect x="490" y="34" width="160" height="44" class="bx-a"/>
+  <text x="570" y="54" text-anchor="middle" class="t-sm" font-weight="700">④ 流量回送（回注）</text>
+  <text x="570" y="69" text-anchor="middle" class="t-mut">干净流量送回目标系统</text>
+
+  <text x="10" y="104" class="t-mut">记忆口诀：<tspan font-weight="700">看见 → 牵走 → 洗净 → 送回</tspan>。四个环节缺一不可，其中「牵」和「送回」都靠路由技术实现。</text>
+  <defs><marker id="a7" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#4338ca"/></marker></defs>
+</svg>
+</div>
+
+<h4>PPT 给的两步服务流程</h4>
+<ol class="steps tight">
+  <li><b>利用专用的检测设备对用户业务流量进行分析监控。</b></li>
+  <li><b>当用户遭受到 DDoS 攻击时，检测设备上报给专用的业务管理平台生成清洗任务，
+      将用户流量牵引到流量清洗中心。</b><span class="pref">p.71</span></li>
+</ol>
+
+<h4>★ 三大组成系统（课本 11.5.2）</h4>
+
+<div class="grid g3">
+  <div class="mini"><div class="t"><span class="ic">1</span>攻击检测系统</div>
+    对用户业务流量<b>逐包检测</b>，发现网络流量中隐藏的非法攻击流量
+    （<b>NTP Flood、SSDP Flood、SYN Flood、ACK Flood、RST Flood、ICMP Flood、UDP Flood、
+    DNS Query Flood、Stream Flood、HTTP Get Flood</b> 等），发现攻击后<b>及时通知并激活防护设备</b>进行流量的清洗。<br>
+    <b>检测技术：</b>静态漏洞攻击特征检查、动态规则过滤、异常流量限速、用户流量模型异常检测。</div>
+  <div class="mini"><div class="t"><span class="ic">2</span>攻击缓解系统</div>
+    通过专业的流量净化产品，将可疑流量<b>从原始网络路径中重定向到净化清洗中心</b>上进行
+    <b>恶意流量的识别和剥离</b>，<b>还原出的合法流量被回注到原网络转发给目标系统</b>，
+    <b>其他合法流量的转发路径不受影响</b>。<br>
+    <b>牵引怎么实现：</b>清洗中心一般利用 <b>IBGP 或者 EBGP 协议</b>，先和城域网中用户流量路径上的
+    多个核心设备建立 <b>BGP Peer</b>。攻击发生时，清洗中心通过 BGP 协议<b>向核心路由器发布 BGP 更新路由通告</b>，
+    更新核心路由器上的路由表项，将流经所有核心设备上的被攻击服务器的流量<b>动态牵引到流量清洗中心</b>进行清洗。
+    同时为清洗中心发布的 BGP 路由<b>添加 no-advertise 属性</b>，确保清洗中心发布的路由不会被扩散到城域网；
+    清洗中心上<b>通过路由策略不接受核心路由器发布的路由更新</b>，从而避免对城域网造成影响。</div>
+  <div class="mini"><div class="t"><span class="ic">3</span>监控管理系统</div>
+    对流量清洗系统的设备进行<b>集中管理配置</b>，展现<b>实时流量、告警事件、状态</b>等信息，
+    及时输出<b>流量分析报告和攻击防护报告</b>等报表。</div>
+</div>
+
+<div class="qa">
+  <div class="qa-h">★ 清洗后「回注」的四种方式（课本 p.352，各有优缺点）</div>
+  <div class="qa-b">
+  <p>清洗完成后，通过多种网络协议和物理接口将清洗后的流量<b>重新注入城域网</b>，主要包括：
+  <b>策略路由、MPLS VPN、二层透传和双链路</b>等。</p>
+  <div class="tbl-wrap"><table>
+  <thead><tr><th>方式</th><th>原理</th><th>优点</th><th>不足</th></tr></thead>
+  <tbody>
+  <tr><td><b>策略路由</b></td>
+      <td>在<b>旁挂路由器上配置策略路由</b>，将流量清洗中心回注的流量<b>指向受保护设备相对应的下一跳</b>，
+          从而<b>绕过旁挂设备的正常转发</b>。为简化部署，可<b>将城域网的用户分组，仅为每组用户配置一条策略路由</b>
+          指向该组用户所对应的下一跳设备</td>
+      <td>可实现针对该组用户的流量回注；<b>初期实施完成后不需要再修改城域网设备的配置</b>，
+          <b>可维护性和可操作性得到很大提升</b></td>
+      <td><b>直接影响到城域网核心设备</b></td></tr>
+  <tr><td><b>MPLS VPN</b></td>
+      <td>利用流量清洗系统做 <b>PE</b>，与城域网汇聚设备建立 <b>MPLS VPN 隧道</b>，
+          清洗后的流量<b>进入 VPN 内进行转发</b>，从而绕过旁挂设备的正常转发</td>
+      <td>部署完成之后，<b>后续用户业务工作量很小</b>；对<b>核心层拓扑的冲击很小</b>，
+          修改主要在<b>城域网边缘</b></td>
+      <td><b>依赖城域网设备支持 MPLS VPN 功能</b>；需要<b>全网部署清洗 VPN，城域网的改动范围大</b></td></tr>
+  <tr><td><b>二层透传</b></td>
+      <td>流量清洗中心<b>旁挂在城域网汇聚设备或者 IDC 核心/汇聚设备上</b>，
+          旁挂设备<b>作为受保护服务器的网关</b>，用二层透传的方式回注。
+          将<b>清洗系统、城域网设备、受保护服务器置于同一 VLAN</b> 中，
+          通过在<b>清洗系统上做三层转发</b>、在<b>城域网设备上做二层透传</b>实现回注</td>
+      <td><b>部署简单</b>，对城域网的<b>影响很小</b></td>
+      <td><b>比较适合旁挂设备为交换机的情况</b></td></tr>
+  <tr><td><b>SDN 方式</b></td>
+      <td>一些大型数据中心或云服务提供商采用<b>基于 SDN（软件定义网络）</b>的流量清洗技术。
+          基本原理是利用 <b>SDN 网络的控制平面可以方便地改变网络流量的路由</b>，实现<b>流量的无缝迁移</b>，进而实现流量清洗</td>
+      <td><b>与改变传统路由器中路由策略的方式相比，实现起来容易很多</b></td>
+      <td>需要网络本身具备 SDN 能力（参见课本 15.1 节）</td></tr>
+  </tbody></table></div>
+  </div>
+</div>
+
+<div class="box key">
+  <div class="box-t">★ 流量清洗的商业形态（简答第 17 题会用到）</div>
+  <p><b>服务对象：</b>主要针对 <b>IDC（互联网数据中心）或云服务</b>的中大型客户，尤其是<b>对互联网有高度依赖</b>的商业客户
+  和那些<b>不能承担由于 DDoS 攻击所造成巨额营业损失</b>的客户，如<b>金融机构、游戏服务提供商、电子商务和内容提供商</b>。</p>
+  <p><b>基本原理：</b>对进入 IDC 或云的数据流量进行<b>实时监控</b>，及时发现包括 DDoS 攻击在内的异常流量，
+  在<b>不影响正常业务</b>的前提下<b>清洗掉异常流量</b>，有效满足客户对 IDC 运作连续性的要求。</p>
+  <p><b>基础设施：</b>要抵御风暴型 DDoS，<b>IDC 还必须有足够的网络带宽来接收攻击流量</b>。
+  大多数 DDoS 流量清洗服务提供商（一般是大型云服务提供商、CDN 服务提供商）都有
+  <b class="hl">3～7 个流量清理中心，通常分布在全球</b>。每个中心都包含 DDoS 缓解设备和大量带宽，
+  <b>这些带宽可能超过 350 Gbps</b>。当客户受到攻击时，只需将所有流量<b>重定向到最近的清理中心</b>即可。</p>
+  <p><b>两种使用方式与计费：</b>① <b>全天候通过清理中心来路由流量</b>；② <b>在发生攻击时按需路由流量</b>。
+  <b>前者所付出的成本远远高于后者，一般较少采用。</b>使用流量清洗服务是需要<b>付费</b>的，
+  <b>通常按照清洗带宽的多少来付费</b>。<span class="bref">p.353</span></p>
+</div>
+
+<h3 id="df-prev">11.6　防范措施与五条建议</h3>
+
+<h4>PPT 给的防范措施（p.69）</h4>
+
+<div class="grid g2">
+  <div class="mini"><div class="t"><span class="ic">带</span>限制带宽</div>
+    <b>限制特定协议占用的带宽</b>，<b>但并不是完善的方法</b>（PPT 自己加了这句限定，答题时要带上）。</div>
+  <div class="mini"><div class="t"><span class="ic">端</span>终端防御</div>
+    <b>及时安装厂商补丁，减少被攻击的机会</b>（对付剧毒包型）；<br>
+    <b>运行尽可能少的服务</b>（对付循环攻击、反射利用）；<br>
+    <b>增强容忍性</b>。</div>
+  <div class="mini"><div class="t"><span class="ic">入</span>入口过滤</div>
+    <b>只允许必要的通信</b>；<b>设置严格的防火墙策略</b>；<b>封锁所有无用的数据</b>。</div>
+  <div class="mini"><div class="t"><span class="ic">限</span>清醒的结论</div>
+    <b class="hl">完全阻止是不可能的，防范可减少被攻击的机会。</b></div>
+</div>
+
+<h4>★ 课本的五条建议（p.353，简答题「如何应对拒绝服务攻击」的标准答案）</h4>
+
+<ol class="steps tight">
+  <li><b>熟悉系统中各种公开服务所采用的软件，了解它们处理请求的资源和时间耗费。</b></li>
+  <li><b>减少和停止不必要的服务，不给攻击者有可乘之机。</b></li>
+  <li><b>修改有关服务的配置参数，保证其对资源的耗费处于可控制的状态。</b></li>
+  <li><b>安装 IP 过滤和报文过滤软件，并根据系统日志对具有攻击企图的行为进行过滤。</b></li>
+  <li><b>及时阅读有关安全方面的信息，并随时更新相应服务软件及防护软件。</b></li>
+</ol>
+
+<div class="box exam">
+  <div class="box-t">★ 课本单选第 6 题</div>
+  <p>「下列安全机制中，主要用于<b>缓解</b>拒绝服务攻击造成的影响的是（　）」答案 <b>C. 流量清洗</b>。<br>
+  <b>A 杀毒软件</b>治的是恶意代码，<b>B 入侵检测</b>只负责「发现」不负责「缓解」，
+  <b>D 防火墙</b>能挡一部分但不是专为 DDoS 设计。<b>注意题干里的「缓解」二字</b>——
+  这正好呼应本节的主线：<b>DoS 不能根除，只能缓解，而最有效的缓解手段是流量清洗。</b></p>
+</div>
+
+</section>
+<section class="sec" id="discuss">
+  <div class="sec-head">
+    <span class="sec-num">§ 12　讨论题</span>
+    <h2 class="sec-t">PPT 提了问、却没给答案的 3 道题</h2>
+    <p class="sec-lede">老师在 PPT 上抛出问题、下一页却没有答案的题目，通常是<b>留着课堂讲或留着考</b>；
+      而且这类题全是「<b>为什么这样设计</b>」而非「是什么」——<b>翻书翻不到，必须理解</b>，正是开卷考试最爱出的一类。</p>
+  </div>
+
+<div class="box exam">
+  <div class="box-t">★ 三道题速查</div>
+  <div class="tbl-wrap idx"><table>
+  <thead><tr><th>PPT 页</th><th>题目</th><th>一句话答案</th></tr></thead>
+  <tbody>
+  <tr><td>p.33</td><td>用 UDP 的好处是什么？</td><td><b>无须握手 → 源地址可伪造 → 能隐身、能反射放大</b></td></tr>
+  <tr><td>p.41</td><td>SYN 风暴为什么必须伪造源地址？</td><td><b>逃避追踪 + 把半连接拖到超时 + 避免自伤</b></td></tr>
+  <tr><td>p.47</td><td>为什么直接风暴型 DDoS 越来越少？</td><td><b>贵、暴露、无放大，被反射型全面替代</b></td></tr>
+  </tbody></table></div>
+</div>
+
+<h3>讨论一：用 UDP 攻击的好处是什么？<span class="pref">p.33</span></h3>
+
+<div class="scene">
+  <div class="scene-k">PPT p.33 · 原题</div>
+  <p class="scene-q">「思考：用 UDP 的好处是什么？」</p>
+  <div class="scene-b">
+    <p>PPT 在讲「风暴型攻击用的分组」时列了 TCP 洪流、ICMP、UDP 洪流三类，
+    然后单独问了这一句就翻页了。<b>答案的钥匙在课本 p.334 的一句话里</b>：
+    「<b>使用 UDP 协议的好处是攻击时可以很方便地伪造源地址。</b>」<br>
+    但只写这一句拿不到满分——要说清<b>为什么 UDP 能伪造而 TCP 不能</b>，以及<b>伪造之后能干什么</b>。</p>
+  </div>
+</div>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>#</th><th>好处</th><th>为什么</th></tr></thead>
+<tbody>
+<tr><td>1</td><td class="hl"><b>可以很方便地伪造源地址</b>（根本原因）</td>
+    <td><b>UDP 是无连接的，不需要三次握手</b>。发出去就不管了，<b>服务器也不会验证「你真的是这个地址吗」</b>。
+        而 TCP 必须完成三次握手：伪造了源地址，SYN+ACK 就发到别处去了，<b>握手根本完不成，连接建不起来</b>。</td></tr>
+<tr><td>2</td><td><b>隐藏身份、逃避追踪</b></td>
+    <td>源地址是假的，受害者日志里<b>查不到攻击者</b>，也无法靠封源 IP 来防（§11.1 检测难点）。</td></tr>
+<tr><td>3</td><td class="hl"><b>可以做反射放大攻击</b>（最重要的一条）</td>
+    <td>把源地址伪造成<b>受害者</b>，响应就会全部发给受害者。这正是 §6.2 「选协议三标准」的第三条
+        「<b>协议具有无连接特性</b>」。<b>没有 UDP 的无连接特性，就没有 NTP / SSDP / DNS 反射攻击。</b></td></tr>
+<tr><td>4</td><td><b>开销小、发包快</b></td>
+    <td>不用维护连接状态、不用重传、不用拥塞控制，<b>攻击者用同样的资源能打出更多的包</b>。</td></tr>
+<tr><td>5</td><td><b>不受连接数限制</b></td>
+    <td>TCP 类攻击受制于对方的连接表和自己的连接开销；UDP 只管发，<b>纯拼带宽</b>。</td></tr>
+</tbody>
+</table></div>
+
+<div class="box key">
+  <div class="box-t">★ 答题模板（三句话）</div>
+  <p><b>最根本的好处是可以很方便地伪造源地址</b>——因为 UDP 是无连接协议，不需要三次握手，
+  服务端不会验证源地址的真实性，而 TCP 伪造源地址后握手无法完成。<br>
+  <b>由此带来两个直接收益：</b>① <b>隐藏攻击者身份、难以追踪</b>；
+  ② <b>可将源地址伪造成受害者，实施反射型放大攻击</b>（如 NTP、SSDP、DNS）。<br>
+  <b>此外</b>，UDP 无须维护连接状态，<b>开销小、发包效率高</b>，同等资源下攻击流量更大。</p>
+  <p class="small muted">佐证：2020 BOTNET 趋势报告中 <b>UDP_FLOOD 占 35.92%，排名第一</b>；
+  2019 年 DDoS 类型前两名 <b>DNS 放大、LDAP 放大</b>也都走 UDP（§4.2）。</p>
+</div>
+
+<h3>讨论二：SYN 风暴为什么<b>必须</b>伪造源地址？<span class="pref">p.41</span></h3>
+
+<p>这道题的完整推导已经写在 <b>§5.1「为什么必须伪造源地址」</b>，此处只放答题版，避免重复：</p>
+
+<div class="box key">
+  <div class="box-t">★ 答题版（PPT 原话是「一方面逃避追踪，另一方面为了攻击能成功。Why？」）</div>
+  <p><b>① 逃避追踪。</b>受害者日志中记录的是伪造的地址，无法定位攻击者。</p>
+  <p><b>② 让半连接占用的时间最大化（这才是「攻击能成功」的关键）。</b>
+  伪造成<b>根本不存在或没开机</b>的地址后，服务器发出的 SYN+ACK <b>无人应答</b>，
+  服务器只能<b>不断重试并等待 SYN Timeout（约 30 秒～2 分钟）超时</b>才释放这条半连接。
+  半连接表上限一般只有 <b>1024</b>，占满即拒绝所有新连接（含正常用户）。</p>
+  <p><b>③ 避免「自伤」与「帮倒忙」。</b>如果不伪造，在<b>未修改攻击主机 TCP 协议栈</b>的情况下，
+  攻击主机的系统会<b>自动对收到的 SYN+ACK 做出响应</b>（<b>通常回 RST</b>，也可能回 ACK 建立连接）。
+  这两种响应都会让<b>受害者服务器提前释放对应的半连接，缩短占用时间、削弱攻击效果</b>；
+  同时这些响应还会<b>消耗攻击主机自身的性能</b>。</p>
+</div>
+
+<h3>讨论三：为什么直接风暴型 DDoS 越来越少？<span class="pref">p.47</span></h3>
+
+<div class="scene">
+  <div class="scene-k">PPT p.47 · 原题（整页只有这一句，标题是「讨论」）</div>
+  <p class="scene-q">「为什么直接风暴型 DDoS 越来越少？」</p>
+  <div class="scene-b">
+    <p>PPT 在讲完直接风暴型的六种攻击后，用<b>一整页</b>抛出这个问题，
+    然后<b>下一页就开始讲反射型</b>——<b>版式本身已经给了提示：答案就是「因为有了反射型」。</b>
+    但要答完整，得说清直接型<b>差在哪三点</b>，反射型<b>正好补上哪三点</b>。</p>
+  </div>
+</div>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>直接风暴型的短板</th><th>具体表现</th><th>反射型怎么补上</th></tr></thead>
+<tbody>
+<tr><td><b>① 成本太高</b></td>
+    <td>攻击流量 <b>≈ 攻击者自己发出的流量（1:1，没有放大）</b>。
+        要打出几百 Gbps，就得先攒出<b>规模巨大的僵尸网络</b>，
+        而攒肉鸡要扫描、要入侵、要维护，又贵又慢</td>
+    <td class="hl"><b>放大几十到几百倍</b>（NTP 达 206～556 倍）。
+        课本原话：发起者<b>「无须掌控大量僵尸网络，只需通过修改源 IP 地址就可以发起攻击」</b></td></tr>
+<tr><td><b>② 容易暴露、容易被追</b></td>
+    <td>受害者日志里留下的是<b>傀儡主机的真实 IP</b>，可以顺藤摸瓜；
+        尤其 <b>TCP 连接耗尽和 HTTP CC 必须完成三次握手，只能用真实 IP</b>，藏都藏不住</td>
+    <td class="hl">日志里全是<b>正规的公共服务器</b>（DNS/NTP），
+        <b>具有攻击者隐蔽、难以追踪的特性</b>；反射器<b>本身没有被入侵</b>，也无从追起</td></tr>
+<tr><td><b>③ 容易被防住</b></td>
+    <td><b>Ping 风暴</b>：大多防火墙直接过滤 ICMP；<br>
+        <b>SYN Flood</b>：现代系统有 SYN Cookie 等机制，且<b>一旦停止攻击受害者即可恢复</b>；<br>
+        <b>TCP 连接耗尽</b>：防火墙会<b>检测并发 TCP 连接数</b>而察觉；<br>
+        傀儡机 IP 一旦暴露就可以被批量封禁</td>
+    <td>反射器是<b>合法的公共服务</b>，<b>不能一封了之</b>；
+        且反射节点<b>无法识别请求发起源是否具有恶意动机</b>，没法自我保护</td></tr>
+</tbody>
+</table></div>
+
+<div class="box key">
+  <div class="box-t">★ 答题模板</div>
+  <p><b>因为反射型 DDoS 在成本、隐蔽性和防御难度三个方面全面优于直接型，把它替代了。</b>具体：</p>
+  <p>① <b>成本：</b>直接型的攻击流量与攻击者发出的流量基本 1:1，必须依靠规模庞大的僵尸网络才能打出足够流量，
+  攒肉鸡代价高；反射型可放大几十至几百倍，<b>无须掌控大量僵尸网络，只需伪造源 IP</b>。</p>
+  <p>② <b>隐蔽性：</b>直接型会在受害者日志中留下傀儡主机真实 IP（HTTP CC、TCP 连接耗尽<b>必须</b>用真实 IP），
+  容易被追踪和封禁；反射型的攻击流量来自正规服务器，<b>攻击者隐蔽、难以追踪</b>。</p>
+  <p>③ <b>可防性：</b>直接型的手段大多已有成熟对策（防火墙过滤 ICMP、SYN Cookie、并发连接数检测、封禁傀儡机 IP），
+  而反射器是必须对公网开放的合法服务，无法简单封禁。</p>
+  <p><b>结论：</b>课本明确写道，反射型「<b>是目前主流的风暴型拒绝服务攻击方法</b>」；
+  PPT 在直接风暴型的开篇也已定调：「<b>现在不是主流，但曾经很风光！</b>」</p>
+</div>
+
+<div class="box eg">
+  <div class="box-t">数据佐证（答题时加上更有说服力）</div>
+  <p><b>2019 年 DDoS 类型 Top 10</b> 中，<b>前两名都是放大（反射）型</b>：DNS amplification <b>20.89%</b>、
+  LDAP amplification <b>17.24%</b>，直接型的 TCP/SYN flood 只排第三（11.63%）。<br>
+  按<b>攻击流量占比</b>看差距更明显（绿盟 2019 数据）：<b>NTP Reflection Flood 占流量 11.7%，
+  但攻击次数只占 4.2%</b>——<b>次数少、流量大，正是「放大」的直接证据</b>。</p>
+</div>
+
+</section>
+<section class="sec pagebreak" id="quiz">
+  <div class="sec-head">
+    <span class="sec-num">§ 13　习题</span>
+    <h2 class="sec-t">课本习题全解（38 题）</h2>
+    <p class="sec-lede">课本 11.6 节 p.354–356　｜　单选 10 · 多选 9 · 简答 17 · 综合 2。
+      <b>选择题答案已逐题对着课本原文复核；17 道简答题课本没有给答案，是逐题写出来的，并标了出处。</b></p>
+  </div>
+
+<div class="box exam">
+  <div class="box-t">★ 开卷考试为什么要重点看这一节</div>
+  <p>老师出题最省事的来源就是<b>课本课后习题</b>。这 38 道题<b>覆盖了本章几乎所有考点</b>，
+  而且<b>简答题问的全是「为什么」和「怎么做」</b>，正是开卷最爱出的类型。
+  纸质版打印后，<b>建议先扫一遍题干</b>——考场上遇到眼熟的直接翻到这里。</p>
+</div>
+
+<h3 id="qz-single">13.1　单项选择题（10 题）</h3>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 1</span>某单位连在公网上的 Web 服务器的访问速度突然变得比平常慢很多，甚至无法访问，这台 Web 服务器最有可能遭到的网络攻击是（　）。</div>
+  <div class="mc-o"><span class="ok">A. 拒绝服务攻击</span><span>B. SQL 注入攻击</span><span>C. 木马入侵</span><span>D. 缓冲区溢出攻击</span></div>
+  <div class="mc-a"><b>答案：A</b>　DoS 定义里就含「<b>或者使服务质量降低</b>」——「变慢」也算 DoS（§1.1）。
+  B/C/D 的目标都是<b>拿数据或拿权限</b>，不会表现为「大家都变慢」。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 2</span>2018 年 2 月，知名代码托管网站 GitHub 遭遇了大规模 Memcached DDoS 攻击，攻击者利用大量暴露在互联网上的 Memcached 服务器实施攻击，这种攻击最有可能属于（　）。</div>
+  <div class="mc-o"><span>A. 直接型 DDoS</span><span class="ok">B. 反射型 DDoS</span><span>C. 剧毒包型 DoS</span><span>D. TCP 连接耗尽型 DDoS</span></div>
+  <div class="mc-a"><b>答案：B</b>　题干里「<b>利用大量暴露在互联网上的 XX 服务器</b>」就是<b>反射型的标志句式</b>——
+  那些 Memcached 服务器是<b>反射器</b>，没有被入侵，只是在回应伪造成 GitHub 的请求（§6.1）。
+  Memcached 走 UDP、响应远大于请求，完全符合选反射协议的三条标准（§6.2）。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 3</span>2016 年 10 月 21 日，美国东海岸地区遭受大面积网络瘫痪，其原因为美国域名解析服务提供商 Dyn 公司当天受到强力的 DDoS 攻击所致，攻击流量的来源之一是感染了（　）僵尸的设备。</div>
+  <div class="mc-o"><span>A. Sinit</span><span>B. Agobot</span><span class="ok">C. Mirai</span><span>D. Slapper</span></div>
+  <div class="mc-a"><b>答案：C</b>　Dyn 事件的元凶是 <b>Mirai</b>——著名的 <b>IoT 僵尸网络</b>，数百万台物联网设备，峰值 <b>1.2 Tbps</b>（§1.1、§7.4）。
+  干扰项：Sinit / Slapper 是 <b>P2P 僵尸网络</b>的早期代表，Agobot 是 <b>IRC 型</b>。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 4</span>拒绝服务攻击导致攻击目标瘫痪的<b>根本原因</b>是（　）。</div>
+  <div class="mc-o"><span class="ok">A. 网络和系统资源是有限的</span><span>B. 防护能力弱</span><span>C. 攻击能力太强</span><span>D. 无法确定</span></div>
+  <div class="mc-a"><b>答案：A</b>　五条原因里<b>只有这条被课本标为「最根本原因」</b>（§1.4、§4.4）。
+  另四条（协议漏洞、best-effort、无认证机制、路由器无追踪）都是「让攻击容易实施」的原因，不是根本原因。
+  <b>正因为这个根本原因消不掉，DoS 才无法被彻底遏制。</b></div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 5</span>下列攻击中，<b>不属于</b>拒绝服务攻击的是（　）。</div>
+  <div class="mc-o"><span>A. SYN Flood</span><span>B. Ping of Death</span><span>C. UDP Flood</span><span class="ok">D. SQL Injection</span></div>
+  <div class="mc-a"><b>答案：D</b>　A、C 是风暴型（§5），B 是剧毒包型（§3.5）。
+  <b>SQL 注入破坏的是机密性/完整性（拿数据），不是可用性</b>，属于第 9 章 Web 应用安全。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 6</span>下列安全机制中，主要用于<b>缓解</b>拒绝服务攻击造成的影响的是（　）。</div>
+  <div class="mc-o"><span>A. 杀毒软件</span><span>B. 入侵检测</span><span class="ok">C. 流量清洗</span><span>D. 防火墙</span></div>
+  <div class="mc-a"><b>答案：C</b>　注意题干的「<b>缓解</b>」二字。PPT 原话：「<b>最有效的对抗风暴型 DDoS 的方法是流量清洗</b>」（§11.5）。
+  <b>B 入侵检测只负责「发现」不负责「缓解」</b>；A 治恶意代码；D 防火墙能挡一部分但不是专为 DDoS 设计的。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 7</span>在风暴型拒绝服务攻击中，如果攻击者<b>直接利用控制的僵尸主机</b>向攻击目标发送攻击报文，则这种拒绝服务攻击属于（　）。</div>
+  <div class="mc-o"><span>A. 反射型拒绝服务攻击</span><span class="ok">B. 直接型拒绝服务攻击</span><span>C. 碎片攻击</span><span>D. 剧毒包型拒绝服务攻击</span></div>
+  <div class="mc-a"><b>答案：B</b>　「<b>直接利用自己控制的主机向攻击目标发送大量网络数据包</b>」正是课本对直接风暴型的定义原句（§4.5）。
+  <b>判据只有一个：包是「自己的肉鸡」发的（直接型），还是「无辜的第三方服务器」发的（反射型）。</b></div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 8</span>拒绝服务攻击除了瘫痪目标这一直接目的，在网络攻防行动中，有时是为了（　），帮助安装的后门生效或提升权限。</div>
+  <div class="mc-o"><span class="ok">A. 重启目标系统</span><span>B. 窃听</span><span>C. 传播木马</span><span>D. 控制主机</span></div>
+  <div class="mc-a"><b>答案：A</b>　对应课本 11.4 节：<b>Windows 中大多数配置变动在生效前都需要重新启动系统</b>，
+  攻击者改了权限配置后，需用 DoS <b>使系统重启或迫使管理员重启</b>，让改动生效（§10 第 4 条）。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 9</span>对 DNS 实施拒绝服务攻击，主要目的是导致 DNS 瘫痪进而引起网络瘫痪，但有时也是为了（　）。</div>
+  <div class="mc-o"><span class="ok">A. 假冒目标 DNS</span><span>B. 权限提升</span><span>C. 传播木马</span><span>D. 控制主机</span></div>
+  <div class="mc-a"><b>答案：A</b>　课本 11.4 节：「<b>对 DNS 的拒绝服务攻击可以达到地址冒充的目的</b>」——
+  <b>致瘫 DNS 后冒充其域名解析</b>，把用户数据包或邮件指向错误的（攻击者的）服务器（§10 第 5 条）。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 10</span>如果攻击者通过一台主机向受害主机<b>发送一条网络消息</b>，导致受害主机瘫痪，则这种 DoS 属于（　）。</div>
+  <div class="mc-o"><span>A. 直接型 DDoS</span><span>B. 反射型 DDoS</span><span class="ok">C. 剧毒包型 DoS</span><span>D. TCP 连接耗尽型 DDoS</span></div>
+  <div class="mc-a"><b>答案：C</b>　题眼是「<b>一台主机、一条消息</b>」。<b>只有剧毒包型能做到「一个包打死一台机器」</b>——
+  因为它靠的是<b>协议或软件实现的漏洞</b>，不靠量（§3.1）。
+  风暴型三个选项都必须<b>靠大量数据包</b>才能奏效，且 A、B、D 都是 <b>DDoS（分布式）</b>，与「一台主机」矛盾。</div>
+</div>
+
+<h3 id="qz-multi">13.2　多项选择题（9 题）</h3>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">多 1</span>很多单位的网络安全管理员在配置网络防火墙时，会阻止 ICMP 协议通过，这样做的主要目的是防止攻击者对单位网络实施（　）。</div>
+  <div class="mc-o"><span>A. 木马传播</span><span class="ok">B. 主机扫描</span><span>C. 端口扫描</span><span class="ok">D. 拒绝服务攻击</span></div>
+  <div class="mc-a"><b>答案：BD</b>　ICMP 的两大滥用：<b>B</b> 用 Ping 探测哪些主机存活（<b>主机扫描</b>）；
+  <b>D</b> Ping 风暴、Ping of Death、Smurf 都走 ICMP（§5.2、§3.5）。<br>
+  <b>C 端口扫描不选</b>——端口扫描用的是 <b>TCP/UDP</b>，ICMP 没有端口号这个概念。
+  <b>A 木马传播不选</b>——木马靠 TCP/UDP 回连，不靠 ICMP。<br>
+  <span class="small muted">这道题正好印证 §5.2 里 PPT 说的「<b>大多防火墙会过滤 ICMP 包</b>」。</span></div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">多 2</span>反射型拒绝服务攻击在选择用作攻击流量的网络协议时，通常依据以下（　）原则。</div>
+  <div class="mc-o"><span class="ok">A. 互联网上有很多可探测到的支持该协议的服务器</span><span class="ok">B. 部分协议的请求报文大小远小于响应报文的大小</span><span class="ok">C. 协议具有无连接特性</span><span>D. 协议具有有连接特性</span></div>
+  <div class="mc-a"><b>答案：ABC</b>　这就是 PPT p.51 给的<b>选协议三标准</b>，一字不差（§6.2）。<br>
+  <b>D 是反的</b>：有连接（TCP）要三次握手，<b>伪造源地址后握手根本完不成</b>，反射不了。
+  <b>「无连接」才是必要条件。</b></div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">多 3</span>DNS 经常被用作反射型 DDoS 攻击的反射源，主要原因包括（　）。</div>
+  <div class="mc-o"><span class="ok">A. DNS 查询的响应包远大于请求包</span><span>B. DNS 报文比较短</span><span class="ok">C. 区域传送或递归查询过程中 DNS 响应报文数量远大于请求报文数量</span><span class="ok">D. 因特网上有很多 DNS 服务器</span></div>
+  <div class="mc-a"><b>答案：ACD</b>　A 对应「放大倍数」标准，C 是 A 的加强版（<b>不只单包更大，包的数量也更多</b>），
+  D 对应「服务器数量多」标准（§6.2、§6.3）。<br>
+  <b>B「DNS 报文比较短」是干扰项</b>——<b>报文短本身不是理由</b>，
+  反射攻击要的是「<b>回的比问的大</b>」这个<b>比例</b>，不是绝对长度。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">多 4</span>下列攻击中，影响了目标系统<b>可用性</b>的有（　）。</div>
+  <div class="mc-o"><span class="ok">A. 拒绝服务攻击</span><span>B. 网络窃听</span><span class="ok">C. 控制目标系统并修改关键配置使得系统无法正常运行</span><span>D. 在目标系统上安装后门</span></div>
+  <div class="mc-a"><b>答案：AC</b>　判据是<b>安全三性</b>：<b>可用性＝还能不能用</b>。
+  A 让服务用不了；C「<b>使得系统无法正常运行</b>」，也是可用性。<br>
+  <b>B 网络窃听</b>破坏<b>机密性</b>（偷看，但系统照常运行）；
+  <b>D 安装后门</b>破坏的是<b>完整性/可控性</b>（系统还能正常用，只是多了个后门）。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">多 5</span>近几年，物联网设备大量被攻击者控制，成为僵尸网络的一部分。从攻击者的角度来看，选择物联网设备作为控制对象的主要因素包括（　）。</div>
+  <div class="mc-o"><span class="ok">A. 物联网设备数量大</span><span class="ok">B. 物联网设备安全防护弱</span><span>C. 物联网设备计算能力弱</span><span class="ok">D. 物联网设备安全漏洞多</span></div>
+  <div class="mc-a"><b>答案：ABD</b>　攻击者要的是「<b>多、好攻破、漏洞多</b>」——数量决定僵尸网络规模，
+  防护弱和漏洞多决定攻陷成本（§7、Mirai 案例）。<br>
+  <b>C 是陷阱</b>：<b>计算能力弱对攻击者是缺点不是优点</b>，肉鸡越强打得越狠。别被「这也是物联网设备的特点」带偏——
+  题干问的是「<b>选择它作为控制对象的因素</b>」，即<b>对攻击者的好处</b>。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">多 6</span>下列协议中，可用作拒绝服务攻击的有（　）。</div>
+  <div class="mc-o"><span class="ok">A. ICMP</span><span class="ok">B. HTTP</span><span class="ok">C. TCP</span><span class="ok">D. UDP</span></div>
+  <div class="mc-a"><b>答案：ABCD（全选）</b>　对号入座：<b>ICMP</b>→Ping 风暴、Ping of Death；
+  <b>HTTP</b>→HTTP 风暴/CC；<b>TCP</b>→SYN Flood、连接耗尽、Land；<b>UDP</b>→UDP 风暴、Trinoo、各种反射。<br>
+  <b>注意和「多 7」的区别</b>：这题问的是「<b>可用作拒绝服务攻击</b>」（范围宽，全都行），
+  多 7 问的是「<b>可用作反射型</b>」（范围窄，只有无连接的应用层协议行）。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">多 7</span>下列协议中，可用作<b>反射型</b>拒绝服务攻击的是（　）。</div>
+  <div class="mc-o"><span>A. UDP</span><span class="ok">B. SSDP</span><span>C. TCP</span><span class="ok">D. NTP</span></div>
+  <div class="mc-a"><b>答案：BD</b>　<b>C. TCP 排除</b>：有连接，伪造源地址后握手完不成（见多 2 的 D）。<br>
+  <b>A. UDP 为什么也不选？</b>这是本题最容易错的地方：<b>UDP 只是传输层协议，它本身不产生响应</b>——
+  能被反射利用的是<b>跑在 UDP 之上、且「回得比问得大」的应用层协议</b>，如 SSDP、NTP、DNS、Chargen、SNMP。
+  <b>UDP 是「必要条件」，不是「反射源」本身。</b>（§6.2、表 11-1）</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">多 8</span>当拒绝服务攻击发生时，被攻击目标的网络安全人员通常可采取的措施包括（　）。</div>
+  <div class="mc-o"><span class="ok">A. 用流量清洗设备对攻击流量进行清洗</span><span class="ok">B. 断开网络，待攻击停止后再连通</span><span>C. 关机</span><span>D. 不采取任何措施</span></div>
+  <div class="mc-a"><b>答案：AB</b>　A 是当前最有效的手段（§11.5）。<br>
+  <b>B 看着很消极，但它是对的</b>——课本明说：「在商业化的流量清洗技术出现之前，
+  <b>早期遭遇 DDoS 攻击时一般只有下线或断网，待攻击者停止攻击后再恢复</b>」（§11.4）。<br>
+  <b>C 关机不选</b>：关机等于攻击者达到了目的，且<b>断网还能保住本机与内网业务，关机什么都没了</b>。
+  <b>D 显然不选。</b></div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">多 9</span>下列选项中，可用于<b>检测</b>拒绝服务攻击的有（　）。</div>
+  <div class="mc-o"><span class="ok">A. DoS 攻击工具的特征</span><span class="ok">B. 网络异常流量特征</span><span>C. 源 IP 地址</span><span>D. 目的地址</span></div>
+  <div class="mc-a"><b>答案：AB</b>　这正是课本 11.5.1 节的<b>两种检测技术</b>：
+  <b>A ＝ 特征标志检测</b>（端口、标志位、特定数据内容），<b>B ＝ 异常流量检测</b>（五类现象）（§11.2、§11.3）。<br>
+  <b>C 源 IP 地址不能用</b>：源 IP <b>可以随便伪造</b>，是检测的最大障碍而非依据（§11.1 难点一）。<br>
+  <b>D 目的地址不能用</b>：目的地址就是受害者自己，<b>正常流量和攻击流量的目的地址是一样的</b>，无法区分。</div>
+</div>
+
+<h3 id="qz-short">13.3　简答题（17 题）</h3>
+
+<p class="small muted"><b>课本没有给这 17 题的答案</b>，下面是逐题写的，并在每题末尾标了课本/PPT 出处，方便你在考场上核对原文。
+屏幕上点标题展开；<b>打印时全部自动摊开</b>。</p>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">简 1</span>拒绝服务攻击这种攻击形式存在的根本原因是什么，是否能完全遏制这种攻击？</div>
+  <div class="qa-b">
+    <p><b>根本原因：网络带宽和系统资源是有限的。</b>无论怎样优化，任何系统的处理能力和任何链路的带宽都有上限，
+    只要攻击者能制造出超过该上限的负载，服务就会瘫痪。</p>
+    <p>此外还有四条<b>使攻击容易实施</b>的原因：① <b>TCP/IP 协议存在漏洞</b>可被利用；
+    ② <b>网络提供 best-effort 服务，不区分数据流量是否是攻击流量</b>；
+    ③ <b>因特网没有认证机制，容易遭受 IP 欺骗</b>；
+    ④ <b>因特网中的路由器不具备数据追踪功能</b>，无法验证数据包是否来自其所声称的位置。</p>
+    <p><b>不能完全遏制。</b>理由有三：</p>
+    <ul>
+      <li><b>病根消不掉。</b>「资源有限」是物理事实，不是可以修补的缺陷。</li>
+      <li><b>难以区分敌我。</b>课本原话：「拒绝服务攻击是<b>最容易实现，却最难防护</b>的攻击手段，
+          因为<b>很难分辨哪些是合法的请求，哪些是伪造的请求</b>」——尤其 HTTP CC 的请求在<b>语义上完全合法</b>。</li>
+      <li><b>现有手段都只能缓解。</b>分组过滤、源端控制、追溯、路由器动态控制这四种响应方法
+          「<b>只能部分地缓解 DDoS 攻击所造成的危害，而不能从根本上解决问题</b>」；
+          即使是最有效的<b>流量清洗</b>，也只是把攻击流量洗掉，并没有让攻击不发生。</li>
+    </ul>
+    <p><b>结论：</b>只能<b>减少被攻击的机会、降低被攻击后的损失</b>（PPT：「完全阻止是不可能的，防范可减少被攻击的机会」）。</p>
+    <p class="qa-src">出处：课本 p.334（五条原因）、p.351（四种方法的局限）、p.353（最难防护）；PPT p.6、p.69。本资料 §1.4、§4.4、§11。</p>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">简 2</span>拒绝服务攻击的核心思想是什么？</div>
+  <div class="qa-b">
+    <p><b>核心思想：用尽可能小的代价，消耗掉受害者有限的资源，使其无法为合法用户提供服务——
+    即制造「攻防代价的不对称」。</b></p>
+    <p>展开三层：</p>
+    <ul>
+      <li><b>目标是可用性，不是机密性或完整性。</b>它<b>不窃取、不篡改</b>任何数据，
+          只让服务<b>不能用或质量显著降低</b>。</li>
+      <li><b>手段是「让对方花的比自己花的多」。</b>三条具体路径：
+          <b>消耗系统或网络资源</b>（CPU、内存、磁盘、带宽）、<b>阻断访问路径</b>、<b>更改系统配置</b>。</li>
+      <li><b>三种实现机制体现了不同的「不对称」。</b>
+          <b>剧毒包型</b>：一个畸形包换对方崩溃，代价比接近 1:∞，但依赖漏洞；
+          <b>风暴型</b>：不依赖漏洞，靠海量合法请求压垮资源；
+          <b>反射型</b>：伪造源地址借第三方服务器放大，攻击者发 234 字节可让受害者收 48200 字节，把不对称放大到几百倍。</li>
+    </ul>
+    <p class="qa-src">出处：课本 p.330（定义与三种手段）、p.331（按机制分类）、p.337（放大）。本资料 §0、§1.1、§2.3。</p>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">简 3</span>拒绝服务攻击的检测方法。</div>
+  <div class="qa-b">
+    <p>课本 11.5.1 节给出<b>两大类</b>：</p>
+    <p><b>一、根据 DoS 攻击工具的特征标志检测</b>（针对使用已知工具的攻击），特征有三类：</p>
+    <ul>
+      <li><b>特定端口。</b>NTP DDoS 用 <b>123</b>；SSDP 用 <b>1900</b>；<b>Trinoo</b>：TCP 27655、UDP 27444 和 31335；
+          <b>Stacheldraht</b>：TCP 16660 和 65000；<b>Trinity</b>：TCP 6667 和 33270。</li>
+      <li><b>标志位。</b>如 <b>Shaft</b> 攻击所用 TCP 分组的<b>序列号都是 0x28374839</b>。</li>
+      <li><b>特定数据内容。</b>如 Trinoo 的全零 4 字节 UDP 包、TFN2K 数据段中的一串 A 字符。</li>
+    </ul>
+    <p><b>局限：</b>端口可被轻易改变；新工具会对关键字符串和控制命令<b>加密</b>、对自身<b>数字签名</b>，
+    使特征标志检测无效；还有一类<b>纯粹野蛮消耗资源</b>的攻击，数据包本身没有任何异常特征。</p>
+    <p><b>二、根据异常流量来检测</b>，五类现象：</p>
+    <ol>
+      <li><b>大量目标主机域名解析</b>：攻击前会<b>解析目标主机名</b>，域名服务器会收到<b>大量反向解析目标 IP 主机名的 PTR 查询请求</b>，BIND 可记录，可用来<b>确定攻击来源</b>。</li>
+      <li><b>极限通信流量</b>：出现明显超出该网络正常极限通信流量的现象，可对不同源地址算出极限值，
+          并<b>在主干路由器端建立 ACL 规则</b>监测和过滤。</li>
+      <li><b>特大型的 ICMP 和 UDP 数据包</b>：正常 UDP 有效数据一般<b>不超过 10 字节</b>，
+          正常 ICMP 长度在 <b>64～128 字节</b>之间，明显更大的很可能是<b>攻击控制信息</b>。</li>
+      <li><b>不属于正常连接通信的 TCP 和 UDP 数据包</b>：隐蔽工具随机使用多种协议；
+          连接到<b>高于 1024 且不属于常用网络服务的目标端口</b>的包也很可疑。</li>
+      <li><b>数据段内容只包含文字和数字字符</b>（无空格、标点、控制字符）：往往是 <b>BASE64 编码</b>后的特征，
+          如 TFN2K 数据段中的一串 A 字符。</li>
+    </ol>
+    <p><b>补充：</b>DoS 工具产生的通信分<b>控制信息</b>（管理者↔攻击代理，<b>目标地址未伪造</b>，一旦捕获就能暴露 DDoS 服务器位置）
+    和<b>攻击通信</b>（攻击代理↔目标主机）两种，据此在 IDS 中建立规则可较准确地检测。</p>
+    <p class="qa-src">出处：课本 p.349–350。本资料 §11.2、§11.3。</p>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">简 4</span>如何利用 IP 协议进行 DoS 攻击？</div>
+  <div class="qa-b">
+    <p>IP 协议被利用的点集中在<b>两处：分片机制</b>和<b>源地址不被验证</b>。</p>
+    <p><b>一、利用 IP 分片重组机制（剧毒包型）</b></p>
+    <ul>
+      <li><b>泪滴（Teardrop）/ 碎片攻击</b>：片偏移字段由发送方自己填、且以 8 字节为单位。
+          攻击者<b>精心构造 offset</b>，使<b>第 2 个分片的偏移不是紧接第 1 个分片之后，而落在第 1 个分片的中间</b>，
+          造成<b>分片重叠</b>。早期系统在重组时会出现<b>堆栈损坏、IP 模块不可用或系统挂起</b>，导致崩溃或重启。</li>
+      <li><b>分片拖垮防火墙/IDS</b>：有些防火墙或 IDS 为检测碎片攻击设置了<b>碎片重组</b>——
+          收到分片时不单独检测，而是<b>等所有分片到齐（必须缓存已到分片）</b>再检测。
+          攻击者<b>伪造并发送大量分片，但故意不让它们构成完整的数据报</b>，
+          以此<b>占用防火墙或 IDS 的 CPU 和存储单元</b>，构成 DoS。</li>
+    </ul>
+    <p><b>二、利用 IP 首部长度限制（Ping of Death 的基础）</b>：
+    RFC 791 规定 IP 数据包最大 <b>65535</b> 字节，IP 头 20 字节，因此数据部分不能超过 <b>65515</b> 字节。
+    发送<b>声称尺寸超限</b>的包，会使接收方在按首部信息<b>为有效载荷生成缓存</b>时出现
+    <b>内存分配错误</b>，导致 TCP/IP 协议栈崩溃。</p>
+    <p><b>三、利用源地址不被验证（IP 欺骗，风暴型与反射型的地基）</b>：
+    IP 协议<b>不保证分组的完整性</b>，攻击者只要有足够特权就能<b>伪造源 IP</b>。由此可以：
+    ① <b>隐藏真正的源地址</b>逃避追踪；② <b>使主机将响应发送给被攻击的主机</b>——即<b>反射型 DDoS</b>；
+    ③ 构造 <b>Land 攻击</b>（源 IP ＝ 目的 IP ＝ 受害者，源端口 ＝ 目的端口），使受害者<b>自己和自己建空连接</b>。</p>
+    <p class="qa-src">出处：课本 p.331–332（碎片、PoD、Land）、p.334（IP 欺骗、IP 不保证完整性）；PPT p.19–26。本资料 §3.3–§3.5、§4.3。</p>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">简 5</span>如何利用 ICMP 协议进行 DoS 攻击？</div>
+  <div class="qa-b">
+    <ul>
+      <li><b>Ping 风暴攻击（风暴型）</b>：利用控制的大量主机向受害者发送大量
+          <b>ICMP 回应请求（ICMP Echo Request，即 Ping）</b>消息，使受害者系统<b>忙于处理这些消息而降低性能</b>，
+          严重者<b>无法对其他消息做出响应</b>。简单而有效，但<b>需要大规模僵尸网络支持</b>，且<b>大多防火墙会过滤 ICMP 包</b>。</li>
+      <li><b>Ping of Death（剧毒包型）</b>：ICMP 包封装在 IP 包中传送，ICMP 首部 8 字节，
+          故 ICMP 数据部分不能超过 <b>65515 − 8 = 65507 字节</b>。发送<b>超长 Ping 包</b>使总长超过 IP 包长限制，
+          接收方<b>生成缓存时出现内存分配错误</b>，协议栈崩溃、死机或重启。
+          （对有的系统，<b>有效载荷超过 4000 字节</b>即可达到目的。）</li>
+      <li><b>Smurf 攻击</b>：课本在防御一节提到，需<b>过滤掉所有 ICMP 协议的 ECHO 报文</b>来防范
+          ——即向<b>广播地址</b>发送源地址伪造成受害者的 ICMP ECHO，让整个网段的主机一起回应受害者，属于<b>反射放大</b>思路。</li>
+      <li><b>ICMP 作为反射/控制载体</b>：反射型攻击中，服务器收到伪造源地址的包后回送的响应也可能是 <b>ICMP 包</b>；
+          另外，<b>特大型的 ICMP 数据包</b>常被 DDoS 工具用来传递<b>加密后的控制信息</b>（正常 ICMP 长度为 64～128 字节）。</li>
+      <li><b>类 PoD 的新变种</b>：2020 年 10 月微软修复的 Windows IPv6 协议栈漏洞，
+          远程发送恶意构造的 <b>ICMPv6 路由广播包</b>即可导致目标<b>代码执行或蓝屏崩溃</b>。</li>
+    </ul>
+    <p class="qa-src">出处：课本 p.331–332、p.335、p.350、p.351；PPT p.27–28、p.40。本资料 §3.5、§5.2、§11.4。</p>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">简 6</span>哪些协议可被攻击者用来进行风暴型 DoS 攻击？攻击者在选择用作 DDoS 攻击流量的协议时，主要考虑哪些因素？</div>
+  <div class="qa-b">
+    <p><b>一、可被利用的协议（按课本的四类分组归纳）：</b></p>
+    <ul>
+      <li><b>TCP</b>——TCP 洪流，常被利用的标志有 <b>SYN、ACK、RST</b>（SYN Flood、ACK Flood、RST Flood、TCP 连接耗尽）。</li>
+      <li><b>ICMP</b>——ICMP Echo 请求/响应报文（Ping floods）。</li>
+      <li><b>UDP</b>——UDP 洪流，以及基于 UDP 的各种应用协议包，如 <b>NTP、SSDP、DNS</b> 等。</li>
+      <li><b>应用层协议</b>——<b>HTTP/HTTPS、NTP、SSDP、DNS、SNMP</b> 等；
+          用作<b>反射源</b>的还包括 <b>Chargen、QOTD、NetBIOS、BitTorrent、Kad、Quake、Steam、Memcached、LDAP</b> 等（表 11-1）。</li>
+    </ul>
+    <p><b>二、选择协议时考虑的因素：</b></p>
+    <p><b>（1）通用因素</b>：该协议在互联网上<b>被广泛部署且必须对外开放</b>（如 DNS、HTTP），
+    防守方<b>不能简单地把它禁掉</b>；协议处理<b>消耗受害者资源多</b>（如 HTTPS 比 HTTP 更耗资源、动态页面比静态页面更耗资源）。</p>
+    <p><b>（2）若要做反射型攻击，则必须同时满足三条标准</b>（PPT p.51）：</p>
+    <ol>
+      <li><b>互联网上有很多可探测到的支持该协议的服务器</b>——反射源越多，汇聚流量越大，且受害者无法靠封 IP 解决。</li>
+      <li><b>部分协议的请求报文大小远小于响应报文的大小</b>——这是<b>放大倍数</b>的来源。</li>
+      <li><b>协议具有无连接特性</b>——无须三次握手，<b>源 IP 可以伪造</b>成受害者，响应才会打向受害者。</li>
+    </ol>
+    <p><b>补充：</b>使用 <b>UDP</b> 协议的好处是<b>攻击时可以很方便地伪造源地址</b>，
+    这既能隐藏身份、逃避追踪，也是实施反射攻击的前提。</p>
+    <p class="qa-src">出处：课本 p.334（四类分组）、p.337（表 11-1 与无连接特性）；PPT p.33、p.51。本资料 §4.2、§6.2、§6.3、§12 讨论一。</p>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">简 7</span>在 11.3.5 节的攻击案例中，DNSPod 是 18 日晚被关闭的，为什么当晚没有出现网络瘫痪，而一直到第二天（19 日晚）才全面爆发？</div>
+  <div class="qa-b">
+    <p>完整推导见本资料 <b>§8.3</b>，此处给答题版：</p>
+    <p><b>核心：瘫痪的触发条件不是「DNSPod 被封」这一瞬间，而是「本地 DNS 缓存全部失效 + 上网用户到达高峰」两个条件同时满足。</b></p>
+    <ol>
+      <li><b>18 日当晚缓存仍然有效，所以没事。</b>各地运营商 DNS 服务器本地缓冲中还存有
+          <code>baofeng.com</code> 的 <b>A 记录</b>，DNS 服务器<b>直接用缓存应答</b>，无须去问已被封禁的 DNSPod，
+          解析成功 → 暴风影音客户端不重试 → 无异常。而且当晚攻击<b>实际只持续了不到五分钟</b>，本身也没什么效果。</li>
+      <li><b>A 记录 1 小时过期、NS 记录 24 小时不过期，形成了必然失败的死循环。</b>
+          A 记录<b>超时时间 3600 s</b>，很快过期；而指向 DNSPod 的 <b>NS 记录一般 24 小时</b>才过期。
+          于是 DNS 服务器<b>手里没有答案，却仍然只认已被封禁的 DNSPod</b>，每次查询必然超时；
+          又因为 <b>DNS 服务器一般被配置为不缓存失败的查询</b>，<b>下一个请求来了还得再问一遍、再超时一遍</b>。</li>
+      <li><b>失败请求持续累积，到 19 日晚高峰突破上限而爆发。</b>
+          暴风影音在解析失败时<b>每隔 20 s 重发一次请求</b>（软件设计缺陷），
+          而其用户<b>遍布全国、多达上亿</b>。随着白天到夜间在线用户不断增多，
+          这些<b>始终无法解析成功的请求逐渐堆积在 DNS 服务器内存里</b>；
+          <b>每个请求需占用一个请求 ID，而 ID 数量有限</b>，
+          到 <b>19 日 21 时 50 分</b>的上网高峰，<b>并发请求数终于耗尽内存或 ID，DNS 服务器拒绝服务</b>，
+          导致整个本地网络的域名解析失效，形成大规模网络瘫痪。</li>
+    </ol>
+    <p class="qa-src">出处：课本 11.3.5 节 p.347–348 第 (5)(6)(8)(10) 步；课本明确将此题留作习题。本资料 §8.3。</p>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">简 8</span>分析 11.3.5 节的攻击案例，给出 DNSPod、暴风影音软件的改进方案。</div>
+  <div class="qa-b">
+    <p><b>一、DNSPod（域名解析服务提供者）</b></p>
+    <ul>
+      <li><b>提升抗 DDoS 能力：</b>接入<b>流量清洗</b>服务，增加带宽冗余；采用<b>多地分布式部署（Anycast）</b>，
+          避免 6 台服务器集中于同一网段被一并封禁。本案中运营商正是因为「流量耗尽了将近 1/3 的带宽」
+          才<b>在骨干网上封掉其 IP</b>——如果流量能被清洗，就不必走到封禁这一步。</li>
+      <li><b>缩短 NS 记录的 TTL 并提供多样化的备用 NS：</b>本案真正的放大器是
+          「<b>NS 记录 24 小时不过期，把所有查询锁死在已被封禁的 IP 上</b>」。
+          缩短 TTL、并把备用 NS 放在<b>不同网段/不同运营商</b>，可以让解析在故障时自动改道。</li>
+      <li><b>与运营商建立应急联动机制：</b>在被封禁前先完成解析切换，而不是被直接封掉后无路可走。</li>
+    </ul>
+    <p><b>二、暴风影音软件（本案的真正放大器）</b></p>
+    <ul>
+      <li><b>取消「固定 20 s 无限重试」：</b>改为<b>指数退避</b>（20 s → 40 s → 80 s…）并设置<b>最大重试次数</b>，
+          超过次数后<b>放弃并静默</b>，不再骚扰 DNS。</li>
+      <li><b>缓存解析失败结果（负缓存）：</b>在一段时间内不再对同一域名发起解析，从源头掐断请求堆积。</li>
+      <li><b>为重试加入随机抖动（jitter）：</b>避免上亿客户端<b>在同一时刻整齐发包</b>形成脉冲式冲击。</li>
+      <li><b>解析失败不应影响主功能：</b>本案中失败的请求是<b>广告或升级</b>这类非核心功能，
+          它们失败就该<b>直接跳过</b>，不该让播放器持续发起解析。</li>
+      <li><b>域名分离与备用解析途径：</b>把广告/升级域名与核心业务域名分开，并内置多个备用解析途径。</li>
+    </ul>
+    <p><b>三、可补充的一般性教训：</b>大用户量客户端软件的<b>重试策略本身就是一种「潜在的 DDoS 能力」</b>——
+    课本原话说其「攻击能力」<b>高出普通僵尸网络几个数量级</b>。因此此类软件的容错设计应当按<b>「不得放大故障」</b>的原则来做。</p>
+    <p class="qa-src">出处：课本 11.3.5 节 p.347–348（第 5、6、8、10 步的缺陷）。课本未给标准答案，以上为逐条对治。本资料 §8。</p>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">简 9</span>如何利用 DNS 进行网络攻击？设计几种可能的攻击方案。</div>
+  <div class="qa-b">
+    <p>DNS 在网络里是「引路人」，所以它<b>既可以被当成靶子，也可以被当成武器，还可以被当成跳板</b>。三类方案：</p>
+    <p><b>方案一：把 DNS 当靶子——直接打瘫它，造成间接型 DoS</b></p>
+    <ul>
+      <li>对目标域名的权威 DNS 服务器发起<b>风暴式 DNS 查询攻击</b>（5·19 案中对 DNSPod 的 6 台服务器就是这么打的）。</li>
+      <li>效果是<b>间接型 DoS</b>：不必碰目标网站一根手指，用户就<b>解析不到它</b>，等同于网站下线。
+          2016 年 <b>Dyn</b> 事件即为此类，导致大量知名网站掉线近一天。</li>
+      <li>进阶：利用<b>客户端软件的重试缺陷</b>制造<b>二次 DoS</b>——5·19 案中暴风影音每 20 s 重试，
+          把上亿普通用户变成了打垮运营商 DNS 的「攻击者」。</li>
+    </ul>
+    <p><b>方案二：把 DNS 当武器——用作反射放大源</b></p>
+    <ul>
+      <li>DNS 满足<b>反射三标准</b>：服务器数量极多、<b>响应包远大于请求包</b>（放大 <b>28～54 倍</b>）、
+          基于 <b>UDP 无连接</b>。</li>
+      <li>做法：把源地址<b>伪造成受害者 IP</b>，向大量开放的 DNS 服务器发送 <b>DNS Query（QR=0）</b>，
+          让响应全部涌向受害者。</li>
+      <li>增强：选择<b>区域传送或递归查询</b>类请求，因为其<b>响应报文数量远大于请求报文数量</b>，放大效果更强。
+          2019 年 <b>DNS amplification 占 DDoS 类型的 20.89%，排名第一</b>。</li>
+    </ul>
+    <p><b>方案三：把 DNS 当跳板——冒充解析，实现重定向与信息窃取</b></p>
+    <ul>
+      <li><b>先致瘫、后冒充</b>：课本 11.4 节明确写道，攻击者可<b>致瘫 DNS 后冒充 DNS 的域名解析</b>，
+          把<b>错误的域名-IP 映射</b>提供给用户。</li>
+      <li>用途：把用户的<b>数据包指向错误的网站</b>（如攻击者的钓鱼站）、把受害者的<b>邮件指向错误的邮件服务器</b>。</li>
+      <li>最终目的两种：<b>窃取受害者的信息</b>（客观上也导致用户不能使用相应服务，构成 DoS）；
+          或<b>纯粹的拒绝服务</b>（使用户不能访问需要访问的网站、不能发邮件到特定邮件服务器）。</li>
+      <li>相关手法：<b>DNS 缓存投毒</b>属于 <b>重定向型 DoS</b>（§9）——修改 DNS 缓存这一「网络参数」，
+          使数据包被重定向；若指向攻击者主机即<b>中间人攻击</b>，若指向不存在的主机即<b>拒绝服务攻击</b>。</li>
+    </ul>
+    <p class="qa-src">出处：课本 p.331（重定向型）、p.337（表 11-1 与 DNS 反射）、p.347–348（5·19 案）、p.348–349（11.4 节地址冒充）。本资料 §6、§8、§9、§10。</p>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">简 10</span>在网络攻击中，拒绝服务攻击除了用于致瘫攻击目标，是否还可作为其他攻击的辅助手段？试举例说明。</div>
+  <div class="qa-b">
+    <p><b>是。</b>拒绝服务攻击还可作为<b>特权提升攻击、获得非法访问</b>的一种辅助手段，
+    此时<b>拒绝服务攻击服从于其他攻击的目的</b>。通常攻击者<b>不能单纯通过 DoS 获得对系统、信息的非法访问，
+    但可将其作为间接手段使用</b>。五个例子：</p>
+    <ol>
+      <li><b>为 IP 劫持 / IP 欺骗铺路。</b>攻击者想<b>冒充 C 跟 B 通信</b>时，通常要求 <b>C 不能响应 B 的消息</b>。
+          为此可先用 <b>SYN Flood</b> 攻击 C（若它在线）<b>使其无法对 B 的消息做出响应</b>，
+          然后通过<b>窃听发向 C 的数据包</b>或<b>猜测其中的序列号</b>，冒充 C 与第三方通信。</li>
+      <li><b>逼系统重启，趁重启时下手。</b>一些系统<b>在启动时会有漏洞</b>，可先用 DoS 使之重启，
+          再针对启动漏洞攻击。例如 <b>RARP-boot</b>：只需知道其<b>引导时监听的端口号（通常为 69）</b>，
+          向其发送伪造的数据包<b>几乎可以完全控制其引导过程</b>。</li>
+      <li><b>打掉防火墙以非法访问。</b>有些网络中<b>防火墙关闭时允许所有数据包通过</b>
+          （特别是<b>提供服务比保障安全更重要</b>的场合，如普通 ISP），
+          则可<b>对防火墙实施 DoS 使其失去作用</b>，从而非法访问受保护网络。</li>
+      <li><b>使已修改的配置生效。</b><b>Windows 系统中大多数配置变动在生效前都需要重新启动系统</b>，
+          攻击者修改了系统管理权限后，可用 DoS <b>使系统重启或迫使真正的管理员重启系统</b>，让改动生效。</li>
+      <li><b>打瘫 DNS 以冒充域名。</b><b>对 DNS 的 DoS 可以达到地址冒充的目的</b>：
+          致瘫 DNS 后冒充其域名解析，把错误的域名-IP 映射提供给用户，
+          将用户的数据包指向<b>攻击者的网站</b>、把邮件指向<b>攻击者的邮件服务器</b>，从而窃取信息。</li>
+    </ol>
+    <p class="qa-src">出处：课本 11.4 节 p.348–349。本资料 §10。</p>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">简 11</span>如何应对拒绝服务攻击？</div>
+  <div class="qa-b">
+    <p>分<b>检测 → 响应 → 防范</b>三层来答，最后落到<b>流量清洗</b>。</p>
+    <p><b>一、检测（先发现）</b>：① <b>按 DoS 攻击工具的特征标志检测</b>（特定端口、标志位、特定数据内容）；
+    ② <b>根据异常流量检测</b>（大量 PTR 反向查询、极限通信流量、特大型 ICMP/UDP 包、不属于正常连接通信的 TCP/UDP 包、
+    数据段只含文字和数字字符）。</p>
+    <p><b>二、响应（打断它），课本给了四种方法</b>：</p>
+    <ol>
+      <li><b>分组过滤</b>——通过<b>丢弃恶意分组</b>保护网络或系统。
+          局限：只限于<b>已定义的固定过滤器，不适合动态变化的攻击模式</b>；
+          「输入诊断」方案需各 ISP 管理员<b>人工配合，工作强度高、耗时大，较难实施</b>。</li>
+      <li><b>源端控制</b>——在源端防止 IP 地址假冒，如<b>路由器检查直连网络分组的源 IP，非法则丢弃</b>。
+          局限：<b>不能彻底消除 IP 假冒</b>，客户机仍可假冒成同一 ISP 网内的其他地址。</li>
+      <li><b>追溯（traceback）</b>——包括 <b>IP 追溯、ICMP 追溯、链路测试</b>三种方法。
+          局限：<b>不能实时控制攻击的危害</b>，<b>攻击很分散时也不能有效追溯</b>。</li>
+      <li><b>路由器动态检测和控制</b>——识别有共同特征的<b>流聚集（aggregate）</b>，
+          用<b>回推（pushback）</b>通知上游路由器限速。
+          局限：面临<b>检测标准、公平性机制、高效实现以及运营管理</b>等很多未解决的问题。</li>
+    </ol>
+    <p><b>三、防范（少挨打）</b>：<b>限制带宽</b>（限制特定协议占用的带宽，但并不完善）；
+    <b>终端防御</b>（<b>及时安装厂商补丁</b>、<b>运行尽可能少的服务</b>、<b>增强容忍性</b>）；
+    <b>入口过滤</b>（<b>只允许必要的通信</b>、<b>设置严格的防火墙策略</b>、<b>封锁所有无用的数据</b>）。</p>
+    <p><b>四、最有效的手段：流量清洗。</b>因为上述措施<b>只能部分缓解、不能从根本上解决问题</b>。
+    流量清洗对混合流量进行净化，<b>洗掉攻击流量、保留正常业务流量</b>，四个环节为
+    <b>攻击监测和判断 → 流量牵引 → 清洗过滤 → 流量回送</b>。</p>
+    <p><b>五、课本给的五条建议</b>：① 熟悉系统中各种公开服务所采用的软件，了解其处理请求的资源和时间耗费；
+    ② <b>减少和停止不必要的服务</b>；③ 修改有关服务的配置参数，保证其对资源的耗费处于<b>可控制的状态</b>；
+    ④ 安装 <b>IP 过滤和报文过滤软件</b>，并根据系统日志对具有攻击企图的行为进行过滤；
+    ⑤ <b>及时阅读有关安全方面的信息</b>，并随时更新相应服务软件及防护软件。</p>
+    <p><b>结论：</b>完全阻止是不可能的，防范只能减少被攻击的机会。</p>
+    <p class="qa-src">出处：课本 p.349–353；PPT p.64–71。本资料 §11 全节。</p>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">简 12</span>简述僵尸网络有几种类型，并分析每种类型的优缺点。</div>
+  <div class="qa-b">
+    <p>课本以 <b>IRC 僵尸网络</b>和 <b>P2P 僵尸网络</b>两类为例介绍，区别在于<b>命令与控制（C&amp;C）信道的组织方式</b>。</p>
+    <p><b>一、IRC 型僵尸网络</b></p>
+    <p><b>结构：</b>基于<b>标准 IRC 协议</b>在 IRC 聊天服务器上构建 C&amp;C 信道，
+    控制者通过该信道实现对大量受控主机的<b>僵尸程序版本更新、恶意攻击</b>等行为的控制；
+    涉及<b>控制者、IRC 服务器、Bot、被攻击对象</b>四方，呈<b>星形</b>拓扑。</p>
+    <p><b>优点：</b><b>结构简单</b>；因为<b>每个僵尸主机都与 IRC 服务器直接相连</b>，
+    所以<b>效率非常高</b>（控制命令传达快）。</p>
+    <p><b>缺点：</b><b>健壮性差，存在单点失效问题</b>——<b>可通过摧毁单个 IRC 服务器来切断控制者与 Bot 的联系，
+    导致整个僵尸网络瘫痪</b>；<b>IRC 服务器一旦被关闭，僵尸主人就完全失去了僵尸网络</b>，
+    <b>蜜罐（Honeypot）和蜜网（Honeynet）技术正是利用了这一弱点</b>捕获了大量 IRC 僵尸网络。</p>
+    <p><b>改良：</b>① Bot <b>使用域名而非固定 IP</b> 连接 IRC 服务器，控制者用<b>动态域名服务</b>把域名映射到多台 IRC 服务器，
+    一旦当前服务器失效即自动连接其他服务器（此即<b>僵尸网络的迁移</b>）；
+    ② 大型僵尸网络采用<b>分层管理模式</b>，由多个 IRC 服务器控制各自的 Bot 群体，再由控制者统一控制。</p>
+    <p><b>二、P2P 型僵尸网络</b></p>
+    <p><b>结构：</b>网络中<b>每台僵尸主机都与某一台或某几台僵尸主机存在连接</b>；
+    新感染主机<b>在感染时即获得某些僵尸主机的 IP 地址</b>并建立连接，之后还可<b>更新所连接的 IP 地址</b>，
+    最终<b>每台僵尸主机都可同任何一台建立通信链路</b>；僵尸主人可<b>通过普通的一台对等主机</b>向整个网络下达命令。</p>
+    <p><b>优点：</b><b>不存在单点失效的缺点</b>——由于僵尸主机间是<b>多对多连接</b>，
+    <b>当一些 Bot 被查杀时并不会影响到 Botnet 的生存</b>；因而<b>更加健壮（鲁棒性强）、隐蔽性更好</b>，
+    是<b>黑客的首选之一</b>，僵尸网络家族正<b>加速向 P2P 控制结构转变</b>（如 Mozi）。</p>
+    <p><b>缺点：</b><b>构建复杂</b>；受构建复杂性的限制，实践中应用的 P2P 僵尸网络<b>大多基于公开的 P2P 协议</b>，
+    其<b>覆盖网拓扑结构和 C&amp;C 机制的设计都缺乏针对性</b>。
+    以 <b>Storm</b> 为例，它利用公开的 <b>Kademlia(Kad)</b> 算法的 <b>Overnet</b> 协议作为 C&amp;C 信道，
+    以<b>异或（XOR）</b>为距离度量建立<b>分布式散列表（DHT）</b>拓扑，
+    虽<b>提高了路由查询速度、增加了拓扑网络的韧性</b>，但<b>拓扑结构过于严格、定位过于精确</b>，
+    导致在<b>容错性、安全性和匿名性</b>方面存在过多缺陷，现已有有效反制措施。</p>
+    <p><b>三、评价指标（可作为加分项）：</b><b>效力（effectiveness）</b>——发起 DDoS 攻击的能力；
+    <b>效率（efficiency）</b>——控制命令传递到整个网络的时间度量；
+    <b>鲁棒性（robustness）</b>——存活性和韧性；另有学者提出<b>隐蔽性</b>——无法通过覆盖网回溯攻击源。</p>
+    <p class="qa-src">出处：课本 11.3.4 节 p.343–346。本资料 §7。</p>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">简 13</span>为了应对攻击者利用分片来穿透防火墙，防火墙在检测时进行数据包的重组，仅当重组后的数据包符合通行规则时，数据包片段才可放行。攻击者如何利用防火墙这一处理机制对防火墙进行攻击？</div>
+  <div class="qa-b">
+    <p><b>答：攻击者可以伪造并发送大量的分片，但故意不让这些分片构成完整的数据报，
+    以此占用防火墙的 CPU 和存储单元，构成对防火墙本身的拒绝服务攻击。</b></p>
+    <p><b>原理拆解：</b></p>
+    <ol>
+      <li><b>题干描述的机制本身留下了一个必然的开销。</b>防火墙为了检测碎片攻击（或其他利用分片的攻击）而设置了
+          <b>碎片重组</b>：收到分片数据包时<b>并不单独检测</b>，而是<b>等待所有的分片都到达</b>、重组完成后再检测。
+          「等待所有分片到达」意味着<b>必须缓存已经到达的分片</b>。</li>
+      <li><b>攻击者利用的正是「缓存 + 等待」。</b>攻击者<b>伪造并发送大量分片</b>，
+          但<b>始终不发送能让它们凑成完整数据报的那一片</b>。
+          防火墙<b>无法判断剩余分片是「还在路上」还是「永远不会来」</b>，
+          只能<b>一直把这些分片留在缓存里、一直等下去</b>。</li>
+      <li><b>后果：</b>大量残缺的分片持续占用防火墙的<b>存储单元</b>，重组逻辑持续消耗其 <b>CPU</b>，
+          最终使防火墙<b>资源耗尽而无法处理正常流量</b>，即对防火墙（或 IDS）构成 DoS。</li>
+    </ol>
+    <p><b>这属于哪一类：</b>它是<b>泪滴/碎片攻击的第三个变种</b>。
+    与前两个变种（<b>小片段攻击</b>、<b>重叠分片攻击</b>）的目的不同——
+    <b>前两者是为了「混过去」（穿透防火墙），这一种是为了「把门卫累死」（打垮防火墙本身）。</b></p>
+    <p><b>可补充的防御思路：</b>为分片重组设置<b>缓存上限与超时时间</b>，超时即丢弃；
+    限制单个源地址可占用的重组缓冲区数量；对<b>残缺率异常</b>的源进行限速。</p>
+    <p class="qa-src">出处：PPT p.25（课本正文未涉及此变种）。本资料 §3.3「三个变种」之变种三。</p>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">简 14</span>在 SYN Flood 攻击中，攻击者为什么要伪造 IP 地址？</div>
+  <div class="qa-b">
+    <p>三个理由，缺一不可（PPT 原话是「一方面<b>逃避追踪</b>，另一方面<b>为了攻击能成功</b>」）：</p>
+    <ol>
+      <li><b>逃避追踪。</b>受害者服务器日志中记录的是<b>伪造的源地址</b>，无法据此定位真正的攻击者。</li>
+      <li><b>使半连接占用的时间最大化，攻击才能成功。</b>
+          把源地址伪造成<b>根本不存在或没开机</b>的地址后，服务器发出的 <b>SYN+ACK 无人应答</b>，
+          服务器只能<b>不断重试并等待 SYN Timeout（分钟级，大约 30 秒～2 分钟）超时后才丢弃</b>这条半连接。
+          半连接表上限一般为 <b>1024</b>，占满后<b>不再接受任何新的连接请求，包括正常用户的</b>。</li>
+      <li><b>避免攻击主机「自伤」并「帮受害者的忙」。</b>
+          如果<b>不伪造</b>源地址，在<b>未修改攻击主机 TCP 协议栈</b>的情况下，
+          攻击主机系统会<b>自动对收到的 TCP SYN+ACK 做出响应</b>——
+          无论是以 <b>TCP ACK</b> 作为响应建立连接，还是以 <b>TCP RST</b> 作为响应取消连接（<b>通常会回应 RST</b>），
+          <b>都会在服务器上释放对应的半连接</b>，使受害者服务器<b>较早地释放半连接、减少占用时间、减弱攻击效果</b>；
+          同时这些响应还会<b>影响攻击主机自身的性能</b>。</li>
+    </ol>
+    <p class="qa-src">出处：课本 p.335；PPT p.41。本资料 §5.1、§12 讨论二。</p>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">简 15</span>如何检测 SYN Flood 攻击？</div>
+  <div class="qa-b">
+    <p>从<b>状态、流量、特征</b>三个角度检测：</p>
+    <p><b>一、看半连接状态（最直接的判据）</b></p>
+    <ul>
+      <li>服务器上<b>处于「半连接」状态的连接数急剧增加</b>并<b>接近或达到系统上限（一般为 1024）</b>，
+          且这些半连接<b>长时间不转为正式连接</b>，只能靠 <b>SYN Timeout（30 秒～2 分钟）</b>超时释放。</li>
+      <li>伴随现象：服务器<b>不断对半连接表中的各客户端重试 TCP SYN+ACK</b>，<b>CPU 和内存消耗异常升高</b>；
+          从正常客户角度看<b>服务器失去响应</b>。</li>
+    </ul>
+    <p><b>二、看异常流量（对应课本 11.5.1 的异常流量检测）</b></p>
+    <ul>
+      <li><b>出现明显超出该网络正常工作时的极限通信流量</b>——现在的技术能对不同源地址计算出对应的极限值，
+          明显超出即表明存在攻击；可<b>在主干路由器端建立 ACL 规则</b>监测和过滤。</li>
+      <li>网络中出现<b>大量的某一类型的数据包</b>——具体到本攻击就是<b>大量 TCP SYN 报文</b>，
+          且<b>SYN 与 ACK 的比例严重失衡</b>（只有大量 SYN 进来，却几乎没有对应的第三次握手 ACK）。</li>
+      <li><b>源地址高度可疑</b>：大量 SYN 的源 IP <b>分散且不可达</b>，
+          或<b>不属于正常连接通信</b>，与该网络的正常访问来源分布明显不符。</li>
+    </ul>
+    <p><b>三、看工具特征（对应特征标志检测）</b></p>
+    <ul>
+      <li>若攻击者使用已知工具，可用<b>特征标志</b>识别，如 <b>Shaft 攻击所用 TCP 分组的序列号都是 0x28374839</b>；
+          <b>Trinoo</b> 等工具还有其<b>特定端口</b>（TCP 27655、UDP 27444 和 31335）。</li>
+      <li><b>局限</b>：端口易改、内容可加密，<b>特征标志检测对新工具往往无效</b>，所以必须结合前两类。</li>
+    </ul>
+    <p><b>四、辅助线索：</b>攻击者在进行 DDoS 攻击前<b>总要解析目标的主机名</b>，
+    因此<b>域名服务器会先接收到大量反向解析目标 IP 主机名的 PTR 查询请求</b>，
+    <b>BIND 域名服务器能够记录这些请求</b>，可用来<b>确定攻击的来源</b>。</p>
+    <p class="qa-src">出处：课本 p.335（半连接机制与上限）、p.349–350（两类检测技术与五类异常现象）。本资料 §5.1、§11.2、§11.3。</p>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">简 16</span>分析 SYN Flood 攻击、TCP 连接耗尽型攻击、HTTP 风暴型攻击的优缺点。</div>
+  <div class="qa-b">
+    <p>三者是一条<b>逐步向应用层推进</b>的链：越往上越难被识别，但越需要真实身份和更多资源。</p>
+    <p><b>一、SYN Flood</b></p>
+    <p><b>原理：</b>发送大量 SYN 报文但<b>不完成第三次握手</b>，使服务器维护<b>大量半连接</b>。</p>
+    <p><b>优点：</b>① <b>可以伪造源地址</b>，隐蔽、难以追踪；
+    ② <b>攻击成本极低</b>——发一个包就能让服务器占用一条半连接达 <b>30 秒～2 分钟</b>，代价高度不对称；
+    ③ 半连接表上限仅约 <b>1024</b>，<b>门槛低</b>；④ <b>互联网上能找到大量攻击程序代码</b>，非常流行。</p>
+    <p><b>缺点：</b>① <b>必须不停地发送</b>，<b>一旦停止攻击受害者即可恢复</b>；
+    ② 半连接数异常增长<b>特征明显、容易被检测</b>；③ 现代系统已有 SYN Cookie 等缓解机制。</p>
+    <p><b>二、TCP 连接耗尽型（空连接攻击）</b></p>
+    <p><b>原理：</b><b>完成三次握手</b>建立真实连接，通过建立<b>众多的 TCP 连接</b>耗尽受害者的连接资源。</p>
+    <p><b>优点：</b>① <b>不需要不停地向受害者发起连接</b>，<b>只需要连接数量到达一定程度即可</b>，
+    维持成本低；② 连接是真实建立的，<b>停止发送后连接仍占用着</b>，不像 SYN Flood 那样一停就恢复。</p>
+    <p><b>缺点：</b>① <b>必须完成三次握手，所以只能使用真实 IP 地址（傀儡主机）</b>，<b>会暴露傀儡机、易被追踪封禁</b>；
+    ② <b>防火墙会检测并发的 TCP 连接数目</b>，超过一定数目、一定频率就会被发现；
+    ③ 需要控制较多傀儡主机。</p>
+    <p><b>三、HTTP 风暴型（CC 攻击）</b></p>
+    <p><b>原理：</b>用 HTTP 协议对网页进行<b>语义上合法的请求</b>，不停地从受害者处获取数据，
+    <b>占用连接的同时占用带宽</b>；重点攻击<b>需要大量数据操作、大量占用 CPU 时间的动态页面</b>（asp/php/jsp/cgi）。</p>
+    <p><b>优点：</b>① 请求<b>在语义上完全合法</b>，与正常用户几乎无法区分，
+    <b>防火墙和特征匹配都很难过滤</b>；② <b>效率最高</b>——一次请求就能让服务器查两次数据库、
+    在几百 MB 数据里搜索一遍，或下载一个大文件；③ <b>HTTPS SSL/CC 效果更好</b>，
+    因为<b>处理 HTTPS 请求比处理 HTTP 请求要占用服务器更多的资源</b>；
+    ④ <b>可借助代理</b>隐藏身份、绕开防火墙的并发连接数检测、并保持连接（攻击主机发给代理后即可断开）。</p>
+    <p><b>缺点：</b>① <b>一般要使用真实的 IP 地址（傀儡主机）</b>，因此攻击者一般都需控制
+    <b>由大量僵尸主机构成的僵尸网络</b>，<b>成本最高</b>；
+    ② 需要事先了解目标站点哪些页面开销大；③ 请求速率异常、集中访问高开销页面仍可能被行为分析发现。</p>
+    <p><b>四、一句话对比：</b><b>SYN Flood 最便宜但停手就失效；TCP 连接耗尽不用一直发但藏不住身份；
+    CC 最难防但最贵。</b></p>
+    <p class="qa-src">出处：课本 p.335–336；PPT p.41、p.42、p.45。本资料 §5.7。</p>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">简 17</span>简述流量清洗的基本原理？并选择某一厂商的流量清洗系统为例进行分析。</div>
+  <div class="qa-b">
+    <p><b>一、基本原理</b></p>
+    <p><b>定义：</b>对 DDoS 攻击与正常业务数据<b>混合在一起</b>的流量进行<b>净化</b>，
+    <b>净化掉 DDoS 攻击流量，保留正常业务流量</b>，保证客户业务 <b>7×24 小时</b>不间断提供。
+    具体做法是对进入 <b>IDC 或云</b>的数据流量进行<b>实时监控</b>，及时发现异常流量，
+    在<b>不影响正常业务</b>的前提下清洗掉异常流量。</p>
+    <p><b>四个关键环节：</b><b>攻击监测和判断 → 流量牵引 → 清洗过滤 → 流量回送</b>。</p>
+    <p><b>三大组成系统：</b></p>
+    <ol>
+      <li><b>攻击检测系统</b>：对用户业务流量<b>逐包检测</b>，发现隐藏的非法攻击流量
+          （NTP Flood、SSDP Flood、SYN Flood、ACK Flood、RST Flood、ICMP Flood、UDP Flood、
+          DNS Query Flood、Stream Flood、HTTP Get Flood 等），发现后<b>及时通知并激活防护设备</b>。
+          检测技术包括：<b>静态漏洞攻击特征检查、动态规则过滤、异常流量限速、用户流量模型异常检测</b>。</li>
+      <li><b>攻击缓解系统</b>：将可疑流量<b>从原始网络路径中重定向到净化清洗中心</b>进行
+          <b>恶意流量的识别和剥离</b>，<b>还原出的合法流量被回注到原网络</b>转发给目标系统，
+          其他合法流量的转发路径不受影响。<br>
+          <b>牵引的实现：</b>清洗中心利用 <b>IBGP 或 EBGP</b> 协议与城域网中用户流量路径上的多个核心设备建立 <b>BGP Peer</b>；
+          攻击发生时通过 BGP <b>发布更新路由通告</b>，更新核心路由器的路由表项，把被攻击服务器的流量
+          <b>动态牵引到清洗中心</b>；同时为清洗中心发布的 BGP 路由<b>添加 no-advertise 属性</b>，
+          确保该路由不会被扩散到城域网，并<b>通过路由策略不接受核心路由器发布的路由更新</b>，避免影响城域网。<br>
+          <b>回注的四种方式：策略路由、MPLS VPN、二层透传、双链路</b>（另有基于 <b>SDN</b> 的实现）。</li>
+      <li><b>监控管理系统</b>：对清洗系统设备<b>集中管理配置</b>，展现<b>实时流量、告警事件、状态</b>等信息，
+          输出<b>流量分析报告和攻击防护报告</b>。</li>
+    </ol>
+    <p><b>二、以某大型云/CDN 服务提供商的流量清洗服务为例分析</b></p>
+    <p class="small muted">（课本未指定厂商，以下按课本 p.353 给出的商业形态特征作分析框架。）</p>
+    <ul>
+      <li><b>部署形态：</b>该类服务商一般在全球部署 <b>3～7 个流量清理中心</b>，
+          每个中心都包含 <b>DDoS 缓解设备</b>和<b>大量带宽</b>，<b>这些带宽可能超过 350 Gbps</b>。
+          客户受到攻击时，只需将所有流量<b>重定向到最近的清理中心</b>即可。
+          这一设计的意义在于：抵御风暴型 DDoS <b>必须有足够的带宽来「接得住」攻击流量</b>，
+          单个企业买不起，只能靠<b>共享的清洗中心池</b>摊薄成本。</li>
+      <li><b>服务对象：</b>主要面向 IDC 或云服务的中大型客户，尤其是<b>对互联网高度依赖</b>、
+          <b>不能承担 DDoS 造成巨额营业损失</b>的客户，如<b>金融机构、游戏服务提供商、电子商务和内容提供商</b>。</li>
+      <li><b>两种使用方式：</b>① <b>全天候通过清理中心路由流量</b>（防护及时，但成本高）；
+          ② <b>发生攻击时按需路由流量</b>（成本低，但切换有延迟）。
+          <b>前者所付出的成本远远高于后者，一般较少采用。</b></li>
+      <li><b>计费：</b>使用流量清洗服务需<b>付费</b>，<b>通常按照清洗带宽的多少来付费</b>。</li>
+      <li><b>局限性分析：</b>清洗依赖<b>能把攻击流量与正常流量区分开</b>，
+          而 <b>HTTP CC 这类语义上完全合法的应用层攻击</b>最难区分；
+          此外牵引与回注涉及路由改动，<b>策略路由方式会直接影响城域网核心设备</b>、
+          <b>MPLS VPN 方式要求全网设备支持且改动范围大</b>，部署有相当的工程代价。
+          因此流量清洗<b>是目前最有效的缓解手段，但仍不能从根本上消除拒绝服务攻击</b>。</li>
+    </ul>
+    <p class="qa-src">出处：课本 11.5.2 节 p.351–353；PPT p.70–71。本资料 §11.5。</p>
+  </div>
+</div>
+
+<h3 id="qz-comp">13.4　综合题（2 题）</h3>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">综 1</span>直接风暴型与反射式风暴型拒绝服务攻击的区别是什么？有哪些网络协议被用来进行风暴型 DoS？如果你是攻击者，选择协议时主要考虑哪些因素？</div>
+  <div class="qa-b">
+    <p><b>第一问：两者的区别</b></p>
+    <p><b>定义上的区别（课本原文）：</b>直接风暴型的特点是攻击者<b>直接利用自己控制的主机</b>向攻击目标发送大量网络数据包；
+    反射型的特点是攻击者<b>伪造攻击数据包，其源地址为被攻击主机的 IP 地址，目的地址为网络上大量网络服务器或某些高速网络服务器</b>，
+    <b>通过这些服务器（作为反射器）的响应</b>实施对目标主机的拒绝服务攻击。</p>
+    <div class="tbl-wrap"><table>
+    <thead><tr><th>对比项</th><th>直接风暴型</th><th>反射型 DRDoS</th></tr></thead>
+    <tbody>
+    <tr><td>谁向受害者发包</td><td>攻击者控制的<b>傀儡主机</b></td><td><b>无辜的正常服务器</b>（反射器）</td></tr>
+    <tr><td>源地址</td><td>可伪造，也可不伪造（如 Trinoo、CC）</td><td><b>必须伪造成受害者的 IP</b></td></tr>
+    <tr><td>是否需大规模僵尸网络</td><td><b>需要</b></td><td><b>无须掌控大量僵尸网络</b>，只需改源 IP</td></tr>
+    <tr><td>流量放大</td><td>基本 <b>1:1</b>，无放大</td><td><b>放大几十至几百倍</b>（NTP 达 206～556 倍）</td></tr>
+    <tr><td>中间主机状态</td><td>傀儡主机<b>已被攻陷</b></td><td><b>反射器未被入侵，只是在回应请求</b></td></tr>
+    <tr><td>隐蔽性</td><td>日志留下傀儡机真实 IP，可追踪</td><td><b>攻击者隐蔽、难以追踪</b></td></tr>
+    <tr><td>现状</td><td>「现在不是主流，但曾经很风光」</td><td><b>目前主流</b>的风暴型攻击方法</td></tr>
+    </tbody></table></div>
+    <p><b>第二问：可被利用的协议</b>（见简 6）：<b>TCP</b>（SYN/ACK/RST 洪流）、<b>ICMP</b>（Ping floods）、
+    <b>UDP</b>（UDP 洪流），以及<b>应用层协议</b> <b>HTTP/HTTPS、NTP、SSDP、DNS、SNMP</b> 等；
+    用作反射源的还有 <b>Chargen、QOTD、NetBIOS、BitTorrent、Kad、Quake、Steam</b>，
+    近年新增 <b>Memcached、LDAP</b>。</p>
+    <p><b>第三问：站在攻击者角度，选协议时考虑什么</b></p>
+    <ol>
+      <li><b>能不能伪造源地址（是否无连接）。</b>这是<b>第一位</b>的：无连接的 UDP 类协议无须三次握手，
+          <b>源地址可以随便伪造</b>，既能隐藏身份，又是做反射的前提；TCP 则做不到。</li>
+      <li><b>放大倍数够不够大。</b>即<b>请求报文远小于响应报文</b>。放大倍数直接决定「投入产出比」：
+          NTP 206～556 倍、Chargen 358.8 倍、DNS 28～54 倍。</li>
+      <li><b>反射源够不够多、够不够容易找到。</b>互联网上要有<b>很多可探测到的支持该协议的服务器</b>
+          （NTP 约 80 万台，SSDP 设备约 1100 万台）——数量决定总流量，分散度决定受害者无法靠封 IP 解决。</li>
+      <li><b>目标方能不能把它关掉。</b>优先选<b>必须对公网开放</b>的协议（DNS、HTTP、NTP），
+          防守方<b>不能一禁了之</b>。</li>
+      <li><b>让受害者处理起来有多贵。</b>如 <b>HTTPS 比 HTTP 更耗资源</b>、
+          <b>动态页面（asp/php/jsp/cgi）比静态页面更耗 CPU 和数据库</b>——同样的请求数，伤害更大。</li>
+      <li><b>能否绕过防御。</b>如 ICMP <b>大多会被防火墙过滤</b>，因此实际效果差；
+          而语义合法的 HTTP 请求<b>很难被特征匹配识别</b>。</li>
+    </ol>
+    <p class="qa-src">出处：课本 p.334（两类定义）、p.336–337（反射型特性、表 11-1）、p.336（CC 与 HTTPS）；PPT p.33、p.38、p.51。本资料 §4.5、§5、§6.2、§12 讨论三。</p>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">综 2</span>查阅资料写一份主流 DDoS 僵尸网络（如 Mirai、Mozi、Gafgyt 等）的分析报告。</div>
+  <div class="qa-b">
+    <p class="small muted">这是开放性作业题，考试不会照原样出。下面给<b>报告提纲 + 课本已提供的事实</b>，
+    考场上若遇到相关简答，按这个框架组织即可。</p>
+    <p><b>建议提纲（五段式）</b></p>
+    <ol>
+      <li><b>背景与规模。</b>据 CNCERT《2019 年上半年我国互联网安全态势报告》：
+          规模在 <b>100 台主机以上的僵尸网络 1842 个</b>，<b>10 万台以上的 21 个</b>；
+          2019 年上半年境内<b>峰值超过 10 Gbps 的大流量 DDoS 事件平均每月约 4300 起，同比增长 18%</b>，
+          且<b>仍有超过 60% 的 DDoS 攻击事件是僵尸网络控制发起的</b>。
+          2020 年 CNCERT 监测发现，<b>DDoS 僵尸网络家族活动主要以 Mirai 和 Gafgyt 为代表的传统 IoT 木马家族为主导</b>。</li>
+      <li><b>典型家族。</b>
+          <b>Mirai（2016）</b>——著名的 <b>IoT 僵尸网络</b>；<b>2016 年 10 月 21 日</b>控制<b>数百万台 IoT 设备</b>
+          攻击美国域名解析服务提供商 <b>Dyn</b>，<b>峰值流量 1.2 Tbps</b>，导致大量知名网站掉线近一天。
+          <b>Gafgyt</b>——与 Mirai 并列的传统 IoT 木马家族。
+          <b>Mozi（2019）</b>——采用 <b>P2P 结构</b>，通过<b>「认证证书」对加入的节点进行身份校验</b>，
+          同时<b>对通信加密</b>，<b>提高了隐匿度和顽固程度</b>；僵尸网络家族正<b>加速向 P2P 控制结构转变</b>，
+          Mozi 是其代表且<b>不断壮大</b>。
+          <b>HNS（2018）</b>——同期发现的 IoT 僵尸网络。</li>
+      <li><b>C&amp;C 结构分析。</b>按 §7 的框架对比 <b>IRC 型</b>（星形、效率高、<b>单点失效</b>）
+          与 <b>P2P 型</b>（网状、<b>无单点失效</b>、构建复杂）；指出<b>IoT 僵尸网络正是从前者向后者演进</b>。</li>
+      <li><b>为什么选 IoT 设备当肉鸡。</b><b>数量大、安全防护弱、安全漏洞多</b>（对应多选第 5 题），
+          再加上物联网设备<b>大量应用</b>、<b>攻击工具自动化程度高</b>（「攻击者能够在几秒钟内入侵一台主机并安装攻击工具」），
+          可以<b>在很短时间内建立起数量庞大的僵尸网络</b>。</li>
+      <li><b>检测与防御。</b>评价指标：<b>效力、效率、鲁棒性、隐蔽性</b>。
+          检测方法：G. Gu 等人提出的 <b>BotHunter、BotSniffer、BotMiner</b>（针对 IRC）；
+          Storm 爆发后针对 <b>P2P</b> 的检测方法研究逐渐兴起。
+          防御建议：IoT 设备<b>改默认口令、及时更新固件、关闭不必要的服务与端口（如 UPnP）、
+          不将管理接口暴露于 Internet</b>；网络侧靠<b>流量清洗</b>与<b>源地址验证</b>。
+          可用 <b>BYOB</b> 开源框架做研究性复现。</li>
+    </ol>
+    <p class="qa-src">出处：课本 11.3.4 节 p.343–346、p.330（Dyn 与 Mirai）、p.334（自动化与 IoT）。本资料 §7。</p>
+  </div>
+</div>
+
+</section>
+<section class="sec pagebreak" id="cheat">
+  <div class="sec-head">
+    <span class="sec-num">§ 14　速查卡</span>
+    <h2 class="sec-t">考前速查卡</h2>
+    <p class="sec-lede"><b>考场上先翻这一节。</b>用题干里的名词在 §14.3 索引里定位节号，再翻到正文。</p>
+  </div>
+
+<h3 id="ch-num">14.1　必背数字</h3>
+
+<div class="mustnum">
+  <div class="n"><b>65535 / 65515 / 65507</b><span>IP 包上限 / IP 数据部分 / ICMP 数据部分（Ping of Death）§3.5</span></div>
+  <div class="n"><b>4000 字节</b><span>对有的系统，ICMP 有效载荷超过它即可达到 PoD 目的　§3.5</span></div>
+  <div class="n"><b>8 字节</b><span>IP 片偏移的单位（偏移值 × 8 ＝ 字节位置）　§3.3</span></div>
+  <div class="n"><b>1024</b><span>半连接表上限，超过即拒绝所有新连接　§5.1</span></div>
+  <div class="n"><b>30 秒 ～ 2 分钟</b><span>SYN Timeout，分钟级　§5.1</span></div>
+  <div class="n"><b>139 / 138 / 137 / 113 / 53</b><span>WinNuke 攻击的目标端口，URG=1　§3.2</span></div>
+  <div class="n"><b>Echo 7 / Chargen 19</b><span>循环（乒乓）攻击的两个 UDP 端口　§3.6</span></div>
+  <div class="n"><b>NTP 123（UDP）</b><span>NTP 端口；SSDP 是 <b>1900（UDP）</b>　§6.4 / §6.5</span></div>
+  <div class="n"><b>239.255.255.250</b><span>SSDP 保留多播地址（IPv4）　§6.5</span></div>
+  <div class="n"><b>600 / 6 / 100</b><span>monlist 返回最后 600 个 IP，每 6 个一组，最多 100 个响应包　§6.4</span></div>
+  <div class="n"><b>234 → 482 × 100</b><span>monlist 请求 234 B，响应 482 B×100 ＝ 48200 B　§6.4</span></div>
+  <div class="n"><b>206 倍（最大 556）</b><span>NTP 放大倍数 ＝ 482×100÷234　§6.4</span></div>
+  <div class="n"><b>DNS 28～54 · SSDP 30.8<br>Chargen 358.8</b><span>表 11-1 常考的几个放大倍数　§6.3</span></div>
+  <div class="n"><b>80 万 / 1800 / 前 50</b><span>开放 NTP 服务器数 / 频繁被请求数 / 前 50 台（美 56%、中 26%）　§6.4</span></div>
+  <div class="n"><b>1100 万 / 38%（410 万）</b><span>全球 SSDP 即插即用设备数 / 可能被利用的比例　§6.2</span></div>
+  <div class="n"><b>400 Gbps</b><span>2014 年 2 月 CloudFlare 遭遇的 NTP DDoS 峰值（Arbor 观察到 325 Gbps）　§6.4</span></div>
+  <div class="n"><b>1.2 Tbps</b><span>2016 Dyn 事件（Mirai）峰值；2018 浙江某 IP 达 <b>1.27 Tbps</b>　§1.1</span></div>
+  <div class="n"><b>27655 / 27444 / 31335</b><span>Trinoo 三端口（PPT p.43 第一个写 27665，两处不一致）　§5.4</span></div>
+  <div class="n"><b>0x28374839</b><span>Shaft 攻击 TCP 分组的固定序列号　§11.2</span></div>
+  <div class="n"><b>16660 / 65000 · 6667 / 33270</b><span>Stacheldraht · Trinity 的 TCP 端口　§11.2</span></div>
+  <div class="n"><b>10 字节 / 64～128 字节</b><span>正常 UDP 有效数据 / 正常 ICMP 长度（超出即可疑）　§11.3</span></div>
+  <div class="n"><b>1024 以上端口</b><span>连到高于 1024 且非常用服务的端口 → 可疑　§11.3</span></div>
+  <div class="n"><b>3600 s / 24 小时</b><span>5·19 案：A 记录 TTL / NS 记录 TTL；重试间隔 <b>20 s</b>　§8</span></div>
+  <div class="n"><b>3 ~ 7 个 / 350 Gbps</b><span>清洗服务商的清理中心数 / 单中心带宽　§11.5</span></div>
+  <div class="n"><b>1999 年 11 月</b><span>CERT/CC 的 DSIT Workshop 首次概括 DDoS　§1.2</span></div>
+  <div class="n"><b>NTPD 4.2.7</b><span>此版本之后默认关闭 monlist；之前用 disable monitor　§6.4</span></div>
+</div>
+
+<h3 id="ch-tbl">14.2　一页对照总表</h3>
+
+<h4>三大类攻击机制</h4>
+<div class="tbl-wrap"><table>
+<thead><tr><th>类别</th><th>怎么打</th><th>包含</th><th>别名</th><th>节</th></tr></thead>
+<tbody>
+<tr><td><b>剧毒包型</b></td><td>畸形包触发<b>协议或软件实现的漏洞</b>，一个包就崩</td>
+    <td>WinNuke、泪滴、Land、Ping of Death、循环攻击</td>
+    <td>杀手包 / <b>漏洞攻击</b> / <b>协议攻击</b></td><td>§3</td></tr>
+<tr><td><b>风暴型</b></td><td>大量「无用」数据包<b>耗尽资源</b></td>
+    <td>直接型（§5）＋ 反射型（§6）</td><td><b>带宽攻击</b></td><td>§4–6</td></tr>
+<tr><td><b>重定向型</b></td><td>改 <b>ARP 表 / DNS 缓存</b>等参数，让包送错地方</td>
+    <td>ARP 欺骗、DNS 缓存投毒</td><td>—（常归入网络监听）</td><td>§9</td></tr>
+</tbody>
+</table></div>
+
+<h4>剧毒包型五种速查</h4>
+<div class="tbl-wrap"><table>
+<thead><tr><th>攻击</th><th>关键构造</th><th>后果</th><th>前提 / 备注</th></tr></thead>
+<tbody>
+<tr><td><b>WinNuke</b></td><td><b>URG=1</b> 的带外数据（OOB），<b>紧急指针与数据位置重合</b>，端口 139/138/137/113/53</td>
+    <td>停止响应、<b>蓝屏</b></td><td>别名<b>带外攻击 / 蓝屏攻击</b>；<b>课本没有</b></td></tr>
+<tr><td><b>泪滴 Teardrop</b></td><td><b>分片偏移重叠</b>（第 2 片落在第 1 片中间）</td>
+    <td>重组异常，<b>堆栈损坏 / 崩溃 / 重启</b></td><td>又名<b>碎片攻击</b>；三变种见 §3.3</td></tr>
+<tr><td><b>Land</b></td><td><b>源 IP＝目的 IP＝受害者，源端口＝目的端口</b></td>
+    <td>自己和自己建<b>空连接</b>，挂起/崩溃/重启</td><td class="hl"><b>端口必须打开并监听</b>，否则回 RST</td></tr>
+<tr><td><b>Ping of Death</b></td><td>ICMP 数据<b>超过 65507 字节</b></td>
+    <td><b>内存分配错误</b>，协议栈崩溃</td><td>CA-1996-26 / CVE-1999-0128</td></tr>
+<tr><td><b>循环攻击</b></td><td>伪造源地址让 <b>Echo(7)↔Chargen(19)</b> 互喂</td>
+    <td>两端口无限来回，耗尽资源</td><td class="hl"><b>只需发一个包</b>；<b>既属剧毒包型也属风暴型</b></td></tr>
+</tbody>
+</table></div>
+
+<h4>风暴型六种速查</h4>
+<div class="tbl-wrap"><table>
+<thead><tr><th>攻击</th><th>耗对方什么</th><th>源 IP</th><th>握手</th><th>关键特点</th></tr></thead>
+<tbody>
+<tr><td><b>SYN Flood</b></td><td><b>半连接表</b>（上限 1024）+ CPU</td><td class="hl"><b>必须伪造</b></td><td>只做前两次</td>
+    <td><b>必须不停发；停手即恢复</b></td></tr>
+<tr><td><b>Ping 风暴</b></td><td>CPU / 处理能力</td><td>可伪造</td><td>无</td>
+    <td>简单有效，但<b>防火墙大多过滤 ICMP</b></td></tr>
+<tr><td><b>TCP 连接耗尽</b></td><td><b>连接资源</b></td><td class="hl"><b>只能真实</b></td><td class="hl"><b>完成三次握手</b></td>
+    <td><b>不用一直发</b>，够数即可；又名<b>空连接攻击</b></td></tr>
+<tr><td><b>UDP 风暴 / Trinoo</b></td><td><b>带宽</b></td><td class="hl">Trinoo <b>不假冒 IP</b></td><td>无</td>
+    <td>向随机端口发<b>全零 4 字节 UDP 包</b></td></tr>
+<tr><td><b>HTTP 风暴 / CC</b></td><td><b>CPU / 数据库 / 带宽</b></td><td class="hl"><b>只能真实</b>（傀儡机）</td><td>完成</td>
+    <td>请求<b>语义合法</b>，打<b>动态页面</b>；<b>HTTPS CC 更狠</b>；用<b>代理</b></td></tr>
+<tr><td><b>邮件炸弹</b></td><td><b>存储空间</b></td><td>—</td><td>—</td>
+    <td><b>直接型 DoS 的标准例子</b>；垃圾邮件<b>不是攻击但效果相同</b></td></tr>
+</tbody>
+</table></div>
+
+<h4>直接型 vs 反射型（最常考的一组）</h4>
+<div class="tbl-wrap"><table>
+<thead><tr><th></th><th>直接风暴型</th><th>反射型 DRDoS</th></tr></thead>
+<tbody>
+<tr><td>谁发包给受害者</td><td>攻击者的<b>傀儡主机</b></td><td><b>无辜的正常服务器</b></td></tr>
+<tr><td>源地址</td><td>可伪造/可不伪造</td><td><b>必须伪造成受害者</b></td></tr>
+<tr><td>放大</td><td><b>1:1，无放大</b></td><td><b>几十至几百倍</b></td></tr>
+<tr><td>需大僵尸网络吗</td><td><b>需要</b></td><td><b>无须</b>，只改源 IP</td></tr>
+<tr><td>中间主机</td><td><b>已被攻陷</b></td><td><b>未被入侵，只是在回应请求</b></td></tr>
+<tr><td>追踪</td><td>可顺傀儡机追</td><td><b>隐蔽、难以追踪</b></td></tr>
+<tr><td>现状</td><td>「不是主流，曾经很风光」</td><td><b>目前主流</b></td></tr>
+</tbody>
+</table></div>
+
+<h4>防御全景</h4>
+<div class="tbl-wrap"><table>
+<thead><tr><th>阶段</th><th>方法</th><th>关键局限</th></tr></thead>
+<tbody>
+<tr><td rowspan="2"><b>检测</b></td><td><b>工具特征标志</b>：特定端口 / 标志位 / 特定数据内容</td>
+    <td>端口易改、内容可加密；<b>野蛮消耗型攻击没有特征</b></td></tr>
+<tr><td><b>异常流量</b>：PTR 查询激增 / 极限流量 / 特大 ICMP·UDP 包 / 非正常连接的 TCP·UDP 包 / 只含文字数字（BASE64）</td>
+    <td>需先建立正常基线</td></tr>
+<tr><td rowspan="4"><b>响应<br>（四种）</b></td><td><b>① 分组过滤</b>（丢弃恶意分组）</td>
+    <td>只限固定过滤器，<b>不适合动态变化的攻击模式</b>；输入诊断需 ISP 人工配合</td></tr>
+<tr><td><b>② 源端控制</b>（路由器校验直连网络的源 IP）</td>
+    <td><b>不能彻底消除 IP 假冒</b>（可在本网段内伪造）</td></tr>
+<tr><td><b>③ 追溯 traceback</b>（IP 追溯 / ICMP 追溯 / 链路测试）</td>
+    <td><b>不能实时控制危害</b>；<b>攻击分散时无法有效追溯</b></td></tr>
+<tr><td><b>④ 路由器动态检测和控制</b>（流聚集 aggregate + 回推 pushback）</td>
+    <td>检测标准、公平性机制、高效实现、运营管理<b>均未解决</b></td></tr>
+<tr><td><b>防范</b></td><td>限制带宽 · 终端防御（<b>打补丁 / 少开服务 / 增强容忍性</b>）· 入口过滤（<b>严格防火墙策略 / 封锁无用数据</b>）</td>
+    <td><b>完全阻止是不可能的</b></td></tr>
+<tr><td class="hl"><b>最有效</b></td><td><b>流量清洗</b>：监测判断 → <b>流量牵引</b> → 清洗过滤 → <b>流量回送</b>；
+    三系统＝检测 / 缓解 / 监控管理；回注四方式＝<b>策略路由 · MPLS VPN · 二层透传 · 双链路</b></td>
+    <td>难以区分<b>语义合法</b>的 CC 请求；牵引回注有工程代价</td></tr>
+</tbody>
+</table></div>
+
+<h3 id="ch-idx">14.3　★ 关键词 → 节号索引</h3>
+
+<p class="small muted">按题干里出现的名词查。<b>索引里的节号就是本资料的节号</b>（每节标题左上角有 §N 编号）。</p>
+
+<div class="tbl-wrap idx"><table>
+<thead><tr><th>关键词</th><th>它是什么</th><th>节</th></tr></thead>
+<tbody>
+<tr><td>可用性</td><td>DoS 破坏的安全属性（不是机密性/完整性）</td><td>§1.1</td></tr>
+<tr><td>服务质量降低</td><td>「变慢」也算 DoS</td><td>§1.1</td></tr>
+<tr><td>分散性 / 协同性 / 汇聚性</td><td>DDoS 的三个特点</td><td>§1.2</td></tr>
+<tr><td>DSIT Workshop</td><td>1999.11 CERT/CC 首次概括 DDoS</td><td>§1.2</td></tr>
+<tr><td>广义 / 狭义</td><td>DDoS 与 DoS 的关系</td><td>§1.3</td></tr>
+<tr><td>best-effort</td><td>不区分攻击流量，成功原因之二</td><td>§1.4</td></tr>
+<tr><td>根本原因</td><td>网络带宽和系统资源是有限的</td><td>§1.4</td></tr>
+<tr><td>直接型 / 间接型 DoS</td><td>按是否直接针对受害者分</td><td>§2.1</td></tr>
+<tr><td>资源破坏型 / 服务终止型</td><td>课本按攻击方式的分类用词</td><td>§2.2</td></tr>
+<tr><td>Killer Packet</td><td>剧毒包型 / 杀手包</td><td>§2.3</td></tr>
+<tr><td>漏洞攻击 / 协议攻击</td><td>剧毒包型的两个别名</td><td>§3.1</td></tr>
+<tr><td>带外数据 / OOB / URG</td><td>WinNuke</td><td>§3.2</td></tr>
+<tr><td>蓝屏攻击 / 带外攻击</td><td>WinNuke 的别名</td><td>§3.2</td></tr>
+<tr><td>片偏移 / offset / DF</td><td>IP 分片的三条规则</td><td>§3.3</td></tr>
+<tr><td>碎片攻击 / 泪滴 / Teardrop</td><td>分片重叠导致重组崩溃</td><td>§3.3</td></tr>
+<tr><td>小片段攻击</td><td>把标志位挤到第二片，穿透防火墙</td><td>§3.3</td></tr>
+<tr><td>重叠分片攻击</td><td>防火墙与主机重组规则不同，穿透防火墙</td><td>§3.3</td></tr>
+<tr><td class="hl">碎片重组 / 拖垮防火墙</td><td class="hl">发大量凑不齐的分片（<b>简答 13 答案</b>）</td><td>§3.3</td></tr>
+<tr><td>Land.c / 空连接</td><td>源=目的=受害者，端口须监听</td><td>§3.4</td></tr>
+<tr><td>死亡之 Ping / ICMP Bug</td><td>Ping of Death</td><td>§3.5</td></tr>
+<tr><td>65507</td><td>ICMP 数据部分上限</td><td>§3.5</td></tr>
+<tr><td>振荡 / 乒乓攻击</td><td>循环攻击，Echo↔Chargen</td><td>§3.6</td></tr>
+<tr><td>handler / agent</td><td>管理者 / 攻击代理（三步骤）</td><td>§4.1</td></tr>
+<tr><td>IP spoofing</td><td>假冒 IP 的两个目的</td><td>§4.3</td></tr>
+<tr><td>带宽攻击</td><td>风暴型的别名</td><td>§4</td></tr>
+<tr><td>半连接 / 半连接表</td><td>SYN Flood 消耗的资源</td><td>§5.1</td></tr>
+<tr><td>SYN Timeout</td><td>30 秒～2 分钟</td><td>§5.1</td></tr>
+<tr><td class="hl">为什么伪造源地址</td><td class="hl">逃避追踪 + 拖到超时 + 避免自伤</td><td>§5.1 / §12</td></tr>
+<tr><td>空连接攻击</td><td>TCP 连接耗尽</td><td>§5.3</td></tr>
+<tr><td>Trinoo / betaaalmostdone</td><td>UDP 风暴工具与口令</td><td>§5.4</td></tr>
+<tr><td>CC / Challenge Collapsar</td><td>HTTP 风暴，挑战黑洞</td><td>§5.5</td></tr>
+<tr><td>黑洞 / Collapsar</td><td>早期抗 DDoS 系统，CC 名字的由来</td><td>§5.5</td></tr>
+<tr><td>为什么用代理</td><td>隐藏身份 / 绕防火墙 / 保持连接</td><td>§5.5</td></tr>
+<tr><td>邮件炸弹 / 垃圾邮件</td><td>耗存储；垃圾邮件不是攻击</td><td>§5.6</td></tr>
+<tr><td>DRDoS</td><td>反射型拒绝服务攻击</td><td>§6.1</td></tr>
+<tr><td>反射器 / Reflector</td><td>未被入侵，只是回应请求</td><td>§6.1</td></tr>
+<tr><td class="hl">选协议三标准</td><td class="hl">服务器多 / 响应远大于请求 / <b>无连接</b></td><td>§6.2</td></tr>
+<tr><td>表 11-1 / 放大倍数</td><td>NTP 206~556、Chargen 358.8、DNS 28~54</td><td>§6.3</td></tr>
+<tr><td>monlist / MON_GETLIST</td><td>返回最后 600 个客户端 IP</td><td>§6.4</td></tr>
+<tr><td>disable monitor</td><td>ntp.conf 中禁用 monlist</td><td>§6.4</td></tr>
+<tr><td>noquery / restrict</td><td>限制 NTP 响应的源地址</td><td>§6.4</td></tr>
+<tr><td>UPnP / SSDP / M-SEARCH</td><td>即插即用与服务发现，端口 1900</td><td>§6.5</td></tr>
+<tr><td>ssdp:alive / byebye</td><td>设备上下线通告</td><td>§6.5</td></tr>
+<tr><td>Botnet / BotMaster / Bot</td><td>僵尸网络三角色</td><td>§7.1</td></tr>
+<tr><td>C&amp;C 信道</td><td>命令与控制信道</td><td>§7.1</td></tr>
+<tr><td>单点失效 / 蜜罐 / 蜜网</td><td>IRC 型的致命弱点</td><td>§7.2</td></tr>
+<tr><td>僵尸网络的迁移</td><td>改变其 IRC 服务器的行为</td><td>§7.2</td></tr>
+<tr><td class="hl">IRC vs P2P 优缺点</td><td class="hl"><b>简答 12 答案</b></td><td>§7.4</td></tr>
+<tr><td>Mirai / Mozi / Gafgyt</td><td>IoT 僵尸网络家族</td><td>§7.4</td></tr>
+<tr><td>DNSPod / 暴风影音</td><td>5·19 网络瘫痪案</td><td>§8</td></tr>
+<tr><td class="hl">两次拒绝服务攻击</td><td class="hl">第二次由第一次引起，因软件缺陷</td><td>§8.2</td></tr>
+<tr><td class="hl">为什么隔一天才爆发</td><td class="hl"><b>简答 7 答案</b>（A 记录 vs NS 记录 TTL）</td><td>§8.3</td></tr>
+<tr><td>ARP 表 / DNS 缓存</td><td>重定向型改的两样东西</td><td>§9</td></tr>
+<tr><td>中间人攻击</td><td>重定向到攻击者主机时的叫法</td><td>§9</td></tr>
+<tr><td>RARP-boot / 端口 69</td><td>逼系统重启后攻击引导过程</td><td>§10</td></tr>
+<tr><td>地址冒充</td><td>致瘫 DNS 后冒充域名解析</td><td>§10</td></tr>
+<tr><td>PTR 反向查询</td><td>攻击前的域名解析痕迹</td><td>§11.3</td></tr>
+<tr><td>0x28374839</td><td>Shaft 的固定序列号</td><td>§11.2</td></tr>
+<tr><td>BASE64 / 一串 A 字符</td><td>TFN2K 的数据段特征</td><td>§11.3</td></tr>
+<tr><td>流聚集 aggregate / 回推 pushback</td><td>路由器动态检测和控制</td><td>§11.4</td></tr>
+<tr><td>IP 追溯 / ICMP 追溯 / 链路测试</td><td>traceback 三方法</td><td>§11.4</td></tr>
+<tr><td>输入调试 / 受控涌入</td><td>链路测试的两种具体方法</td><td>§11.4</td></tr>
+<tr><td class="hl">流量清洗四环节</td><td class="hl">监测判断 → 牵引 → 清洗 → 回送</td><td>§11.5</td></tr>
+<tr><td>BGP Peer / no-advertise</td><td>流量牵引的实现</td><td>§11.5</td></tr>
+<tr><td>策略路由 / MPLS VPN / 二层透传</td><td>回注的三种方式（+ 双链路、SDN）</td><td>§11.5</td></tr>
+<tr><td>Smurf</td><td>需过滤所有 ICMP ECHO 报文</td><td>§11.4</td></tr>
+</tbody>
+</table></div>
+
+<div class="box exam">
+  <div class="box-t">★ 最后三句话（如果只来得及看一段，看这个）</div>
+  <p><b>① 病根：</b>网络带宽和系统资源是有限的——这是根本原因，也是 DoS 无法根除的原因。<br>
+  <b>② 主线：</b>剧毒包型（拼漏洞，已过时）→ 风暴型（拼量，主流）→ 其中直接型（1:1，式微）
+  被反射型（放大几百倍、彻底隐身，当前主流）取代；重定向型（改路标）争议大、只占 2 页。<br>
+  <b>③ 防御：</b>检测（特征标志 / 异常流量）→ 响应（分组过滤 / 源端控制 / 追溯 / 路由器动态控制，
+  <b>四种都只能部分缓解</b>）→ <b>最有效的是流量清洗</b>：监测判断 → 牵引 → 清洗 → 回送。</p>
+</div>
+
+</section>
+<hr>
+<p class="small muted">
+  <b>第 11 章 · 拒绝服务攻击及防御</b>　脉络与详略依老师 PPT（71 页）分配，
+  课本《计算机网络安全原理》（第 2 版）p.330–357 为详解来源。<br>
+  <span class="pref">p.41</span> ＝ PPT 页码　<span class="bref">p.335</span> ＝ 课本页码。
+  标注 <span class="chip warn">PPT 未讲</span> 的小节为课本内容，因课本习题在考而写入正文。<br>
+  打印：<code>Cmd/Ctrl + P</code> → 纸张 A4 → <b>勾选「背景图形 / Background graphics」</b>（否则彩色分区块会变成白底，「定义 / 重点 / 易错」就分不出来了）。
+</p>
+</div><!-- /.page -->
+</body>
+</html>
