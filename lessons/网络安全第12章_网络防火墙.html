@@ -1,0 +1,2273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>第12章 网络防火墙 · 开卷打印资料</title>
+<style>
+/* ==========================================================================
+   第 12 章 · 网络防火墙 —— A4 打印资料
+   设计原则：所见即所打。
+   · 屏幕栏宽 == 打印栏宽：A4 210mm − 左右页边距 2×10mm = 190mm（≈718px）
+   · 从屏幕到纸只有「字号」在变（15px → 9pt），排版结构完全不动
+   · 单一浅色外观，不做暗色；零 JS；零折叠
+   ========================================================================== */
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+
+:root{
+  --ink:#141414; --ink2:#3f3f3f; --ink3:#6e6b64;
+  --line:#c6c2b9; --line2:#e0ddd5; --line3:#efece5;
+  --paper:#fff; --gray:#f4f3f0; --gray2:#eae8e2;
+
+  --accent:#1b3a8f;                                   /* 深蓝，黑白打印下也够深 */
+  --def:#14548c;  --def-bg:#eef4fa;  --def-line:#b9d3e8;
+  --key:#2b3f8f;  --key-bg:#eef0fa;  --key-line:#c0c6e8;
+  --trap:#a81f1f; --trap-bg:#fdeeed; --trap-line:#f0bfbc;
+  --exam:#8a5a00; --exam-bg:#fdf5e2; --exam-line:#e8d29a;
+  --eg:#126b4a;   --eg-bg:#eaf5ef;   --eg-line:#b3ddc8;
+  --ok:#126b4a;
+
+  --font:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --mono:"SF Mono",SFMono-Regular,ui-monospace,Menlo,Consolas,monospace;
+}
+
+body{
+  margin:0; background:var(--gray2); color:var(--ink);
+  font-family:var(--font); font-size:15px; line-height:1.72;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- 版心：屏幕上模拟一张 A4 ---------- */
+.page{
+  max-width:210mm; margin:0 auto; padding:14mm 10mm 20mm;
+  background:var(--paper); box-shadow:0 0 0 1px rgba(0,0,0,.06),0 8px 40px rgba(0,0,0,.10);
+}
+
+/* ---------- 排版 ---------- */
+p{margin:0 0 .72em}
+ul,ol{margin:0 0 .8em; padding-left:1.45em}
+li{margin:0 0 .3em}
+li>ul,li>ol{margin-top:.3em}
+b,strong{font-weight:700}
+a{color:inherit; text-decoration:none}
+hr{border:0; border-top:1px solid var(--line2); margin:1.6em 0}
+
+.hdr{border-bottom:2.5px solid var(--ink); padding-bottom:12px; margin-bottom:18px}
+.hdr .eyebrow{font-size:12px; letter-spacing:.14em; color:var(--accent); font-weight:750}
+.hdr h1{font-size:29px; line-height:1.25; margin:7px 0 9px; letter-spacing:-.02em; font-weight:800}
+.hdr p{font-size:14px; color:var(--ink2); margin:0 0 5px}
+
+.sec{margin-top:30px}
+.sec-head{border-top:2px solid var(--ink); padding-top:11px; margin-bottom:12px}
+.sec-num{display:block; font-size:11.5px; font-weight:800; letter-spacing:.14em; color:var(--accent); margin-bottom:4px}
+h2.sec-t{font-size:23px; font-weight:800; letter-spacing:-.018em; line-height:1.3; margin:0 0 4px}
+.sec-lede{font-size:13.5px; color:var(--ink2); margin:5px 0 0}
+
+h3{font-size:18px; font-weight:760; margin:26px 0 9px; line-height:1.4; letter-spacing:-.01em;
+   border-left:4px solid var(--accent); padding-left:9px}
+h4{font-size:15.5px; font-weight:740; margin:19px 0 7px; line-height:1.5}
+h5{font-size:14.4px; font-weight:720; margin:15px 0 5px; color:var(--ink2)}
+
+.lead{font-size:15.4px; color:var(--ink2); border-left:3px solid var(--accent); padding-left:13px; margin:0 0 18px}
+
+/* ---------- 行内标记 ---------- */
+.hl{background:#fdf0c4; padding:0 2px; font-weight:650; print-color-adjust:exact; -webkit-print-color-adjust:exact}
+mark{background:#fdf0c4; padding:0 3px; border-radius:2px}
+code{font-family:var(--mono); font-size:.87em; background:var(--gray); border:1px solid var(--line2);
+     padding:1px 4px; border-radius:4px; overflow-wrap:anywhere;
+     print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.pill{display:inline-block; font-family:var(--mono); font-size:.85em; background:var(--gray);
+      border:1px solid var(--line2); border-radius:4px; padding:0 5px; overflow-wrap:anywhere}
+.en{font-family:var(--mono); font-size:.9em; color:var(--ink2)}
+.small{font-size:13px}
+.muted{color:var(--ink3)}
+.center{text-align:center}
+.mt0{margin-top:0}
+
+/* ---------- 来源徽标（双轨）----------
+   .pref = PPT 页码（考纲范围），.bref = 课本页码（详解出处）。
+   两者都必须显式 text-transform:none —— 否则塞进任何 uppercase 容器里
+   「p.108」会被渲染成「P.108」。本表整套 CSS 都不使用 uppercase。 */
+.pref,.bref{
+  display:inline-block; font-family:var(--mono); font-size:10.5px; font-weight:700;
+  border-radius:3px; padding:0 4px; margin-left:5px; vertical-align:1px;
+  white-space:nowrap; line-height:1.6; text-transform:none;
+  print-color-adjust:exact; -webkit-print-color-adjust:exact;
+}
+.pref{color:var(--accent); background:#eaeefa; border:1px solid #c2cbea}
+.bref{color:var(--ink3); background:var(--gray); border:1px solid var(--line2)}
+
+.chip{
+  display:inline-block; font-size:11.5px; font-weight:700; padding:.5px 7px;
+  border-radius:10px; border:1px solid var(--line); background:var(--gray); color:var(--ink2);
+  white-space:nowrap; line-height:1.6; text-transform:none;
+  print-color-adjust:exact; -webkit-print-color-adjust:exact;
+}
+.chip.warn{background:var(--exam-bg); border-color:var(--exam-line); color:var(--exam)}
+.chip.bad{background:var(--trap-bg); border-color:var(--trap-line); color:var(--trap)}
+.chips{display:flex; flex-wrap:wrap; gap:6px; margin:10px 0}
+
+/* ---------- 提示框 ---------- */
+.box{
+  border:1px solid var(--line2); border-left:3.5px solid var(--ink3);
+  background:var(--gray); border-radius:0 6px 6px 0; padding:11px 14px; margin:15px 0;
+  font-size:14.4px; break-inside:avoid;
+  print-color-adjust:exact; -webkit-print-color-adjust:exact;
+}
+.box>:last-child{margin-bottom:0}
+.box-t{font-size:12px; font-weight:800; letter-spacing:.06em; margin-bottom:5px; text-transform:none}
+.box.def {border-left-color:var(--def);  background:var(--def-bg);  border-color:var(--def-line)}
+.box.def  .box-t{color:var(--def)}
+.box.key {border-left-color:var(--key);  background:var(--key-bg);  border-color:var(--key-line)}
+.box.key  .box-t{color:var(--key)}
+.box.trap{border-left-color:var(--trap); background:var(--trap-bg); border-color:var(--trap-line)}
+.box.trap .box-t{color:var(--trap)}
+.box.exam{border-left-color:var(--exam); background:var(--exam-bg); border-color:var(--exam-line)}
+.box.exam .box-t{color:var(--exam)}
+.box.eg  {border-left-color:var(--eg);   background:var(--eg-bg);   border-color:var(--eg-line)}
+.box.eg   .box-t{color:var(--eg)}
+/* 课本有、PPT 未讲：灰底 + 虚线框，视觉降级到权重为零（不折叠） */
+.box.beyond{border:1px dashed var(--line); border-left:3.5px dashed var(--line);
+            background:var(--gray); color:var(--ink2)}
+.box.beyond .box-t{color:var(--ink3)}
+
+/* ---------- 表格 ---------- */
+.tbl-wrap{margin:15px 0; border:1px solid var(--line2); border-radius:6px; overflow:hidden; break-inside:avoid}
+table{border-collapse:collapse; width:100%; font-size:13.6px; line-height:1.6}
+th,td{padding:6px 9px; text-align:left; border-bottom:1px solid var(--line3); vertical-align:top}
+thead th{background:var(--gray2); font-weight:750; font-size:13px; color:var(--ink2);
+         border-bottom:1px solid var(--line);
+         print-color-adjust:exact; -webkit-print-color-adjust:exact}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{font-family:var(--mono); font-variant-numeric:tabular-nums; white-space:nowrap}
+.tbl-cap{font-size:12.5px; color:var(--ink3); margin:-9px 0 15px; text-align:center}
+
+/* ---------- 卡片网格 ---------- */
+.grid{display:grid; gap:10px; margin:15px 0}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.mini{border:1px solid var(--line2); border-radius:6px; padding:9px 11px; font-size:13.6px;
+      line-height:1.65; background:var(--paper); break-inside:avoid; min-width:0}
+.mini>:last-child{margin-bottom:0}
+.mini .t{font-weight:750; font-size:13.8px; margin-bottom:4px; display:flex; align-items:center; gap:6px}
+.mini .t .ic{flex:0 0 18px; width:18px; height:18px; border-radius:4px; background:var(--accent); color:#fff;
+             display:grid; place-items:center; font-size:11px; font-weight:800;
+             print-color-adjust:exact; -webkit-print-color-adjust:exact}
+
+/* ---------- 武器一：场景卡 ---------- */
+.scene{border:1px solid var(--line); border-radius:8px; margin:18px 0; padding:13px 15px;
+       background:var(--gray); break-inside:avoid;
+       print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.scene-k{font-size:11.5px; font-weight:800; letter-spacing:.1em; color:var(--trap); margin-bottom:5px; text-transform:none}
+.scene-q{font-size:17px; font-weight:780; line-height:1.45; margin:0 0 8px; letter-spacing:-.012em}
+.scene-b{font-size:14.2px; color:var(--ink2); line-height:1.72}
+.scene-b>:last-child{margin-bottom:0}
+.scene-real{margin:10px 0 0; padding:9px 12px; border-radius:6px; background:var(--paper);
+            border:1px dashed var(--line); font-size:13.4px; line-height:1.7}
+.scene-real .t{font-size:11.5px; font-weight:800; letter-spacing:.08em; color:var(--ink3); margin-bottom:4px}
+.scene-real>:last-child{margin-bottom:0}
+
+/* ---------- 武器二：因果链 ---------- */
+.chain{border:1px solid var(--line); border-radius:7px; overflow:hidden; margin:16px 0; break-inside:avoid}
+.chain-i{display:grid; grid-template-columns:minmax(0,64px) minmax(0,1fr); gap:11px;
+         padding:9px 13px; border-bottom:1px solid var(--line2);
+         print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.chain-i:last-child{border-bottom:0}
+.chain-k{font-size:11.5px; font-weight:800; letter-spacing:.05em; padding-top:2px; line-height:1.5; text-transform:none}
+.chain-b{font-size:14px; line-height:1.68; min-width:0}
+.chain-b>:last-child{margin-bottom:0}
+.chain-i.prev{background:var(--trap-bg)} .chain-i.prev .chain-k{color:var(--trap)}
+.chain-i.now {background:var(--eg-bg)}   .chain-i.now  .chain-k{color:var(--eg)}
+.chain-i.next{background:var(--exam-bg)} .chain-i.next .chain-k{color:var(--exam)}
+
+/* ---------- 武器三：步骤表 ---------- */
+.steps{list-style:none; padding:0; margin:14px 0; counter-reset:st}
+.steps>li{position:relative; padding-left:29px; margin-bottom:8px; counter-increment:st; break-inside:avoid}
+.steps>li::before{
+  content:counter(st); position:absolute; left:0; top:2px; width:20px; height:20px;
+  border-radius:50%; background:var(--accent); color:#fff;
+  display:grid; place-items:center; font-size:11.5px; font-weight:800; font-variant-numeric:tabular-nums;
+  print-color-adjust:exact; -webkit-print-color-adjust:exact;
+}
+.steps.tight>li{margin-bottom:4px}
+
+/* ---------- 定义列表 ---------- */
+.kv{display:grid; grid-template-columns:minmax(0,max-content) minmax(0,1fr); gap:5px 14px;
+    font-size:14px; margin:12px 0}
+.kv dt{font-weight:750; color:var(--ink2)}
+.kv dd{margin:0}
+
+/* ---------- 公式 / 算式 ---------- */
+.fx{font-family:var(--mono); font-size:14px; text-align:center; padding:10px 12px; line-height:1.75;
+    background:var(--gray); border:1px solid var(--line2); border-radius:6px; margin:14px 0;
+    break-inside:avoid; overflow-wrap:anywhere;
+    print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.fx.fx-l{text-align:left}
+.fx small{display:block; font-family:var(--font); font-size:12.8px; color:var(--ink3); margin-top:6px; line-height:1.65}
+sub{font-size:.72em; vertical-align:-.25em}
+sup{font-size:.72em; vertical-align:.45em}
+
+/* ---------- PPT 页数权重条 ----------
+   .wfill 是 <span>，且不是 grid 的直接子元素（它在 .wtrack 里），
+   不会被自动 blockify —— 必须显式 display:block，否则五根条整根不显示。 */
+.wt{display:grid; gap:6px; margin:14px 0; break-inside:avoid}
+.wt-r{display:grid; grid-template-columns:minmax(0,110px) minmax(0,1fr) auto; gap:9px;
+      align-items:center; font-size:13.4px}
+.wt-n{font-weight:700; min-width:0; overflow-wrap:anywhere}
+.wtrack{display:block; height:13px; border-radius:7px; background:var(--gray2); overflow:hidden; min-width:0;
+        print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.wfill{display:block; height:100%; border-radius:7px; background:var(--accent);
+       print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.wfill.hot{background:var(--trap)}
+.wfill.cold{background:#9c988f}
+.wt-v{font-family:var(--mono); font-size:12px; color:var(--ink3); white-space:nowrap}
+
+/* ---------- 放大倍数条 ---------- */
+.amp{display:grid; gap:5px; margin:12px 0; break-inside:avoid}
+.amp-r{display:grid; grid-template-columns:minmax(0,86px) minmax(0,1fr) auto; gap:8px;
+       align-items:center; font-size:13px}
+.amp-n{font-weight:700; min-width:0; overflow-wrap:anywhere}
+.amptrack{display:block; height:11px; border-radius:6px; background:var(--gray2); overflow:hidden; min-width:0;
+          print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.ampfill{display:block; height:100%; border-radius:6px; background:var(--trap);
+         print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.ampfill.mid{background:var(--exam)} .ampfill.low{background:#9c988f}
+.amp-v{font-family:var(--mono); font-size:12px; color:var(--ink3); white-space:nowrap}
+
+/* ---------- 必背数字卡 ---------- */
+.mustnum{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin:14px 0}
+.mustnum .n{border:1px solid var(--exam-line); background:var(--exam-bg); border-radius:6px;
+            padding:7px 10px; font-size:13px; line-height:1.5; min-width:0; break-inside:avoid;
+            print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.mustnum .n b{display:block; font-family:var(--mono); font-size:14.5px; color:var(--exam);
+              font-weight:800; overflow-wrap:anywhere; line-height:1.35}
+.mustnum .n span{display:block; font-size:12px; color:var(--ink2); margin-top:2px}
+
+/* ---------- 关键词索引 ---------- */
+.idx table{font-size:12.8px}
+.idx th,.idx td{padding:4px 8px}
+.idx td:last-child{font-family:var(--mono); font-weight:700; color:var(--accent); white-space:nowrap}
+
+/* ---------- 选择题 ---------- */
+.mc{border:1px solid var(--line2); border-radius:6px; padding:9px 12px; margin:9px 0;
+    background:var(--paper); font-size:13.8px; break-inside:avoid}
+.mc-h{font-weight:640; line-height:1.7; margin-bottom:6px; display:flex; gap:7px; align-items:baseline}
+.qn{flex:0 0 auto; font-family:var(--mono); font-size:11.5px; font-weight:800; color:#fff;
+    background:var(--accent); border-radius:3px; padding:1px 5px; text-transform:none;
+    print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.mc-o{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:2px 14px;
+      font-size:13.4px; line-height:1.65; margin-bottom:6px}
+.mc-o span{min-width:0; overflow-wrap:anywhere}
+.mc-o span.ok{font-weight:750; color:var(--ok)}
+.mc-a{font-size:13.2px; line-height:1.7; background:var(--gray); border:1px solid var(--line2);
+      border-radius:5px; padding:7px 10px;
+      print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.mc-a b{color:var(--ok)}
+
+/* ---------- 简答题（静态，不折叠） ---------- */
+.qa{border:1px solid var(--line2); border-radius:6px; margin:11px 0; overflow:hidden;
+    background:var(--paper); break-inside:avoid}
+.qa-h{padding:8px 12px; font-weight:700; font-size:14.2px; line-height:1.65;
+      background:var(--gray); border-bottom:1px solid var(--line2);
+      display:flex; gap:8px; align-items:baseline;
+      print-color-adjust:exact; -webkit-print-color-adjust:exact}
+.qa-b{padding:10px 12px; font-size:13.8px; line-height:1.72}
+.qa-b>:last-child{margin-bottom:0}
+.qa-src{font-size:12.2px; color:var(--ink3); margin-top:8px; padding-top:6px; border-top:1px dashed var(--line2)}
+
+/* ---------- SVG 图 ---------- */
+.svg-wrap{margin:14px 0; padding:8px; border:1px solid var(--line2); border-radius:6px;
+          background:var(--paper); break-inside:avoid}
+svg.flow{display:block; width:100%; height:auto}
+svg.flow text{font-family:var(--font); fill:var(--ink); font-size:11px}
+svg.flow .mono{font-family:var(--mono)}
+svg.flow .ttl{font-size:12.5px; font-weight:750}
+svg.flow .t-md{font-size:12px; font-weight:700}
+svg.flow .t-sm{font-size:11px}
+svg.flow .lbl{font-size:10.5px; fill:var(--ink3)}
+svg.flow .t-mut{font-size:10px; fill:var(--ink3)}
+svg.flow .bx  {fill:#fff;            stroke:var(--line);  stroke-width:1.3}
+svg.flow .bx-a{fill:var(--key-bg);   stroke:var(--accent);stroke-width:1.5}
+svg.flow .bx-c{fill:var(--gray);     stroke:var(--line);  stroke-width:1.3}
+svg.flow .bx-t{fill:var(--trap-bg);  stroke:var(--trap);  stroke-width:1.4}
+svg.flow .bx-e{fill:var(--eg-bg);    stroke:var(--eg);    stroke-width:1.4}
+svg.flow .ln  {stroke:var(--line);   stroke-width:1.4; fill:none}
+svg.flow .ln-a{stroke:var(--accent); stroke-width:1.8; fill:none}
+svg.flow .ln-t{stroke:var(--trap);   stroke-width:1.8; fill:none}
+
+/* ---------- 强制分页（节制使用：只给最大的几节） ---------- */
+.pagebreak{break-before:page; page-break-before:always}
+
+/* ==========================================================================
+   打印
+   ========================================================================== */
+@page{ size:A4; margin:11mm 10mm; }
+
+@media print{
+  body{background:#fff; font-size:9pt; line-height:1.40}
+  .page{max-width:none; width:auto; margin:0; padding:0; box-shadow:none}
+
+  .hdr{padding-bottom:6pt; margin-bottom:7pt; border-bottom-width:1.6pt}
+  .hdr h1{font-size:19pt; margin:4pt 0 5pt}
+  .hdr p{font-size:9pt; margin:0 0 3pt}
+  .hdr .eyebrow{font-size:8pt}
+
+  .sec{margin-top:12pt}
+  .sec-head{border-top-width:1.4pt; padding-top:6pt; margin-bottom:7pt; break-after:avoid}
+  .sec-num{font-size:8pt; margin-bottom:2pt}
+  h2.sec-t{font-size:14.5pt; break-after:avoid}
+  .sec-lede{font-size:8.6pt; margin-top:3pt}
+  h3{font-size:11.6pt; margin:9pt 0 4pt; border-left-width:3pt; padding-left:6pt; break-after:avoid; break-inside:avoid}
+  h4{font-size:10pt; margin:7pt 0 3pt; break-after:avoid; break-inside:avoid}
+  h5{font-size:9.2pt; margin:5pt 0 2pt; break-after:avoid}
+  .lead{font-size:9.2pt; margin:0 0 6pt; padding-left:7pt}
+
+  p{margin:0 0 3.5pt}
+  ul,ol{margin:0 0 3.5pt; padding-left:1.25em}
+  li{margin:0 0 1.2pt}
+  p,li,dd,dt{orphans:2; widows:2}
+
+  .box{padding:4pt 6pt; margin:5pt 0; font-size:8.5pt; border-left-width:2.2pt}
+  .box-t{font-size:7.7pt; margin-bottom:2pt}
+  .tbl-wrap{margin:5pt 0}
+  table{font-size:7.7pt; line-height:1.36}
+  th,td{padding:2pt 3.2pt}
+  thead th{font-size:7.7pt}
+  .tbl-cap{font-size:7.5pt; margin:-3pt 0 5pt}
+
+  .grid{gap:4pt; margin:5pt 0}
+  .mini{padding:4pt 5.5pt; font-size:8.3pt; line-height:1.42}
+  .mini .t{font-size:8.5pt; margin-bottom:1.5pt}
+  .mini .t .ic{flex-basis:11pt; width:11pt; height:11pt; font-size:6.6pt}
+
+  .scene{padding:5pt 7pt; margin:6pt 0}
+  .scene-k{font-size:7.6pt; margin-bottom:3pt}
+  .scene-q{font-size:10.2pt; margin:0 0 3.5pt}
+  .scene-b{font-size:8.5pt; line-height:1.44}
+  .scene-real{padding:4pt 5.5pt; margin-top:4pt; font-size:8.2pt; line-height:1.42}
+  .scene-real .t{font-size:7.4pt; margin-bottom:2pt}
+
+  .chain{margin:6pt 0}
+  .chain-i{padding:3.5pt 6pt; grid-template-columns:minmax(0,36pt) minmax(0,1fr); gap:5pt}
+  .chain-k{font-size:7.6pt}
+  .chain-b{font-size:8.5pt; line-height:1.42}
+
+  .steps{margin:5pt 0}
+  .steps>li{padding-left:15pt; margin-bottom:2.5pt}
+  .steps>li::before{width:11.5pt; height:11.5pt; font-size:7.2pt; top:1pt}
+  .steps.tight>li{margin-bottom:2pt}
+
+  .kv{font-size:8.4pt; gap:3pt 9pt; margin:6pt 0}
+  .fx{font-size:8.5pt; padding:4pt 6pt; margin:5pt 0; line-height:1.46}
+  .fx small{font-size:7.6pt; margin-top:3pt}
+
+  .chips{gap:3pt; margin:5pt 0}
+  .chip{font-size:7.4pt; padding:0 4pt}
+  .pref,.bref{font-size:6.9pt; padding:0 3pt; margin-left:3pt}
+  code,.pill{font-size:7.9pt; padding:0 2.5pt}
+  .small{font-size:8pt}
+
+  .wt{gap:2.5pt; margin:5pt 0}
+  .wt-r{font-size:8pt; grid-template-columns:minmax(0,74pt) minmax(0,1fr) auto; gap:5pt}
+  .wtrack{height:8pt}
+  .wt-v{font-size:7.2pt}
+
+  .amp{gap:2.5pt; margin:6pt 0}
+  .amp-r{font-size:7.8pt; grid-template-columns:minmax(0,56pt) minmax(0,1fr) auto; gap:5pt}
+  .amptrack{height:7pt}
+  .amp-v{font-size:7.2pt}
+
+  .mustnum{gap:3pt; margin:5pt 0; grid-template-columns:repeat(3,minmax(0,1fr))}
+  .mustnum .n{padding:4pt 6pt; font-size:7.8pt; line-height:1.42}
+  .mustnum .n b{font-size:9pt}
+  .mustnum .n span{font-size:7.1pt}
+
+  .idx table{font-size:7.5pt}
+  .idx th,.idx td{padding:1.6pt 3.2pt}
+
+  .mc{padding:3.5pt 5.5pt; margin:3.5pt 0; font-size:8.3pt}
+  .mc-h{font-size:8.5pt; margin-bottom:2pt; line-height:1.44}
+  .mc-o{font-size:8.2pt; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0.5pt 8pt; margin-bottom:2pt}
+  .mc-a{font-size:8pt; padding:3pt 5pt; line-height:1.44}
+  .qn{font-size:7.2pt; padding:0 3pt}
+
+  .qa{margin:4.5pt 0}
+  .qa-h{padding:3.5pt 5.5pt; font-size:8.6pt; line-height:1.44}
+  .qa-b{padding:4.5pt 5.5pt; font-size:8.3pt; line-height:1.46}
+  .qa-src{font-size:7.4pt; margin-top:3.5pt; padding-top:3pt}
+
+  .svg-wrap{margin:5pt 0; padding:3pt}
+  svg.flow text{font-size:9px}
+  svg.flow .ttl{font-size:10px} svg.flow .t-md{font-size:9.6px}
+  svg.flow .t-sm{font-size:9px} svg.flow .lbl{font-size:8.6px} svg.flow .t-mut{font-size:8.2px}
+
+  hr{margin:7pt 0}
+}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="hdr">
+  <div class="eyebrow">计算机网络安全原理（第 2 版） · 开卷考试打印资料</div>
+  <h1>第 12 章　网络防火墙</h1>
+  <p><b>脉络与篇幅一律以老师的 PPT 为准，课本只用来把 PPT 的每一页展开讲透。</b></p>
+  <p class="small muted">来源徽标：<span class="pref">PPT p.23</span> ＝ 老师 PPT 的页码（考纲范围）　<span class="bref">课本 p.361</span> ＝ 课本页码（详解出处）。
+  凡标了「PPT 原文」「课本原文」的句子，都可以直接抄进卷子。</p>
+</div>
+
+<p class="lead">这一章只有一个问题：<b>内网里有一堆脆弱的、带漏洞的、本来就不该被外人看见的服务，而互联网上任何人都能直接连到它们。</b>
+办法是在内外网的边界上修一道<b>唯一通道</b>，逼所有流量从这里过、并接受检查——这就是防火墙。
+全章 87 页 PPT 讲的其实是三件事：<b>这道墙怎么查（§2 工作原理）</b>、<b>几道墙怎么摆（§3 体系结构）</b>、<b>这道墙有多强、又强不到哪去（§5 评价与不足）</b>。</p>
+
+<div class="box key">
+  <div class="box-t">一句话抓住整章</div>
+  <p>防火墙的全部能力来自一个假设：<b>内网和外网之间存在明确的边界，而且所有流量都必须经过我。</b><br>
+  §2 的四代技术，是在<b>「经过我的流量，我能看懂多少」</b>这条线上一路加码：只看包头 → 记住连接 → 读懂应用 → 又快又懂。<br>
+  §3 的四种结构，是在<b>「我被攻破之后，后果有多惨」</b>这条线上一路减压：全押一台 → 加日志 → 加一层 → 加一整个隔离带。<br>
+  §5 的「不足」全部来自那个假设本身：<b>只要流量不经过我，或者边界根本不存在，我就完全失效。</b>这也正是第 13 章入侵检测存在的理由。</p>
+</div>
+
+<h3>整章的因果链：每一代都在补上一代的漏</h3>
+
+<div class="svg-wrap">
+<svg class="flow" viewBox="0 0 700 236" role="img" aria-label="防火墙四代技术的因果链">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1b3a8f"/>
+    </marker>
+    <marker id="ahr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#a81f1f"/>
+    </marker>
+  </defs>
+
+  <text class="ttl" x="350" y="13" text-anchor="middle">从「只看包头」到「读懂应用」——每一步都是被上一步的漏洞逼出来的</text>
+
+  <rect class="bx-t" x="12" y="24" width="676" height="30" rx="5"/>
+  <text class="t-md" x="350" y="43" text-anchor="middle">病根：内网服务有漏洞、不该暴露，而外网任何人都能直接连上它</text>
+
+  <path class="ln-a" d="M350,54 L350,72" marker-end="url(#ah)"/>
+
+  <rect class="bx-a" x="12" y="76" width="156" height="40" rx="5"/>
+  <text class="t-md" x="90" y="93" text-anchor="middle">① 包过滤</text>
+  <text class="t-sm" x="90" y="108" text-anchor="middle">只看 IP／TCP 包头</text>
+
+  <rect class="bx-a" x="190" y="76" width="156" height="40" rx="5"/>
+  <text class="t-md" x="268" y="93" text-anchor="middle">② 状态检测</text>
+  <text class="t-sm" x="268" y="108" text-anchor="middle">记住这条连接的状态</text>
+
+  <rect class="bx-a" x="368" y="76" width="156" height="40" rx="5"/>
+  <text class="t-md" x="446" y="93" text-anchor="middle">③ 应用网关（代理）</text>
+  <text class="t-sm" x="446" y="108" text-anchor="middle">读懂应用层数据</text>
+
+  <rect class="bx-e" x="546" y="76" width="142" height="40" rx="5"/>
+  <text class="t-md" x="617" y="93" text-anchor="middle">④ 自适应代理</text>
+  <text class="t-sm" x="617" y="108" text-anchor="middle">该快就快，该细就细</text>
+
+  <path class="ln-a" d="M168,96 L188,96" marker-end="url(#ah)"/>
+  <path class="ln-a" d="M346,96 L366,96" marker-end="url(#ah)"/>
+  <path class="ln-a" d="M524,96 L544,96" marker-end="url(#ah)"/>
+
+  <path class="ln-t" d="M90,116 L90,132" marker-end="url(#ahr)"/>
+  <path class="ln-t" d="M268,116 L268,132" marker-end="url(#ahr)"/>
+  <path class="ln-t" d="M446,116 L446,132" marker-end="url(#ahr)"/>
+  <path class="ln-t" d="M617,116 L617,132" marker-end="url(#ahr)"/>
+
+  <rect class="bx-t" x="12" y="136" width="156" height="60" rx="5"/>
+  <text class="t-sm" x="20" y="152">留下的坑：不知道包</text>
+  <text class="t-sm" x="20" y="166">属于哪条连接，只好</text>
+  <text class="t-sm" x="20" y="180">放行「源端口 80」，</text>
+  <text class="t-sm" x="20" y="192">被反向扫描内网</text>
+
+  <rect class="bx-t" x="190" y="136" width="156" height="60" rx="5"/>
+  <text class="t-sm" x="198" y="152">留下的坑：仍然不看</text>
+  <text class="t-sm" x="198" y="166">应用层内容；UDP／</text>
+  <text class="t-sm" x="198" y="180">ICMP 本来就无状态；</text>
+  <text class="t-sm" x="198" y="192">FTP 子连接要另跟踪</text>
+
+  <rect class="bx-t" x="368" y="136" width="156" height="60" rx="5"/>
+  <text class="t-sm" x="376" y="152">留下的坑：每种应用</text>
+  <text class="t-sm" x="376" y="166">要单独写代理；慢、</text>
+  <text class="t-sm" x="376" y="180">贵；聊天等要求直连</text>
+  <text class="t-sm" x="376" y="192">的服务根本代理不了</text>
+
+  <rect class="bx-c" x="546" y="136" width="142" height="60" rx="5"/>
+  <text class="t-sm" x="554" y="152">四代都躲不掉的坑：</text>
+  <text class="t-sm" x="554" y="166">只要流量<tspan font-weight="700">不经过</tspan></text>
+  <text class="t-sm" x="554" y="180">它，或者边界根本</text>
+  <text class="t-sm" x="554" y="192">不存在，就全失效</text>
+
+  <path class="ln-t" d="M617,196 L617,210" marker-end="url(#ahr)"/>
+  <rect class="bx-t" x="380" y="212" width="308" height="22" rx="4"/>
+  <text class="t-sm" x="534" y="227" text-anchor="middle">→ §5「防火墙的不足」，并逼出第 13 章的入侵检测（IDS）</text>
+</svg>
+</div>
+
+<h3>PPT 的篇幅分配：老师把时间花在哪</h3>
+
+<p class="small">全部 87 页，去掉封面 1 页和重复出现的「内容提纲」页 5 页，<b>正文 81 页</b>。下面是各节实际占的页数——
+<b>这决定了本资料每一节该给多少篇幅</b>，而不是照课本的节数平均分。</p>
+
+<div class="wt">
+  <div class="wt-r"><span class="wt-n">§2 工作原理</span><span class="wtrack"><span class="wfill hot" style="width:100%"></span></span><span class="wt-v">37 页 · 46%</span></div>
+  <div class="wt-r"><span class="wt-n">§3 体系结构</span><span class="wtrack"><span class="wfill" style="width:51%"></span></span><span class="wt-v">19 页 · 23%</span></div>
+  <div class="wt-r"><span class="wt-n">§1 概述</span><span class="wtrack"><span class="wfill" style="width:38%"></span></span><span class="wt-v">14 页 · 17%</span></div>
+  <div class="wt-r"><span class="wt-n">§5 评价与不足</span><span class="wtrack"><span class="wfill" style="width:24%"></span></span><span class="wt-v">9 页 · 11%</span></div>
+  <div class="wt-r"><span class="wt-n">§4 发展趋势</span><span class="wtrack"><span class="wfill cold" style="width:5%"></span></span><span class="wt-v">2 页 · 2.5%</span></div>
+</div>
+
+<p class="small">§2 内部再拆一次：<b>包过滤 13 页</b>、<b>状态检测 10 页</b>、<b>应用网关＋自适应代理 11 页</b>、技术发展史 3 页。
+三大技术几乎<b>三分天下</b>，所以本资料给它们三节同等的详细程度。</p>
+
+<div class="box trap">
+  <div class="box-t">⚠ 「发展趋势」只有 2 页，是不是漏掉了重点？——查过了，不是</div>
+  <p>按 skill 的规矩，凡是<b>出现在 PPT 内容提纲的一级标题、正文却近乎空白</b>的那一节，都要拿去和课本习题交叉验证：
+  <b>如果课本习题在考它，那就是「老师留给课本讲」的，不是「不考」的。</b><br>
+  「防火墙技术发展趋势」被列进了 PPT 的一级提纲（5 项之一），正文却只有 2 页。
+  但翻遍课本 12.7 的 <b>12 道单选、8 道多选、11 道问答，没有一道在考「发展趋势」</b>
+  （问答第 10 题考的是<b>不足</b>，而「不足」在 PPT 里有整整 4 页）。<br>
+  <b>结论：这一节确实是老师课上带过的，本资料照 PPT 权重只给它一小段。</b></p>
+</div>
+
+<h3>PPT 与课本的双向对照：范围是怎么定下来的</h3>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th style="width:23%">内容</th><th style="width:15%">PPT</th><th style="width:17%">课本</th><th>本资料怎么处理</th></tr></thead>
+<tbody>
+<tr><td>防火墙定义 / 四类防火墙 / 四大功能</td><td>p.3–16（14 页）</td><td>12.1（p.358–360）</td><td>正文，两边合并</td></tr>
+<tr><td><b>防火墙技术的四代发展史</b></td><td>p.18–20（3 页）</td><td class="muted">几乎没有（只提了 2009 Gartner）</td><td><b>必写</b>：老师专门加的，几乎一定考</td></tr>
+<tr><td>包过滤 / ACL / 六项要求 / 规则实例</td><td>p.21–33（13 页）</td><td>12.2.1（p.360–365）</td><td>正文主体</td></tr>
+<tr><td><b>IP 分片绕过包过滤的三种玩法</b></td><td>p.33（整整一页）</td><td class="muted">只有一句带过</td><td><b>必写</b>：PPT 展开讲了，课本没有</td></tr>
+<tr><td>状态检测 / 连接状态表 / Session 表</td><td>p.34–43（10 页）</td><td>12.2.2（p.365–367）</td><td>正文主体</td></tr>
+<tr><td><b>TCP 状态转换图＋四条判据</b></td><td>p.37–38（2 页）</td><td class="muted">没有状态机</td><td><b>必写</b></td></tr>
+<tr><td>应用网关（代理）优缺点</td><td>p.44–52（9 页）</td><td>12.2.3（p.367–368）</td><td>正文主体</td></tr>
+<tr><td><b>自适应代理（第四代）</b></td><td>p.53–54（2 页）</td><td class="muted">一个字都没有</td><td><b>必写</b>：这是 PPT 的「第四代」定义</td></tr>
+<tr><td>四种体系结构 / 堡垒主机 / DMZ</td><td>p.56–74（19 页）</td><td>12.3（p.370–373）</td><td>正文主体</td></tr>
+<tr><td>评价指标 8 项 / 防火墙的不足</td><td>p.79–87（9 页）</td><td>12.5、12.6（p.374–380）</td><td>正文，按 PPT 的 8 项列</td></tr>
+<tr><td>发展趋势</td><td>p.76–77（2 页）</td><td>12.6 后半（p.379–380）</td><td>照 PPT 权重，压成一小段</td></tr>
+<tr><td class="muted"><b>防火墙的部署方式</b>（透明／网关／NAT 模式）</td><td class="muted"><b>一个字都没提</b></td><td>12.4（p.373–374）</td><td class="muted"><b>不写正文</b>（按你的选择），但<b>课本习题考了 2 道</b>，见下方灰框与习题解析</td></tr>
+<tr><td class="muted">防火墙自身漏洞的具体案例（EXBA／CVE）</td><td class="muted">只说「防火墙本身有漏洞」</td><td>12.6（p.379）</td><td class="muted"><b>不写正文</b>，但<b>单选第 12 题考了</b>，见习题解析</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box beyond">
+  <div class="box-t">PPT 未讲 · 不作要求 —— 但这两块课本习题在考，看一眼就够</div>
+  <p><b>① 防火墙的部署方式（课本 12.4，p.373–374）。</b>讲的不是「怎么查包」，而是「这台防火墙在网络里当什么角色」，三种：
+  <b>透明模式</b>（＝桥接模式＝透明桥接模式，像个二层交换机，<b>不改包头、不做路由</b>，接进原有网络即可，胜在不用改网络规划，输在没法做路由和 NAT）；
+  <b>网关模式</b>（＝路由模式，各接口在<b>不同子网</b>，<b>要做路由转发</b>，适合内外网不在同一网段）；
+  <b>NAT 模式</b>（在网关模式基础上再做<b>地址转换</b>，外网看不到内网真实 IP，还能用私有地址省 IP；要让外网访问内网服务再加<b>地址/端口映射 MAP</b>）。
+  三者里 <b>NAT 模式适用面最广、安全保障最强</b>。<br>
+  <b>考点就两句：能隐藏内网 IP 的只有 NAT 模式；能提供路由功能的是网关模式和 NAT 模式（透明＝桥接，不提供）。</b>
+  对应<b>单选第 11 题</b>与<b>多选第 6 题</b>，完整解析见 §6 习题（单选 11、多选 6）。</p>
+  <p><b>② 防火墙自身的漏洞案例（课本 12.6，p.379）。</b>2016 年影子经纪人泄露的 NSA「方程式组织」武器库里，
+  <b>EXBA（Extra Bacon）</b>利用 Cisco 防火墙 <b>SNMP 服务</b>的零日漏洞 <b>CVE-2016-6366</b> 实现远程控制
+  （前提是目标防火墙<b>启用了 SNMP 服务</b>）。对应<b>单选第 12 题</b>。</p>
+</div>
+
+<h3>PPT 抛了问却没写答案的题 —— 开卷考最爱出的那一类</h3>
+
+<p class="small">老师提了却不给答案，通常是留着课上讲或者留着考；而且这类题问的全是<b>「为什么这样设计」</b>而不是「是什么」，
+<b>翻书翻不到，必须理解</b>。全章共 <b>4 道</b>，其中 <b>2 道被课本习题原样又考了一遍</b>——这是最硬的重点证据。</p>
+
+<div class="tbl-wrap idx">
+<table>
+<thead><tr><th style="width:9%">PPT</th><th style="width:38%">原题</th><th>一句话答案（完整作答在正文对应小节，见右起第二列）</th><th style="width:14%">课本习题</th></tr></thead>
+<tbody>
+<tr><td class="num">p.35</td><td>内网允许访问 Web 站点，若用简单包过滤，存在什么安全问题？</td><td>为放行响应必须开「源端口 80 → 内网 &gt;1023」，攻击者就<b>拿 80 当源端口反向扫描内网</b></td><td class="num muted">—</td></tr>
+<tr><td class="num">p.52</td><td>（老师备注：可作为问题请学生回答）代理有哪些场合根本用不了？</td><td>要求<b>建立直接连接</b>的服务，如聊天、即时消息</td><td class="num muted">—</td></tr>
+<tr><td class="num">p.59</td><td>普通路由器自带的报文过滤，和过滤路由器防火墙的过滤软件有什么区别？</td><td><b>是否对路由的数据包做安全检测</b>；路由器的过滤功能简单得多</td><td class="num"><b>问答 2</b></td></tr>
+<tr><td class="num">p.69</td><td>屏蔽子网中的堡垒主机被攻破，会有什么后果？</td><td>只能看到 <b>DMZ 里的流量</b>；内网主机之间的通信<b>不经过 DMZ</b>，拿不到</td><td class="num"><b>问答 8</b></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 id="conflict">⚠ 教材自己前后打架的地方 —— 先看这张表，后面就不会晕</h3>
+
+<p class="small">这一章同一个东西有五六个名字，而且 <b>PPT 在同一节的 7 页里就换了两种叫法</b>。
+考场上看到陌生名词先查这张表，<b>只看它描述的动作，不要纠结那个名词</b>。</p>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th style="width:34%">出现在哪</th><th style="width:33%">被叫做什么</th><th>说的其实是</th></tr></thead>
+<tbody>
+<tr><td>PPT p.21–33／课本 12.2.1</td><td>包过滤、<b>简单包过滤</b>、<b>静态包过滤</b>、筛选路由器（Screening Router）</td><td rowspan="2"><b>无状态的包过滤</b>（课本 12.2.2 才补上「无状态」这个词）</td></tr>
+<tr><td>课本 p.360</td><td>「包过滤防火墙相当于具有包过滤功能的路由器」</td></tr>
+<tr><td>PPT p.19、p.34–43</td><td><b>动态包过滤</b>、<b>状态检测</b>（Stateful／State Inspection 两种拼法都出现过）、基于状态检查的包过滤</td><td>课本 12.2.2 的<b>「有状态的包过滤防火墙」</b>——同一件事</td></tr>
+<tr><td>PPT p.44–52</td><td>应用级代理、应用代理、<b>应用网关</b>、代理服务器</td><td>课本 12.2.3 的<b>「应用网关防火墙」</b></td></tr>
+<tr><td>PPT p.56、p.59</td><td><b>过滤路由器</b>结构、<b>屏蔽路由器</b>结构（Screening Router）</td><td>课本 12.3.1 的<b>「屏蔽路由器结构」</b></td></tr>
+<tr><td class="hl">PPT p.67 写「屏蔽子网」，p.68–73 却改写「<b>过滤子网</b>」</td><td class="hl"><b>屏蔽子网 ＝ 过滤子网 ＝ 周边网 ＝ DMZ 区 ＝ 中立区 ＝ 非军事化区</b></td><td class="hl">课本 12.3.4 的<b>「屏蔽子网结构」</b>，那块隔离网段叫 <b>DMZ</b>。<b>同一节里换了叫法，是 PPT 自己的笔误，别当成两种结构。</b></td></tr>
+<tr><td>PPT p.61–63／课本 12.3.2</td><td>双宿主主机、<b>双穴主机</b>、双宿主机</td><td>装了<b>两块网卡</b>、跨接内外网的那台堡垒主机</td></tr>
+<tr><td>课本 p.373</td><td>透明模式 ＝ <b>桥接模式</b> ＝ 透明桥接模式</td><td>同一种部署模式（<b>多选第 6 题的 A 和 D 是同义干扰项</b>）</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box exam">
+  <div class="box-t">速判口诀</div>
+  <p><b>只看「它检查到第几层、记不记得上一个包」，不要纠结那个名词叫什么。</b><br>
+  只看包头、不记上一个包 → <b>包过滤（无状态／静态／简单）</b>；<br>
+  只看包头、但记得这条连接走到哪一步了 → <b>状态检测（动态包过滤／有状态包过滤）</b>；<br>
+  连数据区都拆开读 → <b>应用网关（应用代理／应用级代理）</b>。</p>
+</div>
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-num">§ 1　PPT p.3–16（14 页 · 17%）</span>
+    <h2 class="sec-t">防火墙概述：它到底是什么、能干什么</h2>
+    <p class="sec-lede">这一节 PPT 花了 14 页，其中 9 页在做一件事——<b>先把「防火墙」这个词拆成四种完全不同的产品</b>，再说明本章只讲其中一种。这不是啰嗦，是因为后面所有的技术、结构、指标，全都只对「网络防火墙」成立。</p>
+  </div>
+
+<h3>1.1　为什么开头要先分四类</h3>
+
+<div class="scene">
+  <div class="scene-k">PPT p.4–9 · 老师的开场</div>
+  <p class="scene-q">「防火墙」是使用广泛的一个词，在不同领域有不同含义。电力领域指变电站里两台充油设备之间防火焰蔓延的隔墙；煤炭领域指为封闭火区砌筑的隔墙。<span class="bref">课本 p.358</span></p>
+  <div class="scene-b">
+    <p>在网络安全领域，国标《GB/T 20281-2020》把防火墙定义为：<b>对经过的数据流进行解析，并实现访问控制及安全防护功能的网络安全产品</b>。
+    这个定义太宽了，宽到能装下四种完全不同的东西——所以国标紧接着<b>「根据安全目的、实现原理的不同」</b>把它分成了四类。</p>
+    <div class="scene-real">
+      <div class="t">分类的真正判据只有一个：它挡在谁前面、保护的对象是谁</div>
+      <p class="mt0">老师用了 5 页（p.5–9）逐个念定义，看着像流水账，其实<b>四条定义的句式完全一样</b>：「部署于 <b>____</b> 前端／之间，对流经的 <b>____</b> 数据进行解析，具备 <b>____</b> 的访问控制及安全防护功能的网络安全产品」。<b>只有三个空不一样。</b></p>
+    </div>
+  </div>
+</div>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th style="width:20%">四类防火墙</th><th style="width:22%">部署在哪</th><th style="width:24%">解析什么数据</th><th>保护对象</th></tr></thead>
+<tbody>
+<tr><td><b>网络型防火墙</b><br><span class="en small">network-based</span></td><td>不同安全域之间，通常是<b>内外网的边界位置</b></td><td>经过的<b>全部数据流</b>，具备<b>网络层＋应用层</b>访问控制</td><td><b>整个内部网络</b>　<span class="chip warn">本章唯一对象</span></td></tr>
+<tr><td><b>Web 应用防火墙</b><br><span class="en small">WAF</span></td><td><b>Web 服务器前端</b></td><td>流经的 <b>HTTP/HTTPS</b> 访问与响应</td><td><b>Web 应用服务器</b></td></tr>
+<tr><td><b>数据库防火墙</b><br><span class="en small">database firewall</span></td><td><b>数据库服务器前端</b></td><td>流经的<b>数据库访问与响应</b></td><td><b>数据库管理系统</b></td></tr>
+<tr><td><b>主机防火墙</b><br><span class="en small">host-based，又称个人防火墙</span></td><td>装在<b>计算机上</b>（个人机或服务器），位于主机与外网之间</td><td>该主机的网络通信；提供<b>网络层访问控制＋应用程序访问限制＋攻击防护</b></td><td><b>单台主机或服务器</b>（例：Windows Defender）</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box key">
+  <div class="box-t">这张表是怎么考的</div>
+  <p><b>单选第 8 题</b>就是它的直接应用：「某单位连在公网上的 Web 服务器经常遭受网页篡改、挂马、SQL 注入等攻击，选一款<b>最有效</b>的防护设备」——
+  答案是 <b>WAF</b>，不是网络防火墙。<b>判据：被保护的对象是 Web 应用服务器，攻击发生在 HTTP 层面。</b>
+  网络防火墙看到的只是「一条去往 80 端口的 TCP 连接」，它分不清里面装的是正常请求还是 SQL 注入。</p>
+</div>
+
+<h3>1.2　很多教材给出的定义（这一段可以直接抄）</h3>
+
+<div class="box def">
+  <div class="box-t">PPT 原文 <span class="pref">PPT p.10</span></div>
+  <p>防火墙（firewall）是在<b>两个网络之间执行访问控制策略</b>的一个或一组安全系统。它是一种计算机硬件和软件系统集合，是实现网络安全策略的有效工具之一，被广泛应用到 Internet 与 Intranet 之间。</p>
+  <p><b>所有的内部网络与外部网络之间的通信都必须经过防火墙检查与连接，只有授权允许的通信才能获准通过防火墙。</b></p>
+  <p>防火墙可以阻止外界对内部网资源的非法访问，<b>也可以防止内部对外部的不安全访问</b>。</p>
+</div>
+
+<div class="box trap">
+  <div class="box-t">这段定义里藏了三个考点，别只抄不看</div>
+  <p><b>①「都必须经过防火墙」</b>——这是防火墙全部效力的<b>前提假设</b>，不是它的功能。§5 的「不足」第一条（防火墙不能防范<b>不经过</b>它的攻击）就是这句话的反面。<b>单选第 5 题 D</b>「如果一个网络没有明确边界，则使用防火墙可能没效果」考的正是这个。</p>
+  <p><b>②「只有授权允许的通信才能获准通过」</b>——这就是<b>默认拒绝</b>策略，即「<b>没有明确允许的即被禁止</b>」。<b>单选第 2 题、第 9 题、多选第 1 题</b>反复在考。</p>
+  <p><b>③「也可以防止内部对外部的不安全访问」</b>——<b>防火墙的访问控制是双向的</b>。别以为它只挡外面进来的。</p>
+  <p class="small muted">老师在备注里补了一句：<b>「这个定义实际上是指网络防火墙。」</b></p>
+</div>
+
+<h3>1.3　辨析：病毒防火墙 ≠ 网络防火墙</h3>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th style="width:22%"></th><th style="width:39%">病毒防火墙 <span class="pref">PPT p.11</span></th><th>网络防火墙</th></tr></thead>
+<tbody>
+<tr><td><b>本质是什么</b></td><td>病毒<b>实时检测和清除系统</b></td><td>在两个网络之间执行<b>访问控制</b>的系统</td></tr>
+<tr><td><b>监控谁</b></td><td><b>所有的系统应用程序</b>——不管它联不联网</td><td><b>只监控有网络访问的那部分程序</b></td></tr>
+<tr><td><b>目标</b></td><td>保障用户系统的「<b>无毒</b>」环境</td><td>预防黑客入侵、防止木马盗取机密信息</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="small">PPT 补了一句缓冲：「现在有不少网络防火墙也可以查杀部分病毒。」但这不改变 §5 的结论——
+<b>防火墙不具备查杀病毒的功能，即使集成了第三方防病毒模块，杀毒能力也有限</b>。<span class="bref">课本 p.379</span></p>
+
+<h3>1.4　防火墙的四大功能（PPT p.12–16，一页一条）</h3>
+
+<div class="box def">
+  <div class="box-t">总体功能 · PPT 原文 <span class="pref">PPT p.12</span> <span class="bref">课本 p.359</span></div>
+  <p>防火墙对内外网之间的通信进行<b>监控、审计</b>，在<b>网络周界（network perimeter）</b>处阻止网络攻击行为，<b>保护内网中脆弱以及存在安全漏洞的网络服务，防止内网信息暴露</b>。</p>
+  <p class="small muted">这一句几乎就是<b>问答第 1 题</b>（「防火墙部署在网络边界所起的安全防护作用主要体现在哪些方面？」）的标准答案，背下来。</p>
+</div>
+
+<div class="grid g2">
+  <div class="mini">
+    <div class="t"><span class="ic">1</span>网络层控制</div>
+    <p class="mt0"><b>访问控制：</b>包过滤（<b>双向</b>控制）、网络地址转换 <b>NAT</b>、状态检测。<br>
+    <b>流量管理：</b>带宽管理（速率控制、速率保证）、连接数控制、会话管理。</p>
+    <p class="small muted">课本补充：带宽管理按<b>源 IP、目的 IP、应用类型、时间段</b>控制速率；连接数控制限制<b>单个 IP</b> 的最大并发会话数与新建连接速率；会话管理在会话<b>不活跃一定时间或结束后</b>终止会话。<span class="bref">课本 p.359</span></p>
+  </div>
+  <div class="mini">
+    <div class="t"><span class="ic">2</span>应用层控制</div>
+    <p class="mt0"><b>用户管控：</b>基于用户认证的网络访问控制（本地认证／第三方认证）。<br>
+    <b>应用类型控制：</b>按应用<b>特征</b>识别并控制各种应用流量（HTTP、FTP、TELNET、POP3…）。<br>
+    <b>应用内容控制：</b>按<b>内容</b>控制，如按 HTTP 的请求方式（GET/POST/PUT）、传输内容关键字、邮箱名、附件文件名拦钓鱼邮件与垃圾邮件。</p>
+  </div>
+  <div class="mini">
+    <div class="t"><span class="ic">3</span>攻击防护</div>
+    <p class="mt0">基于<b>特征库</b>识别并阻止：网络扫描（主机扫描、端口扫描、漏洞扫描）、典型拒绝服务攻击（ICMP/UDP/SYN Flood、CC 攻击）、Web 应用攻击（SQL 注入、XSS），拦截木马攻击与钓鱼邮件。<br>
+    还提供<b>联动接口</b>，与入侵检测系统等其他安全系统协同（如执行别的系统下发的策略）。</p>
+  </div>
+  <div class="mini">
+    <div class="t"><span class="ic">4</span>安全审计、告警与统计</div>
+    <p class="mt0">防火墙位于边界，<b>能看见内外网之间的所有通信数据</b>：什么时刻、哪个源地址、发往哪个目的地址、负载是什么。<br>
+    因此可以<b>记录所有网络访问并做审计记录</b>、管理事件日志、做流量与攻击事件<b>统计分析</b>，检测到攻击或不安全事件时<b>产生告警</b>。</p>
+  </div>
+</div>
+
+<div class="box exam">
+  <div class="box-t">四大功能怎么记：按「它看到第几层」和「看完做什么」两个维度</div>
+  <p>①②是<b>看到第几层</b>（网络层 vs 应用层）——这正好对应 §2 的包过滤 vs 应用网关。<br>
+  ③是<b>拿特征库比对</b>（这已经越界到入侵防御了，也正是「下一代防火墙」的卖点）。<br>
+  ④是<b>不拦、只记</b>——而它之所以能记全，纯粹因为「所有流量都必须经过我」这个位置优势。<b>位置决定了审计能力，这是防火墙相对于主机防护的最大长处。</b></p>
+</div>
+
+<div class="chain">
+  <div class="chain-i prev"><div class="chain-k">承上</div><div class="chain-b">§1 说清了<b>「防火墙该干什么」</b>：在边界上做访问控制，只放行授权的通信。</div></div>
+  <div class="chain-i now"><div class="chain-k">下一节</div><div class="chain-b">§2 讲<b>「它到底怎么做到的」</b>——所有技术差异，归结为一句话：<b>它检查到第几层、记不记得上一个包。</b></div></div>
+  <div class="chain-i next"><div class="chain-k">先记住</div><div class="chain-b">三大技术：<b>包过滤</b>（只看包头）→ <b>状态检测</b>（记住连接）→ <b>应用网关</b>（读懂数据）。<b>单选第 3、4 题就是在考它们各作用在第几层。</b></div></div>
+</div>
+</div>
+<div class="sec pagebreak">
+  <div class="sec-head">
+    <span class="sec-num">§ 2　PPT p.18–54（37 页 · 46%）——全章最大的一节</span>
+    <h2 class="sec-t">防火墙的工作原理</h2>
+    <p class="sec-lede">PPT 用了近一半篇幅讲这一节，内部又几乎三分天下：<b>包过滤 13 页、状态检测 10 页、应用网关＋自适应代理 11 页</b>。所以本资料给这三块同等的详细程度。</p>
+  </div>
+
+<h3>2.0　技术发展的四代（PPT 有、课本几乎没有 → 必考）</h3>
+
+<p class="small">课本 12.2 只按「实现技术」分成三类（包过滤／有状态包过滤／应用网关）＋下一代防火墙，<b>完全没有按年代分代</b>。
+分代法是老师专门加进来的 3 页，<b>年份和公司名要能对上</b>。</p>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th style="width:12%">代</th><th style="width:12%">年份</th><th style="width:22%">技术</th><th style="width:22%">谁做的</th><th>要点</th></tr></thead>
+<tbody>
+<tr><td><b>第一代</b></td><td class="num">1983</td><td><b>包过滤</b>（Packet filter）<br>又称简单包过滤、<b>静态包过滤</b></td><td class="muted">—</td><td><b>几乎与路由器同时问世</b>（这句是考点：包过滤本来就是路由器的能力）</td></tr>
+<tr><td><b>第二代</b></td><td class="num">1991</td><td><b>应用型防火墙</b>（代理防火墙）</td><td><b>贝尔实验室</b></td><td>提出了初步结构</td></tr>
+<tr><td><b>第三代</b></td><td class="num">1992<br>1994</td><td><b>动态包过滤</b>（Dynamic packet filter），后演变为<b>状态检测</b>（Stateful inspection）</td><td>1992 <b>USC 信息科学院</b>开发<br>1994 <b>以色列 CheckPoint</b> 推出第一个商业化产品</td><td>「动态包过滤」和「状态检测」<b>是同一条线上的前后名字</b></td></tr>
+<tr><td><b>第四代</b></td><td class="num">1998</td><td><b>自适应代理</b>（Adaptive proxy）</td><td><b>NAI 公司</b>，产品 <b>Gauntlet Firewall for NT</b></td><td>「给代理服务器防火墙赋予了全新的意义」</td></tr>
+<tr><td><b>下一代</b></td><td class="num">2009</td><td><b>下一代防火墙</b>（NGFW）</td><td><b>Gartner</b> 提出<span class="bref">课本 p.368</span></td><td>深度包检测，<b>超越基于端口、协议的检测与阻断，增加了应用层检测和入侵防护</b></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box trap">
+  <div class="box-t">⚠ 教材自己打架：状态检测到底是第三代还是第四代？</div>
+  <p>PPT 正文（p.19）明确把<b>状态检测算作第三代</b>，第四代留给自适应代理。<br>
+  但老师<b>在 p.19 和 p.20 的备注里都写了同一句</b>：「<b>也有文献将状态检测防火墙作为第四代防火墙</b>。」<br>
+  <b>考试按 PPT 正文答：状态检测＝第三代，自适应代理＝第四代。</b>如果题目出现「第四代＝状态检测」的选项，说明出题人用了另一派文献，看题干的其它线索（有没有提自适应代理）再定。</p>
+</div>
+
+<h3>2.1　包过滤（PPT p.21–33，13 页）</h3>
+
+<div class="chain">
+  <div class="chain-i prev"><div class="chain-k">承上</div><div class="chain-b">§1 要求「所有流量必须经过我，只放行授权的」。<b>最省事的实现方式是什么？</b></div></div>
+  <div class="chain-i now"><div class="chain-k">本节</div><div class="chain-b">路由器<b>本来就要拆开每个包的 IP 头</b>才能转发。既然已经拆了，顺手比对一张规则表——<b>这就是包过滤，几乎零额外成本</b>，所以它 1983 年就出现了。</div></div>
+  <div class="chain-i next"><div class="chain-k">留下的坑</div><div class="chain-b">它<b>只看这一个包</b>，不知道这包属于哪条连接、是不是自己人请求的响应 → 被迫开大口子 → §2.2 状态检测</div></div>
+</div>
+
+<div class="box def">
+  <div class="box-t">定义 · 两边合并 <span class="pref">PPT p.22</span> <span class="bref">课本 p.360</span></div>
+  <p>包过滤（Packet Filtering）作用在 TCP/IP 体系结构的<b>网络层和传输层</b>，根据数据包的<b>包头信息</b>（源和目的 IP 地址、端口号、标志位等），依据<b>事先设定的过滤规则</b>，决定是否允许数据包通过。</p>
+  <p><b>包过滤防火墙相当于一个具有包过滤功能的路由器</b>，因此也常被称为<b>筛选路由器（Screening Router）</b>。</p>
+</div>
+
+<div class="box exam">
+  <div class="box-t">「与一般路由器的区别」——这句被考了两次</div>
+  <p>课本 p.360 原文：<b>「具有包过滤功能的路由器，可以在网络接口设置过滤规则。数据包进出路由器时，路由器依据在数据包出入方向配置的规则处理数据包。」</b><br>
+  这既是 <b>PPT p.59 的课堂提问</b>，也是<b>课本问答第 2 题</b>。标准答案只有一句：<b>差别在于是否对路由的数据包进行安全检测。</b>
+  老师在 p.59 备注里补的口语版是：<b>一般路由器上的过滤软件比较简单，而过滤路由器防火墙的过滤软件功能较强。</b></p>
+</div>
+
+<h4>它到底看包头里的哪几样东西</h4>
+
+<div class="grid g2">
+  <div class="mini">
+    <div class="t"><span class="ic">P</span>PPT p.24 的五项</div>
+    <ul class="mt0">
+      <li><b>IP 协议类型</b>（TCP、UDP、ICMP 等）</li>
+      <li><b>IP 源地址和目标地址</b></li>
+      <li><b>IP 选择域</b>的内容</li>
+      <li><b>TCP 或 UDP 的源端口号和目标端口号</b></li>
+      <li><b>ICMP 消息类型</b></li>
+    </ul>
+    <p class="small"><b>PPT 原文：「访问控制列表由这 5 个元素来组成定义的规则。」</b></p>
+  </div>
+  <div class="mini">
+    <div class="t"><span class="ic">书</span>课本 p.360 的说法</div>
+    <p class="mt0">源地址、目的地址、<b>TCP/UDP 源端口号、TCP/UDP 目的端口号</b>、<b>ICMP 消息类型</b>，以及<b>各种标志位</b>（如 <b>TCP SYN 标志、TCP ACK 标志</b>），都可以用作判定参数。</p>
+    <p class="small"><b>课本把「IP 选择域」换成了「标志位」</b>，而标志位（SYN/ACK）在下一节状态检测里是绝对主角。<b>两边合起来记。</b></p>
+  </div>
+</div>
+
+<div class="fx fx-l">
+  常说的「<b>五元组</b>」＝ 源地址 · 源端口 · 目的地址 · 目的端口 · 协议
+  <small>课本 12.2.4 原话：传统防火墙「基于五元组进行包过滤」，而这正是<b>下一代防火墙要突破的东西</b>——
+  大量 Web 应用都从 80 端口走，五元组根本分不清里面是什么应用。</small>
+</div>
+
+<h4>访问控制列表（ACL）与六项基本要求</h4>
+
+<div class="box def">
+  <div class="box-t">课本原文 <span class="bref">课本 p.361</span></div>
+  <p><b>访问控制列表（Access Control List，ACL）由按序排列的过滤规则构成</b>，工作在防火墙某个接口的特定方向上，以 <code>in</code> 表示流入数据包，以 <code>out</code> 表示流出数据包。
+  数据包到达防火墙后，ACL 中的各条过滤规则<b>按序</b>与数据包进行匹配。<b>如果某条过滤规则匹配数据包，则立即执行对应的允许或者拒绝操作，数据包无须继续与 ACL 中剩余的过滤规则匹配。</b></p>
+  <p class="small muted">包过滤防火墙执行的操作<b>只有允许和拒绝两种</b>。允许＝数据包正常通过、不受影响；拒绝＝数据包被丢弃、无法到达目的主机。</p>
+</div>
+
+<ol class="steps tight">
+  <li>包过滤防火墙必须能够<b>存储</b>包过滤规则。</li>
+  <li>当数据包到达防火墙的相应端口时，防火墙能够<b>分析 IP、TCP、UDP 等协议报文头字段</b>。</li>
+  <li>包过滤规则的<b>应用顺序与存储顺序相同</b>。</li>
+  <li>如果一条规则<b>阻止</b>某个数据包的传输，那么此数据包便被防火墙<b>丢弃</b>。</li>
+  <li>如果一条规则<b>允许</b>某个数据包的传输，那么此数据包可以<b>正常通行</b>。</li>
+  <li>从安全的角度出发，如果某个数据包<b>不匹配任何一条</b>过滤规则，那么该数据包应当被防火墙<b>丢弃</b>。</li>
+</ol>
+
+<div class="box key">
+  <div class="box-t">六项要求里，真正要背的是这两句</div>
+  <p><b>规则 3、4、5 合起来说明一件事：过滤规则在 ACL 中的存储顺序非常重要。</b>因为匹配一命中就停，<b>与数据包匹配的第一条规则将发挥作用，剩余的规则全部被忽略</b>。<span class="pref">PPT p.25</span><span class="bref">课本 p.362</span></p>
+  <p><b>规则 6 的原理是：「未明确表示允许的便被禁止」</b>，即<b>默认拒绝</b>。这是 PPT 原话，也是<b>单选第 2、9 题和多选第 1 题</b>反复在考的那一句。</p>
+</div>
+
+<h4>顺序为什么要命：课本给的两套 ACL 对照（这是最好的例题）</h4>
+
+<p class="small">安全需求：<b>允许</b>源于 <code>10.65.0.0/16</code> 子网的数据包进入内网，<b>拒绝</b>源于 <code>10.65.19.0/8</code> 子网的数据包进入。
+注意 <code>10.65.19.100</code> 这个地址<b>同时属于两个子网</b>——这就是全部麻烦的来源。<span class="bref">课本 p.361–362</span></p>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th style="width:14%">方案</th><th style="width:36%">规则顺序</th><th style="width:26%">来了个 10.65.19.100</th><th>结果</th></tr></thead>
+<tbody>
+<tr><td><b>方案一</b><br><span class="chip bad">有纰漏</span></td><td>① 允许 <code>10.65.0.0/16</code> 进入<br>② 拒绝 <code>10.65.19.0/8</code> 进入</td><td>先试规则 ①，它属于 <code>10.65.0.0/16</code>，<b>匹配成功 → 执行「允许」</b>，规则 ② 根本不会再被匹配</td><td class="num"><b>放行</b>——违背了安全策略</td></tr>
+<tr><td><b>方案二</b><br><span class="chip warn">正确</span></td><td>① 拒绝 <code>10.65.19.0/8</code> 进入<br>② 允许 <code>10.65.0.0/16</code> 进入</td><td>先试规则 ①，匹配成功 → <b>拒绝</b>。而其它源于 <code>10.65.0.0/16</code> 的包不匹配 ①，落到 ② 被允许</td><td class="num"><b>拒绝</b>——与安全策略吻合</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box exam">
+  <div class="box-t">这个例子能推出一条通用规则，考简答题直接写</div>
+  <p><b>范围越小、越具体的规则必须排在越前面；范围大的、兜底的规则排在后面。</b>
+  否则宽规则会先命中，把本该被特殊处理的那部分包一并放走。<br>
+  再加一句收尾：<b>「默认处理操作可以看作是位于所有 ACL 末尾的一条过滤规则」</b>——<b>它只在数据包与所有规则都不匹配时才会被执行</b>。<span class="bref">课本 p.362</span></p>
+</div>
+
+<h4>默认策略：允许 vs 拒绝</h4>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th style="width:16%">默认动作</th><th style="width:30%">安全策略归结为</th><th>后果</th></tr></thead>
+<tbody>
+<tr><td><b>默认允许</b></td><td><b>「没有明确禁止的即被允许」</b></td><td>一旦安全管理员考虑不充分，<b>某些该拒绝的包类型没写成规则</b>，它们就会按默认允许通过，<b>对网络安全构成威胁</b></td></tr>
+<tr><td><b>默认拒绝</b><span class="chip warn">应当采用</span></td><td><b>「没有明确允许的即被禁止」</b></td><td><b>从安全的角度看，包过滤防火墙的默认处理方法应当是拒绝数据包。</b>Cisco 路由器采用的就是拒绝策略<span class="bref">课本 p.362</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<h4>包过滤的处理流程（PPT p.27 图 ＝ 课本图 12-1）</h4>
+
+<div class="svg-wrap">
+<svg class="flow" viewBox="0 0 700 238" role="img" aria-label="包过滤防火墙的处理流程图">
+  <defs>
+    <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#6e6b64"/>
+    </marker>
+  </defs>
+  <text class="ttl" x="350" y="13" text-anchor="middle">包过滤的处理流程 —— 注意它是「默认拒绝」版本</text>
+
+  <rect class="bx-c" x="176" y="24" width="200" height="24" rx="4"/>
+  <text class="t-sm" x="276" y="40" text-anchor="middle">数据包到达 → 存储好的 ACL</text>
+  <path class="ln" d="M276,48 L276,62" marker-end="url(#a2)"/>
+
+  <rect class="bx-a" x="176" y="62" width="200" height="24" rx="4"/>
+  <text class="t-sm" x="276" y="78" text-anchor="middle">取下一条过滤规则，与数据包匹配</text>
+  <path class="ln" d="M276,86 L276,98" marker-end="url(#a2)"/>
+
+  <path class="bx" d="M276,98 L396,120 L276,142 L156,120 z"/>
+  <text class="t-sm" x="276" y="124" text-anchor="middle">该规则允许包传输？</text>
+  <text class="lbl" x="404" y="117">是</text>
+  <path class="ln" d="M396,120 L470,120" marker-end="url(#a2)"/>
+  <rect class="bx-e" x="470" y="108" width="106" height="24" rx="12"/>
+  <text class="t-sm" x="523" y="124" text-anchor="middle">允许包通过</text>
+  <text class="lbl" x="282" y="152">否</text>
+  <path class="ln" d="M276,142 L276,152" marker-end="url(#a2)"/>
+
+  <path class="bx" d="M276,152 L396,172 L276,192 L156,172 z"/>
+  <text class="t-sm" x="276" y="176" text-anchor="middle">该规则阻止包传输？</text>
+  <text class="lbl" x="404" y="169">是</text>
+  <path class="ln" d="M396,172 L470,172" marker-end="url(#a2)"/>
+  <rect class="bx-t" x="470" y="160" width="106" height="24" rx="12"/>
+  <text class="t-sm" x="523" y="176" text-anchor="middle">阻塞包（丢弃）</text>
+  <text class="lbl" x="282" y="202">否</text>
+  <path class="ln" d="M276,192 L276,200" marker-end="url(#a2)"/>
+
+  <path class="bx" d="M276,200 L396,216 L276,230 L156,216 z"/>
+  <text class="t-sm" x="276" y="220" text-anchor="middle">还有下一条规则吗？</text>
+  <text class="lbl" x="404" y="213">否</text>
+  <path class="ln-t" d="M396,216 L470,216 L523,216 L523,186" marker-end="url(#a2)"/>
+  <text class="lbl" x="12" y="196">是 → 回到上面，取下一条规则继续匹配</text>
+  <path class="ln" d="M156,216 L26,216 L26,74 L174,74" marker-end="url(#a2)"/>
+
+  <rect class="bx-t" x="596" y="150" width="96" height="44" rx="4"/>
+  <text class="t-sm" x="604" y="166">规则全试完</text>
+  <text class="t-sm" x="604" y="180">还没命中</text>
+  <text class="t-sm" x="604" y="192" font-weight="700">→ 丢弃</text>
+</svg>
+</div>
+
+<h4>包过滤到底看到多少：只检查包头 <span class="pref">PPT p.26</span></h4>
+
+<div class="svg-wrap">
+<svg class="flow" viewBox="0 0 700 150" role="img" aria-label="包过滤只检查包头，不看数据区">
+  <text class="ttl" x="350" y="13" text-anchor="middle">同一个数据包，包过滤和应用代理各自看到什么（PPT p.23／p.48 的两张图合并）</text>
+
+  <rect class="bx-c" x="120" y="34" width="86" height="34" rx="4"/>
+  <text class="t-sm" x="163" y="55" text-anchor="middle">IP 报头</text>
+  <rect class="bx-c" x="206" y="34" width="106" height="34" rx="4"/>
+  <text class="t-sm" x="259" y="55" text-anchor="middle">TCP／UDP 报头</text>
+  <rect class="bx" x="312" y="34" width="268" height="34" rx="4"/>
+  <text class="t-sm" x="446" y="55" text-anchor="middle">数据（应用层负载）</text>
+
+  <path class="ln-a" d="M120,78 L120,92 L312,92 L312,78"/>
+  <text class="t-md" x="216" y="108" text-anchor="middle" fill="#1b3a8f">包过滤看这里：分组过滤判断信息</text>
+  <text class="t-sm" x="216" y="124" text-anchor="middle">源／目的 IP · 源／目的端口 · 协议 · 标志位</text>
+  <text class="t-sm" x="216" y="140" text-anchor="middle" font-weight="700">「只检查包头」</text>
+
+  <path class="ln-t" d="M312,78 L312,92 L580,92 L580,78"/>
+  <text class="t-md" x="446" y="108" text-anchor="middle" fill="#a81f1f">应用代理还看这里：应用代理判断信息</text>
+  <text class="t-sm" x="446" y="124" text-anchor="middle">对数据区进行分析，据此判断是否允许通过</text>
+  <text class="t-sm" x="446" y="140" text-anchor="middle" font-weight="700">「只检查数据」</text>
+</svg>
+</div>
+
+<p class="small">PPT p.26 和 p.49 用的是同一张 TCP/IP 分层图，唯一的差别是底下那行字：
+<b>包过滤那页写「只检查包头」，应用级代理那页写「只检查数据」</b>。这两句就是<b>单选第 3、4 题</b>的全部依据
+（包过滤型主要作用在<b>网络层</b>；应用网关主要作用在<b>应用层</b>）。</p>
+
+<h4>三个必须会写的包过滤规则表</h4>
+
+<p class="small">这三张表 PPT 和课本各出了一部分，全部合在这里。<b>写规则表的通用套路：一条出站、一条入站，成对出现；客户端口写 &gt;1023，服务端口写具体值。</b></p>
+
+<h5>① HTTP（Web）——PPT p.28 ＝ 课本表 12-1</h5>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>规则</th><th>方向</th><th>源地址</th><th>目的地址</th><th>协议</th><th>源端口</th><th>目的端口</th><th>是否通过</th></tr></thead>
+<tbody>
+<tr><td class="num"><b>A</b></td><td>出</td><td>内部</td><td>Internet</td><td>TCP</td><td class="num">&gt;1023</td><td class="num"><b>80</b></td><td><b>允许</b></td></tr>
+<tr><td class="num"><b>B</b></td><td>入</td><td>Internet</td><td>内部</td><td>TCP</td><td class="num"><b>80</b></td><td class="num">&gt;1023</td><td><b>允许</b></td></tr>
+</tbody>
+</table>
+</div>
+<p class="small"><b>为什么源端口是 &gt;1023：</b>内网主机作为客户端访问 Web 时，操作系统给它分配一个 <b>1024 以上的随机端口</b>作源端口，目的端口是 Web 服务默认的 80。规则 A 保证请求出得去，<b>规则 B 保证响应回得来</b>。<span class="bref">课本 p.363</span><br>
+<b class="hl">记住规则 B——下一节整节都在处理它捅出来的娄子。</b></p>
+
+<h5>② Telnet「只允许出站」——PPT p.29</h5>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>规则</th><th>方向</th><th>源地址</th><th>目的地址</th><th>协议</th><th>源端口</th><th>目的端口</th><th>是否通过</th></tr></thead>
+<tbody>
+<tr><td class="num"><b>A</b></td><td>出</td><td>内部</td><td>外部</td><td>TCP</td><td class="num">&gt;1023</td><td class="num"><b>23</b></td><td><b>允许</b></td></tr>
+<tr><td class="num"><b>B</b></td><td>入</td><td>外部</td><td>内部</td><td>TCP</td><td class="num"><b>23</b></td><td class="num">&gt;1023</td><td><b>允许</b></td></tr>
+<tr><td class="num"><b>C</b></td><td>双向</td><td>任意</td><td>任意</td><td>任意</td><td class="num">任意</td><td class="num">任意</td><td><b>拒绝</b></td></tr>
+</tbody>
+</table>
+</div>
+<p class="small"><b>规则 C 就是把「默认拒绝」显式写成了最后一条兜底规则</b>——正好印证课本那句「默认操作可看作位于所有 ACL 末尾的一条规则」。
+<b>效果是「只允许出站」</b>：内网可以 Telnet 出去（A），响应回得来（B），但外网主动 Telnet 进来（目的端口 23、方向入）不匹配 A/B，落到 C 被拒。</p>
+
+<h5>③ SMTP 邮件服务器 ＋ 屏蔽恶意主机 —— PPT p.30 与课本表 12-2 是同一道题的两个版本</h5>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>规则</th><th>方向</th><th>源地址</th><th>目的地址</th><th>协议</th><th>源端口</th><th>目的端口</th><th>处理</th></tr></thead>
+<tbody>
+<tr><td class="num"><b>1</b></td><td>入</td><td><b>211.1.1.1</b>（恶意主机）</td><td>内网地址</td><td>任意</td><td class="num">任意</td><td class="num">任意</td><td><b>拒绝</b></td></tr>
+<tr><td class="num"><b>2</b></td><td>入</td><td>互联网地址</td><td><b>10.65.19.10</b></td><td>TCP</td><td class="num">&gt;1023</td><td class="num"><b>25</b></td><td><b>允许</b></td></tr>
+<tr><td class="num"><b>3</b></td><td>出</td><td><b>10.65.19.10</b></td><td>互联网地址</td><td>TCP</td><td class="num"><b>25</b></td><td class="num">&gt;1023</td><td><b>允许</b></td></tr>
+</tbody>
+</table>
+</div>
+<p class="small">PPT p.30 的版本里邮件服务器是 <code>199.245.180.1</code>、恶意主机叫 <code>hacker</code>，规则完全同构。<b>两处要点：</b>
+<b>①「拒绝恶意主机」这条必须排在最前面</b>，否则它会先命中规则 2 被放行——正是上面那个 ACL 顺序陷阱；
+<b>② 规则 1 的协议／端口全填「任意」</b>，因为要屏蔽的是「这台主机的一切流量」，不管它用什么协议什么端口。<span class="bref">课本 p.363–364</span></p>
+
+<h4>包过滤的优点与缺点（PPT p.31–32，课本 p.364）</h4>
+
+<div class="grid g2">
+  <div class="mini">
+    <div class="t"><span class="ic">＋</span>优点</div>
+    <ul class="mt0">
+      <li><b>一台设备护住整个网络。</b>放在重要位置上的一台包过滤路由器即可保护整个网络，<b>不管内部网站点规模多大</b>。</li>
+      <li><b>对用户透明。</b>不需用户软件支持，也不要对客户机做特殊设置。<br>
+      <span class="small muted">老师备注解释了「透明」：允许包通过时，其表现与普通路由器没什么区别，用户感觉不到它；<b>只有在某些包被禁入或禁出时，用户才会意识到它的存在</b>。</span></li>
+      <li><b>快、通用。</b>处理速度快、效率高，对正常通信影响小；常作为不可信网络的<b>第一层防卫</b>，能有效阻塞公开的恶意站点的信息流。</li>
+    </ul>
+  </div>
+  <div class="mini">
+    <div class="t"><span class="ic">−</span>缺点</div>
+    <ul class="mt0">
+      <li><b>信息不足，只能「就事论事」。</b>仅依赖网络层和传输层信息（IP、端口、TCP 标志），<b>不检查应用负载</b>，难以做细致分析。</li>
+      <li><b>一些协议难以有效过滤</b>，如 <b>RPC、UDP</b>（它们没有连接状态可依）。</li>
+      <li><b>支持的规则数量有限</b>，规则过多会依次匹配，<b>降低网络效率</b>。</li>
+      <li><b>正确制定规则并不容易</b>，尤其是安全策略复杂的大型网络，配置不当就防不住。</li>
+      <li><b>包中字段容易伪造</b>，攻击者可通过 <b>IP 欺骗</b>绕过；包过滤本身<b>难以进行用户身份认证</b>。<span class="bref">课本 p.364</span></li>
+    </ul>
+  </div>
+</div>
+
+<h4>PPT 专门用一整页讲的：IP 分片如何绕过包过滤 <span class="pref">PPT p.33</span></h4>
+
+<p class="small">课本对这件事只有一句「攻击者可以采用将攻击数据包分片发送的方法，使攻击数据包穿越防火墙」<span class="bref">课本 p.378</span>，
+而 PPT 给了整整一页三种玩法。<b>老师专门加的，几乎一定考。</b></p>
+
+<div class="box key">
+  <div class="box-t">根因：分片之后，端口号只出现在第一片里</div>
+  <p>IP 分片时，<b>只有第一个分片含有 TCP/UDP 头（也就是端口号）</b>，后续分片只有 IP 头 + 数据。
+  于是包过滤面对第 2 片以后的分片<b>根本没有端口可查</b>，只能要么全放、要么全拦——三种攻击全部来自这一个事实。</p>
+</div>
+
+<ol class="steps">
+  <li><b>拦了第一片，后面照样过去（探测主机是否存在）。</b>禁止第一片之后，其他分片还是能通过、到达目的主机。目的主机<b>永远拼不齐这个包</b>，超时后会回一个 <b>ICMP 组装超时</b>报文——<b>黑客靠这条 ICMP 就知道该主机存在</b>（顺带也是一次拒绝服务）。</li>
+  <li><b>禁了应答的首片，后面的分片仍然流出（信息泄露）。</b>当外部请求进入、而策略禁止应答时，应答的<b>首片被禁</b>，但<b>其余分片仍会流出</b>，黑客分析这些流出的分片就能拿到想要的东西。</li>
+  <li><b>极小数据段式攻击（Tiny Fragment）。</b>入侵者<b>刻意造出极小的分片，强行把 TCP 头信息拆到多个数据包里</b>。<b>目的就是绕过过滤规则</b>——黑客赌的是过滤器/路由器<b>只检查第一个分片</b>而放行其余分片。<b>把端口号挤到第二片去，第一片就查不出端口了。</b></li>
+</ol>
+
+<div class="box exam">
+  <div class="box-t">怎么答、怎么防</div>
+  <p>问「包过滤有什么缺陷」时，除了课本那四条，<b>加上一条「不能正确处理分片包」并举极小分片攻击为例，是最容易拿分的加分点</b>。<br>
+  防御思路课本在 §5 里给了：<b>一些防火墙产品会对接收到的分片数据包先重组再执行检查</b>，从而防范利用分片进行的攻击——代价是必须缓存先到的分片、<b>需要较强的缓存能力</b>，这也正是<b>「背靠背缓冲」这项指标对这类防火墙有重要意义</b>的原因。<span class="bref">课本 p.376</span></p>
+</div>
+</div>
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-num">§ 2.2　PPT p.34–43（10 页）</span>
+    <h2 class="sec-t">状态检测（动态包过滤 ／ 有状态的包过滤）</h2>
+    <p class="sec-lede">这一节 PPT 的开场不是定义，而是<b>一道课堂提问</b>——老师把上一节留下的那个洞直接摆到你面前。整节内容都是在回答它。</p>
+  </div>
+
+<div class="scene">
+  <div class="scene-k">PPT p.35 · 老师的开场提问（本节全部难点所在）</div>
+  <p class="scene-q">内部网络允许用户访问 Web 站点。如果是简单包过滤，对于进入的包必须开放以下规则：<b>所有源 TCP 端口为 80、IP 地址任意、目标为内部 IP、端口号大于 1024</b> 的包放行。——<b>存在什么安全问题？</b></p>
+  <div class="scene-b">
+    <p>这条规则就是上一节 HTTP 规则表里的<b>规则 B</b>，它非开不可，否则 Web 服务器的响应根本回不到内网。可它是<b>一个巨大的、永久敞开的口子</b>。</p>
+    <div class="scene-real">
+      <div class="t">老师在备注里写的答案</div>
+      <p class="mt0"><b>安全隐患：攻击者采用 80 端口作为源端口对内部网络进行扫描。</b><br>
+      <b>解决思路：基于状态来确定是否允许数据包通过。</b></p>
+    </div>
+    <p style="margin-top:10px"><b>为什么这招管用：</b>课本把道理说透了——<b>80 端口并不一定代表 Web 服务</b>。IANA 只是「为 Web 服务<b>指派</b>了 80 端口，便于其他程序与 Web 服务相互通信」，
+    但<b>实际应用中完全可以把 80 端口与其他应用绑定，也可以指定某一个客户进程使用该端口</b>。所以攻击者<b>完全可以利用 80 端口向内网发送扫描数据包</b>。<span class="bref">课本 p.364</span></p>
+    <p><b>问题的关键一句话（课本原文）：</b><b class="hl">出现安全问题的关键是防火墙无法区分一个源于外网主机 80 端口的数据包是不是对内网 Web 服务请求的响应。</b></p>
+  </div>
+</div>
+
+<div class="chain">
+  <div class="chain-i prev"><div class="chain-k">承上</div><div class="chain-b">包过滤<b>只看孤立的一个包</b>，为了放行响应必须开「源端口 80 → 内网 &gt;1023」这个大口子，被人拿 80 当源端口反向扫描。</div></div>
+  <div class="chain-i now"><div class="chain-k">本节</div><div class="chain-b">给防火墙加一张<b>连接状态表</b>：出去的请求登记一笔，回来的包<b>查得到登记才放行</b>。这样「80 端口的包」就分成了两种——<b>我请求过的</b>和<b>凭空来的</b>。</div></div>
+  <div class="chain-i next"><div class="chain-k">留下的坑</div><div class="chain-b">它仍然<b>不看应用层数据</b>；而且 <b>UDP／ICMP 本来就没有状态</b>、<b>FTP 会另开子连接</b>、<b>加密之后什么都看不见</b> → §2.3 应用网关</div></div>
+</div>
+
+<h3>定义</h3>
+
+<div class="box def">
+  <div class="box-t">PPT 原文 <span class="pref">PPT p.36</span></div>
+  <p><b>状态检测又称动态包过滤</b>，在网络层由一个<b>检查引擎</b>截获数据包，<b>抽取出与应用层状态有关的信息</b>，并以此作为依据决定对该数据包是接受还是拒绝。</p>
+  <p>检查引擎<b>维护一个动态的状态信息表</b>并对后续的数据包进行检查。<b>一旦发现任何连接的参数有意外变化，该连接就被中止。</b></p>
+  <p>它在协议底层截取数据包，然后分析这些数据包，并且<b>将当前数据包和状态信息与前一时刻的数据包和状态信息进行比较</b>，从而得到该数据包的控制信息。</p>
+</div>
+
+<div class="box def">
+  <div class="box-t">课本的说法 <span class="bref">课本 p.365</span></div>
+  <p>上一节所述的防火墙属于<b>无状态的包过滤防火墙</b>——它<b>无法辨别一个 TCP 数据包是属于连接建立的初始化阶段、还是数据传输阶段、或者是断连阶段</b>，因此难以精确地对数据包进行过滤。</p>
+  <p><b>有状态的包过滤防火墙，常常也被称为状态检测（State Inspection）防火墙</b>，具有详细记录网络连接状态信息的功能：<b>哪台主机发出了 TCP 连接请求、连接是否建立、连接是否释放</b>等。防火墙通常采用<b>连接状态表</b>跟踪网络连接的状态。</p>
+</div>
+
+<h3>为什么 TCP 能被「跟踪」：四条判据 <span class="pref">PPT p.37–38</span></h3>
+
+<p class="small">PPT 用一整页贴了 TCP 状态转换图，下一页给出四条结论。<b>课本完全没有这部分，是老师专门补的。</b>
+状态图本身不必背，<b>要背的是从图里读出来的这四句</b>——防火墙判断「这个包合不合法」靠的就是它们。</p>
+
+<div class="svg-wrap">
+<svg class="flow" viewBox="0 0 700 224" role="img" aria-label="TCP 连接建立与断开过程中双方的状态变化">
+  <defs>
+    <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1b3a8f"/>
+    </marker>
+  </defs>
+  <text class="ttl" x="350" y="13" text-anchor="middle">TCP 一条连接的完整状态序列 —— 防火墙就是照着它对表的</text>
+
+  <line class="ln" x1="96" y1="50" x2="96" y2="206" stroke-dasharray="3 3"/>
+  <line class="ln" x1="604" y1="50" x2="604" y2="206" stroke-dasharray="3 3"/>
+  <rect class="bx-a" x="26" y="28" width="140" height="20" rx="4"/>
+  <text class="t-sm" x="96" y="42" text-anchor="middle">客户端（主动打开）</text>
+  <rect class="bx-a" x="534" y="28" width="140" height="20" rx="4"/>
+  <text class="t-sm" x="604" y="42" text-anchor="middle">服务器（被动打开）</text>
+
+  <text class="t-mut" x="96" y="64" text-anchor="middle">CLOSED</text>
+  <text class="t-mut" x="604" y="64" text-anchor="middle">LISTEN</text>
+
+  <path class="ln-a" d="M100,80 L600,80" marker-end="url(#a3)"/>
+  <text class="t-sm" x="350" y="76" text-anchor="middle">① SYN</text>
+  <text class="t-mut" x="96" y="96" text-anchor="middle">SYN_SENT</text>
+  <text class="t-mut" x="604" y="96" text-anchor="middle">SYN_RCVD</text>
+
+  <path class="ln-a" d="M600,112 L100,112" marker-end="url(#a3)"/>
+  <text class="t-sm" x="350" y="108" text-anchor="middle">② SYN + ACK</text>
+
+  <path class="ln-a" d="M100,132 L600,132" marker-end="url(#a3)"/>
+  <text class="t-sm" x="350" y="128" text-anchor="middle">③ ACK</text>
+  <text class="t-mut" x="96" y="148" text-anchor="middle">ESTABLISHED</text>
+  <text class="t-mut" x="604" y="148" text-anchor="middle">ESTABLISHED</text>
+
+  <rect class="bx-e" x="284" y="138" width="132" height="18" rx="4"/>
+  <text class="t-sm" x="350" y="151" text-anchor="middle">数据传输状态</text>
+
+  <path class="ln-a" d="M100,172 L600,172" marker-end="url(#a3)"/>
+  <text class="t-sm" x="350" y="168" text-anchor="middle">④~⑦ 四次挥手（FIN → ACK ← FIN ← ACK）</text>
+  <text class="t-mut" x="96" y="188" text-anchor="middle">FIN_WAIT_1 → FIN_WAIT_2</text>
+  <text class="t-mut" x="604" y="188" text-anchor="middle">CLOSE_WAIT → LAST_ACK</text>
+  <text class="t-mut" x="96" y="202" text-anchor="middle">→ TIME_WAIT (2MSL) → CLOSED</text>
+  <text class="t-mut" x="604" y="202" text-anchor="middle">→ CLOSED</text>
+
+  <rect class="bx-t" x="190" y="206" width="320" height="18" rx="4"/>
+  <text class="t-sm" x="350" y="219" text-anchor="middle">会话关闭或延迟一段时间后，防火墙删除该状态表条目</text>
+</svg>
+</div>
+
+<div class="box key">
+  <div class="box-t">从这张图能读出的四条判据 · PPT 原文 <span class="pref">PPT p.38</span></div>
+  <ol class="mt0">
+    <li><b>TCP 的连接是有状态的</b>，不同阶段有不同状态。</li>
+    <li><b>TCP 连接状态转换是有顺序的，不是任意的。</b></li>
+    <li><b>客户端不可能进入 LISTEN 状态，服务器不可能进入 SYN_SEND 状态。</b></li>
+    <li><b>TCP 包中的标志有些是不能同时存在的</b>，如 <b>SYN 标志不可能和 FIN、RST、PSH 标志同时存在</b>。</li>
+  </ol>
+  <p><b>根据以上原则，防火墙可以判断出连接双方目前的状态，进而判断是否有数据包违反规则。</b></p>
+  <p class="small muted">第 4 条正是各种「畸形包扫描」（如 SYN+FIN 扫描）被状态检测挡下来的原因——这种包<b>在协议上根本不可能合法出现</b>。</p>
+</div>
+
+<h3>连接状态表长什么样</h3>
+
+<p class="small">PPT p.39 和课本图 12-4 给的是同一种表，字段完全一致。</p>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>源地址</th><th>源端口</th><th>目的地址</th><th>目的端口</th><th>协议</th><th>连接状态</th></tr></thead>
+<tbody>
+<tr><td class="num">10.65.19.8</td><td class="num">10000</td><td class="num">200.1.1.1</td><td class="num">80</td><td>TCP</td><td><b>SYN-SENT</b>（同步已发送）</td></tr>
+<tr><td class="num">192.168.1.100</td><td class="num">1030</td><td class="num">210.9.88.29</td><td class="num">80</td><td>TCP</td><td><b>Established</b>（已建立连接）</td></tr>
+<tr><td class="num">192.168.1.101</td><td class="num">1033</td><td class="num">173.66.32.122</td><td class="num">25</td><td>TCP</td><td><b>Established</b></td></tr>
+<tr><td class="num">223.43.21.231</td><td class="num">1990</td><td class="num">192.168.1.6</td><td class="num">80</td><td>TCP</td><td><b>Established</b>（这一批是外部访问内网 Web 服务器）</td></tr>
+</tbody>
+</table>
+</div>
+<p class="small muted">前几行源地址是内网 <code>192.168.1.x</code>、目的端口 80/25——<b>内网主机主动出去</b>；后几行目的地址是 <code>192.168.1.6</code>、目的端口 80——<b>外网主机访问内网的 Web 服务器</b>。同一张表两个方向都记。</p>
+
+<h3>整条流程：状态表是怎么建立、匹配、删除的 <span class="pref">PPT p.41</span></h3>
+
+<ol class="steps">
+  <li>内部主机与外部主机建立连接时，<b>首先发送一个 TCP SYN 包或 UDP 数据包</b>，其中包含目的 IP、端口号、源 IP 和端口号。</li>
+  <li>这个包通过防火墙时，<b>防火墙在状态表中建立一条状态信息规则</b>，然后把数据包发送到外部网络。
+    <span class="small muted">课本版：防火墙<b>先检查访问规则</b>，判断是否允许该包通过；<b>允许通过，才把连接状态信息记入状态表</b>，此时状态为 <b>SYN-SENT</b>。<span class="bref">课本 p.365</span></span></li>
+  <li>外部主机返回请求响应时（设置了 <b>SYN/ACK</b> 标志的包），<b>防火墙从状态表中查找是否存在相应规则</b>。</li>
+  <li><b>找到匹配的状态信息就放行，否则丢弃</b>——因为它不是内部请求的响应。同时把这两台主机相应端口的连接状态<b>改为 ESTABLISHED</b>。</li>
+  <li><b>会话关闭或延迟一段时间后，防火墙将相应的状态信息规则从状态表中删除</b>，<b class="hl">保证了放弃的连接不会在状态表中留下漏洞</b>。</li>
+</ol>
+
+<div class="box exam">
+  <div class="box-t">Session 表：同一件事的另一种叫法 <span class="pref">PPT p.40</span></div>
+  <p>PPT 原文：「在状态防火墙中会<b>动态维护着一个 Session 表项</b>，通过 Session 表项来检测基于 <b>TCP/UDP 连接</b>的连接状态，动态地判断报文是否可以通过，从而决定哪些连接是合法访问，哪些是非法访问。」<br>
+  配的那张图讲的是 Telnet：<b>用户 A 发起 Telnet 会话 → 防火墙创建 Session 表项 → A 的会话返回报文因为匹配 Session 表项而可以通过 → 其他用户的 Telnet 报文被阻塞不能通过。</b><br>
+  <b>「连接状态表」「状态信息表」「Session 表」在本章指的是同一张表。</b></p>
+</div>
+
+<div class="box def">
+  <div class="box-t">有状态防火墙的完整判决顺序 · 课本图 12-5 <span class="bref">课本 p.366</span></div>
+  <p>数据包到达端口 → <b>先问：它属于已存在的连接吗？</b></p>
+  <ul class="mt0">
+    <li><b>属于</b> → 再问过滤规则集是否允许 → 允许则<b>放行，并在状态表中更新连接状态</b>；不允许则拒绝。</li>
+    <li><b>不属于</b> → 再问过滤规则集是否允许 → 允许则<b>放行，并在状态表中建立连接项</b>；不允许则拒绝。</li>
+  </ul>
+  <p><b>关键：状态表不能取代过滤规则，它是叠在规则之上的一层。</b>「属于已有连接」只是让它<b>免于被规则误伤</b>，不是无条件放行。</p>
+</div>
+
+<h3>优点与缺点</h3>
+
+<div class="grid g2">
+  <div class="mini">
+    <div class="t"><span class="ic">＋</span>优点 <span class="pref">PPT p.42</span></div>
+    <ul class="mt0">
+      <li><b>克服了包过滤防火墙的局限性</b>，能够根据协议、端口及源地址、目的地址的具体情况决定数据包是否可以通过。</li>
+      <li><b>快。</b>对每个安全策略允许的请求启动相应的进程，可以<b>快速地确认符合授权标准的数据包</b>。</li>
+      <li><b>跟踪连接和包，因而可以使用一组附加的标准</b>来确定是否允许或拒绝通信。</li>
+      <li class="small"><b>课本补充：日志更全。</b>可在状态表基础上记录<b>连接建立时间、持续时间、拆除时间</b>，有助于发现异常通信行为。<span class="bref">课本 p.366</span></li>
+    </ul>
+  </div>
+  <div class="mini">
+    <div class="t"><span class="ic">−</span>缺点 <span class="pref">PPT p.43</span></div>
+    <p class="mt0"><b>PPT 只有一句话：</b>「状态检测防火墙的<b>安全特性是最好的</b>，但其<b>配置非常复杂，会降低网络效率</b>。」</p>
+    <p class="small">这一页只有一行字，但课本用了一整页展开——见下方三条限制。<b>问答第 6 题「有状态相比无状态有哪些优点」要靠上一栏，问「有什么限制」要靠下面。</b></p>
+  </div>
+</div>
+
+<h4>课本补的三条限制（这是最容易被出简答题的地方）<span class="bref">课本 p.366</span></h4>
+
+<div class="grid g3">
+  <div class="mini">
+    <div class="t"><span class="ic">1</span>很多协议根本没有状态</div>
+    <p class="mt0"><b>UDP 和 ICMP 都是无状态协议</b>，不像 TCP 有连接建立、维护、拆除的具体过程，只能用变通办法。</p>
+    <p><b>DNS 这种一问一答的好办：</b>把通过防火墙的<b>域名解析请求</b>加进状态表，服务器的回复<b>匹配上就放行，然后立刻删除该条目</b>。</p>
+    <p><b>复杂的 UDP 应用只能靠定时器：</b>为相应的 UDP 连接<b>设置定时器，超过一定时间没有 UDP 流量就删除条目</b>。</p>
+  </div>
+  <div class="mini">
+    <div class="t"><span class="ic">2</span>有些协议会动态开子连接</div>
+    <p class="mt0"><b>典型是 FTP。</b>客户端先与服务端 <b>21 端口</b>建连接，然后<b>指定一个随机端口作数据传输端口</b>并用 <b>PORT 命令</b>告知服务端，此后数据在<b>客户端指定端口与服务端 20 端口</b>之间传输。</p>
+    <p>防火墙必须<b>跟踪连接信息、掌握子连接使用的端口并记入状态表</b>，才能确保子连接通过。数据库、多媒体协议也有这个问题。</p>
+    <p class="hl"><b>致命的一句：子连接端口的协商必须明文进行；如果经过了加密，防火墙将无法理解通信内容，也就无法进行正确的处理。</b></p>
+  </div>
+  <div class="mini">
+    <div class="t"><span class="ic">3</span>贵</div>
+    <p class="mt0">为了建立和管理连接状态表，<b>有状态包过滤需要付出高昂的处理开销，对硬件设备的性能有更高的要求</b>。</p>
+    <p>相应地，<b>价格上往往比一般的无状态包过滤防火墙高出不少</b>。</p>
+    <p class="small muted">这条和 §5「并发连接数取决于哪些因素」是同一件事的两面：状态表越大越吃内存，CPU 也扛不住。</p>
+  </div>
+</div>
+
+<div class="box exam">
+  <div class="box-t">状态检测把攻击难度抬高了多少 —— 课本给了一段可以直接抄的论证 <span class="bref">课本 p.365</span></div>
+  <p><b>「攻击者发出的数据包在防火墙的连接状态表中如果不存在匹配将无法通过防火墙。」</b>那攻击者能不能先嗅探、拿到某个合法 TCP 连接的信息，再<b>伪造源地址</b>混进去？课本说很难奏效，两个原因：</p>
+  <p><b>①</b> 由于采用的是伪造的 IP 地址，<b>攻击者要接收内网主机返回的数据包非常困难</b>（回包发到真主机那儿去了）。<br>
+  <b>②</b> 如果伪造的地址与内网主机<b>正常终止连接，防火墙会立即从连接状态表中删除相关条目</b>，攻击者无法继续利用相应的连接信息。</p>
+</div>
+</div>
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-num">§ 2.3–2.4　PPT p.44–54（11 页）</span>
+    <h2 class="sec-t">应用网关防火墙（应用代理）与自适应代理</h2>
+    <p class="sec-lede">前两种技术再怎么改进，看到的都还是<b>包头</b>。这一节换了一个完全不同的做法：<b>不转发包，而是替你把这条连接重新走一遍</b>——于是防火墙成了通信的一方，自然就能读懂应用层数据。</p>
+  </div>
+
+<div class="chain">
+  <div class="chain-i prev"><div class="chain-k">承上</div><div class="chain-b">状态检测能分清「这个包属不属于我请求的连接」，但<b>它仍然不知道这条连接里在传什么</b>。以 HTTP 为例：它只知道该允许还是拒绝 HTTP 流量，仅此而已。</div></div>
+  <div class="chain-i now"><div class="chain-k">本节</div><div class="chain-b">代理服务器<b>把一条连接拆成两条</b>：客户 ↔ 代理、代理 ↔ 服务器。代理是<b>真正的通信端点</b>，所以能拿到完整的应用层数据，<b>可以配置来过滤具体 HTTP 流量类型的数据</b>。</div></div>
+  <div class="chain-i next"><div class="chain-k">留下的坑</div><div class="chain-b">每种应用都要单独写一个代理；慢、贵；<b>要求建立直接连接的服务（聊天、即时消息）根本没法代理</b> → §2.4 自适应代理，用一条控制通道在「快」和「细」之间切换</div></div>
+</div>
+
+<h3>2.3.1　代理是怎么工作的</h3>
+
+<div class="box def">
+  <div class="box-t">PPT 原文 <span class="pref">PPT p.45</span></div>
+  <p><b>应用代理（应用网关）是代理内部网络用户与外部网络服务器进行信息交换的程序。</b>
+  它将内部用户的请求确认后送达外部服务器，同时将外部服务器的响应再回送给用户。</p>
+  <p class="small muted">配图的核心是两条线：用户主机与外部主机之间是<b>「感觉的连接」</b>，而真正存在的是用户主机↔代理服务器、代理服务器↔外部主机两段<b>「实际的连接」</b>。</p>
+</div>
+
+<div class="box def">
+  <div class="box-t">课本原文 <span class="bref">课本 p.367</span></div>
+  <p>应用网关防火墙（Application Gateway）<b>除了利用网络层和传输层的信息，还利用应用层的信息内容来过滤数据包</b>，通常以<b>代理服务器（Proxy Server）技术</b>为基础，作用在<b>应用层</b>。</p>
+  <p>在此过程中，<b>代理服务器位于内网用户与外网服务器之间，对内网用户和外服务器都完全透明</b>：内网用户认为自己直接和外网服务器通信，外网服务器同样认为自己的通信对象就是一台普通的客户机。</p>
+  <p class="small muted">老师备注补的形象说法：<b>「对于用户，代理服务器给用户一种直接使用『真正』服务器的感觉；对于真正的服务器，代理服务器给它一种在代理主机上直接处理用户的假象。」</b></p>
+</div>
+
+<div class="box key">
+  <div class="box-t">代理最初根本不是为了安全 —— 这是理解它的关键 <span class="bref">课本 p.367</span></div>
+  <p><b>「使用代理服务器的最初目的是提高网络通信速度。」</b>做法是<b>把内网用户频繁访问的页面存在缓冲区里</b>：用户提交请求时，如果缓存中有该页面，代理<b>检查所缓存的页面是否为最新</b>；是最新版本就直接给用户，否则代理才向站点提交请求、取回内容转发给用户，并把页面保存在缓冲区中。</p>
+  <p><b>正因为它「能理解网络应用，同时又是内外网通信的必经通道」，才顺理成章地发展成了一种有效的安全防护技术。</b>这两个条件缺一不可——这也解释了为什么代理天然就在应用层。</p>
+</div>
+
+<h4>它凭什么判得更准</h4>
+
+<ul>
+  <li><b>决策依据多了「应用上下文」。</b>「由于代理直接和应用程序交互，它可以根据<b>应用上下文</b>进行决策和判定，<b>而不仅仅依据 IP 地址和端口号</b>，可以做出更为准确的判定。」<span class="pref">PPT p.47</span></li>
+  <li><b>能拆开数据区。</b>「应用代理可以<b>对数据包的数据区进行分析</b>，并以此判断数据是否允许通过。」<span class="pref">PPT p.48</span>——对照 §2.1 的那张分层图：包过滤「只检查包头」，应用代理「<b>只检查数据</b>」。<span class="pref">PPT p.49</span></li>
+  <li><b>能挡应用层攻击。</b>课本：能在数据包到达内网用户前拦截并详细分析，<b>有助于检测缓冲区溢出攻击、SQL 注入攻击等应用层攻击</b>。</li>
+  <li><b>能做完善的审计。</b>「所有网络数据包的头首部和负载都可以被记录，从而实现完善的审计。」代理<b>可以监控客户机与服务器之间所有交互</b>并写审计日志。<span class="pref">PPT p.46</span></li>
+  <li><b>能做用户身份认证。</b>「可以通过应用网关防火墙对<b>用户身份进行认证</b>，确保只有允许的用户才能通过。」——这正是包过滤做不到的（包过滤「难以进行用户身份认证」）。</li>
+</ul>
+
+<div class="box eg">
+  <div class="box-t">对照实验：同一个「HTTP 流量」，两种技术各能做到哪一步 <span class="pref">PPT p.50</span></div>
+  <p><b>包过滤技术：</b>仅仅知道应该<b>允许或者拒绝 HTTP 流量</b>。（要么 80 端口全开，要么全关）<br>
+  <b>应用级代理：</b>可以配置来<b>过滤具体 HTTP 流量类型的数据</b>。<br>
+  <b>结论（PPT 原话）：</b>给防火墙管理员的管理带来<b>极大的伸缩性</b>，可以严格控制什么流量将会被允许，什么流量将被拒绝。</p>
+</div>
+
+<div class="box eg">
+  <div class="box-t">课本给的那个更硬的例子：有漏洞、厂商还没出补丁，怎么办 <span class="bref">课本 p.367</span></div>
+  <p>内网面向外网的某个应用（如微软 IIS）被发现有安全漏洞，<b>厂商尚未发布补丁</b>。</p>
+  <p><b>用包过滤：</b>管理员只能通过「IP 地址 + 80 端口」的组合<b>屏蔽外网对内网 IIS 服务的访问</b>——<b>相当于把 IIS 服务与外网隔离</b>，服务直接不可用了。</p>
+  <p><b>用代理服务器：</b>可以<b>在向外网提供正常 IIS 服务的同时实施安全防护</b>——配置代理服务器过滤指定类型的数据，<b>让代理识别攻击应用程序安全漏洞的恶意流量并及时阻止</b>，从而保护存在漏洞的网络服务。</p>
+  <p><b>一句话结论：包过滤只有「开」和「关」，代理有「开着但只放行安全的那部分」。</b>这就是「伸缩性」的具体含义。</p>
+</div>
+
+<h4>缺点（PPT 用了两页，课本归纳成四条，合并如下）</h4>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th style="width:16%">从哪看</th><th>具体是什么</th></tr></thead>
+<tbody>
+<tr><td><b>① 功能覆盖</b></td><td><b>每种应用服务都需要专门的代理。</b>不同应用服务采用的网络协议差异较大（HTTP、FTP、Telnet），<b>不能采用统一的方法进行分析</b>，给代理模块的实现带来很大困难。实际应用中，<b>大部分代理服务器只能处理相对较少的应用服务</b>。</td></tr>
+<tr><td><b>② 性能</b></td><td><b>往往比包过滤防火墙性能要差。</b>究其原因，<b>应用代理需要检查数据负载、分析应用层内容，而包过滤只需检查包头信息</b>；对相同的数据包，<b>应用代理的检查时间往往比包过滤更长</b>。要在应用层处理报文，<b>造成数据传输的延迟</b>；如果应用代理设计不当，<b>将使数据传输出现明显延迟，甚至使数据包频繁重传，导致网络拥塞</b>。</td></tr>
+<tr><td><b>③ 价格</b></td><td><b>通常比包过滤防火墙更为昂贵</b>，对硬件设备有更高的要求，<b>升级的成本也较高</b>。</td></tr>
+<tr><td><b>④ 配置管理</b></td><td><b>需要针对应用服务类型逐一设置</b>，而且<b>管理员必须对应用协议有深入理解</b>，管理的复杂性较高。</td></tr>
+<tr><td><b>⑤ 有些服务根本代理不了</b><span class="chip warn">PPT 特意留的思考题</span></td><td><b>有些服务要求建立直接连接，无法使用代理</b>，比如<b>聊天服务、即时消息服务</b>。<span class="pref">PPT p.52</span><br>
+另有一条：<b>不能使用户免于协议本身缺点的限制</b>——协议自己设计得有问题，代理也救不了。</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box exam">
+  <div class="box-t">问答第 7 题「应用网关防火墙有哪些优点和缺陷？」的答题骨架</div>
+  <p><b>优点先写三条：</b>① 工作在应用层、能分析数据负载，判定更准确，能防缓冲区溢出／SQL 注入等应用层攻击；
+  ② 能做<b>用户身份认证</b>和细粒度控制（同一个 80 端口里可以只放行部分流量）；③ 头部与负载都能记录，<b>审计完善</b>。<br>
+  <b>缺点写四条：</b>每种应用要专门的代理、性能差有延迟、价格贵、配置管理复杂。<b>再补一句加分项：要求直连的服务（如即时消息）无法代理。</b></p>
+</div>
+
+<h3>2.4　自适应代理（第四代，课本一个字都没写）<span class="pref">PPT p.53–54</span></h3>
+
+<div class="box trap">
+  <div class="box-t">⚠ 这两页是 PPT 独有的，课本完全没有</div>
+  <p>课本 12.2 只讲了包过滤／有状态包过滤／应用网关／下一代防火墙四类，<b>「自适应代理」这个名词一次都没出现</b>。
+  但它是 PPT 给出的<b>「第四代防火墙」的定义</b>（1998 年 NAI，产品 Gauntlet Firewall for NT）。<b>老师专门加的内容，几乎一定考。</b></p>
+</div>
+
+<div class="box def">
+  <div class="box-t">PPT 原文 <span class="pref">PPT p.53</span></div>
+  <p>新型的自适应代理（Adaptive proxy）防火墙，<b>本质上也属于代理服务技术，但它也结合了动态包过滤（状态检测）技术</b>。</p>
+  <p><b>组成这类防火墙的基本要素有两个：自适应代理服务器与动态包过滤器。</b></p>
+  <p>它<b>结合了代理服务防火墙安全性和包过滤防火墙的高速度等优点</b>，在保证安全性的基础上<b>将代理服务器防火墙的性能提高 10 倍以上</b>。</p>
+  <p class="small muted">PPT p.20 的另一种表述：<b>「具有应用代理的安全性，但不采用应用代理的数据传送方式，而采用包过滤的传送方式。」</b>——这一句最能说明它是怎么又安全又快的：<b>安全判断照代理的方式做，数据搬运照包过滤的方式做。</b></p>
+</div>
+
+<h4>它凭什么能自动切换：靠一条控制通道 <span class="pref">PPT p.54</span></h4>
+
+<ol class="steps">
+  <li><b>在自适应代理与动态包过滤器之间存在一个「控制通道」。</b></li>
+  <li>配置防火墙时，<b>用户仅仅将所需要的服务类型、安全级别等信息通过相应代理的管理界面进行设置就可以了</b>——不用管底层怎么实现。</li>
+  <li>自适应代理<b>根据用户的配置信息，决定是使用代理服务器从应用层代理请求，还是使用动态包过滤器从网络层转发包</b>。</li>
+  <li>如果选的是后者（走包过滤这条快路），它就<b>动态地通知包过滤器增减过滤规则</b>，<b>满足用户对速度和安全性的双重要求</b>。</li>
+</ol>
+
+<div class="box exam">
+  <div class="box-t">一句话记住第四代</div>
+  <p><b>安全级别高的流量走代理（慢但看得懂），安全级别低的流量走动态包过滤（快但只看包头），由一条控制通道在两者之间调度并动态改写过滤规则。</b>
+  用户只需要说「我要什么服务、要多安全」，剩下的它自己选路。</p>
+</div>
+
+<h3>2.5　下一代防火墙（NGFW）</h3>
+
+<p class="small">PPT 只在发展史那页写了一行「下一代防火墙：2009 年，Gartner 提出」，课本 12.2.4 用了两页展开。
+按 PPT 的权重这里只给一小段——<b>但那个定义要能默写</b>。</p>
+
+<div class="box def">
+  <div class="box-t">Gartner 的定义 <span class="bref">课本 p.368</span></div>
+  <p>2009 年 Gartner 发布《定义下一代防火墙》研究报告，把下一代防火墙定义为：<b>一种深度包检测防火墙，超越了基于端口、协议的检测与阻断，增加了应用层的检测和入侵防护</b>。</p>
+</div>
+
+<div class="box key">
+  <div class="box-t">为什么会有它：还是那个 80 端口 <span class="bref">课本 p.368</span></div>
+  <p>随着移动互联网、物联网、Web 2.0、云计算发展，<b>大量 Web 应用都通过 80 端口传输信息</b>，
+  <b>传统防火墙采用的端口过滤方法很难进行细粒度控制</b>——基于「五元组」的包过滤在这里彻底失效了，因为一切都长得像 HTTP。</p>
+  <p><b>课本的收尾一句最该记：「从本质上讲，上述下一代网络防火墙就是高性能的应用网关防火墙。」</b>
+  它把管控维度从「IP + 端口」换成了<b>「何人、何时、何地、何种应用动作、何种威胁」</b>，实现了从「以设备为中心」到<b>「以用户为中心」</b>的转变。</p>
+  <p class="small muted">课本还列了它必须具备的五种功能（高精度管控／外部安全智能／一体化引擎多模块联动／可视化智能管理／高性能处理架构），
+  以及一张 NGAF 产品的体系结构图。<b>PPT 一页没讲，习题也没考，知道有这回事即可。</b></p>
+</div>
+</div>
+<div class="sec pagebreak">
+  <div class="sec-head">
+    <span class="sec-num">§ 3　PPT p.56–74（19 页 · 23%）</span>
+    <h2 class="sec-t">防火墙的体系结构</h2>
+    <p class="sec-lede">§2 讲的是<b>「一台设备怎么查」</b>，这一节讲的是<b>「几台设备怎么摆」</b>。四种结构不是并列的四个选项，而是<b>一条改进链：每一种都在缩小「某个部件被攻破之后的后果」</b>。抓住这条线，四种结构的优缺点就不用背了。</p>
+  </div>
+
+<div class="box key">
+  <div class="box-t">整节的主线：单点失效的后果，一次比一次轻</div>
+  <p><b>屏蔽路由器</b>——全部身家押在一个部件上，它一倒，什么都没了。<br>
+  <b>双宿主主机</b>——换成一台能装应用网关、能写日志的主机，但<b>它仍然是唯一的那一点</b>：一旦被控制并恢复转发功能，外网就能直接访问内网。<br>
+  <b>屏蔽主机</b>——拆成路由器 + 堡垒主机两个部件，风险分散了；<b>但两者在同一子网</b>，路由器一破，堡垒主机和内网之间再无阻挡。<br>
+  <b>屏蔽子网</b>——中间插进一整个隔离子网（DMZ），<b>堡垒主机被攻破，攻击者也只能看到 DMZ 里的流量</b>，因为内网主机之间的通信根本不经过 DMZ。<br>
+  <b class="hl">单选第 7 题「四种防火墙结构中相对而言最安全的是」→ 屏蔽子网结构。这条链就是答案的理由。</b></p>
+</div>
+
+<h3>3.0　两个前置概念：堡垒主机与 DMZ</h3>
+
+<div class="grid g2">
+  <div class="mini">
+    <div class="t"><span class="ic">堡</span>堡垒主机（Bastion Host）<span class="pref">PPT p.57</span></div>
+    <p class="mt0"><b>PPT 原文：</b>被网络管理员<b>认定为网络安全核心点</b>的系统，常常充当内部网络或防火墙中<b>应用代理</b>的角色。</p>
+    <p><b>课本补的词源与定位：</b>「堡垒」源于中世纪城堡的防护，指城堡为了抵御攻击者而<b>特别加固的部分</b>。在防火墙体系结构中，堡垒主机<b>允许外网主机访问，向外网提供一些网络服务，它一般充当应用代理</b>。<b>由于具有一定的开放性、容易遭受外网攻击，因此被视为防火墙体系结构中的核心主机。</b><span class="bref">课本 p.371</span></p>
+    <p><b>安全加固要求（PPT 与课本合并）：</b>使用<b>安全性较高的操作系统</b>、及时安装补丁；<b>关闭不必需的服务</b>；<b>避免安装不必需的软件</b>；<b>禁用不必要的账户</b>；<b>有限制地访问磁盘</b>（一般能访问配置文件即可），避免被植入恶意程序。</p>
+    <p class="small muted">老师备注：按网卡数量分两种——<b>双穴主机（两块网卡）</b>和<b>单穴主机（一块网卡）</b>。</p>
+  </div>
+  <div class="mini">
+    <div class="t"><span class="ic">Z</span>DMZ 区<span class="pref">PPT p.58</span></div>
+    <p class="mt0"><b>PPT 原文：</b>中立区或非军事化区域（Demilitarized Zone，DMZ），是存在于<b>企业内部网络和外部网络之间的一个小型网络</b>，作为外网和内网的<b>缓冲区</b>以进一步隔离公网和内部私有网络。<b>DMZ 内放置一些必须公开的服务器。</b></p>
+    <p><b>课本的对应表述：</b>屏蔽子网结构中<b>被隔离的子网</b>就被称为中立区（DMZ），也常被称为非军事化区。<b>一些需要对外网提供服务的主机，如 Web 服务器、邮件服务器，通常被放置在 DMZ 区中。</b><span class="bref">课本 p.373</span></p>
+    <p class="hl"><b>单选第 6 题</b>：「内网中需要向外提供服务的服务器常常放在一个单独的网段，这个网段称为」→ <b>DMZ</b>。</p>
+    <p class="small muted">别名一大堆：DMZ ＝ 中立区 ＝ 非军事化区 ＝ 周边网 ＝ 屏蔽子网 ＝ 过滤子网。见首页的术语对照表。</p>
+  </div>
+</div>
+
+<h3>四种结构一张图看完</h3>
+
+<div class="svg-wrap">
+<svg class="flow" viewBox="0 0 700 252" role="img" aria-label="四种防火墙体系结构的拓扑对比">
+  <defs>
+    <marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#6e6b64"/>
+    </marker>
+  </defs>
+  <text class="ttl" x="350" y="13" text-anchor="middle">四种体系结构：中间垫的东西一层比一层厚</text>
+
+  <!-- strip 1 -->
+  <text class="t-sm" x="8" y="44" font-weight="700">① 屏蔽路由器</text>
+  <rect class="bx-c" x="98" y="28" width="56" height="26" rx="13"/>
+  <text class="t-sm" x="126" y="45" text-anchor="middle">互联网</text>
+  <path class="ln" d="M154,41 L316,41"/>
+  <rect class="bx-a" x="316" y="28" width="118" height="26" rx="4"/>
+  <text class="t-sm" x="375" y="45" text-anchor="middle">包过滤防火墙</text>
+  <path class="ln" d="M434,41 L594,41" marker-end="url(#a4)"/>
+  <rect class="bx-e" x="594" y="28" width="98" height="26" rx="4"/>
+  <text class="t-sm" x="643" y="45" text-anchor="middle">内部网络</text>
+
+  <!-- strip 2 -->
+  <text class="t-sm" x="8" y="98" font-weight="700">② 双宿主主机</text>
+  <rect class="bx-c" x="98" y="82" width="56" height="26" rx="13"/>
+  <text class="t-sm" x="126" y="99" text-anchor="middle">互联网</text>
+  <path class="ln" d="M154,95 L306,95"/>
+  <rect class="bx-a" x="306" y="80" width="138" height="30" rx="4"/>
+  <text class="t-sm" x="375" y="93" text-anchor="middle">双宿（双穴）主机</text>
+  <text class="t-mut" x="375" y="105" text-anchor="middle">堡垒主机 · 两块网卡</text>
+  <path class="ln" d="M444,95 L594,95" marker-end="url(#a4)"/>
+  <rect class="bx-e" x="594" y="82" width="98" height="26" rx="4"/>
+  <text class="t-sm" x="643" y="99" text-anchor="middle">内部网络</text>
+
+  <!-- strip 3 -->
+  <text class="t-sm" x="8" y="152" font-weight="700">③ 屏蔽主机</text>
+  <rect class="bx-c" x="98" y="136" width="56" height="26" rx="13"/>
+  <text class="t-sm" x="126" y="153" text-anchor="middle">互联网</text>
+  <path class="ln" d="M154,149 L232,149"/>
+  <rect class="bx-a" x="232" y="136" width="110" height="26" rx="4"/>
+  <text class="t-sm" x="287" y="153" text-anchor="middle">屏蔽路由器</text>
+  <path class="ln" d="M342,149 L400,149"/>
+  <rect class="bx-a" x="400" y="136" width="110" height="26" rx="4"/>
+  <text class="t-sm" x="455" y="153" text-anchor="middle">堡垒主机</text>
+  <path class="ln" d="M510,149 L594,149" marker-end="url(#a4)"/>
+  <rect class="bx-e" x="562" y="130" width="130" height="38" rx="4" fill="none" stroke="#126b4a" stroke-dasharray="3 3"/>
+  <rect class="bx-e" x="594" y="136" width="94" height="26" rx="4"/>
+  <text class="t-sm" x="641" y="153" text-anchor="middle">内部网络</text>
+  <text class="t-mut" x="520" y="181">堡垒主机与内网主机在同一子网</text>
+
+  <!-- strip 4 -->
+  <text class="t-sm" x="8" y="212" font-weight="700">④ 屏蔽子网</text>
+  <rect class="bx-c" x="98" y="196" width="56" height="26" rx="13"/>
+  <text class="t-sm" x="126" y="213" text-anchor="middle">互联网</text>
+  <path class="ln" d="M154,209 L192,209"/>
+  <rect class="bx-a" x="192" y="196" width="98" height="26" rx="4"/>
+  <text class="t-sm" x="241" y="213" text-anchor="middle">外部路由器</text>
+  <path class="ln" d="M290,209 L326,209"/>
+  <rect class="bx-t" x="312" y="188" width="112" height="42" rx="4"/>
+  <text class="t-sm" x="368" y="204" text-anchor="middle">堡垒主机</text>
+  <text class="t-mut" x="368" y="217" text-anchor="middle">周边网／DMZ 区</text>
+  <path class="ln" d="M424,209 L458,209"/>
+  <rect class="bx-a" x="458" y="196" width="98" height="26" rx="4"/>
+  <text class="t-sm" x="507" y="213" text-anchor="middle">内部路由器</text>
+  <path class="ln" d="M556,209 L594,209" marker-end="url(#a4)"/>
+  <rect class="bx-e" x="594" y="196" width="94" height="26" rx="4"/>
+  <text class="t-sm" x="641" y="213" text-anchor="middle">内部网络</text>
+  <text class="t-mut" x="312" y="244">两台包过滤防火墙 ＋ 一台堡垒主机；内网主机之间的通信不经过 DMZ</text>
+</svg>
+</div>
+
+<h3>3.1　屏蔽路由器结构（＝过滤路由器结构）<span class="pref">PPT p.59–60</span></h3>
+
+<p><b>定义：</b>在内部网络和互联网之间配置一台<b>具备包过滤功能的路由器</b>，由该路由器执行包过滤操作。<b>它是内外网通信的唯一渠道，所有通信都必须经由它检查。</b>
+可以由厂家专门生产的过滤路由器实现，也可以由<b>安装了具有过滤功能软件的普通路由器</b>实现。<span class="bref">课本 p.370</span></p>
+
+<div class="grid g2">
+  <div class="mini">
+    <div class="t"><span class="ic">＋</span>优点</div>
+    <ul class="mt0"><li><b>硬件成本低、结构简单、易于部署</b>——这是最简单的一种防火墙结构。</li>
+    <li>包过滤通常在路由器上实现，而<b>路由器对外提供的网络服务数量很少</b>，因此它相对于一般主机而言防护简单易行。</li></ul>
+  </div>
+  <div class="mini">
+    <div class="t"><span class="ic">−</span>缺点</div>
+    <ul class="mt0">
+      <li><b>没有或只有很简单的日志记录功能</b>，网络管理员<b>很难确定网络系统是否正在被攻击或已经被入侵</b>。</li>
+      <li><b>规则表随着应用的扩展会变得很大、很复杂。</b></li>
+      <li><b>依靠一个单一的部件来保护整个网络系统</b>，一旦这个部件出问题，就失去保护作用，<b>而用户可能还不知道</b>。</li>
+      <li>课本补：包过滤防火墙<b>无法进行用户身份认证</b>；若被攻击者控制，攻击者<b>能随意修改过滤规则，进而直接访问内网主机</b>。</li>
+    </ul>
+  </div>
+</div>
+
+<h3>3.2　双宿主主机结构（双穴主机）<span class="pref">PPT p.61–63</span></h3>
+
+<p><b>定义（PPT 原文）：</b>用一台<b>装有两块网卡</b>的堡垒主机（称为双宿主主机）做防火墙。
+<b>两块网卡各自与受保护网和外部网相连，每块网卡都有独立的 IP 地址。</b>
+堡垒主机上运行着防火墙软件（<b>应用层网关</b>），可以转发应用程序，也可提供服务等功能。</p>
+
+<div class="box def">
+  <div class="box-t">课本补的两个关键限定 <span class="bref">课本 p.370–371</span></div>
+  <p><b>「多宿主机」这个术语用来描述配备多个网络接口的主机</b>，每个接口连着一个网络，因而多宿主机可以被用来在不同网络之间进行寻径——<b>路由器就是一种典型的多宿主机</b>。</p>
+  <p><b class="hl">如果禁止寻径功能，多宿主机连接的多个网络无法通过该主机相互通信，但是每个网络都可以访问多宿主机提供的网络服务。</b>
+  ——这一句是双宿主机能当防火墙的<b>全部前提</b>：<b>必须关掉路由转发</b>，内外网才被真正断开，通信只能靠主机上的应用网关<b>逐个应用地转发</b>。</p>
+  <p>PPT 配图上的两行字正是这个意思：<b>「禁止内外网络之间直接通信」「所有的通信必须经过双穴主机」</b>。<span class="pref">PPT p.62</span></p>
+</div>
+
+<div class="grid g2">
+  <div class="mini">
+    <div class="t"><span class="ic">＋</span>优点</div>
+    <p class="mt0"><b>PPT 原文：</b>双穴主机网关<b>优于屏蔽路由器的地方是堡垒主机的系统软件可用于维护系统日志、硬件拷贝日志或远程日志</b>。这对于日后的检查非常有用。</p>
+    <p><b>但紧跟着一句转折必须一起记：</b>「<b>但这不能帮助网络管理者确认内网中哪些主机可能已被黑客入侵。</b>」</p>
+    <p class="small muted">课本版：双宿主机可以<b>监视内外网之间的所有通信</b>，因而它的日志记录有助于管理员<b>审计网络的安全性</b>。</p>
+  </div>
+  <div class="mini">
+    <div class="t"><span class="ic">−</span>缺点</div>
+    <p class="mt0"><b>PPT 原文（以设问形式给出）：</b>「<b>如何保护堡垒主机？</b>一旦入侵者侵入堡垒主机<b>并使其只具有路由功能</b>，则<b>任何网上用户均可以随便访问内部网络</b>。」</p>
+    <p><b>课本版说得更完整：</b>这种体系结构的<b>核心防护点是双宿主机</b>，一旦双宿主机被攻击者成功控制，<b>并被配置为在内、外之间转发数据包</b>，那么外网主机将可以直接访问内部网络，<b>防火墙的防护功能完全丧失</b>。</p>
+    <p class="hl"><b>攻击者做的事其实就是「把你关掉的寻径功能重新打开」。</b>这就是为什么上面那条「必须禁止寻径」是全部前提。</p>
+  </div>
+</div>
+
+<h3>3.3　屏蔽主机结构（主机过滤结构）<span class="pref">PPT p.64–66</span></h3>
+
+<p><b>定义（PPT 原文）：</b>包括<b>一个分组（包）过滤路由器（屏蔽路由器）连接外部网络，再通过一个堡垒主机与内部网络相连</b>。
+通常在路由器上设立过滤规则，并<b>使这个堡垒主机成为从外部网络唯一可直接到达的主机</b>，确保内部网络不受未被授权的外部用户的攻击。</p>
+
+<ol class="steps tight">
+  <li>来自外部网络的数据包<b>先经过屏蔽路由器过滤</b>，不符合过滤规则的数据包被过滤掉。</li>
+  <li>符合规则的包<b>被传送到堡垒主机上</b>。</li>
+  <li><b>代理服务软件</b>将允许通过的信息传输到受保护的内部网上。</li>
+</ol>
+
+<div class="box trap">
+  <div class="box-t">⚠ 顺序不能颠倒 —— 这是课本专门强调的 <span class="bref">课本 p.372</span></div>
+  <p><b>「在屏蔽主机结构中，堡垒主机必须部署在包过滤防火墙之后」</b>，因为包过滤防火墙可以对堡垒主机和内网的其他主机实施安全防护。</p>
+  <p><b>如果两者位置对调</b>（堡垒主机直接与互联网相连、包过滤防火墙与内部网络相连），则包过滤防火墙必须允许堡垒主机与内网主机相互通信。
+  <b>一旦堡垒主机被攻击者控制，攻击者就可以利用堡垒主机直接访问内部网络，包过滤防火墙也就无法发挥对内网的防护作用——整个体系结构等同于双宿主机结构。</b></p>
+</div>
+
+<div class="grid g2">
+  <div class="mini">
+    <div class="t"><span class="ic">＋</span>优点</div>
+    <ul class="mt0">
+      <li>如果受保护网络是一个<b>虚拟扩展的本地网</b>（没有子网和路由器），那么<b>内网的变化不影响堡垒主机和屏蔽路由器的配置</b>。<span class="small muted">课本版：无论内部网络如何变化都不会对两者的配置产生影响。</span></li>
+      <li><b>危险区域只限制在堡垒主机和屏蔽路由器</b>——安全风险<b>集中</b>在这两个组件上，只要它们本身没有漏洞并且配置完善，攻击者就很难对内部网络实施攻击。</li>
+    </ul>
+  </div>
+  <div class="mini">
+    <div class="t"><span class="ic">−</span>缺点</div>
+    <ul class="mt0">
+      <li class="hl"><b>堡垒主机与其他主机在同一个子网</b>，一旦包过滤路由器被攻破，<b>整个内网和堡垒主机之间就再也没有任何阻挡</b>。</li>
+      <li>一旦入侵者侵入堡垒主机并使其只具有路由功能，则任何网上用户均可随便访问内部网络——<b>与双穴主机结构的弱点一样</b>。</li>
+      <li>课本补：<b>堡垒主机的安全性非常关键</b>，包过滤防火墙虽能防护一些，但堡垒主机本身有漏洞被控制，攻击者就能直接访问内网主机。</li>
+    </ul>
+  </div>
+</div>
+
+<h3>3.4　屏蔽子网结构（＝过滤子网结构，最安全）<span class="pref">PPT p.67–73（7 页）</span></h3>
+
+<p class="small muted">⚠ PPT 在这一节的 7 页里标题从「屏蔽子网体系结构」换成了「过滤子网体系结构」，<b>是同一种结构，不是两种</b>。见首页术语对照表。</p>
+
+<p><b>定义：</b>在外界网络和内部网络之间建立一个<b>双方都可以访问的独立网络（屏蔽子网）</b>，用<b>两台分组过滤路由器</b>将这一子网分别与内部网络和外部网络分开。
+<b>内网主机和外网主机均可以对被隔离的子网进行访问，但是禁止内、外网主机穿越子网直接通信。</b>在被隔离的子网中，除包过滤路由器之外<b>至少还包含一台堡垒主机，该堡垒主机作为应用网关防火墙</b>，在内外网之间转发通信数据。<span class="bref">课本 p.372</span></p>
+
+<div class="box def">
+  <div class="box-t">PPT 原文，三句话说透它的价值 <span class="pref">PPT p.68–69</span></div>
+  <p>屏蔽子网体系结构通过<b>添加周边网络</b>更进一步地把内部网络和外部网络隔离开；周边网络是一个<b>被隔离的独立子网</b>，充当了内网和外网的缓冲区，在内、外网络之间形成了一个<b>「隔离带」</b>，构成了一个所谓的<b>「非军事区」（DMZ）</b>。</p>
+  <p><b>屏蔽子网不提供外部网络和内部网络之间的通路。</b></p>
+  <p>它是在内/外部网之间<b>另加的一个安全保护层</b>，相当于一个应用网关。<b>如果入侵者成功地闯过外层保护网到达防火墙，屏蔽网络就能在入侵者与内部网之间再提供一层保护。</b></p>
+</div>
+
+<div class="scene">
+  <div class="scene-k">PPT p.69 · 老师的提问 —— 也是课本问答第 8 题</div>
+  <p class="scene-q">如果屏蔽子网中的堡垒主机被攻破，会有什么后果？</p>
+  <div class="scene-b">
+    <p><b>PPT p.70 给的答案：</b>如果入侵者仅仅侵入到屏蔽子网中的堡垒主机，他<b>只能偷看到屏蔽子网的信息流而看不到内部网的信息</b>，因为<b>屏蔽子网的信息流仅往来于外部网到堡垒主机</b>。</p>
+    <p><b class="hl">没有内部网主机间的信息流（重要和敏感的信息）在屏蔽子网中流动，所以堡垒主机受到损害也不会破坏内部网的信息流。</b></p>
+    <div class="scene-real">
+      <div class="t">课本给的等价表述（更适合写在卷子上）<span class="bref">课本 p.373</span></div>
+      <p class="mt0">对于屏蔽子网结构，黑客要侵入内网，必须<b>攻破外部包过滤防火墙，设法侵入 DMZ 区的堡垒主机</b>。
+      <b>由于内网中主机之间的通信不经过 DMZ 区，因此，即使黑客侵入堡垒主机，也无法获取内网主机间的敏感通信数据。</b>
+      <b>黑客只有控制内部包过滤防火墙，才能进入内网实施破坏。</b></p>
+    </div>
+  </div>
+</div>
+
+<h4>三个部件各干什么（PPT p.71–73，一页一个）</h4>
+
+<div class="grid g3">
+  <div class="mini">
+    <div class="t"><span class="ic">堡</span>堡垒主机</div>
+    <p class="mt0">与屏蔽子网相连，<b>是外部网服务于内部网的主节点</b>。<b>DMZ 区的堡垒主机是内、外网通信的唯一通道</b>，因此通过对它进行配置，<b>可以细粒度地设定内外网之间允许哪些网络通信</b>。<span class="bref">课本 p.373</span></p>
+    <p>它承担的具体活儿：<b>在内、外部路由器上建立包过滤</b>，以便内部网用户可直接操作外部服务器；<b>在主机上建立代理服务</b>，在内网用户与外部服务器之间建立<b>间接连接</b>；<b>接收外来电子邮件</b>并分发给相应站点；<b>接收外来 FTP</b> 并连到内网的匿名 FTP 服务器；<b>接收外来的有关内部网站点的域名服务</b>。</p>
+  </div>
+  <div class="mini">
+    <div class="t"><span class="ic">内</span>内部路由器</div>
+    <p class="mt0"><b>主要功能是保护内部网免受来自外部网「与过滤子网」的侵扰</b>——<b>注意它连 DMZ 也要防</b>。</p>
+    <p>可以设定，<b>使 DMZ 上的堡垒主机与内网之间传递的服务、和内网与外网之间传递的服务不完全相同</b>。</p>
+    <p><b>它完成防火墙的大部分包过滤工作</b>，允许某些符合安全规则的服务在内/外部网之间互传（如 Telnet、FTP、WAIS、Archie、Gopher 等外向服务）。</p>
+    <p class="small">课本把它的作用归成两条：① 使内网<b>避免受源于外网和 DMZ 区的侵扰</b>；② <b>以规则的形式限定内网主机只能经由 DMZ 区的堡垒主机访问外部网络</b>，从而<b>有效禁止内网用户与外网直接通信</b>。</p>
+  </div>
+  <div class="mini">
+    <div class="t"><span class="ic">外</span>外部路由器</div>
+    <p class="mt0">既可保护过滤子网又保护内部网。<b>实际上在外部路由器上仅做一小部分包过滤</b>，它几乎让所有屏蔽子网的外向请求通过，<b>与内部路由器的包过滤规则基本上相同</b>。</p>
+    <p>它的包过滤主要是对屏蔽子网上的主机提供保护；但由于 DMZ 上主机的安全<b>主要靠主机自身的安全机制保障</b>，所以<b>外部路由器提供的很多保护并非必要</b>。</p>
+    <p class="hl"><b>它真正有效的任务是：阻隔来自外部网上伪造源地址进来的任何数据包——这些数据包自称来自内部网，其实来自外部网。</b></p>
+    <p class="small muted">课本同句：外部包过滤防火墙<b>对于阻隔伪造源地址的数据包非常有效</b>，特别是一些以内网地址作为源地址、实际来源于外网的数据包。</p>
+  </div>
+</div>
+
+<div class="box exam">
+  <div class="box-t">问答第 8 题的完整答题结构</div>
+  <p><b>问：防火墙的屏蔽子网结构通常包括哪些部分？为什么说这种结构具有很高的安全性？</b></p>
+  <p><b>组成（先答这个）：</b><b>两台包过滤防火墙（外部路由器、内部路由器）＋ 一台堡垒主机 ＋ 中间的屏蔽子网（DMZ 区）</b>。DMZ 中还常放置需要对外提供服务的 Web、邮件服务器。</p>
+  <p><b>为什么安全（三层递进）：</b><br>
+  ① <b>攻击路径变长了</b>：黑客必须先攻破外部包过滤防火墙，再侵入 DMZ 的堡垒主机，<b>还要再控制内部包过滤防火墙</b>，才能进入内网。<br>
+  ② <b>攻破中间层的收益变小了</b>：内网主机之间的通信不经过 DMZ，<b>即使侵入堡垒主机也拿不到内网的敏感通信数据</b>。<br>
+  ③ <b>隐藏了内网</b>：通过配置外部包过滤防火墙，外网主机只能访问 DMZ 中指定的一些网络服务，<b>内部网络对于外网用户完全不可见</b>；外部包过滤还能有效阻隔伪造源地址的数据包。<br>
+  <b>顺带答缺点：管理和配置较为复杂，只有在两台包过滤防火墙和一台堡垒主机都配置完善的条件下，才能充分发挥安全防护作用。</b></p>
+</div>
+
+<h3>3.5　混合结构 <span class="pref">PPT p.74</span></h3>
+
+<p class="small">课本只说一句「可以以这几种体系结构为基础，针对不同应用场景进行灵活组合」，PPT 给了完整的 8 种组合清单：</p>
+
+<div class="chips">
+  <span class="chip">使用多堡垒主机</span><span class="chip">合并内部路由器与外部路由器</span><span class="chip">合并堡垒主机与外部路由器</span><span class="chip">合并堡垒主机与内部路由器</span>
+  <span class="chip">使用多台内部路由器</span><span class="chip">使用多台外部路由器</span><span class="chip">使用多个过滤子网</span><span class="chip">使用双宿主主机与过滤子网</span>
+</div>
+
+<div class="box key">
+  <div class="box-t">课本给的「防火墙使用四步骤」——很像简答题的骨架 <span class="bref">课本 p.373</span></div>
+  <ol class="mt0">
+    <li><b>制定完善的内网安全策略。</b></li>
+    <li><b>遵从安全策略，确定防火墙的体系结构。</b>（课本原话：体系结构的选择是防火墙系统充分发挥效用的重要一步）</li>
+    <li><b>根据需求制定包过滤防火墙的过滤规则，或者配置堡垒主机。</b></li>
+    <li><b>做好审计工作，并按计划查看审计记录，从而及时发现攻击行为。</b></li>
+  </ol>
+</div>
+</div>
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-num">§ 4　PPT p.76–77（2 页 · 2.5%）</span>
+    <h2 class="sec-t">防火墙技术的发展趋势</h2>
+    <p class="sec-lede">全章篇幅最小的一节，只有 2 页，而且课本习题一道都没考（见首页的核查说明）。按 PPT 权重，这里只列清单。</p>
+  </div>
+
+<div class="grid g2">
+  <div class="mini">
+    <div class="t"><span class="ic">P</span>PPT p.76–77 的七条</div>
+    <ul class="mt0">
+      <li><b>智能化</b>：从目前的<b>静态防御策略</b>向具备人工智能的智能化方向发展。</li>
+      <li><b>高速度</b>：必须在运算速度上升级，<b>才不致于成为网络的瓶颈</b>。</li>
+      <li><b>并行体系结构</b>：分布式并行处理的防火墙。</li>
+      <li><b>多功能</b>：在保密性、包过滤、服务、管理和安全等方面增加更多更强的功能（<b>All-In-One 技术</b>）。</li>
+      <li><b>专业化</b>：电子邮件防火墙、FTP 防火墙等<b>针对特定服务的专业化防火墙</b>将作为一种产品门类出现。</li>
+      <li><b>防病毒</b>：许多防火墙已内置病毒和内容扫描功能。</li>
+      <li><b>IPv6 网络需求</b>：下一代网络的新需求。</li>
+    </ul>
+  </div>
+  <div class="mini">
+    <div class="t"><span class="ic">书</span>课本 12.6 的五条（措辞不同，可互相印证）<span class="bref">课本 p.379–380</span></div>
+    <ul class="mt0">
+      <li><b>高性能</b>：追求「<b>线速防火墙</b>」——数据可按传输介质的带宽通畅传输，防火墙的处理基本上不会给数据传输带来间断和延时。核心手段是硬件结构调整：<b>网络处理器（NP）</b>（可编程、能线速智能处理包）与 <b>ASIC</b>（把指令或计算逻辑固化到芯片）。</li>
+      <li><b>多功能</b>：例如支持 <b>IPSec VPN</b>；据 IDC 统计，<b>国外近 90% 的加密 VPN 都是通过防火墙实现的</b>。</li>
+      <li><b>智能化</b>：目前主要是静态防御策略，难以适应动态变化的网络环境。</li>
+      <li><b>协作化</b>：两个方面——① 与其他安全设备协作，实现<b>统一威胁管理（UTM）</b>；② <b>与云端协作</b>（安全云，威胁数据上传综合分析后再下发策略）。</li>
+      <li><b>更安全</b>：设计上不存在漏洞、配置上正确反映安全需求。<b>拒绝服务攻击漏洞是防火墙产品很容易出现的一种漏洞。</b></li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-num">§ 5　PPT p.79–87（9 页 · 11%）</span>
+    <h2 class="sec-t">防火墙的评价：性能指标，以及它做不到的事</h2>
+    <p class="sec-lede">这一节分两半：前 5 页讲<b>「怎么衡量一台防火墙好不好」</b>（8 项指标），后 4 页讲<b>「防火墙的不足」</b>。后半页数更多，也考得更多——<b>问答第 10 题就是它</b>。</p>
+  </div>
+
+<h3>5.1　评价标准与国标</h3>
+
+<div class="box def">
+  <div class="box-t">为什么需要评价标准 <span class="bref">课本 p.374</span></div>
+  <p>市场上防火墙产品价格<b>从数千元到几十万元不等</b>，性能千差万别。<b>为满足低安全需求而采用高端设备会造成资源浪费，为满足高安全需求而采用低端设备则无法达到期望目标。</b>因此需要一套指标来衡量。</p>
+  <p>这些指标主要来自 <b>IETF RFC 2647</b>（并发连接数的定义）、<b>IETF RFC 1242</b>（吞吐量、时延、丢包率的定义）、<b>RFC 2544</b>（背靠背缓冲的测试方法），
+  以及 <b>2020 年 11 月 1 日实施的国标《GB/T 20281-2020 信息安全技术 防火墙安全技术要求和测试评价方法》</b>。</p>
+  <p class="small muted">PPT p.80 贴的是一张国标清单截图，第一行就是 <b>GB/T 20281-2020</b>（代替 GB/T 20010-2005、20281-2015、31505-2015、32917-2016，实施日期 2020-11-01）。<b>这张截图只需记住「GB/T 20281-2020」这一个编号和它的名字。</b></p>
+</div>
+
+<h3>5.2　八项性能指标 <span class="pref">PPT p.81–83</span></h3>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th style="width:16%">指标</th><th style="width:44%">定义（PPT 原文，可直接抄）</th><th>它衡量的是什么</th></tr></thead>
+<tbody>
+<tr><td><b>1. 吞吐量</b><br><span class="en small">throughput</span></td><td>防火墙<b>在不丢失数据包的情况下</b>能达到的<b>最大的转发数据包的速度</b>。<span class="small muted">课本／RFC 1242 版：在保证不丢失数据帧的情况下，设备能够达到的<b>最大数据帧转发速率</b>，以<b>比特/秒或字节/秒</b>表示。</span></td><td>转发包的能力，<b>对网络的性能影响较大</b>；吞吐量太小防火墙就成了<b>网络瓶颈</b>。<b>被视为评价防火墙性能的一项核心指标。</b></td></tr>
+<tr><td><b>2. 时延</b></td><td>从入口处进入的<b>输入帧的最后一个比特</b>，到从出口发出的<b>输出帧的第一个比特</b>所用的时间间隔。<span class="small muted">课本版换了个说法：数据包的<b>第一个比特进入</b>防火墙到<b>最后一个比特输出</b>的时间间隔。</span></td><td>防火墙<b>处理数据的快慢</b>。时延主要源于排队、检测、日志、转发等处理时间。</td></tr>
+<tr><td><b>3. 丢包率</b></td><td>防火墙<b>由于资源不足应转发而未转发的帧</b>所占的百分比。</td><td><b>稳定性和可靠性</b>。较低的丢包率意味着在一定负载压力下性能稳定。</td></tr>
+<tr><td><b>4. 背靠背缓冲</b></td><td>从空闲状态开始，以<b>传输介质最小合法间隔极限的传输速率</b>发送相当数量的<b>固定长度的帧</b>，<b>当出现第一个帧丢失时所发送的帧数</b>。</td><td><b>缓存能力及对网络突发流量的处理能力。</b>网络突发而处理不过来时，把数据写入缓存，<b>以空间换时间</b>逐步发送，避免数据丢失。</td></tr>
+<tr><td><b>5. 并发连接数</b></td><td><b>穿越防火墙的主机之间或主机与防火墙之间能同时建立的最大连接数。</b><span class="small muted">RFC 2647 版：内网和外网之间穿越防火墙<b>能够同时建立的最大连接数量</b>；这里的连接指网络会话，泛指 IP 层及 IP 层以上的通信信息流，最常见的有 <b>TCP 连接、HTTP 连接、SQL 连接</b>。</span></td><td>测试防火墙<b>建立和维持 TCP 连接的性能</b>，也体现对客户端 TCP 连接请求的<b>响应能力</b>。</td></tr>
+<tr><td><b>6. 连接速率</b></td><td>所有网络连接<b>能成功建立的前提下</b>，防火墙能够达到的<b>最大连接建立速率</b>，单位<b>连接数/秒</b>。</td><td>对连接请求的<b>实时处理能力</b>，由防火墙 <b>CPU 的资源调度能力</b>决定。</td></tr>
+<tr><td><b>7. 应用识别及分析能力</b></td><td><b>对应用网关防火墙而言</b>：能够<b>劫持的网络应用数量</b>、应用识别和控制的<b>粒度</b>（如是否支持对应用子功能的识别及控制），以及<b>应用特征库的更新速度</b>。</td><td class="hl">课本点破了它的地位：<b>对应用网关防火墙而言，关键的性能指标不再是网络层吞吐量，而是应用识别及分析。</b></td></tr>
+<tr><td><b>8. 其他指标</b></td><td><b>功能、可管理性、自身的安全性。</b></td><td>见下方展开。</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box exam">
+  <div class="box-t">问答第 9 题（有标准答案的那道）：并发连接数主要取决于哪些因素？ <span class="bref">课本 p.375</span></div>
+  <p><b>标准答案三条：① 防火墙设备内并发连接表的大小；② 防火墙的 CPU 处理能力；③ 防火墙的物理链路的承载能力。</b></p>
+  <p><b>① 并发连接表：</b>它是防火墙用以保存并发连接信息的表结构，<b>位于防火墙的系统内存</b>。通过防火墙的连接都要在表中保存记录，所以最大并发连接数<b>受限于表的大小</b>。<b>但并发连接表也不是越大越好——越大意味着占用更多内存资源。</b>
+  课本给了一笔账：如果每条表项占 <b>300 B</b>，那么</p>
+  <div class="fx fx-l">1 000 条 × 300 B × 8 bit/B ≈ <b>2.34 Mb</b>　　　　100 万条 ≈ <b>2.34 Gb</b>
+  <small>「内存开销相当高昂」——这就是为什么高端防火墙贵。这个算式本身就是得分点，写出来。</small></div>
+  <p><b>② CPU：</b>转发过程中 CPU 要执行许可判断、流量统计、审计记录。<b>如果 CPU 跟不上，数据包排队等待时间延长，可能超时重传；最坏情况下雪崩效应将出现</b>——一方面重传使待处理数据越积越多，另一方面没有足够计算资源及时检查转发，<b>最终导致整个防火墙系统瘫痪</b>。</p>
+  <p><b>③ 物理链路：</b>很多防火墙提供千兆甚至万兆接口，但<b>连接的物理链路未必支持高速通信</b>。<b>拥挤的低速链路无法承载过多的并发连接</b>，即使防火墙本身能支持大规模并发，也无法充分发挥性能。</p>
+</div>
+
+<div class="box beyond">
+  <div class="box-t">课本给了各项指标的国标具体数值 —— PPT 未讲，了解即可</div>
+  <p><b>并发连接数：</b>百兆产品 TCP 并发连接数不小于 <b>5 万</b>条，千兆不小于 <b>20 万</b>条，万兆不小于 <b>200 万</b>条。<br>
+  <b>网络层吞吐量：</b>对 <b>64 字节短包</b>，百兆不小于线速的 <b>20%</b>、千兆不小于 <b>35%</b>；对 <b>1518 字节长包</b>，百兆不小于线速的 <b>90%</b>、千兆不小于 <b>95%</b>；高性能万兆产品至少 <b>80 Gbit/s</b>。<br>
+  <b>时延：</b>对 64／512／1518 字节包，百兆产品平均延迟不应超过 <b>500 μs</b>，千兆、万兆不应超过 <b>90 μs</b>。<br>
+  <b>TCP 新建连接速率：</b>百兆／千兆／万兆分别不小于 <b>1 500、5 000、50 000 条/s</b>。<span class="bref">课本 p.375–377</span></p>
+  <p class="small"><b>唯一要记的是那三档包长：64 字节短包、512 字节中长包、1518 字节长包</b>——<b>问答第 11 题专门在考 1518 是怎么来的</b>，见 §6 问答第 11 题。</p>
+</div>
+
+<h4>「其他指标」的三条（选购防火墙时看什么）<span class="bref">课本 p.377–378</span></h4>
+
+<div class="grid g3">
+  <div class="mini">
+    <div class="t"><span class="ic">1</span>功能</div>
+    <p class="mt0">采用的是<b>无状态还是有状态</b>的包过滤技术，还是<b>应用网关</b>技术？<b>日志和报警功能</b>是否齐备？能支持<b>哪些服务类型</b>？是否具有<b>用户身份认证</b>功能（对应用网关防火墙尤其要注意）？</p>
+  </div>
+  <div class="mini">
+    <div class="t"><span class="ic">2</span>可管理性</div>
+    <p class="mt0">用户界面是否友好、配置管理是否操作简单。<b>随着下一代防火墙功能越来越多，可视化管理非常重要</b>——只有获取的信息足够充分，才能做出更合理的判断、部署更有效的策略。</p>
+  </div>
+  <div class="mini">
+    <div class="t"><span class="ic">3</span>自身的安全性</div>
+    <p class="mt0"><b class="hl">防火墙要保护内部网络的安全，必须首先确保自身的安全性。</b>看操作系统平台的安全性、抗攻击能力、冗余设置。<b>很多防火墙产品都被发现存在安全漏洞</b>，因此还要看厂家的研发力量和售后服务体系、对漏洞是否能及时补救。</p>
+  </div>
+</div>
+
+<h3>5.3　防火墙的不足（PPT 用了 4 页，是本节考得最多的地方）</h3>
+
+<p class="small">PPT p.84–87 一页一组，课本 12.6 归纳成五条。<b>问答第 10 题「防火墙技术在安全防护方面还存在哪些不足」直接考它。</b>
+下面按「根因」分组，比按 PPT 的页序更好记。</p>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th style="width:20%">根因</th><th style="width:40%">PPT 的说法 <span class="pref">PPT p.84–87</span></th><th>课本的补充 <span class="bref">课本 p.378–379</span></th></tr></thead>
+<tbody>
+<tr>
+  <td><b>A. 位置决定的：<br>流量不经过它，它就管不着</b><span class="chip bad">最根本</span></td>
+  <td>· 防火墙<b>不能防范不经过防火墙的攻击</b>（<b>云计算时代问题更突出</b>）<br>· 防火墙<b>不能防止来自网络内部的攻击</b>（从内网攻击内网）<b>和泄密行为</b></td>
+  <td><b>「防火墙的防护并不全面。」</b>它的实施假设是<b>内外网之间存在明确边界</b>，<b>适合于保护相对独立、与外部网络互联途径有限的网络</b>。<br>反例：公司主机既能通过网关上网，<b>每台又配了 3G/4G/5G/Wi-Fi 上网设备</b>——<b>内外网间的互联通道太多，内网节点都暴露在互联网上</b>，难以确定在哪儿部署防火墙集中检查。<br>另一半：<b>内网用户攻击内网其他主机，数据包不需要经由防火墙，因此防火墙无法察觉。</b>还有<b>内网用户的主动泄密</b>（发邮件等）、<b>通过存储介质传播的恶意代码</b>，防火墙都无法防范。</td>
+</tr>
+<tr>
+  <td><b>B. 它是被动执行策略的设备</b></td>
+  <td>· 防火墙<b>不能防止策略配置不当或错误配置</b>引起的安全威胁<br>· 防火墙是一个<b>被动的安全策略执行设备，就像门卫一样</b>，要根据既定的策略或配置来执行安全检查，<b>一般没有检查配置是否正确的能力</b></td>
+  <td>防火墙所发挥的防护作用<b>在很大程度上取决于配置是否正确、完善</b>。<b>管理员如何设计体系结构、如何配置安全规则，是防火墙能否充分发挥作用的关键。</b>体系结构不合理或安全规则没有吻合安全策略，防火墙将无法发挥防护作用。</td>
+</tr>
+<tr>
+  <td><b>C. 允许的端口本身就是通道</b></td>
+  <td>· 防火墙<b>不能防止利用服务器系统和网络协议漏洞</b>所进行的攻击<br>· 防火墙<b>不能防止黑客通过防火墙准许的访问端口对该服务器的漏洞进行攻击</b></td>
+  <td>攻击者可以<b>伪造数据包</b>，生成防火墙过滤规则<b>允许的</b>攻击数据包，绕过监控；也可以<b>把攻击数据包分片发送</b>，穿越防火墙。<br>课本原话：<b>「一般的包过滤防火墙基本上无力防护，应用网关防火墙也必须经过特别配置、在能够识别漏洞的条件下才可能阻断攻击数据包。」</b></td>
+</tr>
+<tr>
+  <td><b>D. 它自己也有漏洞</b></td>
+  <td>· 防火墙<b>不能防止本身的安全漏洞的威胁</b><br>· <b>「防火墙保护别人有时却无法保护自己」</b>，目前还没有厂商绝对保证防火墙不会存在安全漏洞，<b>因此对防火墙也必须提供某种安全保护</b></td>
+  <td>一些防火墙产品存在漏洞，<b>导致防火墙本身可被攻击者控制</b>。具体案例（PPT 未讲，但<b>单选第 12 题在考</b>）见 §6 单选第 12 题解析。</td>
+</tr>
+<tr>
+  <td><b>E. 查不了病毒／恶意代码</b></td>
+  <td>· 防火墙<b>不能防止受病毒感染的文件的传输</b><br>· 防火墙<b>本身并不具备查杀病毒的功能</b>，即使集成了第三方的防病毒软件或模块，<b>杀毒能力也有限</b></td>
+  <td>原因：<b>恶意代码的存储方式灵活、隐蔽，可以隐藏在网络数据的任何部分，甚至会采用加密技术自我保护</b>，要想通过防火墙发现恶意代码异常困难。</td>
+</tr>
+<tr>
+  <td class="muted"><b>F.（课本独有）性能跟不上带宽增长</b></td>
+  <td class="muted">PPT 未提</td>
+  <td>网络宽带化进程迅速，<b>防火墙需要检查的数据迅猛增加</b>；<b>检查强度越高，计算开销越大</b>（尤其应用网关要检查应用负载）。防火墙处理速度相对较慢，<b>往往成为网络通信的瓶颈</b>；也因此<b>很难实时判断网络攻击活动是否发生</b>。</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="box exam">
+  <div class="box-t">全章的收尾句 —— 也是通往第 13 章的桥 <span class="pref">PPT p.87</span></div>
+  <p><b>PPT 原文：「由于防火墙的局限性，因此仅在内部网络入口处设置防火墙系统不能有效地保护计算机网络的安全，而入侵检测系统（Intrusion Detection System，IDS）可以弥补防火墙的不足。」</b></p>
+  <p><b>课本的对应表述：</b>「仅在内部网络边界处设置防火墙不足以全面保护内网的安全，防火墙还需要与其他安全产品相互配合，提升网络整体的安全性。」<b>以防火墙为代表的基于边界的网络安全防护模型有其本身固有的缺点</b>——课本把展开留给了<b>第 13 章（入侵检测）和第 15 章 15.2 节（零信任安全）</b>。</p>
+  <p class="small muted">这句话回答了一个学生常问的问题：<b>为什么下一章要讲入侵检测？</b>因为防火墙的所有不足都指向同一件事——<b>它只能在边界上按既定规则做「进/不进」的判断，既看不见已经在里面的东西，也不会自己发现异常。</b></p>
+</div>
+</div>
+<div class="sec pagebreak">
+  <div class="sec-head">
+    <span class="sec-num">§ 6　课本 12.7 习题（p.381–383）· 31 题全收，逐题解析</span>
+    <h2 class="sec-t">习题与解析</h2>
+    <p class="sec-lede">单选 12 题、多选 8 题、问答 11 题，<b>一题不删</b>。答案来源已逐题标注：凡课本答案页写「略」的，解析由本资料<b>依据课本原文自拟</b>并注明出处页码，你可以自己复核。</p>
+  </div>
+
+<div class="box key">
+  <div class="box-t">先看这个：31 道题分布在哪几节</div>
+  <p><b>包过滤／ACL 顺序／默认策略</b>：单选 2、3、9，多选 1，问答 3、4、5 —— <b>7 题，最密集</b><br>
+  <b>体系结构／DMZ／堡垒主机</b>：单选 6、7，问答 8 —— <b>3 题</b><br>
+  <b>防火墙的不足与自身安全</b>：单选 5、12，多选 3、5、7、8，问答 10 —— <b>7 题，同样密集</b><br>
+  <b>应用网关／WAF</b>：单选 4、8，问答 7 —— 3 题　　<b>状态检测</b>：问答 6 —— 1 题<br>
+  <b>评价指标</b>：问答 9、11 —— 2 题　　<b>部署方式（PPT 未讲）</b>：单选 11、多选 6 —— 2 题<br>
+  <b>其他基本概念</b>：单选 1、10，多选 2、4，问答 1、2 —— 6 题</p>
+</div>
+
+<h3>一、单项选择题（12 题）</h3>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 1</span>在防火墙技术中，我们所说的外网通常指的是（　）。</div>
+  <div class="mc-o"><span>A. 受信任的网络</span><span class="ok">B. 非受信任的网络</span><span>C. 防火墙内的网络</span><span>D. 局域网</span></div>
+  <div class="mc-a"><b>答案 B。</b>防火墙的整个模型建立在「把网络分成信任程度不同的安全域」之上。<b>内网＝受信任的网络，外网＝非受信任的网络。</b>
+  C 说的是内网；D 局域网只是一种组网形态，与信任无关（外网也可以是别人的局域网）。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 2</span>下面关于防火墙策略说法正确的是（　）。</div>
+  <div class="mc-o" style="grid-template-columns:1fr"><span>A. 在创建防火墙策略以前，不需要对企业那些必不可少的应用软件执行风险分析</span><span class="ok">B/C. 防火墙处理入站通信的默认策略应该是阻止所有的包和连接，除了被指出的允许通过的通信类型和连接</span><span>B. 防火墙安全策略一旦设定，就不能再做任何改变</span><span>D. 防火墙规则集与防火墙平台体系结构无关</span></div>
+  <div class="mc-a"><b>答案 C。</b>这就是<b>「默认拒绝」——没有明确允许的即被禁止</b>，见 §2.1。<br>
+  A 错：必须先做风险分析才知道该放行什么；B 错：安全策略要随需求和威胁变化调整；D 错：<b>规则集与平台体系结构密切相关</b>——同样一套策略，放在屏蔽路由器结构和屏蔽子网结构上，规则要写在哪台设备、写成什么样完全不同（见 §3.4：内、外部路由器的规则分工）。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 3</span>包过滤型防火墙主要作用在（　）。</div>
+  <div class="mc-o"><span>A. 网络接口层</span><span>B. 应用层</span><span class="ok">C. 网络层</span><span>D. 数据链路层</span></div>
+  <div class="mc-a"><b>答案 C。</b>课本原文：包过滤作用在 TCP/IP 体系结构的<b>网络层和传输层</b>。<b>选项里没有传输层，所以选网络层。</b>
+  记忆锚点是 PPT p.26 那张图下面的四个字：<b>「只检查包头」</b>。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 4</span>应用网关防火墙主要作用在（　）。</div>
+  <div class="mc-o"><span>A. 数据链路层</span><span>B. 网络层</span><span>C. 传输层</span><span class="ok">D. 应用层</span></div>
+  <div class="mc-a"><b>答案 D。</b>与上一题成对。对应 PPT p.49 图下的四个字：<b>「只检查数据」</b>。注意应用网关<b>并非不看包头</b>——课本说它「<b>除了</b>利用网络层和传输层的信息，<b>还</b>利用应用层的信息内容来过滤」，但<b>主要作用层</b>是应用层。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 5</span>下列关于防火墙的说法，<b>错误</b>的是（　）。</div>
+  <div class="mc-o" style="grid-template-columns:1fr"><span>A. 防火墙的核心是访问控制</span><span>B. 防火墙也有可能被攻击者远程控制</span><span class="ok">C. 路由器中不能集成防火墙的部分功能</span><span>D. 如果一个网络没有明确边界，则使用防火墙可能没效果</span></div>
+  <div class="mc-a"><b>答案 C（选的是错误项）。</b>C 与课本 12.1.1 直接矛盾：网络防火墙有两种产品形态——<b>单一主机防火墙（硬件防火墙）和路由器集成防火墙</b>，「<b>目前大多数中高档路由器都支持这种模式的防火墙</b>」。而且包过滤本来就是 1983 年从路由器上长出来的。<br>
+  A 对（定义就是「执行访问控制策略」）；B 对（§5 不足 D，EXBA 案例就是实例）；D 对（§5 不足 A，防火墙的前提就是存在明确边界）。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 6</span>在设计防火墙时，考虑内网中需要向外提供服务的服务器常常放在一个单独的网段，这个网段称为（　）。</div>
+  <div class="mc-o"><span>A. RSA</span><span>B. DES</span><span>C. CA</span><span class="ok">D. DMZ</span></div>
+  <div class="mc-a"><b>答案 D。</b>DMZ（Demilitarized Zone，中立区／非军事化区），内外网之间的缓冲网段，<b>放必须公开的服务器</b>（Web、邮件）。
+  A/B 是密码算法（RSA 公钥、DES 分组密码），C 是证书颁发机构——全是干扰项。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 7</span>四种防火墙结构中，相对而言最安全的是（　）。</div>
+  <div class="mc-o"><span>A. 屏蔽路由器结构</span><span>B. 屏蔽主机结构</span><span>C. 双宿主机结构</span><span class="ok">D. 屏蔽子网结构</span></div>
+  <div class="mc-a"><b>答案 D。</b>课本原句可直接引用：<b>「屏蔽子网结构在几种防火墙体系结构中具有最高的安全性。」</b>
+  理由见 §3 那条主线：<b>它是唯一一种「中间部件被攻破后，攻击者仍然拿不到内网通信数据」的结构</b>，因为内网主机之间的流量不经过 DMZ。<br>
+  <b>四种结构的安全性排序：屏蔽路由器 &lt; 双宿主机 ≈ 屏蔽主机 &lt; 屏蔽子网。</b></div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 8</span>某单位连在公网上的 Web 服务器经常遭受网页篡改、网页挂马、SQL 注入等黑客攻击，请为该 Web 服务器选择一款最有效的防护设备（　）。</div>
+  <div class="mc-o"><span>A. 网络防火墙</span><span>B. IDS</span><span class="ok">C. WAF</span><span>D. 杀毒软件</span></div>
+  <div class="mc-a"><b>答案 C。</b>回到 §1 的那张四类表：<b>保护对象是 Web 应用服务器、攻击发生在 HTTP 层面 → Web 应用防火墙（WAF）</b>，它「部署于 Web 服务器前端，对流经的 HTTP/HTTPS 访问和响应数据进行解析」。<br>
+  A 错：网络防火墙保护的是整个内网，它看到的只是「一条去往 80 端口的 TCP 连接」，<b>分不清里面是正常请求还是 SQL 注入</b>；
+  B 错：IDS 只<b>检测</b>不<b>阻断</b>（题目要「防护」）；D 错：杀毒软件保护的是主机上的文件，管不了 HTTP 请求的内容。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 9</span>配置防火墙时，<b>不正确</b>的观点是（　）。</div>
+  <div class="mc-o" style="grid-template-columns:1fr"><span class="ok">A. 可以不考虑防火墙过滤规则的顺序</span><span>B. 没有明确允许的就是禁止的</span><span>C. 防火墙过滤规则的顺序与安全相关</span><span>D. 根据需要可以允许从内部站点访问 Internet 也可以从 Internet 访问内部站点</span></div>
+  <div class="mc-a"><b>答案 A（选的是不正确项）。</b>A 与 C 直接对立，必有一错——而课本 6 项基本要求的第 3、4、5 条<b>就是专门用来说明顺序至关重要的</b>（匹配一命中就停，后面全忽略）。见 §2.1 那两套 ACL 方案的对照。<br>
+  <b>D 是这题的暗坑</b>：很多人觉得「让外网访问内部站点」听着就不安全。但注意它说的是<b>「根据需要可以」</b>——DMZ 里的 Web 服务器就是专门给外网访问的。<b>这一条也正是多选第 1 题的答案 A。</b></div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 10</span>很多单位的安全管理员会因为安全的原因禁用因特网控制管理协议（ICMP），他们可以使用网络安全设备（　）来实现。</div>
+  <div class="mc-o"><span>A. 杀毒软件</span><span class="ok">B. 防火墙</span><span>C. 入侵检测系统</span><span>D. 网络扫描软件</span></div>
+  <div class="mc-a"><b>答案 B。</b>「禁用某种协议」是典型的<b>访问控制</b>动作，而<b>访问控制正是防火墙的核心</b>；包过滤的判定参数里明确包含 <b>IP 协议类型（TCP/UDP/ICMP）和 ICMP 消息类型</b>，写一条「拒绝 ICMP」的规则即可。<br>
+  C 错的理由和单 8 一样：<b>IDS 只检测不阻断</b>；A、D 根本不在通信路径上做拦截。<br>
+  <span class="small muted">顺带记：<b>ICMP 常被禁用</b>这个事实，正是<b>多选第 8 题</b>里「把攻击包藏在 ICMP 流量中」不成立的原因。</span></div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 11</span>下列防火墙部署模式中，可隐藏内网 IP 地址的是（　）。<span class="chip">PPT 未讲 · 课本 12.4</span></div>
+  <div class="mc-o"><span>A. 透明模式</span><span>B. 网关模式</span><span class="ok">C. NAT 模式</span><span>D. 桥接模式</span></div>
+  <div class="mc-a"><b>答案 C。</b>课本 p.374 原文：<b>「NAT 模式使用地址转换功能可确保外部网络不能直接看到内部网络的 IP 地址，进一步增强了对内部网络的安全防护。」</b>
+  同时内网可以使用<b>私有地址</b>，还解决了 IP 地址数量不足的问题。<br>
+  A/D 是同一个东西（<b>透明模式又称桥接模式</b>），它「<b>只过滤通过的数据包，但不会修改数据包包头中的任何信息</b>」，自然藏不住地址；
+  B 网关模式在不同安全区间转发时<b>「一般不会改变 IP 数据包包头中的源地址和端口号（除非明确采用了地址翻译策略）」</b>。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">单 12</span>方程式组织武器库中的 EXBA 工具利用 Cisco 防火墙的一个零日漏洞（CVE-2016-6366）实现对 Cisco 防火墙的远程控制。攻击成功的前提是目标防火墙中必须启用（　）。<span class="chip">PPT 未讲 · 课本 12.6</span></div>
+  <div class="mc-o"><span>A. FTP 服务</span><span>B. 包过滤服务</span><span>C. VPN 服务</span><span class="ok">D. SNMP 服务</span></div>
+  <div class="mc-a"><b>答案 D。</b>课本 p.379 原文：<b>CVE-2016-6366 漏洞存在于 Cisco 防火墙中的简单网络管理协议（SNMP）服务模块，漏洞执行之后可关闭防火墙对 Telnet/SSH 的认证，从而允许攻击者进行未授权的操作，如实现任意 Telnet 登录。</b><br>
+  <b>背景（课本同页）：</b>2016 年影子经纪人泄露的美国国家安全局（NSA）攻击团队<b>「方程式组织（Equation Group）」</b>武器库中，有多个专门针对国内外著名防火墙厂商（Cisco、Fortigate、Juniper、天融信、深信服）的攻击工具，可实现<b>远程控制、权限提升、执行恶意代码</b>。针对 Cisco PIX 系列和 ASA 防火墙的另一个工具叫 <b>JETPLOW</b>；EXBA 攻击时还同时使用了远程执行漏洞 <b>CVE-2016-6367</b>。<br>
+  <b>这题的意义：它是「防火墙自身也有漏洞」这条不足的实证</b>——见 §5 不足 D。</div>
+</div>
+
+<h3>二、多项选择题（8 题）</h3>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">多 1</span>配置防火墙时，<b>错误</b>的原则是（　）。</div>
+  <div class="mc-o" style="grid-template-columns:1fr"><span class="ok">A. 允许从内部站点访问 Internet 而不允许从 Internet 访问内部站点</span><span>B. 没有明确允许的就是禁止的</span><span>C. 防火墙过滤规则的顺序与安全密切相关</span><span class="ok">D. 可以不考虑防火墙过滤规则的顺序</span></div>
+  <div class="mc-a"><b>答案 AD。</b>D 显然错（与 C 对立）。<b>A 是这一章最容易做错的一道</b>——它读起来像「标准做法」，为什么算错误原则？<br>
+  <b>因为它把一条常见配置说成了绝对原则。</b>现实中大量网络<b>必须</b>让外网访问内部站点：整个 <b>DMZ 区存在的意义</b>就是「放置一些必须公开的服务器」供外网访问（单选 6 刚考过）；单选 9 的 D 项也明确写着<b>「根据需要可以允许从内部站点访问 Internet 也可以从 Internet 访问内部站点」</b>，那是<b>正确</b>观点。<b>把「可以按需双向开放」说成「一律不允许外网访问内网」，就是错误的原则。</b><br>
+  <span class="small muted">对照记忆：单选 9 问「不正确的观点」，D 是<b>正确</b>的；多选 1 问「错误的原则」，同样意思的 A 是<b>错误</b>的——因为多选 1 的 A 少了「根据需要可以」这个限定，变成了一刀切。<b>差别就在那几个字上。</b></span></div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">多 2</span>下列安全机制，可用于<b>机密性</b>保护的有（　）。</div>
+  <div class="mc-o"><span class="ok">A. 加密</span><span class="ok">B. 防火墙</span><span>C. 入侵检测</span><span>D. 数字签名</span></div>
+  <div class="mc-a"><b>答案 AB。</b>A 不用解释。<b>B 之所以算，依据是课本 12.1.2 那句「防止内网信息暴露」</b>——防火墙通过访问控制阻止外部读取内网资源，属于机密性保护手段（课本 12.4 还提到 NAT 模式「具备了一定的机密性」）。<br>
+  C 错：<b>入侵检测是「检测」不是「保护」</b>，它事后发现，不阻止泄露；D 错：<b>数字签名提供的是完整性、身份鉴别和不可否认性，恰恰不提供机密性</b>（签名值本身不加密内容）。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">多 3</span>下列关于防火墙的说法中，<b>正确</b>的是（　）。</div>
+  <div class="mc-o" style="grid-template-columns:1fr"><span class="ok">A. 防火墙并不能阻止所有的网络攻击</span><span class="ok">B. 防火墙自身可能存在安全漏洞导致攻击者可以绕过防火墙</span><span class="ok">C. 如果防火墙配置不当，可能会起不到预期的防护作用</span><span class="ok">D. 攻击流量不经过防火墙，而是通过无线接入单位内网，防火墙无法进行控制</span></div>
+  <div class="mc-a"><b>答案 ABCD，全选。</b>这四条正好是 §5「不足」的四条根因：A＝总纲，B＝根因 D（自身漏洞），C＝根因 B（被动执行策略、配置决定一切），D＝根因 A（流量不经过它就管不着，课本举的正是「每台主机配了 3G/4G/5G/Wi-Fi 上网设备」）。<br>
+  <b>这题是本章「不足」那一节的浓缩，值得反过来当提纲背。</b></div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">多 4</span>下列系统或设备中，（　）采用<b>访问控制机制</b>来实现对资源的安全访问。</div>
+  <div class="mc-o"><span>A. 加密系统</span><span class="ok">B. 防火墙</span><span class="ok">C. 操作系统</span><span class="ok">D. 数据库</span></div>
+  <div class="mc-a"><b>答案 BCD。</b>访问控制的本质是<b>「主体—客体—权限」三元组：先判断你是谁，再决定你能不能碰这个资源」</b>。防火墙按规则决定包能不能过、操作系统按权限位决定进程能不能读文件、数据库按用户角色决定能不能查表——都是这个模式。<br>
+  <b>A 错，而且错得很典型：加密系统靠的是「你有没有密钥」，而不是「系统查表判断你有没有权限」。</b>没有密钥的人一样能拿到密文，只是解不开——<b>它保护的是数据本身，不是访问路径</b>。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">多 5</span>防火墙的安全漏洞可能存在于（　）。</div>
+  <div class="mc-o"><span class="ok">A. 设计上</span><span class="ok">B. 安全策略的配置上</span><span class="ok">C. 防火墙软件的实现上</span><span class="ok">D. 硬件平台上</span></div>
+  <div class="mc-a"><b>答案 ABCD，全选。</b>课本 12.5「其他指标」的第 3 条正是这个视角：<b>选防火墙要考虑「防火墙采用的操作系统平台的安全性、防火墙的抗攻击能力、防火墙的冗余设置」</b>；12.6 又说「防火墙自身的安全性主要体现在<b>自身设计和管理</b>两个方面」。<br>
+  <b>四个选项分别对应：设计（架构本身有缺陷）、配置（管理员写错规则）、实现（代码 bug，如 CVE-2016-6366）、硬件平台（底层芯片/OS 的漏洞）。一个都跑不掉。</b></div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">多 6</span>下列防火墙部署模式中，可提供<b>路由</b>功能的是（　）。<span class="chip">PPT 未讲 · 课本 12.4</span></div>
+  <div class="mc-o"><span>A. 透明模式</span><span class="ok">B. 网关模式</span><span class="ok">C. NAT 模式</span><span>D. 桥接模式</span></div>
+  <div class="mc-a"><b>答案 BC。</b>课本 p.373–374：<b>网关模式「也称为路由模式」，所有网络接口处于不同的子网中，防火墙不仅要过滤数据包，还需要根据 IP 地址执行路由功能</b>；
+  <b>NAT 模式是在网关模式的基础上再加地址转换</b>，所以它当然也有路由能力。<br>
+  <b>A 和 D 是同一个东西</b>——透明模式又称桥接模式、透明桥接模式，「其作用更像是处于同一 VLAN 的<b>二层交换机或者桥接器</b>」，<b>不做路由</b>。<b>把 A、D 设成两个选项，本身就是在考「你知不知道这俩是同义词」。</b><br>
+  <span class="small muted">三种模式一句话：<b>透明＝二层桥接、不改包头不做路由；网关＝三层路由；NAT＝三层路由 + 地址转换（还能加 MAP 做端口映射，让外网访问内网服务却看不到真实地址）。NAT 模式适用于所有网络环境，安全保障能力最强。</b></span></div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">多 7</span>下列说法正确的是（　）。</div>
+  <div class="mc-o" style="grid-template-columns:1fr"><span class="ok">A. 路由器可以集成防火墙功能</span><span class="ok">B. 防火墙可以实现 VPN</span><span class="ok">C. 防火墙可以实现路由功能</span><span>D. 防火墙可以阻止内网用户泄密</span></div>
+  <div class="mc-a"><b>答案 ABC。</b>A ← 课本 12.1.1「路由器集成防火墙」，也正是单选 5 的 C 项为什么错；
+  B ← 课本 12.6「支持 IPSec VPN 的防火墙目前使用很多，据 IDC 统计<b>国外近 90% 的加密 VPN 都是通过防火墙实现的</b>」；
+  C ← 课本 12.4 网关模式／NAT 模式（与多选 6 同源）。<br>
+  <b>D 错，而且是课本的原话反面：「防火墙不能防止内网用户的主动泄密。内网用户通过电子邮件或者其他方法泄露信息，防火墙无法防范。」</b><span class="bref">课本 p.379</span>
+  PPT p.84 的说法是「不能防止来自网络内部的攻击<b>和泄密行为</b>」。</div>
+</div>
+
+<div class="mc">
+  <div class="mc-h"><span class="qn">多 8</span>从攻击者的角度看，为了提高成功率，可以采用（　）等方法穿过防火墙。</div>
+  <div class="mc-o" style="grid-template-columns:1fr"><span class="ok">A. 将攻击数据包隐藏在 HTTPS 流量中</span><span class="ok">B. 将攻击数据包的 TCP 目的端口设置成 80</span><span>C. 将攻击数据包的 TCP 目的端口设置成 5480</span><span>D. 将攻击数据包隐藏在 ICMP 协议流量中</span></div>
+  <div class="mc-a"><b>答案 AB。</b>判据只有一条：<b>挑一个「防火墙几乎一定放行」的通道钻进去。</b><br>
+  <b>A 对：</b>HTTPS 是加密的，<b>防火墙将无法理解通信内容，也就无法进行正确的处理</b>（课本 p.366 讲 FTP 子连接时的同一句话）。<b>加密是防火墙的天敌。</b><br>
+  <b>B 对：</b>80 端口几乎没有单位敢关。而且正如 §2.2 讲的，<b>80 端口并不一定代表 Web 服务</b>，完全可以绑别的应用——这也正是下一代防火墙要解决的问题。<br>
+  <b>C 错：</b><b>5480 是个冷僻端口，恰恰最可能被「默认拒绝」直接挡掉</b>（没有明确允许的即被禁止）。<br>
+  <b>D 错：</b>ICMP <b>恰恰是最常被禁用的协议</b>——单选第 10 题刚说完「很多单位的安全管理员会因为安全的原因禁用 ICMP」。<b>这两题是配套出的，别答反。</b></div>
+</div>
+
+<h3>三、问答题（11 题）</h3>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">问 1</span>防火墙部署在网络边界所起到的安全防护作用主要体现在哪些方面？</div>
+  <div class="qa-b">
+    <p><b>课本参考答案（四条）：</b></p>
+    <ol class="mt0">
+      <li><b>保护内网中脆弱以及存在安全漏洞的网络服务；</b></li>
+      <li><b>实施安全策略，对网络通信进行访问控制；</b></li>
+      <li><b>防止内网信息暴露；</b></li>
+      <li><b>对内外网之间的通信进行监控审计。</b></li>
+    </ol>
+    <p>答完这四条，可以再补一句<b>「而这一切成立的前提是：所有内外网通信都必须经过防火墙」</b>，与后面的问 10 呼应。</p>
+    <div class="qa-src">来源：课本答案页有标准答案。原始出处是课本 12.1.2 开头那段与 PPT p.12，措辞几乎一字不差。</div>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">问 2</span>网络级防火墙通常是具有包过滤功能的路由器，这类路由器与一般路由器主要有哪些区别？</div>
+  <div class="qa-b">
+    <p><b>课本参考答案只有一句：差别在于是否对路由的数据包进行安全检测。</b></p>
+    <p><b>展开（拿分点）：</b>一般路由器只关心<b>「这个包该往哪个口送」</b>，依据是路由表；包过滤路由器在转发之前<b>还要拿包头去比对 ACL</b>，依据是安全策略，结果只有<b>允许</b>和<b>拒绝</b>两种。
+    课本 p.360 的具体表述是：<b>「具有包过滤功能的路由器，可以在网络接口设置过滤规则；数据包进出路由器时，路由器依据在数据包出入方向配置的规则处理数据包。」</b></p>
+    <p><b>再补老师在 PPT 备注里给的口语版：「一般路由器上的过滤软件比较简单，而过滤路由器防火墙的过滤软件功能较强。」</b></p>
+    <div class="qa-src">来源：课本答案页有标准答案。<b>这道题同时也是 PPT p.59 的课堂提问</b>——老师提了不答，课本又考了一遍，是本章最硬的重点信号之一。</div>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">问 3</span>请简述包过滤防火墙是如何工作的。</div>
+  <div class="qa-b">
+    <p><b>按「看什么 → 比什么 → 怎么判 → 判完做什么」四步答：</b></p>
+    <ol class="mt0">
+      <li><b>作用位置：</b>工作在 TCP/IP 体系结构的<b>网络层和传输层</b>，部署在内外网边界，是内外网通信的必经通道。</li>
+      <li><b>提取信息：</b>拆开每个数据包的<b>包头</b>，取出源/目的 IP 地址、TCP/UDP 源/目的端口号、协议类型、ICMP 消息类型、各种标志位（SYN、ACK）等——<b>不检查应用负载</b>。</li>
+      <li><b>依次匹配：</b>把这些字段与 <b>ACL（访问控制列表）</b>中<b>按序排列</b>的过滤规则逐条匹配。<b>一旦某条规则匹配成功，立即执行其允许或拒绝操作，剩余规则不再匹配。</b></li>
+      <li><b>执行动作：</b>允许 → 数据包依据路由表正常转发；拒绝 → 数据包被直接丢弃，无法到达目的主机。</li>
+      <li><b>默认处理：</b>如果与所有规则都不匹配，则执行默认策略。<b>从安全角度出发，默认策略应当是拒绝（「没有明确允许的即被禁止」）。</b></li>
+    </ol>
+    <div class="qa-src">来源：课本答案页写「略」。本解析依据课本 12.2.1（p.360–362）与 PPT p.22–27 自拟。</div>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">问 4</span>包过滤防火墙的运作通常需要满足哪些基本要求？</div>
+  <div class="qa-b">
+    <p><b>六项（照抄课本 p.361／PPT p.25 即可，见 §2.1）：</b></p>
+    <ol class="mt0">
+      <li>必须能够<b>存储</b>包过滤规则。</li>
+      <li>数据包到达相应端口时，能够<b>分析 IP、TCP、UDP 等协议报文头字段</b>。</li>
+      <li>包过滤规则的<b>应用顺序与存储顺序相同</b>。</li>
+      <li>如果一条规则<b>阻止</b>某数据包传输，该数据包被<b>丢弃</b>。</li>
+      <li>如果一条规则<b>允许</b>某数据包传输，该数据包<b>正常通行</b>。</li>
+      <li>从安全的角度出发，<b>不匹配任何一条规则的数据包应当被丢弃</b>。</li>
+    </ol>
+    <p><b>答完六条务必加上这两句总结，这才是出题人想看到的：</b>第 3、4、5 项说明<b>过滤规则在 ACL 中的存储顺序非常重要</b>——与数据包匹配的第一条规则将发挥作用，其余全被忽略；第 6 项体现的原则是<b>「未明确表示允许的便被禁止」</b>。</p>
+    <div class="qa-src">来源：课本答案页写「略」。本解析依据课本 p.361–362 原文。</div>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">问 5</span>包过滤防火墙在安全防护方面有哪些优点和缺点？</div>
+  <div class="qa-b">
+    <p><b>优点（三条）：</b>① <b>一台设备保护整个网络</b>，放在边界即可对全网实施保护，简单易行，与内网站点规模无关；
+    ② <b>处理速度快、效率高</b>，对正常网络通信影响小；
+    ③ <b>对用户和应用都透明</b>，内网用户无须对主机做特殊设置，也不需要客户端软件支持。</p>
+    <p><b>缺点（四条＋一条加分项）：</b>① <b>判定信息不足</b>——只依赖网络层和传输层头部信息，<b>不对应用负载进行检查</b>，难以做细致分析（RPC、UDP 这类协议尤其难以有效过滤）；
+    ② <b>规则配置较为困难</b>，特别是安全策略复杂的大型网络，配置不当就无法有效防护；
+    ③ <b>支持的规则数量有限</b>，规则过多则依次匹配会降低网络效率；
+    ④ <b>包中的字段信息容易伪造</b>，攻击者可通过 <b>IP 欺骗</b>绕过；<b>本身难以进行用户身份认证</b>。</p>
+    <p><b class="hl">加分项（PPT 专门讲了一页、课本只有一句）：不能正确处理 IP 分片包。</b>因为<b>只有第一个分片含有端口号</b>，攻击者可以用<b>极小数据段式攻击（tiny fragment）</b>把 TCP 头强行拆到多个包里，赌过滤器只检查第一个分片而放行其余分片，从而绕过过滤规则。<span class="pref">PPT p.33</span></p>
+    <div class="qa-src">来源：课本答案页写「略」。本解析依据课本 p.364 与 PPT p.31–33。</div>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">问 6</span>有状态的包过滤防火墙相比于无状态的包过滤防火墙有哪些优点？</div>
+  <div class="qa-b">
+    <p><b>先说无状态的病根（不说这个，后面的优点就没有落点）：</b>无状态包过滤<b>无法辨别一个 TCP 数据包属于连接建立的初始化阶段、数据传输阶段还是断连阶段</b>，因此难以精确过滤。
+    典型后果：为了让内网访问外网 Web 的响应能回来，必须放行「源端口 80 → 内网端口 &gt;1023」的所有入站包，<b>而防火墙无法区分一个源于外网 80 端口的包是不是对内网请求的响应</b>，攻击者就<b>以 80 端口作为源端口扫描内网主机</b>。</p>
+    <p><b>优点（四条）：</b></p>
+    <ol class="mt0">
+      <li><b>能判断包是否属于已存在的连接。</b>用<b>连接状态表</b>跟踪每条连接（源/目的地址、端口、协议、连接状态），只有<b>能在状态表中匹配到</b>的响应包才放行，从根本上堵住了上面那个洞。</li>
+      <li><b>过滤更精确、防护更有效。</b>能根据协议、端口及源/目的地址的具体情况综合决定是否放行，并可依据 TCP 状态转换的合法性（如客户端不可能进入 LISTEN、SYN 不可能与 FIN 同时置位）识别畸形包。</li>
+      <li><b>提升了攻击者渗透防火墙的难度。</b>攻击者发出的数据包若在状态表中不存在匹配将无法通过；即使嗅探到合法连接信息并伪造源地址，也<b>难以收到返回的数据包</b>，且连接一旦正常终止<b>防火墙会立即删除状态表条目</b>，攻击者无法继续利用。</li>
+      <li><b>日志信息更全面。</b>可在状态表基础上记录<b>连接建立时间、持续时间、拆除时间</b>，有助于管理员发现异常通信行为。</li>
+    </ol>
+    <p class="small muted"><b>如果题目还问「有什么代价」：</b>UDP/ICMP 无状态只能用变通办法（DNS 靠请求-应答配对、复杂 UDP 靠定时器）；FTP 等会动态开子连接的协议必须额外跟踪子连接端口，<b>且端口协商必须明文，加密就没法处理</b>；维护状态表<b>处理开销高、对硬件要求高、价格更贵</b>。</p>
+    <div class="qa-src">来源：课本答案页写「略」。本解析依据课本 12.2.2（p.365–366）与 PPT p.35–43。</div>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">问 7</span>应用网关防火墙有哪些优点和缺陷？</div>
+  <div class="qa-b">
+    <p><b>优点（四条）：</b></p>
+    <ol class="mt0">
+      <li><b>工作在应用层，能分析数据负载。</b>代理直接与应用程序交互，可依据<b>应用上下文</b>而不仅仅是 IP 和端口做出决策，判定更准确；有助于检测<b>缓冲区溢出攻击、SQL 注入攻击</b>等应用层攻击。</li>
+      <li><b>控制粒度细、伸缩性好。</b>包过滤只能决定允许或拒绝整类 HTTP 流量，<b>应用代理可以配置来过滤具体的 HTTP 流量类型</b>；对于有漏洞而厂商尚未出补丁的服务，可以<b>在继续对外提供服务的同时过滤掉针对该漏洞的恶意流量</b>，而不必像包过滤那样直接把服务隔离。</li>
+      <li><b>能进行用户身份认证</b>，确保只有允许的用户才能通过——这是包过滤做不到的。</li>
+      <li><b>审计完善。</b>代理是通信的必经端点，<b>所有数据包的头部和负载都可以被记录</b>，可监控客户机与服务器之间的全部交互。</li>
+    </ol>
+    <p><b>缺陷（四条＋一条加分项）：</b>① <b>每种应用服务都需要专门的代理</b>，不同应用协议差异大、无法统一分析，实际产品只能处理相对较少的应用；
+    ② <b>性能差</b>——要检查数据负载、分析应用层内容，检查时间比包过滤长，造成传输延迟，设计不当甚至导致数据包频繁重传、网络拥塞；
+    ③ <b>价格昂贵</b>，对硬件要求高，升级成本高；
+    ④ <b>配置和管理复杂</b>，需针对应用服务类型逐一设置，且管理员必须对应用协议有深入理解。</p>
+    <p><b class="hl">加分项：有些要求建立直接连接的服务无法使用代理，如聊天服务、即时消息服务；另外，代理也不能使用户免于协议本身缺点的限制。</b><span class="pref">PPT p.51–52</span></p>
+    <div class="qa-src">来源：课本答案页写「略」。本解析依据课本 12.2.3（p.367–368）与 PPT p.46–52。<b>其中「聊天/即时消息无法代理」是 PPT p.52 特意留给学生回答的问题</b>（老师备注：可作为问题请学生回答）。</div>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">问 8</span>防火墙的屏蔽子网结构通常包括哪些部分？为什么说这种结构具有很高的安全性？</div>
+  <div class="qa-b">
+    <p><b>组成：两台包过滤防火墙（外部包过滤防火墙／外部路由器、内部包过滤防火墙／内部路由器）＋ 一台堡垒主机 ＋ 由它们隔离出来的独立子网（屏蔽子网／周边网／DMZ 区）。</b>
+    DMZ 中除堡垒主机外，还常放置需要对外提供服务的 Web 服务器、邮件服务器。堡垒主机作为<b>应用网关防火墙</b>在内外网之间转发通信数据，是<b>内、外网通信的唯一通道</b>。</p>
+    <p><b>安全性高的三个理由：</b></p>
+    <ol class="mt0">
+      <li><b>攻击链变长。</b>黑客要侵入内网，必须先<b>攻破外部包过滤防火墙</b>，再<b>设法侵入 DMZ 区的堡垒主机</b>，还必须<b>控制内部包过滤防火墙</b>，才能进入内网实施破坏。<b>多了一整层保护。</b></li>
+      <li><b>攻破中间层的收益极小。</b><b>内网中主机之间的通信不经过 DMZ 区</b>，因此即使黑客侵入堡垒主机，<b>也无法获取内网主机间的敏感通信数据</b>——他只能看到往来于外网与堡垒主机之间的信息流。</li>
+      <li><b>内网被完全隐藏，且能挡地址伪造。</b>通过配置外部包过滤防火墙，<b>外网主机只能访问 DMZ 中指定的一些网络服务，内部网络对于外网用户完全不可见</b>；外部包过滤防火墙对<b>阻隔伪造源地址的数据包非常有效</b>，特别是那些以内网地址作源地址、实际来自外网的包。此外内部包过滤防火墙还能<b>限定内网主机只能经由 DMZ 的堡垒主机访问外网</b>，禁止内外网直接通信。</li>
+    </ol>
+    <p><b>可以补一句缺点显示完整性：</b>管理和配置较为复杂，<b>只有在两台包过滤防火墙和一台堡垒主机都配置完善的条件下，才能充分发挥安全防护作用</b>。</p>
+    <div class="qa-src">来源：课本答案页写「略」。本解析依据课本 12.3.4（p.372–373）与 PPT p.67–73。<b>这道题同时也是 PPT p.69 的课堂提问「如果屏蔽子网中的堡垒主机被攻破会有什么后果」</b>，答案在 PPT p.70。</div>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">问 9</span>防火墙产品的并发连接数主要取决于哪些因素？</div>
+  <div class="qa-b">
+    <p><b>课本参考答案三条：① 防火墙设备内并发连接表的大小；② 防火墙的 CPU 处理能力；③ 防火墙的物理链路的承载能力。</b></p>
+    <p><b>① 并发连接表的大小。</b>并发连接表是防火墙用以保存并发连接信息的表结构，<b>位于防火墙的系统内存</b>；通过防火墙的连接都要在表中保存记录，因此最大并发连接数<b>受限于表的大小</b>。<b>但表并非越大越好——越大意味着占用更多内存</b>：若每条表项占 300 B，则 1 000 条约需 <code>1000×300B×8bit/B ≈ 2.34 Mb</code>，<b>100 万条则约需 2.34 Gb，内存开销相当高昂</b>。</p>
+    <p><b>② CPU 处理能力。</b>CPU 在转发中要遵从访问控制策略做许可判断、流量统计、审计记录。<b>若 CPU 跟不上并发连接数的增长，数据包排队等待时间延长、可能超时重传；最坏情况下出现雪崩效应</b>——重传使待处理数据越积越多，同时没有足够计算资源及时检查转发，<b>最终导致整个防火墙系统瘫痪</b>。</p>
+    <p><b>③ 物理链路的承载能力。</b>虽然很多防火墙提供千兆甚至万兆接口，<b>但所连接的物理链路未必支持高速通信</b>；<b>拥挤的低速链路无法承载过多的并发连接</b>，即使防火墙本身支持大规模并发也无法充分发挥性能。</p>
+    <div class="qa-src">来源：课本答案页有标准答案（三条），展开部分依据课本 p.375。</div>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">问 10</span>防火墙技术在安全防护方面还存在哪些不足？</div>
+  <div class="qa-b">
+    <p><b>按「根因」分五组答，比逐条罗列得分高（详见 §5.3 的对照表）：</b></p>
+    <ol class="mt0">
+      <li><b>防护并不全面——它只管经过它的流量。</b>防火墙的实施假设是内外网之间存在明确边界。若内外网互联通道太多（如每台主机都配 3G/4G/5G/Wi-Fi 上网设备），内网节点直接暴露在互联网上，就无法集中检查；而<b>内网用户攻击内网其他主机时数据包不经由防火墙，防火墙无法察觉</b>。同理也<b>防不住内网用户的主动泄密</b>和<b>通过存储介质传播的恶意代码</b>。</li>
+      <li><b>它是被动的安全策略执行设备。</b>防护效果在很大程度上取决于<b>体系结构是否合理、安全规则是否吻合安全策略</b>；它<b>就像门卫一样按既定配置执行检查，一般没有检查配置是否正确的能力</b>。</li>
+      <li><b>防不住利用系统漏洞和协议漏洞的攻击。</b>攻击者可<b>伪造出符合过滤规则的攻击数据包</b>，或<b>把攻击数据包分片发送</b>穿越防火墙；也可以<b>通过防火墙准许的访问端口</b>攻击该服务器的漏洞——<b>一般的包过滤防火墙基本上无力防护</b>。</li>
+      <li><b>防火墙自身也可能有安全漏洞、被攻击者控制。</b>目前没有厂商能保证防火墙不存在漏洞，<b>因此对防火墙本身也必须提供安全保护</b>（实例：EXBA 利用 CVE-2016-6366 远程控制 Cisco 防火墙）。</li>
+      <li><b>不能防止病毒、木马等恶意代码的传输。</b>防火墙本身不具备查杀病毒的功能，即使集成第三方防病毒模块能力也有限——因为<b>恶意代码存储方式灵活隐蔽，可藏在网络数据的任何部分，甚至采用加密自我保护</b>。</li>
+    </ol>
+    <p><b>再补一条课本独有的：性能跟不上带宽增长。</b>检查强度越高计算开销越大，防火墙处理速度相对较慢，<b>往往成为网络通信的瓶颈</b>，也<b>很难实时判断网络攻击活动是否发生</b>。</p>
+    <p><b>结论句（务必写上）：</b>仅在内部网络边界处设置防火墙不足以全面保护内网安全，防火墙<b>需要与其他安全产品相互配合</b>——<b>入侵检测系统（IDS）可以弥补防火墙的不足</b>。</p>
+    <div class="qa-src">来源：课本答案页写「略」。本解析依据课本 12.6（p.378–379）与 PPT p.84–87。</div>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="qa-h"><span class="qn">问 11</span>国标《GB/T 20281-2020》对吞吐量、时延等指标的要求按数据包大小分三档：64 字节短包、512 字节中长包、1518 字节长包。试分析<b>长包选定为 1518 字节</b>的依据。</div>
+  <div class="qa-b">
+    <p><b>依据：1518 字节正是以太网 MAC 帧的最大长度</b>，国标制定时很可能考虑了以太网帧的最长情况。算式如下：</p>
+    <div class="fx">帧头 <b>14</b> B（6 目的地址 ＋ 6 源地址 ＋ 2 类型） ＋ 数据 <b>1500</b> B（＝ MTU） ＋ 帧尾 <b>4</b> B（FCS） ＝ <b>1518</b> B
+    <small>以太网 MTU 是 1500 字节，所以数据部分最长就是 1500 字节；加上首尾开销，一个 MAC 帧最长 1518 字节。</small></div>
+    <p><b>为什么要拿最长帧来测：</b>短包和长包考验的是防火墙的两种不同能力。<b>64 字节短包</b>包数多、每个包都要走一遍规则匹配，考验的是<b>包处理速率</b>（所以国标对短包的吞吐量要求只有线速的 20%–35%）；<b>1518 字节长包</b>包数少、每包载荷大，考验的是<b>数据搬运带宽</b>（所以对长包的要求高达线速的 90%–95%）。<b>两头都测，才能反映防火墙在真实混合流量下的表现。</b></p>
+    <div class="qa-src">来源：课本答案页有标准答案。<b>⚠ 但答案原文写的是「以太网的 MAC 帧有 18 字节的帧头（6 字节目标地址，6 字节源地址和 2 字节的类型）和帧尾（4 字节的帧检验序列 FCS）」——括号里 6+6+2＝14，不是 18。</b>
+    出题人是把「帧头 14 ＋ 帧尾 4 ＝ 18 字节总开销」误写成了「18 字节的帧头」。<b>本资料采信改后的：帧头 14 B、帧尾 4 B、合计开销 18 B。最终结果 1518 不变。</b>答题时按 14 ＋ 1500 ＋ 4 写，不会错。</div>
+  </div>
+</div>
+
+<div class="box beyond">
+  <div class="box-t">这两项按范围排除了，报备一下——想要随时可以加</div>
+  <p><b>① 四、综合题第 1 题：</b>「查阅近年来有关防火墙安全漏洞的相关资料，撰写一份有关防火墙自身安全问题的分析报告。」——<b>这是课外作业，不是考题</b>，没有标准答案可背；真要考的知识点已经在<b>单选 12</b>（EXBA/CVE-2016-6366/SNMP）和<b>多选 5</b>（漏洞可能存在于设计/配置/实现/硬件平台）里覆盖了。</p>
+  <p><b>② 12.8 实验：</b>「Windows 内置防火墙配置」——要求配置 Windows 防火墙安全策略并多次变更、截图写实验报告。<b>属于上机实验，与开卷笔试无关</b>，故未收录。</p>
+</div>
+</div>
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-num">§ 7　考场速查</span>
+    <h2 class="sec-t">速查卡：三张对照表 ＋ 必记数字 ＋ 答案一览</h2>
+    <p class="sec-lede">正文里分散在各节的东西，在这里横着排一遍。<b>考场上先翻这两页，找不到再回正文对应小节。</b></p>
+  </div>
+
+<h3>表一　三大技术横向对照（本章最高频的对照题）</h3>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th style="width:15%"></th><th style="width:28%">包过滤<br><span class="small muted">无状态／静态／简单包过滤</span></th><th style="width:29%">状态检测<br><span class="small muted">动态包过滤／有状态包过滤</span></th><th>应用网关<br><span class="small muted">应用代理／应用级代理</span></th></tr></thead>
+<tbody>
+<tr><td><b>作用层</b></td><td><b>网络层 ＋ 传输层</b></td><td>网络层 ＋ 传输层（在网络层由检查引擎截获）</td><td><b>应用层</b>（以代理服务器技术为基础）</td></tr>
+<tr><td><b>看什么</b></td><td><b>只看包头</b>：五元组 ＋ 标志位 ＋ ICMP 类型</td><td>包头 ＋ <b>连接状态表</b>（记住这条连接走到哪一步）</td><td><b>还看数据区</b>：应用上下文、协议内容</td></tr>
+<tr><td><b>第几代</b></td><td>第一代（1983）</td><td>第三代（1992 USC／1994 CheckPoint）<br><span class="small muted">也有文献算第四代</span></td><td>第二代（1991 贝尔实验室）</td></tr>
+<tr><td><b>速度</b></td><td><b>最快</b>，对通信影响小</td><td>较快（对允许的请求启动进程，可快速确认）</td><td><b>最慢</b>，有明显延迟</td></tr>
+<tr><td><b>价格</b></td><td>最便宜</td><td>比无状态<b>高出不少</b></td><td><b>最贵</b>，硬件要求最高</td></tr>
+<tr><td><b>能否认证用户</b></td><td class="hl"><b>不能</b></td><td>不能</td><td class="hl"><b>能</b></td></tr>
+<tr><td><b>透明性</b></td><td><b>对用户透明</b>，无须客户端设置</td><td>对用户透明</td><td>对内网用户和外网服务器<b>都完全透明</b>（双方都以为在直连）</td></tr>
+<tr><td><b>致命短板</b></td><td>不知道包属于哪条连接 → 被迫开「源端口 80」大口子 → <b>被反向扫描</b>；<b>字段易伪造、分片可绕过</b></td><td>仍不看应用层；<b>UDP/ICMP 无状态</b>；<b>FTP 子连接要另跟踪且协商必须明文</b>；<b>加密就没辙</b>；开销大</td><td><b>每种应用要专门的代理</b>；慢、贵、配置复杂；<b>要求直连的服务（聊天、即时消息）无法代理</b></td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="small"><b>第四代＝自适应代理</b>（1998 NAI／Gauntlet）：本质属代理技术，但结合了动态包过滤；两个基本要素是<b>自适应代理服务器</b>与<b>动态包过滤器</b>，之间有一条<b>控制通道</b>；
+「<b>具有应用代理的安全性，但不采用应用代理的数据传送方式，而采用包过滤的传送方式</b>」，性能提高 10 倍以上。<br>
+<b>下一代防火墙</b>（2009 Gartner）：<b>深度包检测防火墙，超越了基于端口、协议的检测与阻断，增加了应用层的检测和入侵防护</b>；<b>本质上就是高性能的应用网关防火墙</b>。</p>
+
+<h3>表二　四种体系结构横向对照</h3>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th style="width:14%">结构</th><th style="width:24%">由什么组成</th><th style="width:28%">优点</th><th>致命弱点（＝考点）</th></tr></thead>
+<tbody>
+<tr><td><b>屏蔽路由器</b><br><span class="small muted">＝过滤路由器</span></td><td><b>一台</b>具备包过滤功能的路由器，是内外网唯一渠道</td><td>硬件成本低、结构简单、<b>易于部署</b>；路由器对外服务少，防护简单易行</td><td><b>日志几乎没有</b>，管理员很难知道是否被入侵；规则表会变得庞大复杂；<b>依靠单一部件保护全网，它一出问题就全失效、而用户可能还不知道</b></td></tr>
+<tr><td><b>双宿主主机</b><br><span class="small muted">＝双穴主机</span></td><td><b>一台装两块网卡</b>的堡垒主机，各接内外网、各有独立 IP，运行应用层网关；<b>必须禁止寻径（路由转发）</b></td><td>相比屏蔽路由器，<b>堡垒主机的系统软件可维护系统日志、硬件拷贝日志或远程日志</b>，便于日后检查</td><td><b>但日志不能帮管理者确认内网哪些主机已被入侵</b>；<b>一旦入侵者侵入堡垒主机并使其恢复路由功能，任何网上用户均可随便访问内部网络，防护功能完全丧失</b></td></tr>
+<tr><td><b>屏蔽主机</b><br><span class="small muted">＝主机过滤</span></td><td><b>屏蔽路由器接外网 ＋ 堡垒主机接内网</b>；堡垒主机是外网唯一可直接到达的主机。<b>堡垒主机必须在包过滤防火墙之后</b></td><td>内网如何变化都<b>不影响两者配置</b>；<b>危险区域只限于堡垒主机和屏蔽路由器</b></td><td><b>堡垒主机与其他内网主机在同一子网</b>——包过滤路由器一被攻破，<b>内网与堡垒主机之间再无任何阻挡</b>；侵入堡垒主机并使其只具路由功能，弱点同双宿主机</td></tr>
+<tr><td><b>屏蔽子网</b><span class="chip warn">最安全</span><br><span class="small muted">＝过滤子网</span></td><td><b>两台包过滤防火墙（内部路由器 ＋ 外部路由器）＋ 一台堡垒主机 ＋ 中间的独立子网（DMZ／周边网）</b></td><td><b>安全性最高</b>：攻击链最长；<b>内网通信不经过 DMZ，堡垒主机被攻破也拿不到内网数据</b>；外网只能访问 DMZ 指定服务，<b>内网对外网完全不可见</b>；外部路由器能<b>阻隔伪造源地址的包</b></td><td><b>管理和配置较为复杂</b>，只有两台包过滤防火墙和一台堡垒主机<b>都配置完善</b>时才能充分发挥作用</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box key">
+  <div class="box-t">三个部件各自的一句话职责（屏蔽子网结构）</div>
+  <p><b>堡垒主机</b>＝内外网通信的<b>唯一通道</b>，外网服务于内网的主节点，跑代理服务，收外来邮件/FTP/域名服务。<br>
+  <b>内部路由器</b>＝<b>防内网免受来自外网「和 DMZ」的侵扰</b>，完成防火墙的<b>大部分包过滤工作</b>，并限定内网只能经堡垒主机访问外网。<br>
+  <b>外部路由器</b>＝只做一小部分包过滤，规则与内部路由器基本相同；<b>真正有效的任务是阻隔来自外网、伪造成内网源地址的数据包</b>。</p>
+</div>
+
+<h3>必背数字与名词</h3>
+
+<div class="mustnum">
+  <div class="n"><b>1983 / 1991 / 1992 / 1998 / 2009</b><span>一代包过滤／二代代理（贝尔）／三代动态包过滤（USC，1994 CheckPoint 商业化）／四代自适应代理（NAI Gauntlet）／下一代（Gartner）</span></div>
+  <div class="n"><b>GB/T 20281-2020</b><span>《信息安全技术 防火墙安全技术要求和测试评价方法》，2020-11-01 实施</span></div>
+  <div class="n"><b>RFC 2647 / RFC 1242 / RFC 2544</b><span>并发连接数／吞吐量·时延·丢包率／背靠背缓冲的测试方法</span></div>
+  <div class="n"><b>&gt;1023（或 &gt;1024）</b><span>客户端随机源端口的范围，写包过滤规则表必用</span></div>
+  <div class="n"><b>80 / 25 / 23 / 21·20</b><span>HTTP／SMTP／Telnet／FTP 控制·数据</span></div>
+  <div class="n"><b>1518 ＝ 14 + 1500 + 4</b><span>以太网最大帧长＝帧头＋MTU＋FCS；国标三档包长 64 / 512 / 1518 字节</span></div>
+  <div class="n"><b>300 B/条 → 1000 条 ≈ 2.34 Mb</b><span>并发连接表内存估算；100 万条 ≈ 2.34 Gb</span></div>
+  <div class="n"><b>CVE-2016-6366 · EXBA · SNMP</b><span>方程式组织攻击 Cisco 防火墙的零日漏洞；另有 JETPLOW、CVE-2016-6367</span></div>
+  <div class="n"><b>提高 10 倍以上</b><span>自适应代理相对代理服务器防火墙的性能提升</span></div>
+</div>
+
+<h3>关键词索引：看到这个词，去哪一节找</h3>
+
+<div class="tbl-wrap idx">
+<table>
+<thead><tr><th style="width:26%">关键词</th><th style="width:24%">在哪一节</th><th style="width:26%">关键词</th><th>在哪一节</th></tr></thead>
+<tbody>
+<tr><td>网络周界 network perimeter</td><td>§1.4 总体功能</td><td>连接状态表／Session 表</td><td>§2.2</td></tr>
+<tr><td>WAF／数据库防火墙／主机防火墙</td><td>§1.1 四类表</td><td>SYN_SENT／ESTABLISHED</td><td>§2.2 状态序列图</td></tr>
+<tr><td>病毒防火墙</td><td>§1.3 辨析表</td><td>四条 TCP 判据</td><td>§2.2</td></tr>
+<tr><td>ACL（访问控制列表）</td><td>§2.1</td><td>FTP 子连接／PORT 命令</td><td>§2.2 限制②</td></tr>
+<tr><td>六项基本要求</td><td>§2.1</td><td>代理服务器 Proxy Server</td><td>§2.3</td></tr>
+<tr><td>默认拒绝／没有明确允许的即被禁止</td><td>§2.1</td><td>自适应代理／控制通道</td><td>§2.4</td></tr>
+<tr><td>筛选路由器 Screening Router</td><td>§2.1 定义</td><td>下一代防火墙 NGFW</td><td>§2.5</td></tr>
+<tr><td>五元组</td><td>§2.1</td><td>堡垒主机 Bastion Host</td><td>§3.0</td></tr>
+<tr><td>极小数据段式攻击（tiny fragment）</td><td>§2.1 分片三种玩法</td><td>DMZ／中立区／非军事化区／周边网</td><td>§3.0</td></tr>
+<tr><td>80 端口反向扫描</td><td>§2.2 开场</td><td>多宿主机／禁止寻径</td><td>§3.2</td></tr>
+<tr><td>吞吐量／时延／丢包率／背靠背缓冲</td><td>§5.2 八项指标</td><td>并发连接数三因素</td><td>§5.2 ＋ 问 9</td></tr>
+<tr><td>透明模式／网关模式／NAT 模式／MAP</td><td>首页灰框 ＋ 单选 11／多选 6</td><td>UTM／零信任</td><td>§4（趋势·协作化）</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>答案一览（自测后对照）</h3>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th style="width:14%">题型</th><th>答案</th></tr></thead>
+<tbody>
+<tr><td><b>单选</b></td><td class="num">1.B　2.C　3.C　4.D　5.C　6.D　7.D　8.C　9.A　10.B　11.C　12.D</td></tr>
+<tr><td><b>多选</b></td><td class="num">1.AD　2.AB　3.ABCD　4.BCD　5.ABCD　6.BC　7.ABC　8.AB</td></tr>
+<tr><td><b>问答</b></td><td class="small">课本答案页给了标准答案的只有 <b>1、2、9、11</b> 四题；<b>3、4、5、6、7、8、10</b> 答案页写「略」，本资料的解析依据课本原文自拟并已逐题标注出处页码。</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box exam">
+  <div class="box-t">最后三句话，出考场前再看一眼</div>
+  <p><b>① 一切技术差异归结为：它检查到第几层、记不记得上一个包。</b>只看包头不记上一个包＝包过滤；记得连接状态＝状态检测；拆开数据区读＝应用网关。<br>
+  <b>② 一切结构差异归结为：某个部件被攻破后，攻击者能拿到什么。</b>屏蔽子网之所以最安全，唯一的理由是<b>内网主机之间的通信不经过 DMZ</b>。<br>
+  <b>③ 一切「不足」归结为：流量不经过它，或者边界根本不存在，它就完全失效。</b>这也是下一章讲入侵检测的理由。</p>
+</div>
+</div>
+<hr>
+<p class="small muted center">第 12 章 网络防火墙 · 开卷考试打印资料　|　脉络与篇幅依据老师 PPT（87 页），详解依据课本 p.358–383　|　改完源码跑 <code>./build.sh &amp;&amp; python3 check.py</code> 重新生成</p>
+</div>
+</body>
+</html>
