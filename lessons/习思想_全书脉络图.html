@@ -1,0 +1,789 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>习思想脉络图</title>
+
+<style>
+/* ---------- tokens: light (bare :root = complete palette) ---------- */
+:root{
+  --paper:#F5F4F1;
+  --surface:#FCFCFB;
+  --surface-2:#EFEEEA;
+  --ink:#1A1D22;
+  --ink-2:#4B525B;
+  --ink-3:#858C96;
+  --rule:#DEDCD6;
+  --rule-soft:#E9E7E2;
+
+  --zhu:#A33420;         /* 朱砂 — 总纲段 & 收束 */
+  --zhu-wash:#F6E9E5;
+  --qing:#22685C;        /* 青 — 展开段 */
+  --qing-wash:#E4EFEC;
+  --dai:#34497A;         /* 黛 — 保障段 */
+  --dai-wash:#E7EAF3;
+
+  --serif:"Songti SC",STSong,"SimSun",Georgia,serif;
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:"SF Mono",Menlo,Consolas,monospace;
+
+  --maxw:760px;
+}
+
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#14161A;
+    --surface:#1B1E24;
+    --surface-2:#22262D;
+    --ink:#E9E7E2;
+    --ink-2:#AAB0B9;
+    --ink-3:#787F89;
+    --rule:#2E333B;
+    --rule-soft:#262B32;
+
+    --zhu:#E4816B;
+    --zhu-wash:#2E2320;
+    --qing:#63B7A7;
+    --qing-wash:#1B2926;
+    --dai:#8EA6DC;
+    --dai-wash:#1E2431;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#14161A;
+  --surface:#1B1E24;
+  --surface-2:#22262D;
+  --ink:#E9E7E2;
+  --ink-2:#AAB0B9;
+  --ink-3:#787F89;
+  --rule:#2E333B;
+  --rule-soft:#262B32;
+
+  --zhu:#E4816B;
+  --zhu-wash:#2E2320;
+  --qing:#63B7A7;
+  --qing-wash:#1B2926;
+  --dai:#8EA6DC;
+  --dai-wash:#1E2431;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-weight:300;
+  font-size:16px;
+  line-height:1.85;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:var(--serif);font-weight:700;text-wrap:balance;line-height:1.4;margin:0}
+p{margin:0}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--zhu);outline-offset:3px;border-radius:2px}
+
+/* ---------- shell ---------- */
+.shell{max-width:1120px;margin:0 auto;padding:0 24px 96px;display:grid;gap:48px}
+@media(min-width:980px){
+  .shell{grid-template-columns:186px minmax(0,1fr);align-items:start;gap:56px;padding-top:8px}
+}
+
+/* ---------- masthead ---------- */
+.masthead{padding:56px 0 30px;border-bottom:1px solid var(--rule)}
+@media(min-width:980px){.masthead{grid-column:1/-1}}
+.eyebrow{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:16px
+}
+.masthead h1{font-size:clamp(30px,5vw,42px);letter-spacing:.02em}
+.dek{margin-top:16px;max-width:var(--maxw);color:var(--ink-2);font-size:16.5px}
+.dek strong{font-weight:500;color:var(--ink)}
+
+/* ---------- nav rail ---------- */
+.rail{display:none}
+@media(min-width:980px){
+  .rail{display:block;position:sticky;top:24px;padding-top:4px}
+}
+.rail-title{
+  font-family:var(--mono);font-size:11px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--ink-3);padding-bottom:10px;border-bottom:1px solid var(--rule);margin-bottom:12px
+}
+.rail ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.rail a{
+  display:flex;gap:9px;text-decoration:none;color:var(--ink-2);font-size:13.5px;line-height:1.5;
+  padding:5px 8px;border-radius:4px;border-left:2px solid transparent;transition:background .15s,color .15s
+}
+.rail a:hover{background:var(--surface-2);color:var(--ink)}
+.rail a .n{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);padding-top:2px}
+.rail a.is-zhu{border-left-color:var(--zhu)}
+.rail a.is-qing{border-left-color:var(--qing)}
+.rail a.is-dai{border-left-color:var(--dai)}
+
+/* mobile jump strip */
+.strip{
+  display:flex;gap:8px;overflow-x:auto;padding:12px 24px;max-width:100%;
+  position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--rule);
+  scrollbar-width:none
+}
+.strip::-webkit-scrollbar{display:none}
+.strip a{
+  flex:0 0 auto;text-decoration:none;font-size:13px;color:var(--ink-2);
+  padding:4px 11px;border:1px solid var(--rule);border-radius:100px;white-space:nowrap
+}
+@media(min-width:980px){.strip{display:none}}
+
+/* ---------- content flow ---------- */
+.flow{display:grid;gap:52px;min-width:0}
+.sec{display:grid;gap:20px;scroll-margin-top:70px}
+.sec-head{display:grid;gap:8px;max-width:var(--maxw)}
+.sec-num{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--ink-3)}
+.sec h2{font-size:clamp(21px,3vw,25px)}
+.sec h3{font-size:17px;margin-top:6px}
+.sec p{max-width:var(--maxw);color:var(--ink-2)}
+.sec p strong{font-weight:500;color:var(--ink)}
+.lead{font-size:16.5px}
+
+/* ---------- generic table ---------- */
+.tw{overflow-x:auto;border:1px solid var(--rule);border-radius:5px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:440px}
+th,td{text-align:left;padding:11px 15px;border-bottom:1px solid var(--rule-soft);vertical-align:top;line-height:1.65}
+th{
+  font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-3);background:var(--surface-2);border-bottom:1px solid var(--rule)
+}
+tr:last-child td{border-bottom:0}
+td.k{font-weight:500;color:var(--ink);white-space:nowrap}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--ink-2);white-space:nowrap}
+
+/* segment tinting on rows */
+.r-zhu td.k{color:var(--zhu)}
+.r-qing td.k{color:var(--qing)}
+.r-dai td.k{color:var(--dai)}
+
+/* ---------- skeleton diagram ---------- */
+.skel{display:grid;gap:14px}
+.seg{
+  display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;
+  padding:18px 18px 18px 0;border-radius:6px;background:var(--surface);border:1px solid var(--rule)
+}
+.seg-spine{width:4px;border-radius:0 3px 3px 0;align-self:stretch}
+.seg-body{display:grid;gap:13px;min-width:0}
+.seg-label{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px}
+.seg-name{font-family:var(--serif);font-weight:700;font-size:16px}
+.seg-rel{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+  padding:2px 8px;border-radius:100px
+}
+.seg-range{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin-left:auto}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{
+  display:flex;align-items:baseline;gap:7px;padding:6px 11px;border-radius:4px;
+  background:var(--surface-2);border:1px solid var(--rule-soft);font-size:13.5px;line-height:1.5
+}
+.chip b{font-family:var(--mono);font-weight:500;font-size:11.5px;color:var(--ink-3)}
+.chip.mark{border-style:dashed}
+.seg-note{font-size:13px;color:var(--ink-3);line-height:1.7}
+
+.seg-zhu .seg-spine{background:var(--zhu)}
+.seg-zhu .seg-rel{background:var(--zhu-wash);color:var(--zhu)}
+.seg-zhu .chip.mark{border-color:var(--zhu);background:var(--zhu-wash)}
+.seg-qing .seg-spine{background:var(--qing)}
+.seg-qing .seg-rel{background:var(--qing-wash);color:var(--qing)}
+.seg-qing .chip.mark{border-color:var(--qing);background:var(--qing-wash)}
+.seg-dai .seg-spine{background:var(--dai)}
+.seg-dai .seg-rel{background:var(--dai-wash);color:var(--dai)}
+
+/* ---------- legend ---------- */
+.legend{display:flex;flex-wrap:wrap;gap:9px;max-width:var(--maxw)}
+.lg{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2);
+  padding:4px 10px;border:1px solid var(--rule);border-radius:100px;background:var(--surface)}
+.sw{width:9px;height:9px;border-radius:2px;flex:0 0 auto}
+
+/* ---------- chapter cards ---------- */
+.cards{display:grid;gap:14px}
+.card{
+  border:1px solid var(--rule);border-radius:6px;background:var(--surface);
+  padding:18px 20px;display:grid;gap:11px
+}
+.card-top{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px}
+.card-ch{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--ink-3)}
+.card-title{font-family:var(--serif);font-weight:700;font-size:17px}
+.card-q{margin-left:auto;font-size:12.5px;color:var(--ink-3);font-family:var(--mono)}
+.card p{font-size:14.5px;max-width:none}
+.card-zhu .card-title{color:var(--zhu)}
+.card-qing .card-title{color:var(--qing)}
+.card-dai .card-title{color:var(--dai)}
+
+.kps{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.kps li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;font-size:14.5px;line-height:1.7;color:var(--ink-2)}
+.kps .tag{
+  font-family:var(--mono);font-size:11px;color:var(--ink-3);white-space:nowrap;padding-top:4px;
+  font-variant-numeric:tabular-nums
+}
+.kps b{font-weight:500;color:var(--ink)}
+
+/* ---------- callouts ---------- */
+.note{
+  border-left:3px solid var(--rule);padding:2px 0 2px 17px;display:grid;gap:7px;max-width:var(--maxw);
+  font-size:14.5px;color:var(--ink-2);line-height:1.75
+}
+.note b{font-weight:500;color:var(--ink)}
+.note-t{font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+.note.warn{border-left-color:var(--zhu)}
+.note.warn .note-t{color:var(--zhu)}
+
+/* ---------- echo diagram ---------- */
+.echo{
+  border:1px solid var(--rule);border-radius:6px;background:var(--surface);padding:26px 20px;
+  display:grid;gap:0;justify-items:center
+}
+.echo-row{display:grid;gap:10px;justify-items:center;text-align:center}
+.echo-box{
+  border:1px solid var(--zhu);background:var(--zhu-wash);color:var(--zhu);
+  padding:11px 20px;border-radius:5px;font-family:var(--serif);font-weight:700;font-size:15.5px
+}
+.echo-cap{font-size:13px;color:var(--ink-3);line-height:1.6;max-width:340px}
+.echo svg{display:block;margin:2px 0}
+.echo svg .ln{stroke:var(--zhu);stroke-width:1.5;fill:none;stroke-dasharray:4 4}
+.echo svg .ar{fill:var(--zhu);stroke:none}
+.echo-mid{font-size:12.5px;color:var(--ink-3);font-family:var(--mono);letter-spacing:.1em;padding:2px 0}
+
+/* ---------- ordered steps ---------- */
+.steps{display:grid;gap:13px;counter-reset:s;margin:0;padding:0;list-style:none;max-width:var(--maxw)}
+.steps li{
+  display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;
+  font-size:14.5px;color:var(--ink-2);line-height:1.75
+}
+.steps li::before{
+  counter-increment:s;content:counter(s);
+  font-family:var(--mono);font-size:11.5px;color:var(--ink-3);
+  border:1px solid var(--rule);border-radius:100px;width:22px;height:22px;
+  display:grid;place-items:center;margin-top:3px
+}
+.steps b{font-weight:500;color:var(--ink)}
+
+footer{
+  grid-column:1/-1;border-top:1px solid var(--rule);padding-top:20px;margin-top:8px;
+  font-size:12.5px;color:var(--ink-3);line-height:1.8
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<nav class="strip" aria-label="章节跳转">
+  <a href="#gen">目录生成器</a>
+  <a href="#skel">全书骨架</a>
+  <a href="#zong">总纲段</a>
+  <a href="#zhan">展开段</a>
+  <a href="#bao">保障段</a>
+  <a href="#shou">收束呼应</a>
+  <a href="#ming">十个明确</a>
+  <a href="#order">复习顺序</a>
+  <a href="#idx">速查总表</a>
+</nav>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">习近平新时代中国特色社会主义思想概论 · 2023 版教材</div>
+    <h1>习思想脉络图</h1>
+    <p class="dek">这份图只做一件事：讲清楚<strong>教材为什么长这样</strong>、每章到底在讲什么、章与章之间是什么关系。不讲条目怎么背——你手上那份 71 页资料已经把 72 个知识点列全了。先看这张图，再回去看那些条目，它们就不是 72 条孤立清单，而是挂在一棵树上的叶子。</p>
+  </header>
+
+  <nav class="rail" aria-label="目录">
+    <div class="rail-title">目录</div>
+    <ol>
+      <li><a href="#gen"><span class="n">01</span><span>目录生成器</span></a></li>
+      <li><a href="#skel"><span class="n">02</span><span>全书骨架</span></a></li>
+      <li><a href="#zong" class="is-zhu"><span class="n">03</span><span>总纲段 · 递进</span></a></li>
+      <li><a href="#zhan" class="is-qing"><span class="n">04</span><span>展开段 · 并列</span></a></li>
+      <li><a href="#bao" class="is-dai"><span class="n">05</span><span>保障段 · 并列</span></a></li>
+      <li><a href="#shou" class="is-zhu"><span class="n">06</span><span>收束 · 呼应</span></a></li>
+      <li><a href="#ming"><span class="n">07</span><span>十个明确</span></a></li>
+      <li><a href="#order"><span class="n">08</span><span>复习顺序</span></a></li>
+      <li><a href="#idx"><span class="n">09</span><span>速查总表</span></a></li>
+    </ol>
+  </nav>
+
+  <main class="flow">
+
+    <!-- 01 -->
+    <section class="sec" id="gen">
+      <div class="sec-head">
+        <div class="sec-num">01</div>
+        <h2>目录不是"编"出来的，是"生成"出来的</h2>
+        <p class="lead">十七章看起来很多，但不是编者随手排的。<strong>两条现成的官方框架，直接生成了绝大部分章节。</strong></p>
+      </div>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>生成器 A ·「五位一体」总体布局</th><th>落在哪章</th></tr></thead>
+          <tbody>
+            <tr class="r-qing"><td class="k">经济建设</td><td>第六章 · 推动高质量发展</td></tr>
+            <tr class="r-qing"><td class="k">政治建设</td><td>第八章 · 全过程人民民主 ＋ 第九章 · 全面依法治国</td></tr>
+            <tr class="r-qing"><td class="k">文化建设</td><td>第十章 · 建设社会主义文化强国</td></tr>
+            <tr class="r-qing"><td class="k">社会建设</td><td>第十一章 · 以保障和改善民生为重点加强社会建设</td></tr>
+            <tr class="r-qing"><td class="k">生态文明建设</td><td>第十二章 · 建设社会主义生态文明</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>生成器 B ·「四个全面」战略布局</th><th>落在哪章</th></tr></thead>
+          <tbody>
+            <tr><td class="k">全面建设社会主义现代化国家</td><td>第二章 · 以中国式现代化全面推进民族复兴</td></tr>
+            <tr><td class="k">全面深化改革</td><td>第五章 · 全面深化改革开放</td></tr>
+            <tr><td class="k">全面依法治国</td><td>第九章 · 全面依法治国</td></tr>
+            <tr><td class="k">全面从严治党</td><td>第十七章 · 全面从严治党</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>两条线一叠加，<strong>17 章的骨架就出来了</strong>。剩下要单独定位的只有导论、第一章、第三章、第四章、第七章和第十三~十六章。这就是编者的想法——<strong>教材是在给两大布局做逐项展开</strong>。</p>
+
+      <div class="note">
+        <div class="note-t">副作用</div>
+        <p>背"五位一体"和"四个全面"时，其实同时在背目录；反过来，看到目录也能倒推出这两个布局。这两个概念在客观题里出现频率极高。</p>
+      </div>
+    </section>
+
+    <!-- 02 -->
+    <section class="sec" id="skel">
+      <div class="sec-head">
+        <div class="sec-num">02</div>
+        <h2>全书骨架：总—分—总，三段关系各不相同</h2>
+        <p class="lead">"承上启下还是循序渐进"——<strong>答案是分段不同，不能一概而论</strong>。这是理解全书最关键的一点。</p>
+      </div>
+
+      <div class="legend">
+        <span class="lg"><span class="sw" style="background:var(--zhu)"></span>总纲段 · 收束（递进 / 呼应）</span>
+        <span class="lg"><span class="sw" style="background:var(--qing)"></span>展开段（并列）</span>
+        <span class="lg"><span class="sw" style="background:var(--dai)"></span>保障段（并列）</span>
+      </div>
+
+      <div class="skel">
+
+        <div class="seg seg-zhu">
+          <div class="seg-spine"></div>
+          <div class="seg-body">
+            <div class="seg-label">
+              <span class="seg-name">总纲段</span>
+              <span class="seg-rel">递进 · 顺序不能乱</span>
+              <span class="seg-range">导论 + 一~五章</span>
+            </div>
+            <div class="chips">
+              <span class="chip"><b>导论</b>这套理论本身</span>
+              <span class="chip"><b>一</b>我们在哪？</span>
+              <span class="chip"><b>二</b>要去哪？</span>
+              <span class="chip mark"><b>三</b>谁来领导？</span>
+              <span class="chip"><b>四</b>为了谁·靠谁？</span>
+              <span class="chip"><b>五</b>靠什么动力？</span>
+            </div>
+            <p class="seg-note">连问五个问题、一章答一个。其中三、四、五是<strong>并列的三根支柱</strong>，共同承接第二章的目标。<br>◎ 第三章标虚线框——它与第十七章构成全书最重要的呼应。</p>
+          </div>
+        </div>
+
+        <div class="seg seg-qing">
+          <div class="seg-spine"></div>
+          <div class="seg-body">
+            <div class="seg-label">
+              <span class="seg-name">展开段</span>
+              <span class="seg-rel">并列 · 先看哪章都行</span>
+              <span class="seg-range">六~十二章 ＝ 五位一体</span>
+            </div>
+            <div class="chips">
+              <span class="chip"><b>六</b>经济建设</span>
+              <span class="chip mark"><b>七</b>战略支撑（非五位一体）</span>
+              <span class="chip"><b>八</b>政治·民主</span>
+              <span class="chip"><b>九</b>政治·法治</span>
+              <span class="chip"><b>十</b>文化建设</span>
+              <span class="chip"><b>十一</b>社会建设</span>
+              <span class="chip"><b>十二</b>生态文明</span>
+            </div>
+            <p class="seg-note">把"要去哪"拆成五个建设领域逐一展开。七章横向支撑第六章，八、九两章合起来才是政治建设。</p>
+          </div>
+        </div>
+
+        <div class="seg seg-dai">
+          <div class="seg-spine"></div>
+          <div class="seg-body">
+            <div class="seg-label">
+              <span class="seg-name">保障段</span>
+              <span class="seg-rel">并列 · 条件与环境</span>
+              <span class="seg-range">十三~十六章</span>
+            </div>
+            <div class="chips">
+              <span class="chip"><b>十三</b>国家安全 · 向内</span>
+              <span class="chip"><b>十四</b>国防军队 · 向内</span>
+              <span class="chip"><b>十五</b>一国两制·统一 · 向外</span>
+              <span class="chip"><b>十六</b>大国外交 · 向外</span>
+            </div>
+            <p class="seg-note">性质与前面七章不同：前面是"要建成什么"，这四章是"建设要有什么条件"。</p>
+          </div>
+        </div>
+
+        <div class="seg seg-zhu">
+          <div class="seg-spine"></div>
+          <div class="seg-body">
+            <div class="seg-label">
+              <span class="seg-name">收束</span>
+              <span class="seg-rel">回环 · 呼应第三章</span>
+              <span class="seg-range">十七章</span>
+            </div>
+            <div class="chips">
+              <span class="chip mark"><b>十七</b>全面从严治党</span>
+            </div>
+            <p class="seg-note">颜色回到总纲段的朱砂——这不是配色巧合：<strong>第十七章不是新增一个领域，而是回到第三章的问题，把圈闭上。</strong></p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>段落</th><th>内部关系</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr class="r-zhu"><td class="k">导论 + 一~五章</td><td class="k">递进</td><td>每章都在前一章基础上追问下一个问题，跳读会断链</td></tr>
+            <tr class="r-qing"><td class="k">六~十二章</td><td class="k">并列</td><td>五位一体各领域互不依赖，可按薄弱程度调整顺序</td></tr>
+            <tr class="r-dai"><td class="k">十三~十六章</td><td class="k">并列</td><td>四类保障条件，同样互不依赖</td></tr>
+            <tr class="r-zhu"><td class="k">十七章</td><td class="k">回环呼应</td><td>不是新内容的追加，是回到起点闭合全书</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <div class="note-t">一句话记住全书</div>
+        <p>先讲清"这套理论是什么"（导论）→ 再讲"我们在哪、要去哪、谁带路、为了谁、靠什么走"（一~五章）→ 然后把"要去哪"拆成五个建设领域逐一展开（六~十二章）→ 再补上四类保障条件（十三~十六章）→ 最后回到"带路的人自己必须过硬"（十七章）。</p>
+      </div>
+    </section>
+
+    <!-- 03 -->
+    <section class="sec" id="zong">
+      <div class="sec-head">
+        <div class="sec-num">03</div>
+        <h2>总纲段：一条真正的递进链</h2>
+        <p class="lead">这一段是全书最需要"顺着读"的部分。它其实是<strong>连问五个问题，一章答一个</strong>。简答题、材料题的重灾区也在这里。</p>
+      </div>
+
+      <div class="cards">
+
+        <article class="card card-zhu">
+          <div class="card-top">
+            <span class="card-ch">导论</span>
+            <span class="card-title">习近平新时代中国特色社会主义思想</span>
+            <span class="card-q">元层面</span>
+          </div>
+          <p>不讲国家怎么建，<strong>只讲这个"思想"本身</strong>。四个问题：</p>
+          <ul class="kps">
+            <li><span class="tag">1 · 2</span><span><b>怎么来的</b>——时代背景（世界／民族／国家／理论／党五个层面）＋"两个结合"</span></li>
+            <li><span class="tag">3</span><span><b>是什么</b>——完整科学体系 ＝ 十个明确 ＋ 十四个坚持 ＋ 十三个方面成就 ＋ 六个必须坚持</span></li>
+            <li><span class="tag">4</span><span><b>什么地位</b>——写入党章、载入宪法、当代中国马克思主义</span></li>
+            <li><span class="tag">5</span><span><b>为什么重要</b>——"两个确立"的决定性意义</span></li>
+          </ul>
+          <div class="note">
+            <p>导论和后面十七章<b>不是同一层次</b>的东西。后面十七章是"这个思想说了什么"，导论是"这个思想自身是什么"。所以导论看起来抽象——它本来就是元层面的。另外，知识点 3 里的<b>「十个明确」是全书的目录索引</b>，不是普通知识点，是打开整本书的钥匙。</p>
+          </div>
+        </article>
+
+        <article class="card card-zhu">
+          <div class="card-top">
+            <span class="card-ch">第一章</span>
+            <span class="card-title">新时代坚持和发展中国特色社会主义</span>
+            <span class="card-q">我们在哪？</span>
+          </div>
+          <p>回答"<strong>举什么旗、走什么路</strong>"。三层：</p>
+          <ul class="kps">
+            <li><span class="tag">6 · 7</span><span><b>旗帜姓什么</b>——是社会主义而不是其他什么主义 ＋ 四个自信</span></li>
+            <li><span class="tag">8 · 9</span><span><b>处在什么阶段</b>——新时代的科学内涵和意义 ＋ 一变两不变（主要矛盾变了，但初级阶段国情、最大发展中国家地位没变）</span></li>
+            <li><span class="tag">10</span><span><b>怎么走下去</b>——一以贯之坚持和发展：基本理论路线方略 ＋ 统筹五位一体、协调四个全面</span></li>
+          </ul>
+          <div class="note warn">
+            <div class="note-t">全书分水岭</div>
+            <p>知识点 10 里第一次完整抛出"五位一体 ＋ 四个全面"，而这正是后面十几章的目录生成器。<b>第一章末尾开始，教材从"讲方位"转入"讲布局的逐项展开"。</b></p>
+          </div>
+        </article>
+
+        <article class="card card-zhu">
+          <div class="card-top">
+            <span class="card-ch">第二章</span>
+            <span class="card-title">以中国式现代化全面推进中华民族伟大复兴</span>
+            <span class="card-q">要去哪？</span>
+          </div>
+          <p>本章篇幅最大（10 个知识点），因为它同时装了<strong>目标</strong>和<strong>路径</strong>两件事：</p>
+          <ul class="kps">
+            <li><span class="tag">11–13</span><span><b>目标线</b>——中国梦（国家富强·民族振兴·人民幸福）→ 全面建成小康社会（第一个百年已完成）→ 全面建设现代化强国（两步走）</span></li>
+            <li><span class="tag">14–17</span><span><b>路径线</b>——中国式现代化的由来 → 五个中国特色 → 本质要求（九条）→ 人类文明新形态</span></li>
+            <li><span class="tag">18–20</span><span><b>怎么推进</b>——五个重大原则 → 六对重大关系 → 团结奋斗</span></li>
+          </ul>
+          <div class="note">
+            <p>中国梦是<b>目标</b>，中国式现代化是<b>实现这个目标的路径</b>，二者不是并列概念。教材逻辑是"民族复兴（要什么）→ 以中国式现代化来推进（怎么要）"——<b>本章标题就是本章提纲</b>。</p>
+          </div>
+        </article>
+
+        <article class="card card-zhu">
+          <div class="card-top">
+            <span class="card-ch">第三章</span>
+            <span class="card-title">坚持党的全面领导</span>
+            <span class="card-q">谁来领导？</span>
+          </div>
+          <p>目标定了（第二章），接下来是实现目标的<strong>三个根本前提</strong>。三、四、五章彼此并列，谁先谁后不影响理解。</p>
+          <ul class="kps">
+            <li><span class="tag">21 · 22</span><span><b>为什么是党</b>——最本质特征、最大优势 ＋ 最高政治领导力量</span></li>
+            <li><span class="tag">23 · 24</span><span><b>怎么领导</b>——全面的、系统的、整体的 ＋ 维护党中央权威和集中统一领导</span></li>
+            <li><span class="tag">25</span><span><b>靠什么保证</b>——党的领导制度体系（六个方面制度）</span></li>
+          </ul>
+          <div class="note warn">
+            <div class="note-t">与第十七章配对复习</div>
+            <p>本章讲"党怎么领导国家"，第十七章讲"党怎么建设自己"。<b>两章合并复习，效率远高于分开背</b>——详见第 06 节。</p>
+          </div>
+        </article>
+
+        <article class="card card-zhu">
+          <div class="card-top">
+            <span class="card-ch">第四章</span>
+            <span class="card-title">坚持以人民为中心</span>
+            <span class="card-q">为了谁·靠谁？</span>
+          </div>
+          <ul class="kps">
+            <li><span class="tag">26–28</span><span><b>立场是什么</b>——守江山守的是人民的心 ＋ 人民立场是根本政治立场 ＋ 坚持人民至上</span></li>
+            <li><span class="tag">29</span><span><b>总纲</b>——全面落实以人民为中心的发展思想</span></li>
+            <li><span class="tag">30–32</span><span><b>三个子项</b>——群众路线（工作方法）· 办好办实（民生实事）· 共同富裕（发展成果）</span></li>
+          </ul>
+          <div class="note warn">
+            <div class="note-t">易看错</div>
+            <p>29 不是和 30–32 并列的第四条，而是 30、31、32 的<b>总标题</b>。复习资料里它们是平排编号，很容易看成四条并列，其实是"1 总 ＋ 3 分"。</p>
+          </div>
+        </article>
+
+        <article class="card card-zhu">
+          <div class="card-top">
+            <span class="card-ch">第五章</span>
+            <span class="card-title">全面深化改革开放</span>
+            <span class="card-q">靠什么动力？</span>
+          </div>
+          <ul class="kps">
+            <li><span class="tag">33</span><span><b>为什么改革</b>——关键一招、重要法宝、深刻革命</span></li>
+            <li><span class="tag">34</span><span><b>改什么</b>——统筹推进各领域改革；含总目标 ＝ 完善发展中国特色社会主义制度 ＋ 推进国家治理体系和治理能力现代化</span></li>
+            <li><span class="tag">35</span><span><b>改到什么时候</b>——永无止境</span></li>
+            <li><span class="tag">36</span><span><b>对外的一面</b>——高水平对外开放</span></li>
+          </ul>
+          <div class="note">
+            <p>改革开放在全书里的定位是<b>动力</b>。目标（二章）靠党领导（三章）、为人民（四章）、用改革开放这个动力（五章）来实现，三者缺一不可。</p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- 04 -->
+    <section class="sec" id="zhan">
+      <div class="sec-head">
+        <div class="sec-num">04</div>
+        <h2>展开段：五位一体的逐项落地</h2>
+        <p class="lead">从第六章开始教材换了写法：<strong>不再层层推进，而是平铺展开</strong>。这七章互相之间没有先后依赖，回答的是同一个问题的五个方面——<strong>目标怎么在各个领域具体建设？</strong></p>
+      </div>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>章</th><th>五位一体归属</th><th>本章在回答什么</th><th>知识点</th></tr></thead>
+          <tbody>
+            <tr class="r-qing"><td class="k">六</td><td>经济建设</td><td>经济怎么发展 —— 高质量发展</td><td class="num">37–46</td></tr>
+            <tr class="r-qing"><td class="k">七</td><td>（非五位一体）战略支撑</td><td>靠什么支撑发展 —— 教育·科技·人才</td><td class="num">47–52</td></tr>
+            <tr class="r-qing"><td class="k">八</td><td>政治建设 · 民主面</td><td>政治上人民怎么当家作主</td><td class="num">53–57</td></tr>
+            <tr class="r-qing"><td class="k">九</td><td>政治建设 · 法治面</td><td>政治上怎么依法治理</td><td class="num">58–62</td></tr>
+            <tr class="r-qing"><td class="k">十</td><td>文化建设</td><td>精神上靠什么立起来</td><td class="num">63–66</td></tr>
+            <tr class="r-qing"><td class="k">十一</td><td>社会建设</td><td>民生和社会治理怎么办</td><td class="num">67–69</td></tr>
+            <tr class="r-qing"><td class="k">十二</td><td>生态文明建设</td><td>人和自然怎么相处</td><td class="num">70–72</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>三处最容易看错的结构</h3>
+
+      <div class="note warn">
+        <div class="note-t">其一 · 第七章不属于五位一体</div>
+        <p>这是全书归属最容易混淆的一章。教育、科技、人才是二十大提出的<b>"基础性、战略性支撑"</b>，不是第六个建设领域，而是<b>横向服务于第六章的高质量发展</b>——知识点 47 一上来就讲三者的辩证关系："教育是根本、科技是关键、人才是基础"。所以它插在第六章后面，不是并列的第六项。<b>客观题很爱考这个定位。</b></p>
+      </div>
+
+      <div class="note warn">
+        <div class="note-t">其二 · 八章 ＋ 九章合起来才是"政治建设"</div>
+        <p>民主（八）和法治（九）是政治建设的两面：八章讲"人民怎么当家作主"（全过程人民民主 ＋ 人民当家作主的制度体系），九章讲"国家怎么依法治理"（法治道路 ＋ 法治体系 ＋ 法治中国）。把它们看成一章的两半，就不会觉得政治建设"多占了一章"。</p>
+      </div>
+
+      <div class="note warn">
+        <div class="note-t">其三 · 第六章 10 个知识点，内部还有分层</div>
+        <p>记成<b>"理念 → 制度 → 格局"</b>三层，比背 10 个平排条目省力得多：</p>
+        <ul class="kps">
+          <li><span class="tag">37–39</span><span><b>理念层</b>——新发展理念（创新协调绿色开放共享）及其与高质量发展的关系</span></li>
+          <li><span class="tag">40–44</span><span><b>制度层</b>——社会主义基本经济制度：公有制为主体 ＋ 按劳分配为主体 ＋ 社会主义市场经济，"两个毫不动摇"</span></li>
+          <li><span class="tag">45 · 46</span><span><b>格局层</b>——新发展格局（国内大循环为主体、双循环相互促进）＋ 现代化经济体系</span></li>
+        </ul>
+      </div>
+
+      <div class="note">
+        <div class="note-t">各章内部的共同套路</div>
+        <p>展开段这七章几乎都是同一个三段式写法，认出来以后每章都好读：<br><b>① 为什么重要（地位定性）→ ② 走什么道路 / 坚持什么原则 → ③ 具体怎么建设</b></p>
+        <p>比如第十章：63（文化繁荣兴盛是必然要求 ＝ 为什么）→ 64、65（意识形态、核心价值观 ＝ 走什么路）→ 66（铸就文化新辉煌 ＝ 怎么建）。第九章、第十二章也是同一结构。</p>
+      </div>
+    </section>
+
+    <!-- 05 -->
+    <section class="sec" id="bao">
+      <div class="sec-head">
+        <div class="sec-num">05</div>
+        <h2>保障段：不是"建设内容"，是"条件与环境"</h2>
+        <p class="lead">这四章和前面七章<strong>性质不同</strong>。前面是"要建成什么"，这四章是"建设要有什么条件"。它们也彼此并列，可再分成向内、向外两组。</p>
+      </div>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>章</th><th>内容</th><th>性质</th></tr></thead>
+          <tbody>
+            <tr class="r-dai"><td class="k">十三</td><td>维护和塑造国家安全（总体国家安全观、"十个坚持"）</td><td>向内 · 发展的底线条件</td></tr>
+            <tr class="r-dai"><td class="k">十四</td><td>巩固国防和强大人民军队（强军目标、"十一个明确"）</td><td>向内 · 安全的武力后盾</td></tr>
+            <tr class="r-dai"><td class="k">十五</td><td>一国两制与祖国完全统一</td><td>向外 · 国家的完整性</td></tr>
+            <tr class="r-dai"><td class="k">十六</td><td>大国外交与人类命运共同体（"十个坚持"）</td><td>向外 · 发展的外部环境</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <div class="note-t">考纲提示</div>
+        <p>按你资料的说明，<b>十三章及以后每一章出一个客观题</b>，所以复习文档对这几章只给了"客观题部分"。目标是<b>认得住那几组数字口诀</b>，不必按简答题的深度去啃。</p>
+      </div>
+
+      <div class="note warn">
+        <div class="note-t">客观题陷阱 · 三组同名不同物</div>
+        <p><b>十三章</b>＝国家安全的"十个坚持"　·　<b>十六章</b>＝外交的"十个坚持"　·　<b>十七章</b>＝党建的"十三个坚持"。另有<b>十四章</b>＝强军的"十一个明确"。名字撞车，内容完全不同，是最常见的失分点。</p>
+      </div>
+    </section>
+
+    <!-- 06 -->
+    <section class="sec" id="shou">
+      <div class="sec-head">
+        <div class="sec-num">06</div>
+        <h2>收束：全书最重要的一处呼应</h2>
+        <p class="lead">第十七章不是"再加一个领域"，而是<strong>回到起点，把圈闭上</strong>。</p>
+      </div>
+
+      <div class="echo">
+        <div class="echo-row">
+          <div class="echo-box">第三章 · 坚持党的全面领导</div>
+          <p class="echo-cap">对外：党怎么<strong>领导国家</strong>——领导一切工作</p>
+        </div>
+        <svg width="30" height="76" viewBox="0 0 30 76" aria-hidden="true">
+          <path class="ln" d="M15 2 L15 74"/>
+          <path class="ar" d="M15 74 l-4.5 -7 h9 z"/>
+          <path class="ar" d="M15 2 l-4.5 7 h9 z"/>
+        </svg>
+        <div class="echo-mid">一体两面</div>
+        <svg width="30" height="76" viewBox="0 0 30 76" aria-hidden="true">
+          <path class="ln" d="M15 2 L15 74"/>
+          <path class="ar" d="M15 74 l-4.5 -7 h9 z"/>
+          <path class="ar" d="M15 2 l-4.5 7 h9 z"/>
+        </svg>
+        <div class="echo-row">
+          <div class="echo-box">第十七章 · 全面从严治党</div>
+          <p class="echo-cap">对内：党怎么<strong>建设自己</strong>——自我革命</p>
+        </div>
+      </div>
+
+      <p>第三章说"党领导一切"，那就必然要回答：<strong>凭什么资格领导？</strong>第十七章的答案是——<strong>打铁必须自身硬</strong>：以党的自我革命引领社会革命，"让人民来监督政府、勇于自我革命"是跳出历史周期率的两个答案。</p>
+
+      <div class="note warn">
+        <div class="note-t">复习策略</div>
+        <p>理解了这个呼应，第十七章的"十三个坚持"就不是凭空出现的一串条目，而是第三章那个问题的完整回答。<b>第三章和第十七章应该放在一起复习。</b></p>
+      </div>
+    </section>
+
+    <!-- 07 -->
+    <section class="sec" id="ming">
+      <div class="sec-head">
+        <div class="sec-num">07</div>
+        <h2>另一张地图：「十个明确」就是全书目录</h2>
+        <p class="lead">导论知识点 3 里的"十个明确"，是这一思想的<strong>主体内容和四梁八柱</strong>。它几乎和教材章节一一对应——<strong>背"十个明确"等于过一遍全书目录，反过来也成立。</strong></p>
+      </div>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>明确</th><th>内容要旨</th><th>对应章节</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>党的领导是最本质特征、最大优势、最高政治领导力量</td><td class="k">第三章</td></tr>
+            <tr><td class="num">2</td><td>总任务是社会主义现代化和民族复兴，分两步走</td><td class="k">第二章</td></tr>
+            <tr><td class="num">3</td><td>主要矛盾 ＋ 以人民为中心 ＋ 全过程人民民主 ＋ 共同富裕</td><td class="k">第一章 ＋ 第四章 ＋ 第八章</td></tr>
+            <tr><td class="num">4</td><td>总体布局五位一体，战略布局四个全面</td><td class="k">第六~十二章的总纲</td></tr>
+            <tr><td class="num">5</td><td>全面深化改革总目标</td><td class="k">第五章</td></tr>
+            <tr><td class="num">6</td><td>全面依法治国总目标</td><td class="k">第九章</td></tr>
+            <tr><td class="num">7</td><td>基本经济制度、新发展理念、新发展格局、高质量发展、统筹发展和安全</td><td class="k">第六章（＋十三章）</td></tr>
+            <tr><td class="num">8</td><td>强军目标</td><td class="k">第十四章</td></tr>
+            <tr><td class="num">9</td><td>中国特色大国外交、人类命运共同体</td><td class="k">第十六章</td></tr>
+            <tr><td class="num">10</td><td>全面从严治党、新时代党的建设总要求</td><td class="k">第十七章</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <p>十个明确没有单独覆盖到的，只有第七章（教科人才，二十大后新增）、第十章（文化）、第十一章（社会）、第十二章（生态）、第十五章（统一）——而这几章恰好由"五位一体"（十、十一、十二）和"十四个坚持"（第 12 条一国两制、第 7 条核心价值体系、第 8 条改善民生、第 9 条人与自然）补齐。</p>
+        <p><b>"十个明确"偏理论定性，"十四个坚持"偏工作方略</b>，两者叠加正好盖满全书——这也是导论知识点 3 说它们"构成完整科学体系"的实际含义。</p>
+      </div>
+    </section>
+
+    <!-- 08 -->
+    <section class="sec" id="order">
+      <div class="sec-head">
+        <div class="sec-num">08</div>
+        <h2>复习顺序建议</h2>
+        <p class="lead">不建议从头到尾线性背。按结构走，效率高得多。</p>
+      </div>
+
+      <ol class="steps">
+        <li><span><b>先立骨架（半小时）</b>——把第 02 节那张骨架图和"五位一体／四个全面 → 章节"两张对应表弄熟。骨架立住，后面所有内容都有地方挂。</span></li>
+        <li><span><b>再吃总纲段</b>（导论 + 一~五章）——这一段是递进的，<b>必须顺着读</b>，跳读会断链。而且简答题、材料题的重灾区就在这五章（资料里前言 1 和附录列的真题绝大多数落在这里）。</span></li>
+        <li><span><b>然后按领域扫展开段</b>（六~十二章）——并列的，可按薄弱程度调整顺序。每章先认出"为什么 → 走什么路 → 怎么建"这个三段式，再填内容。</span></li>
+        <li><span><b>第三章 ＋ 第十七章合并复习</b>——利用首尾呼应，一次搞定两章。</span></li>
+        <li><span><b>最后过保障段</b>（十三~十六章）——只是客观题，主攻那几组数字口诀，重点是别把三组"坚持"混起来。</span></li>
+      </ol>
+    </section>
+
+    <!-- 09 -->
+    <section class="sec" id="idx">
+      <div class="sec-head">
+        <div class="sec-num">09</div>
+        <h2>速查总表</h2>
+        <p class="lead">章节、知识点编号、在全书中的角色，一屏对齐。</p>
+      </div>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>章</th><th>标题</th><th>知识点</th><th>在全书中的角色</th></tr></thead>
+          <tbody>
+            <tr class="r-zhu"><td class="k">导论</td><td>习近平新时代中国特色社会主义思想</td><td class="num">1–5</td><td>元层面：理论本身</td></tr>
+            <tr class="r-zhu"><td class="k">一</td><td>新时代坚持和发展中国特色社会主义</td><td class="num">6–10</td><td>我们在哪（方位）</td></tr>
+            <tr class="r-zhu"><td class="k">二</td><td>以中国式现代化全面推进中华民族伟大复兴</td><td class="num">11–20</td><td>要去哪（目标·路径）</td></tr>
+            <tr class="r-zhu"><td class="k">三</td><td>坚持党的全面领导</td><td class="num">21–25</td><td>谁来领导 ◎</td></tr>
+            <tr class="r-zhu"><td class="k">四</td><td>坚持以人民为中心</td><td class="num">26–32</td><td>为了谁·依靠谁</td></tr>
+            <tr class="r-zhu"><td class="k">五</td><td>全面深化改革开放</td><td class="num">33–36</td><td>靠什么动力</td></tr>
+            <tr class="r-qing"><td class="k">六</td><td>推动高质量发展</td><td class="num">37–46</td><td>经济建设</td></tr>
+            <tr class="r-qing"><td class="k">七</td><td>社会主义现代化建设的教育、科技、人才战略</td><td class="num">47–52</td><td>战略支撑（非五位一体）</td></tr>
+            <tr class="r-qing"><td class="k">八</td><td>发展全过程人民民主</td><td class="num">53–57</td><td>政治建设 · 民主</td></tr>
+            <tr class="r-qing"><td class="k">九</td><td>全面依法治国</td><td class="num">58–62</td><td>政治建设 · 法治</td></tr>
+            <tr class="r-qing"><td class="k">十</td><td>建设社会主义文化强国</td><td class="num">63–66</td><td>文化建设</td></tr>
+            <tr class="r-qing"><td class="k">十一</td><td>以保障和改善民生为重点加强社会建设</td><td class="num">67–69</td><td>社会建设</td></tr>
+            <tr class="r-qing"><td class="k">十二</td><td>建设社会主义生态文明</td><td class="num">70–72</td><td>生态文明建设</td></tr>
+            <tr class="r-dai"><td class="k">十三</td><td>维护和塑造国家安全</td><td class="num">客观题</td><td>保障 · 向内</td></tr>
+            <tr class="r-dai"><td class="k">十四</td><td>巩固建设国防和强大人民军队</td><td class="num">客观题</td><td>保障 · 向内</td></tr>
+            <tr class="r-dai"><td class="k">十五</td><td>坚持"一国两制"和推进祖国完全统一</td><td class="num">客观题</td><td>保障 · 向外</td></tr>
+            <tr class="r-dai"><td class="k">十六</td><td>中国特色大国外交和推动构建人类命运共同体</td><td class="num">客观题</td><td>保障 · 向外</td></tr>
+            <tr class="r-zhu"><td class="k">十七</td><td>全面从严治党</td><td class="num">客观题</td><td>收束 · 呼应第三章 ◎</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    据《习思想 2026-6-15 修订》复习文档（导论 + 第 1–12 章共 72 个编号知识点，第 13–17 章仅客观题要点）梳理。<br>
+    本页只讲结构与章际关系，不复述知识点内容——具体条目请回原文档对照编号查阅。
+  </footer>
+
+</div>
